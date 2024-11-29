@@ -1659,10 +1659,6 @@ PODS:
     - ReactCommon/turbomodule/core
     - Yoga
   - SocketRocket (0.7.0)
-  - VisionCamera (3.9.2):
-    - React
-    - React-callinvoker
-    - React-Core
   - Yoga (0.0.0)
 
 DEPENDENCIES:
@@ -1738,7 +1734,6 @@ DEPENDENCIES:
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
   - RNReanimated (from `../node_modules/react-native-reanimated`)
   - RNScreens (from `../node_modules/react-native-screens`)
-  - VisionCamera (from `../node_modules/react-native-vision-camera`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
@@ -1887,8 +1882,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-reanimated"
   RNScreens:
     :path: "../node_modules/react-native-screens"
-  VisionCamera:
-    :path: "../node_modules/react-native-vision-camera"
   Yoga:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
@@ -1964,7 +1957,6 @@ SPEC CHECKSUMS:
   RNReanimated: 83a2baa5f4dc44ace7b5296ea1f3533d998dfb69
   RNScreens: c7ceced6a8384cb9be5e7a5e88e9e714401fd958
   SocketRocket: abac6f5de4d4d62d24e11868d7a2f427e0ef940d
-  VisionCamera: 36c460338692788a0d377dce7d32f8ba049fb4f2
   Yoga: 055f92ad73f8c8600a93f0e25ac0b2344c3b07e6
 
 PODFILE CHECKSUM: 44a2e01c99dc13f1ddd8a4a92a0d4371363158ee
