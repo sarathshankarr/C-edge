@@ -553,6 +553,13 @@ const ConfirmPassword = ({ navigation, route, ...props }) => {
                 )}
 
               </TouchableOpacity>
+
+
+              <View style={{justifyContent: 'flex-end', flex: 1, marginVertical: 10}}>
+          <Text style={{textAlign: 'center', color: '#000', marginBottom: 5}}>
+            All rights with Codeverse Technologies
+          </Text>
+        </View>
         
 
 

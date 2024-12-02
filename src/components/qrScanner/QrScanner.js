@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View, Alert } from "react-native";
-// import {
-//   Camera,
-//   useCameraDevice,
-//   useCodeScanner,
-// } from "react-native-vision-camera";
+import {
+  Camera,
+  useCameraDevice,
+  useCodeScanner,
+} from "react-native-vision-camera";
 
 const QRScanner = (props) => {
   const [hasPermission, setHasPermission] = useState(false);

@@ -410,6 +410,12 @@ const MailConfirmation = ({ navigation, route, }) => {
           <Text style={styles.loginBtnText}>{Constant.GET_OTP_BTN_LABEL}</Text>
         </TouchableOpacity>
 
+        <View style={{justifyContent: 'flex-end', flex: 1, marginVertical: 10}}>
+          <Text style={{textAlign: 'center', color: '#000', marginBottom: 5}}>
+            All rights with Codeverse Technologies
+          </Text>
+        </View>
+
              {isPopUp ? (
             <View style={CommonStyles.customPopUpStyle}>
               <AlertComponent

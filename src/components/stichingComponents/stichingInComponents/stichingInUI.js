@@ -20,7 +20,7 @@ const StichingInUI = ({route, ...props }) => {
     if(props.itemsArray){
       set_filterArray(props.itemsArray);
     }
-    console.log("itemsArray from Props ==> ", props?.itemsArray)
+    // console.log("itemsArray from Props ==> ", props?.itemsArray)
   }, [props.itemsArray]);
 
   const backBtnAction = () => {

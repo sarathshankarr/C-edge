@@ -9,7 +9,7 @@ const Production = ({ navigation }) => {
     { id: 2, name: 'Stitching In', component: 'StichingInComponent', image: require('../../../../assets/images/png/stitch.png') },
     { id: 3, name: 'Finishing In', component: 'FinishingStyleComponent', image: require('../../../../assets/images/png/finishingg.png') },
     { id: 4, name: 'Fabric Process In', component: 'FabricProcessInList', image: require('../../../../assets/images/png/fabric.png') },
-    // { id: 5, name: 'Create In ', component: 'CreateInProcess', image: require('../../../../assets/images/png/cut.png') },
+    { id: 5, name: 'Gate Pass Acknowledgement', component: 'GatePassAckList', image: require('../../../../assets/images/png/growth.png') },
   ];
 
   const outwardProcess = [   

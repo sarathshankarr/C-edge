@@ -9,6 +9,8 @@ import {
   TextInput,
   Alert,
   Button,
+  ActivityIndicator,
+  RefreshControl,
 } from 'react-native';
 import {
   heightPercentageToDP as hp,
@@ -20,13 +22,17 @@ import LoaderComponent from '../../../utils/commonComponents/loaderComponent';
 import * as Constant from '../../../utils/constants/constant';
 import AlertComponent from '../../../utils/commonComponents/alertComponent';
 import color from '../../../utils/commonStyles/color';
+import FilterModal from '../../../utils/commonComponents/FilterModal';
 let searchImg = require('./../../../../assets/images/png/searchIcon.png');
 
 const FabricProcessInListUI = ({route, navigation, ...props}) => {
   const [isListOpen, set_ListOpen] = useState(false);
+  const [refreshing, set_refreshing] = useState(false);
   const [filterArray, set_filterArray] = useState([]);
   const [ItemsArray, set_ItemsArray] = useState([]);
   const [recName, set_recName] = useState(undefined);
+  const [isFilterVisible, setFilterVisible] = useState(false);
+
   let isKeyboard = useRef(false);
 
   React.useEffect(() => {
@@ -44,6 +50,8 @@ const FabricProcessInListUI = ({route, navigation, ...props}) => {
   const popOkBtnAction = () => {
     props.popOkBtnAction();
   };
+
+  
 
   // const filterPets = name => {
   //   const styleArray = filterArray.filter(item => {
@@ -97,6 +105,15 @@ const FabricProcessInListUI = ({route, navigation, ...props}) => {
     // Alert.alert('Clicked the PDF Icon of :', );
   };
 
+  const fetchMore=()=>{
+    props.fetchMore(true);
+  }
+
+  const onRefresh = () => {
+    set_refreshing(true);
+    props.fetchMore(false); 
+    set_refreshing(false);
+  };
 
 
   const createPage = () => {
@@ -201,7 +218,7 @@ const FabricProcessInListUI = ({route, navigation, ...props}) => {
                   style={{height: 15, width: 15, marginLeft: 15}}
                 />
                 <TextInput
-                   style={[styles.input, Platform.OS === 'ios' && styles.iosPadding]}
+                  style={{color:'#000'}}
                   underlineColorAndroid="transparent"
                   placeholder="Search "
                   placeholderTextColor="#7F7F81"
@@ -260,6 +277,12 @@ const FabricProcessInListUI = ({route, navigation, ...props}) => {
               renderItem={renderItem}
               keyExtractor={(item, index) => '' + index}
               showsVerticalScrollIndicator={false}
+              onEndReached={() => fetchMore()}
+              onEndReachedThreshold={0.2}
+              ListFooterComponent={() => props.isLoading && <ActivityIndicator size="large" />}
+              refreshControl={
+                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+              }
             />
           ) : (
             <View style={CommonStyles.noRecordsFoundStyle}>
@@ -273,6 +296,15 @@ const FabricProcessInListUI = ({route, navigation, ...props}) => {
           )}
         </View>
       </View>
+
+      <View style={styles.container}>
+      <Button title="Open Filter" onPress={() => setFilterVisible(true)} />
+      <FilterModal
+        isVisible={isFilterVisible}
+        onClose={() => setFilterVisible(false)}
+      />
+    </View>
+
       {props.isPopUp ? (
         <View style={CommonStyles.customPopUpStyle}>
           <AlertComponent
@@ -288,7 +320,7 @@ const FabricProcessInListUI = ({route, navigation, ...props}) => {
         </View>
       ) : null}
 
-      {props.isLoading === true ? (
+      {props.MainLoading === true ? (
         <LoaderComponent
           isLoader={true}
           loaderText={Constant.LOADER_MESSAGE}
@@ -302,6 +334,12 @@ const FabricProcessInListUI = ({route, navigation, ...props}) => {
 export default FabricProcessInListUI;
 
 const styles = StyleSheet.create({
+
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   leftBtnTextStyle: {
     color: 'white',
     fontSize: fonts.fontMedium,
@@ -317,11 +355,5 @@ const styles = StyleSheet.create({
     borderRadius: hp('0.5%'),
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  input: {
-    color: '#000',
-  },
-  iosPadding: {
-    paddingVertical: 18,
   },
 });

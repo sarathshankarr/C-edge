@@ -165,7 +165,6 @@ const LoginComponent = ({ navigation, route, ...props }) => {
       } else {
         popUpAction(Constant.LOGIN_FAIL_MSG, Constant.DefaultAlert_MSG, 'OK', true, false);
       }
-
     } catch (error) {
       console.log('handleLogin Error ', error);
       popUpAction(Constant.SERVICE_FAIL_MSG, Constant.DefaultAlert_MSG, 'OK', true, false);
