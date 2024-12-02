@@ -1142,6 +1142,9 @@ const styles = StyleSheet.create({
     width: '98%',
     backgroundColor: '#fff',
     borderRadius: 10,
+    borderColor: 'lightgray', // Optional: Adds subtle border (for effect)
+    borderWidth: 1,
+    marginTop:3
   },
   noCategoriesText: {
     textAlign: 'center',

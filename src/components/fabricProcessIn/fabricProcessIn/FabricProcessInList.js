@@ -210,9 +210,14 @@ const handlePdf = async (item) => {
 
       const downloadFolder = Platform.OS === 'android' ? ReactNativeBlobUtil.fs.dirs.DownloadDir : ''; 
       // const pdfPath = `${downloadFolder}/${item.so_style_id}.pdf`;
-      const pdfPath = `/storage/emulated/0/Download/${item.so_style_id}_${Date.now()}.pdf`;
+      // const pdfPath = `/storage/emulated/0/Download/${item.so_style_id}_${Date.now()}.pdf`;
 
-      
+      const pdfPath =
+        Platform.OS === 'android'
+          ? `/storage/emulated/0/Download/${item.so_style_id}_${Date.now()}.pdf`
+          : `${ReactNativeBlobUtil.fs.dirs.DocumentDir}/item.so_style_id}_${Date.now()}.pdf`;
+  
+
       await ReactNativeBlobUtil.fs.writeFile(pdfPath, base64Data, 'base64');
 
       // Alert.alert('PDF Downloaded', `PDF saved successfully at ${pdfPath}`);
@@ -269,7 +274,12 @@ const handleScan = async (item) => {
       }
 
 
-      const pdfPath = `/storage/emulated/0/Download/${item.so_style_id}.pdf`;
+      // const pdfPath = `/storage/emulated/0/Download/${item.so_style_id}.pdf`;
+
+      const pdfPath =
+      Platform.OS === 'android'
+        ? `/storage/emulated/0/Download/${item.so_style_id}_${Date.now()}.pdf`
+        : `${ReactNativeBlobUtil.fs.dirs.DocumentDir}/item.so_style_id}_${Date.now()}.pdf`;
 
 
       await ReactNativeBlobUtil.fs.writeFile(pdfPath, base64Data, 'base64');

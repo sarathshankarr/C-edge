@@ -246,8 +246,10 @@ const StockRequestEditUi = ({ route, ...props }) => {
                 numberOfLines={2}
                 value={remarks}
                 onChangeText={(text) => set_remarks(text)}
-                style={{ color: 'black' }}
-              />
+                style={[
+                  styles.input,
+                  Platform.OS === 'ios' && { paddingVertical: 10 }, // Apply padding only for iOS
+                ]}              />
             </View>
           </View>
           <View style={styles.wrapper}>
@@ -538,7 +540,9 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
     paddingHorizontal: 5,
     textAlign:'center'
-  }
-  
+  },
+  input:{
+    color:"black"
+},
 
 })
