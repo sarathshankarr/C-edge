@@ -12,9 +12,9 @@
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		682C483833ED97ED5897EE20 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 3B0057DE3A70699A213D2862 /* PrivacyInfo.xcprivacy */; };
-		79155AF9A55168C9180610C0 /* libPods-ERP-ERPTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4F54F5C6F2485D1E10A574F1 /* libPods-ERP-ERPTests.a */; };
+		77A35436F0DA2A8269DEE049 /* libPods-ERP.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2407C4DE258755EEAE3EF578 /* libPods-ERP.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
-		F119CFF0595ABAB1D2E88314 /* libPods-ERP.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F959247FF5DBBD756C5CFAD0 /* libPods-ERP.a */; };
+		F82155FC8985DB9B85C8F14B /* libPods-ERP-ERPTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DCC747C21444AD7EA7B5D687 /* libPods-ERP-ERPTests.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -38,15 +38,15 @@
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = ERP/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = ERP/main.m; sourceTree = "<group>"; };
 		13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = ERP/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		2407C4DE258755EEAE3EF578 /* libPods-ERP.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ERP.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3B0057DE3A70699A213D2862 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = ERP/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		473F82214266B17306DCABBC /* Pods-ERP-ERPTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ERP-ERPTests.release.xcconfig"; path = "Target Support Files/Pods-ERP-ERPTests/Pods-ERP-ERPTests.release.xcconfig"; sourceTree = "<group>"; };
-		4F54F5C6F2485D1E10A574F1 /* libPods-ERP-ERPTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ERP-ERPTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		4F9194E0822D09F253E0D1E4 /* Pods-ERP.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ERP.debug.xcconfig"; path = "Target Support Files/Pods-ERP/Pods-ERP.debug.xcconfig"; sourceTree = "<group>"; };
-		54A76907A26179CDFAEC3B20 /* Pods-ERP-ERPTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ERP-ERPTests.debug.xcconfig"; path = "Target Support Files/Pods-ERP-ERPTests/Pods-ERP-ERPTests.debug.xcconfig"; sourceTree = "<group>"; };
-		7F73E2547C1C518F0D37CB2A /* Pods-ERP.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ERP.release.xcconfig"; path = "Target Support Files/Pods-ERP/Pods-ERP.release.xcconfig"; sourceTree = "<group>"; };
+		4E84AD46CB756B8D873EAC6F /* Pods-ERP.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ERP.debug.xcconfig"; path = "Target Support Files/Pods-ERP/Pods-ERP.debug.xcconfig"; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = ERP/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		8CCDD8C4B85B6D9692D85B9A /* Pods-ERP-ERPTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ERP-ERPTests.release.xcconfig"; path = "Target Support Files/Pods-ERP-ERPTests/Pods-ERP-ERPTests.release.xcconfig"; sourceTree = "<group>"; };
+		9DFD6374E3941FFFD8C45EC7 /* Pods-ERP-ERPTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ERP-ERPTests.debug.xcconfig"; path = "Target Support Files/Pods-ERP-ERPTests/Pods-ERP-ERPTests.debug.xcconfig"; sourceTree = "<group>"; };
+		B7FE5700002E819BA2E9559A /* Pods-ERP.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ERP.release.xcconfig"; path = "Target Support Files/Pods-ERP/Pods-ERP.release.xcconfig"; sourceTree = "<group>"; };
+		DCC747C21444AD7EA7B5D687 /* libPods-ERP-ERPTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ERP-ERPTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
-		F959247FF5DBBD756C5CFAD0 /* libPods-ERP.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-ERP.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -54,7 +54,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				79155AF9A55168C9180610C0 /* libPods-ERP-ERPTests.a in Frameworks */,
+				F82155FC8985DB9B85C8F14B /* libPods-ERP-ERPTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -62,7 +62,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F119CFF0595ABAB1D2E88314 /* libPods-ERP.a in Frameworks */,
+				77A35436F0DA2A8269DEE049 /* libPods-ERP.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -105,8 +105,8 @@
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				F959247FF5DBBD756C5CFAD0 /* libPods-ERP.a */,
-				4F54F5C6F2485D1E10A574F1 /* libPods-ERP-ERPTests.a */,
+				2407C4DE258755EEAE3EF578 /* libPods-ERP.a */,
+				DCC747C21444AD7EA7B5D687 /* libPods-ERP-ERPTests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -145,10 +145,10 @@
 		BBD78D7AC51CEA395F1C20DB /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				4F9194E0822D09F253E0D1E4 /* Pods-ERP.debug.xcconfig */,
-				7F73E2547C1C518F0D37CB2A /* Pods-ERP.release.xcconfig */,
-				54A76907A26179CDFAEC3B20 /* Pods-ERP-ERPTests.debug.xcconfig */,
-				473F82214266B17306DCABBC /* Pods-ERP-ERPTests.release.xcconfig */,
+				4E84AD46CB756B8D873EAC6F /* Pods-ERP.debug.xcconfig */,
+				B7FE5700002E819BA2E9559A /* Pods-ERP.release.xcconfig */,
+				9DFD6374E3941FFFD8C45EC7 /* Pods-ERP-ERPTests.debug.xcconfig */,
+				8CCDD8C4B85B6D9692D85B9A /* Pods-ERP-ERPTests.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -160,12 +160,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "ERPTests" */;
 			buildPhases = (
-				FC397A4A47DDEBC7127B1C6F /* [CP] Check Pods Manifest.lock */,
+				4015E229BA74A586F9B97EA8 /* [CP] Check Pods Manifest.lock */,
 				00E356EA1AD99517003FC87E /* Sources */,
 				00E356EB1AD99517003FC87E /* Frameworks */,
 				00E356EC1AD99517003FC87E /* Resources */,
-				FCBABF523CA7AA352322FE27 /* [CP] Embed Pods Frameworks */,
-				99AFF095B669E2BAD198FAAB /* [CP] Copy Pods Resources */,
+				7F6DD661773242EA8BEAC30B /* [CP] Embed Pods Frameworks */,
+				AA7A8841CDFFB143EFBB4C44 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -181,13 +181,13 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "ERP" */;
 			buildPhases = (
-				A045A42784D5232212FBF7CD /* [CP] Check Pods Manifest.lock */,
+				3299059C397AF8C209E68A71 /* [CP] Check Pods Manifest.lock */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
-				E24D0F6222B1A687CC1F1CAA /* [CP] Embed Pods Frameworks */,
-				AB3DF995CF90DE5C19548402 /* [CP] Copy Pods Resources */,
+				7FA40FA0CD1382E0205253F6 /* [CP] Embed Pods Frameworks */,
+				1A856FB179C0D91528A038B1 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -271,24 +271,24 @@
 			shellPath = /bin/sh;
 			shellScript = "set -e\n\nWITH_ENVIRONMENT=\"$REACT_NATIVE_PATH/scripts/xcode/with-environment.sh\"\nREACT_NATIVE_XCODE=\"$REACT_NATIVE_PATH/scripts/react-native-xcode.sh\"\n\n/bin/sh -c \"$WITH_ENVIRONMENT $REACT_NATIVE_XCODE\"\n";
 		};
-		99AFF095B669E2BAD198FAAB /* [CP] Copy Pods Resources */ = {
+		1A856FB179C0D91528A038B1 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-ERP-ERPTests/Pods-ERP-ERPTests-resources-${CONFIGURATION}-input-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-ERP/Pods-ERP-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-ERP-ERPTests/Pods-ERP-ERPTests-resources-${CONFIGURATION}-output-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-ERP/Pods-ERP-resources-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ERP-ERPTests/Pods-ERP-ERPTests-resources.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ERP/Pods-ERP-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		A045A42784D5232212FBF7CD /* [CP] Check Pods Manifest.lock */ = {
+		3299059C397AF8C209E68A71 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -310,41 +310,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		AB3DF995CF90DE5C19548402 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-ERP/Pods-ERP-resources-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-ERP/Pods-ERP-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ERP/Pods-ERP-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		E24D0F6222B1A687CC1F1CAA /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-ERP/Pods-ERP-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-ERP/Pods-ERP-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ERP/Pods-ERP-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		FC397A4A47DDEBC7127B1C6F /* [CP] Check Pods Manifest.lock */ = {
+		4015E229BA74A586F9B97EA8 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -366,7 +332,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		FCBABF523CA7AA352322FE27 /* [CP] Embed Pods Frameworks */ = {
+		7F6DD661773242EA8BEAC30B /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -381,6 +347,40 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ERP-ERPTests/Pods-ERP-ERPTests-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		7FA40FA0CD1382E0205253F6 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-ERP/Pods-ERP-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-ERP/Pods-ERP-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ERP/Pods-ERP-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		AA7A8841CDFFB143EFBB4C44 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-ERP-ERPTests/Pods-ERP-ERPTests-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-ERP-ERPTests/Pods-ERP-ERPTests-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ERP-ERPTests/Pods-ERP-ERPTests-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -416,7 +416,7 @@
 /* Begin XCBuildConfiguration section */
 		00E356F61AD99517003FC87E /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 54A76907A26179CDFAEC3B20 /* Pods-ERP-ERPTests.debug.xcconfig */;
+			baseConfigurationReference = 9DFD6374E3941FFFD8C45EC7 /* Pods-ERP-ERPTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -443,7 +443,7 @@
 		};
 		00E356F71AD99517003FC87E /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 473F82214266B17306DCABBC /* Pods-ERP-ERPTests.release.xcconfig */;
+			baseConfigurationReference = 8CCDD8C4B85B6D9692D85B9A /* Pods-ERP-ERPTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
@@ -467,7 +467,7 @@
 		};
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 4F9194E0822D09F253E0D1E4 /* Pods-ERP.debug.xcconfig */;
+			baseConfigurationReference = 4E84AD46CB756B8D873EAC6F /* Pods-ERP.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -494,7 +494,7 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 7F73E2547C1C518F0D37CB2A /* Pods-ERP.release.xcconfig */;
+			baseConfigurationReference = B7FE5700002E819BA2E9559A /* Pods-ERP.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
