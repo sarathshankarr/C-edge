@@ -54,10 +54,7 @@ const FabricProcessInList = ({ route }) => {
     }
   }
 
-{/* <option value="-1">Select</option>                                
- -->                             <option value="batchNo">BatchNo</option>
-                                <option value="orderNo">Order No</option>
-                                <option value="designName">Design No</option> */}
+
 
   const getInitialData = async (page = 0, reload = false) => {
     
@@ -109,6 +106,45 @@ const FabricProcessInList = ({ route }) => {
       set_MainLoading(false);
     }
     
+
+  };
+
+  const getFilteredList = async (types, Ids) => {
+
+    let userName = await AsyncStorage.getItem('userName');
+    let userPsd = await AsyncStorage.getItem('userPsd');
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+
+    set_isLoading(true);
+    let obj =  {
+      "username": userName,
+       "password": userPsd,
+       "menuId": 587,
+       "fromRecord": 0,
+       "toRecord": 25,
+       "searchKeyValue": "",
+       "styleSearchDropdown": "-1",
+       "categoryType" : types,
+       "categoryIds" : Ids
+     }
+
+  
+    let stichingOutAPIObj = await APIServiceCall.getFilteredListFBI(obj);
+    set_isLoading(false);
+    
+    if(stichingOutAPIObj && stichingOutAPIObj.statusData){
+
+      if(stichingOutAPIObj && stichingOutAPIObj.responseData){
+        set_itemsArray(stichingOutAPIObj.responseData)
+      } 
+
+    } else {
+      popUpAction(Constant.SERVICE_FAIL_MSG,Constant.DefaultAlert_MSG,'OK', true,false);
+    }
+
+    if(stichingOutAPIObj && stichingOutAPIObj.error) {
+      popUpAction(Constant.SERVICE_FAIL_MSG,Constant.DefaultAlert_MSG,'OK', true,false)
+    }
 
   };
 
@@ -210,14 +246,9 @@ const handlePdf = async (item) => {
 
       const downloadFolder = Platform.OS === 'android' ? ReactNativeBlobUtil.fs.dirs.DownloadDir : ''; 
       // const pdfPath = `${downloadFolder}/${item.so_style_id}.pdf`;
-      // const pdfPath = `/storage/emulated/0/Download/${item.so_style_id}_${Date.now()}.pdf`;
+      const pdfPath = `/storage/emulated/0/Download/${item.so_style_id}_${Date.now()}.pdf`;
 
-      const pdfPath =
-        Platform.OS === 'android'
-          ? `/storage/emulated/0/Download/${item.so_style_id}_${Date.now()}.pdf`
-          : `${ReactNativeBlobUtil.fs.dirs.DocumentDir}/item.so_style_id}_${Date.now()}.pdf`;
-  
-
+      
       await ReactNativeBlobUtil.fs.writeFile(pdfPath, base64Data, 'base64');
 
       // Alert.alert('PDF Downloaded', `PDF saved successfully at ${pdfPath}`);
@@ -274,12 +305,7 @@ const handleScan = async (item) => {
       }
 
 
-      // const pdfPath = `/storage/emulated/0/Download/${item.so_style_id}.pdf`;
-
-      const pdfPath =
-      Platform.OS === 'android'
-        ? `/storage/emulated/0/Download/${item.so_style_id}_${Date.now()}.pdf`
-        : `${ReactNativeBlobUtil.fs.dirs.DocumentDir}/item.so_style_id}_${Date.now()}.pdf`;
+      const pdfPath = `/storage/emulated/0/Download/${item.so_style_id}.pdf`;
 
 
       await ReactNativeBlobUtil.fs.writeFile(pdfPath, base64Data, 'base64');
@@ -334,6 +360,7 @@ const handleScan = async (item) => {
       backBtnAction = {backBtnAction}
       popOkBtnAction = {popOkBtnAction}
       fetchMore={fetchMore}
+      applyFilterFxn={getFilteredList}
     />
 
   );
