@@ -230,7 +230,10 @@ const FabricProcessInListUI = ({route, navigation, ...props}) => {
                   style={{height: 15, width: 15, marginLeft: 15}}
                 />
                 <TextInput
-                  style={{color:'#000'}}
+                   style={[
+                    styles.input,
+                    Platform.OS === 'ios' && { paddingVertical: 17 }, // Apply padding only for iOS
+                  ]}
                   underlineColorAndroid="transparent"
                   placeholder="Search "
                   placeholderTextColor="#7F7F81"
@@ -354,6 +357,9 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  input:{
+color:"black"
   },
   leftBtnTextStyle: {
     color: 'white',
