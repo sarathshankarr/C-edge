@@ -320,10 +320,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 15,
-    marginBottom: 10,
-    elevation: 5,
-    padding: 10,
+    marginTop: 10,
+    marginBottom:15,
+    marginHorizontal:10
   },
   clearButton: {
     flex: 1,

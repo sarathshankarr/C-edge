@@ -265,7 +265,10 @@ const StoreApproveEditUi = ({ route, ...props }) => {
                 numberOfLines={2}
                 value={remarks}
                 onChangeText={(text) => set_remarks(text)}
-                style={{ color: 'black' }}
+                style={[
+                  styles.input,
+                  Platform.OS === 'ios' && { paddingVertical: 10 }, // Apply padding only for iOS
+                ]}
               />
             </View>
           </View>
@@ -438,6 +441,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  input:{
+    color:"black"
+},
 
 })
 

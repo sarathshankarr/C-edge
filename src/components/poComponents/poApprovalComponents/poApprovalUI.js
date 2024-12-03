@@ -159,7 +159,10 @@ const POApprovalUI = ({ route, ...props }) => {
               numberOfLines={3}
               value={props.remarks}
               onChangeText={(text) => setRemarks(text)}
-              style={{ color: 'black' }}
+              style={[
+                styles.input,
+                Platform.OS === 'ios' && { paddingVertical: 10 }, // Apply padding only for iOS
+              ]}    
             />
           </View>
         </View>
@@ -202,3 +205,9 @@ const POApprovalUI = ({ route, ...props }) => {
 }
 
 export default POApprovalUI;
+
+const styles = StyleSheet.create({
+  input:{
+    color:"black"
+},
+})
