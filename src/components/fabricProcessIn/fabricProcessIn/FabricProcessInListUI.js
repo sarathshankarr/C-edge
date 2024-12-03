@@ -31,6 +31,13 @@ const FabricProcessInListUI = ({route, navigation, ...props}) => {
   const [filterArray, set_filterArray] = useState([]);
   const [ItemsArray, set_ItemsArray] = useState([]);
   const [recName, set_recName] = useState(undefined);
+
+  const [categories, set_categories]=useState([
+    { id: "batchNo", value: "Batch No" },
+    { id: "orderNo", value: "Order No" },
+    { id: "designName", value: "Design Name" },
+    { id: "BrandName", value: "Brand Name" }
+  ])
   const [isFilterVisible, setFilterVisible] = useState(false);
 
   let isKeyboard = useRef(false);
@@ -51,6 +58,10 @@ const FabricProcessInListUI = ({route, navigation, ...props}) => {
     props.popOkBtnAction();
   };
 
+  const applyFilterFxn = (types, Ids) => {
+    props.applyFilterFxn(types, Ids);
+  };
+
   
 
   // const filterPets = name => {
@@ -69,6 +80,7 @@ const FabricProcessInListUI = ({route, navigation, ...props}) => {
   //     set_filterArray([]);
   //   }
   // };
+
   const filterPets = (name) => {
     const searchTerm = name.toString().toLowerCase().trim();  
     if(searchTerm.length===0){
@@ -96,13 +108,11 @@ const FabricProcessInListUI = ({route, navigation, ...props}) => {
 
   const handleScan = async(item) => {
     props.handleScan(item);
-    // Alert.alert('Clicked the Scan Icon of :');
   };
 
 
   const handlePdf = async(item) => {
     props.handlePdf(item);
-    // Alert.alert('Clicked the PDF Icon of :', );
   };
 
   const fetchMore=()=>{
@@ -186,6 +196,8 @@ const FabricProcessInListUI = ({route, navigation, ...props}) => {
     );
   };
 
+
+
   return (
     <View style={[CommonStyles.mainComponentViewStyle]}>
       <View style={[CommonStyles.headerView]}>
@@ -218,12 +230,9 @@ const FabricProcessInListUI = ({route, navigation, ...props}) => {
                   style={{height: 15, width: 15, marginLeft: 15}}
                 />
                 <TextInput
-                  style={[
-                    styles.input,
-                    Platform.OS === 'ios' && { paddingVertical: 18 }, // Apply padding only for iOS
-                  ]}
+                  style={{color:'#000'}}
                   underlineColorAndroid="transparent"
-                  placeholder="Search"
+                  placeholder="Search "
                   placeholderTextColor="#7F7F81"
                   autoCapitalize="none"
                   value={recName}
@@ -304,7 +313,10 @@ const FabricProcessInListUI = ({route, navigation, ...props}) => {
       <Button title="Open Filter" onPress={() => setFilterVisible(true)} />
       <FilterModal
         isVisible={isFilterVisible}
+        categoriesList={categories}
+        selectedCategoryListAPI={'getSelectedCategoryListFBI'}
         onClose={() => setFilterVisible(false)}
+        applyFilterFxn={() => applyFilterFxn(types, Ids)}
       />
     </View>
 
@@ -359,8 +371,4 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  input: {
-    color: '#000',
-    // Additional shared styles for TextInput can go here
-  }
 });
