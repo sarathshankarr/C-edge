@@ -70,7 +70,7 @@ const GatePassAckListUI = ({route, ...props }) => {
             {item.vendorname}
             </Text>             
             <Text style={[CommonStyles.tylesTextStyle, {  flex:1,textAlign:'center'  }]}>
-            {item.isAcknowledgement === 1 ? "Deliverd" : "Open"}
+            {item.isAcknowledgement === 1 ? "Delivered" : "Open"}
             </Text>     
             {/* <TouchableOpacity onPress={() => handleScan(item)} style={{flex:1, alignItems:'center'}}>
                 <Image
