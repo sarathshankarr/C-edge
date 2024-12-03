@@ -56,6 +56,10 @@ const styles = StyleSheet.create({
     borderRadius:9,
     padding: 10,
     elevation:3,
+    shadowColor: '#000', // Shadow color for iOS
+  shadowOffset: { width: 0, height: 2 }, // Offset for the shadow
+  shadowOpacity: 0.25, // Opacity of the shadow
+  shadowRadius: 3.84, // Radius for the shadow blur
     // borderColor:'black',
   },
   heading: {
