@@ -81,7 +81,7 @@ const FilterModal = ({isVisible, onClose, categoriesList, selectedCategoryListAP
     const handleSelectCategory=(item)=>{
       setSelectedCategory(item.id);
       setSearchText('');
-      getSelectedCategoryListFBI(selectedCategoryListAPI, item.id);
+      // getSelectedCategoryListFBI(selectedCategoryListAPI, item.id);
     }
 
     const handleAppyFilter=()=>{

@@ -60,10 +60,13 @@ const styles = StyleSheet.create({
   section: {
     marginBottom: 20,
     backgroundColor: 'white', // Light grey background
-    borderRadius:9,
+    borderRadius: 9,
     padding: 10,
-    elevation:5,
-    // borderColor:'black',
+    elevation: 5, // Works on Android
+    shadowColor: '#000', // Shadow color for iOS
+    shadowOffset: { width: 0, height: 2 }, // Offset for the shadow
+    shadowOpacity: 0.25, // Opacity of the shadow
+    shadowRadius: 3.84, // Radius for the shadow blur
   },
   heading: {
     fontSize: 20,
