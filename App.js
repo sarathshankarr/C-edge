@@ -15,8 +15,11 @@ const App = () => {
 
 
   return (
-      <View style={{flex:1}}>
-        <StatusBar translucent={false}  backgroundColor={color.color2}/>
+      <View style={{
+        flex:1,
+        height: 20, // You can use a library like `react-native-status-bar-height` to handle dynamic heights
+        backgroundColor:color.color2 }}>
+        <StatusBar translucent={false}    barStyle="light-content"  backgroundColor={color.color2}/>
         <AppNavigator  />
       </View>
   );

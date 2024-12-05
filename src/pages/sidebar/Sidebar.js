@@ -19,13 +19,13 @@ const Sidebar = ({navigation, route}) => {
   const [styleDropdownVisible, setStyleDropdownVisible] = useState(false);
   const [orderDropdownVisible, setOrderDropdownVisible] = useState(false);
 
-  const toggleDropdown = (dropdown) => {
+  const toggleDropdown = dropdown => {
     if (dropdown === 'style') {
       setStyleDropdownVisible(!styleDropdownVisible);
-      setOrderDropdownVisible(false); 
+      setOrderDropdownVisible(false);
     } else if (dropdown === 'order') {
       setOrderDropdownVisible(!orderDropdownVisible);
-      setStyleDropdownVisible(false); 
+      setStyleDropdownVisible(false);
     }
   };
 
@@ -446,12 +446,15 @@ const Sidebar = ({navigation, route}) => {
             />
             <Text style={styles.hometxt}>Style Management</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => toggleDropdown('style')}>
-          <Image
-            style={styles.homeimg}
-            source={styleDropdownVisible ? require('../../../assets/images/png/down-arrow.png') : require('../../../assets/images/png/chevron.png')}
-          />
+          <TouchableOpacity onPress={() => toggleDropdown('style')}>
+            <Image
+              style={styles.homeimg}
+              source={
+                styleDropdownVisible
+                  ? require('../../../assets/images/png/down-arrow.png')
+                  : require('../../../assets/images/png/chevron.png')
+              }
+            />
           </TouchableOpacity>
         </View>
         {styleDropdownVisible && (
@@ -462,12 +465,17 @@ const Sidebar = ({navigation, route}) => {
               borderRadius: 8,
               padding: 10,
               marginBottom: 10,
-              marginLeft:25,
-              elevation:3
-            }}
-          >
-            <TouchableOpacity onPress={() => navigation.navigate('StyleManageComponent')} style={{flexDirection:'row', alignItems:"center"}}>
-            {/* <Image
+              marginLeft: 25,
+              elevation: 3,
+              shadowColor: '#000', // Shadow color for iOS
+              shadowOffset: {width: 0, height: 2}, // Offset for the shadow
+              shadowOpacity: 0.25, // Opacity of the shadow
+              shadowRadius: 3.84, // Radius for the shadow blur
+            }}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('StyleManageComponent')}
+              style={{flexDirection: 'row', alignItems: 'center'}}>
+              {/* <Image
               style={styles.categoriesimg}
               source={require('../../../assets/images/png/chevron.png')}
             /> */}
@@ -476,13 +484,14 @@ const Sidebar = ({navigation, route}) => {
                   fontSize: 14,
                   color: '#000',
                   paddingVertical: 5,
-                }}
-              >
+                }}>
                 Style
               </Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => navigation.navigate('DDAList')} style={{flexDirection:'row', alignItems:"center"}}>
-            {/* <Image
+            <TouchableOpacity
+              onPress={() => navigation.navigate('DDAList')}
+              style={{flexDirection: 'row', alignItems: 'center'}}>
+              {/* <Image
               style={styles.categoriesimg}
               source={require('../../../assets/images/png/chevron.png')}
             /> */}
@@ -492,8 +501,11 @@ const Sidebar = ({navigation, route}) => {
                   color: '#000',
                   paddingVertical: 5,
                   elevation: 3,
-                }}
-              >
+                  shadowColor: '#000', // Shadow color for iOS
+                  shadowOffset: {width: 0, height: 2}, // Offset for the shadow
+                  shadowOpacity: 0.25, // Opacity of the shadow
+                  shadowRadius: 3.84, // Radius for the shadow blur
+                }}>
                 Design Directory Approval
               </Text>
             </TouchableOpacity>
@@ -514,12 +526,15 @@ const Sidebar = ({navigation, route}) => {
             />
             <Text style={styles.hometxt}>Order Management</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => toggleDropdown('order')}>
-          <Image
-            style={styles.homeimg}
-            source={orderDropdownVisible ? require('../../../assets/images/png/down-arrow.png') : require('../../../assets/images/png/chevron.png')}
-          />
+          <TouchableOpacity onPress={() => toggleDropdown('order')}>
+            <Image
+              style={styles.homeimg}
+              source={
+                orderDropdownVisible
+                  ? require('../../../assets/images/png/down-arrow.png')
+                  : require('../../../assets/images/png/chevron.png')
+              }
+            />
           </TouchableOpacity>
         </View>
         {orderDropdownVisible && (
@@ -530,12 +545,17 @@ const Sidebar = ({navigation, route}) => {
               borderRadius: 8,
               padding: 10,
               marginBottom: 10,
-              marginLeft:25,
-              elevation:3
-            }}
-          >
-            <TouchableOpacity onPress={() => navigation.navigate('POApproveListComponent')} style={{flexDirection:'row', alignItems:"center"}}>
-            {/* <Image
+              marginLeft: 25,
+              elevation: 3,
+              shadowColor: '#000', // Shadow color for iOS
+              shadowOffset: {width: 0, height: 2}, // Offset for the shadow
+              shadowOpacity: 0.25, // Opacity of the shadow
+              shadowRadius: 3.84, // Radius for the shadow blur
+            }}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('POApproveListComponent')}
+              style={{flexDirection: 'row', alignItems: 'center'}}>
+              {/* <Image
               style={styles.categoriesimg}
               source={require('../../../assets/images/png/chevron.png')}
             /> */}
@@ -545,17 +565,17 @@ const Sidebar = ({navigation, route}) => {
                   color: '#000',
                   paddingVertical: 5,
                   elevation: 3,
-                }}
-              >
+                  shadowColor: '#000', // Shadow color for iOS
+                  shadowOffset: {width: 0, height: 2}, // Offset for the shadow
+                  shadowOpacity: 0.25, // Opacity of the shadow
+                  shadowRadius: 3.84, // Radius for the shadow blur
+                }}>
                 PO Approval
               </Text>
             </TouchableOpacity>
           </View>
         )}
-
-       
       </View>
-      
 
       {/* Logout and Delete Account */}
       <View style={styles.logoutContainer}>
@@ -739,6 +759,10 @@ const styles = StyleSheet.create({
     elevation: 5,
     marginHorizontal: 30,
     width: '80%',
+    shadowColor: '#000', // Shadow color for iOS
+    shadowOffset: {width: 0, height: 2}, // Offset for the shadow
+    shadowOpacity: 0.25, // Opacity of the shadow
+    shadowRadius: 3.84, // Radius for the shadow blur
   },
   logoutimg: {
     height: 20,

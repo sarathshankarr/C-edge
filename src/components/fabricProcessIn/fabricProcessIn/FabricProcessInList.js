@@ -93,7 +93,7 @@ const FabricProcessInList = ({ route }) => {
             : [...prevItems, ...LISTAPIOBJ.responseData] 
           );
     
-          if(LISTAPIOBJ?.responseData?.length<ListSize){
+          if(LISTAPIOBJ?.responseData?.length<ListSize-1){
             setHasMore(false);
           }
           
