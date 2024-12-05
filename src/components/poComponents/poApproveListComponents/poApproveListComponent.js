@@ -8,6 +8,8 @@ import { useFocusEffect } from '@react-navigation/native';
 
 const POApproveListComponent = ({ navigation, route, ...props }) => {
 
+  const ListSize=10;
+
   const [itemsArray, set_itemsArray] = useState();
     const [isLoading, set_isLoading] = useState(false);
     const [isPopUp, set_isPopUp] = useState(false);
@@ -17,14 +19,21 @@ const POApproveListComponent = ({ navigation, route, ...props }) => {
     const [isPopupLeft, set_isPopupLeft] = useState(false);
 
 
-  React.useEffect(() => {
-    getInitialData();
-    console.log("props ===>", props )
-  }, []);
+    const [MainLoading, set_MainLoading] = useState(false);
+
+
+    const [page, setpage] = useState(0);
+  
+    const [hasMore, setHasMore] = useState(true); 
+
+  // React.useEffect(() => {
+  //   getInitialData();
+  //   console.log("props ===>", props )
+  // }, []);
 
   useFocusEffect(
     React.useCallback(() => {
-      getInitialData();
+      getInitialData(0, true);
     }, [])
   );
   
@@ -32,7 +41,7 @@ const POApproveListComponent = ({ navigation, route, ...props }) => {
     navigation.navigate('Main');
   };
 
-  const getInitialData = async () => {
+  const getInitialData = async (page = 0, reload = false) => {
     
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
@@ -40,7 +49,16 @@ const POApproveListComponent = ({ navigation, route, ...props }) => {
     let brandIds = await AsyncStorage.getItem('brandIds');
     let usercompanyId = await AsyncStorage.getItem('companyId');
 
-    set_isLoading(true);
+    const fromRecord = reload ? 0 : page * ListSize;
+    const toRecord = fromRecord + ListSize - 1;
+
+    set_isLoading(!reload);
+    set_MainLoading(reload);
+
+    console.log("from : ",fromRecord, "to : ",  toRecord);
+
+
+    try {
     let obj = {
       "menuId": '4',
       "searchKeyValue": "Not Approved",
@@ -49,13 +67,13 @@ const POApproveListComponent = ({ navigation, route, ...props }) => {
       "locIds": locIds ? locIds : 0,
       "brandIds":brandIds ? brandIds: 0 ,
       "compIds": usercompanyId,
-      "fromRecord": 0,
-      "toRecord": 999,
+      "fromRecord": fromRecord,
+      "toRecord": toRecord,
       "userName":userName,
       "userPwd": userPsd
   }
 
-  console.log("list pos req obj ===> ", obj);
+  // console.log("list pos req obj ===> ", obj);
 
     let poEditAPIObj = await APIServiceCall.allPOAPIService(obj);
     set_isLoading(false);
@@ -63,7 +81,15 @@ const POApproveListComponent = ({ navigation, route, ...props }) => {
     if(poEditAPIObj && poEditAPIObj.statusData){
 
       if(poEditAPIObj && poEditAPIObj.responseData){
-        set_itemsArray(poEditAPIObj.responseData);
+        // set_itemsArray(poEditAPIObj.responseData);
+        set_itemsArray(prevItems => reload 
+          ? poEditAPIObj.responseData 
+          : [...prevItems, ...poEditAPIObj.responseData] 
+        );
+
+        if(poEditAPIObj?.responseData?.length < ListSize-1){
+          setHasMore(false);
+        }
       }
     } else {
       popUpAction(Constant.SERVICE_FAIL_MSG,Constant.DefaultAlert_MSG,'OK', true,false);
@@ -72,6 +98,10 @@ const POApproveListComponent = ({ navigation, route, ...props }) => {
     if(poEditAPIObj && poEditAPIObj.error) {
       popUpAction(Constant.SERVICE_FAIL_MSG,Constant.DefaultAlert_MSG,'OK', true,false)
     }
+  }finally{
+    set_isLoading(false);
+    set_MainLoading(false);
+  }
 
   };
 
@@ -91,6 +121,21 @@ const POApproveListComponent = ({ navigation, route, ...props }) => {
     navigation.navigate('POApprovalComponent',{item:item});
   };
 
+  const fetchMore= (more) =>{
+    
+    if(more){
+      console.log("fetch more ==> ", hasMore, isLoading );
+      if(!hasMore || MainLoading || isLoading) return;
+      const next =page + 1  ;
+      setpage(next);
+      getInitialData(next, false);
+    }else{
+      setpage(0);
+      getInitialData(0, true);
+      setHasMore(true);
+    }
+  }
+
   return (
 
     <POApproveUI
@@ -104,6 +149,8 @@ const POApproveListComponent = ({ navigation, route, ...props }) => {
       actionOnRow = {actionOnRow}
       backBtnAction = {backBtnAction}
       popOkBtnAction = {popOkBtnAction}
+      fetchMore={fetchMore}
+      MainLoading = {MainLoading}
     />
 
   );

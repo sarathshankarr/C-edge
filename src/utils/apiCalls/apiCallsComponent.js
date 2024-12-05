@@ -231,7 +231,7 @@ export async function allPOAPIService(jsonValue) {
         }
     ).then((response) => response.json()).then(async (data) => {
 
-        console.log('PO List ', data[0])
+        // console.log('PO List ', data[0])
 
         if (data) {
             statusData = true;
@@ -458,7 +458,7 @@ export async function allCuttingStyles(jsonValue) {
             body: JSON.stringify(jsonValue),
         }
     ).then(async (response) => await response.json()).then(async (data) => {
-        console.log('allCuttingStyles11 ', data[0])
+        // console.log('allCuttingStyles11 ', data[0])
 
         if (data) {
             statusData = true;

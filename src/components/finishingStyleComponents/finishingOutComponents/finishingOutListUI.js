@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import {View,StyleSheet,TouchableOpacity,Text,FlatList,TextInput,Image} from 'react-native';
+import {View,StyleSheet,TouchableOpacity,Text,FlatList,TextInput,Image, ActivityIndicator, RefreshControl} from 'react-native';
 import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
 import * as Constant from "../../../utils/constants/constant";
 import CommonStyles from "../../../utils/commonStyles/commonStyles";
@@ -13,6 +13,8 @@ const FinishingOutListUI = ({route, ...props }) => {
   const [filterArray, set_filterArray] = useState(undefined);
   const [recName, set_recName] = useState(undefined);
   let isKeyboard = useRef(false);
+  const [refreshing, set_refreshing] = useState(false);
+
 
   React.useEffect(() => {
 
@@ -32,6 +34,16 @@ const FinishingOutListUI = ({route, ...props }) => {
 
   const popOkBtnAction = () => {
     props.popOkBtnAction();
+  };
+
+  const fetchMore=()=>{
+    props.fetchMore(true);
+  }
+
+  const onRefresh = () => {
+    set_refreshing(true);
+    props.fetchMore(false); 
+    set_refreshing(false);
   };
 
   const filterPets = (recName) => {
@@ -137,22 +149,34 @@ const FinishingOutListUI = ({route, ...props }) => {
           
         </View>
 
-        {!props.isLoading && props.itemsArray && props.itemsArray.length > 0 ? <View style={{flexDirection :'row', justifyContent:'space-between'}}>
+        {props.itemsArray && props.itemsArray.length > 0 ? <View style={{flexDirection :'row', justifyContent:'space-between'}}>
           <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:1.5,textAlign:'left'}]}>{'Style Details'}</Text>
           {/* <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:1,textAlign:'center',}]}>{'Color'}</Text>
           <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:1,textAlign:'center',}]}>{'WO'}</Text> */}
           <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:1.2,textAlign:'right',marginRight:wp('2%'),}]}>{'TQty/Fin.Qty'}</Text>
         </View> : <View style = {CommonStyles.noRecordsFoundStyle}>
-            {!props.isLoading ? <Text style={[CommonStyles.tylesHeaderTextStyle, {fontSize: 18}]}>{Constant.noRecFound}</Text> : null}
+            {!props.MainLoading ? <Text style={[CommonStyles.tylesHeaderTextStyle, {fontSize: 18}]}>{Constant.noRecFound}</Text> : null}
         </View>}
 
         <View style={CommonStyles.listStyle}>
-          <FlatList
+          {/* <FlatList
             data={filterArray}
             renderItem={renderItem}
             keyExtractor={(item, index) => "" + index}
             showsVerticalScrollIndicator = {false}
-          />
+          /> */}
+           <FlatList
+              data={filterArray}
+              renderItem={renderItem}
+              keyExtractor={(item, index) => '' + index}
+              showsVerticalScrollIndicator={false}
+              onEndReached={() => fetchMore()}
+              onEndReachedThreshold={0.2}
+              ListFooterComponent={() => props.isLoading && <ActivityIndicator size="large" />}
+              refreshControl={
+                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+              }
+            />
         </View>
       </View>  
 
@@ -169,7 +193,7 @@ const FinishingOutListUI = ({route, ...props }) => {
         />
       </View> : null}
 
-      {props.isLoading === true ? <LoaderComponent  isLoader={true} loaderText = {Constant.LOADER_MESSAGE } isButtonEnable = {false} /> : null} 
+      {props.MainLoading === true ? <LoaderComponent  isLoader={true} loaderText = {Constant.LOADER_MESSAGE } isButtonEnable = {false} /> : null} 
 
     </View>
   );

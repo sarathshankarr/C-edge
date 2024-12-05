@@ -7,6 +7,8 @@ import {
   FlatList,
   Image,
   TextInput,
+  RefreshControl,
+  ActivityIndicator,
 } from 'react-native';
 import {
   heightPercentageToDP as hp,
@@ -25,10 +27,13 @@ let searchImg = require('./../../../../assets/images/png/searchIcon.png');
 const StockRequestListUI = ({navigation, route, ...props}) => {
   // const navigation=useNavigation;
 
+
   const [isListOpen, set_ListOpen] = useState(false);
   const [filterArray, set_filterArray] = useState(undefined);
   const [recName, set_recName] = useState(undefined);
   let isKeyboard = useRef(false);
+  const [refreshing, set_refreshing] = useState(false);
+
 
   React.useEffect(() => {
     if (props.itemsArray) {
@@ -50,6 +55,16 @@ const StockRequestListUI = ({navigation, route, ...props}) => {
 
   const createPage = () => {
     props.create();
+  };
+
+  const fetchMore=()=>{
+    props.fetchMore(true);
+  }
+
+  const onRefresh = () => {
+    set_refreshing(true);
+    props.fetchMore(false); 
+    set_refreshing(false);
   };
 
   const filterPets = recName => {
@@ -227,7 +242,7 @@ const StockRequestListUI = ({navigation, route, ...props}) => {
           </View>
         ) : (
           <View style={CommonStyles.noRecordsFoundStyle}>
-            {!props.isLoading ? (
+            {!props.MainLoading ? (
               <Text style={[CommonStyles.tylesHeaderTextStyle, {fontSize: 18}]}>
                 {Constant.noRecFound}
               </Text>
@@ -236,12 +251,24 @@ const StockRequestListUI = ({navigation, route, ...props}) => {
         )}
 
         <View style={CommonStyles.listStyle}>
-          <FlatList
+          {/* <FlatList
             data={filterArray}
             renderItem={renderItem}
             keyExtractor={(item, index) => '' + index}
             showsVerticalScrollIndicator={false}
-          />
+          /> */}
+           <FlatList
+              data={filterArray}
+              renderItem={renderItem}
+              keyExtractor={(item, index) => '' + index}
+              showsVerticalScrollIndicator={false}
+              onEndReached={() => fetchMore()}
+              onEndReachedThreshold={0.2}
+              ListFooterComponent={() => props.isLoading && <ActivityIndicator size="large" />}
+              refreshControl={
+                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+              }
+            />
         </View>
       </View>
 
@@ -260,7 +287,7 @@ const StockRequestListUI = ({navigation, route, ...props}) => {
         </View>
       ) : null}
 
-      {props.isLoading === true ? (
+      {props.MainLoading === true ? (
         <LoaderComponent
           isLoader={true}
           loaderText={Constant.LOADER_MESSAGE}

@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import {View,StyleSheet,TouchableOpacity,Text,FlatList,Image,TextInput} from 'react-native';
+import {View,StyleSheet,TouchableOpacity,Text,FlatList,Image,TextInput, RefreshControl, ActivityIndicator} from 'react-native';
 import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
 import * as Constant from "./../../../utils/constants/constant";
 import CommonStyles from "./../../../utils/commonStyles/commonStyles";
@@ -13,6 +13,8 @@ const GatePassAckListUI = ({route, ...props }) => {
 
   const [filterArray, set_filterArray] = useState(undefined);
   const [recName, set_recName] = useState(undefined);
+  const [refreshing, set_refreshing] = useState(false);
+
   let isKeyboard = useRef(false);
 
   React.useEffect(() => {
@@ -33,6 +35,16 @@ const GatePassAckListUI = ({route, ...props }) => {
 
   const popOkBtnAction = () => {
     props.popOkBtnAction();
+  };
+
+  const fetchMore=()=>{
+    props.fetchMore(true);
+  }
+
+  const onRefresh = () => {
+    set_refreshing(true);
+    props.fetchMore(false); 
+    set_refreshing(false);
   };
 
   const filterPets = (recName) => {
@@ -133,17 +145,34 @@ const GatePassAckListUI = ({route, ...props }) => {
           <Text style={[CommonStyles.tylesHeaderTextStyle,{textAlign:'center', flex:1}]}>{'Status'}</Text>
           {/* <Text style={[CommonStyles.tylesHeaderTextStyle,{textAlign:'center', flex:1}]}>{'Actions'}</Text> */}
         </View> : <View style = {CommonStyles.noRecordsFoundStyle}>
-            {!props.isLoading ? <Text style={[CommonStyles.tylesHeaderTextStyle, {fontSize: 18}]}>{Constant.noRecFound}</Text> : null}
+            {!props.MainLoading ? <Text style={[CommonStyles.tylesHeaderTextStyle, {fontSize: 18}]}>{Constant.noRecFound}</Text> : null}
         </View>}
        
-        <View style={CommonStyles.listStyle}>
+        {/* <View style={CommonStyles.listStyle}>
           <FlatList
             data={filterArray}
             renderItem={renderItem}
             keyExtractor={(item, index) => "" + index}
             showsVerticalScrollIndicator = {false}
           />
+        </View> */}
+
+         <View style={CommonStyles.listStyle}>
+            <FlatList
+              data={filterArray}
+              renderItem={renderItem}
+              keyExtractor={(item, index) => '' + index}
+              showsVerticalScrollIndicator={false}
+              onEndReached={() => fetchMore()}
+              onEndReachedThreshold={0.2}
+              ListFooterComponent={() => props.isLoading && <ActivityIndicator size="large" />}
+              refreshControl={
+                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+              }
+            />
         </View>
+
+
       </View>  
 
       {props.isPopUp ? <View style={CommonStyles.customPopUpStyle}>
@@ -159,7 +188,7 @@ const GatePassAckListUI = ({route, ...props }) => {
         />
       </View> : null}
 
-      {props.isLoading === true ? <LoaderComponent isLoader={true} loaderText = {Constant.LOADER_MESSAGE } isButtonEnable = {false} /> : null} 
+      {props.MainLoading === true ? <LoaderComponent isLoader={true} loaderText = {Constant.LOADER_MESSAGE } isButtonEnable = {false} /> : null} 
 
     </View>
   );

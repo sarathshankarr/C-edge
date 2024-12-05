@@ -24,6 +24,10 @@ import AlertComponent from '../../../utils/commonComponents/alertComponent';
 import color from '../../../utils/commonStyles/color';
 import FilterModal from '../../../utils/commonComponents/FilterModal';
 let searchImg = require('./../../../../assets/images/png/searchIcon.png');
+let addImg = require('./../../../../assets/images/png/addition.png');
+let addImg1 = require('./../../../../assets/images/png/add.png');
+let filterImg = require('./../../../../assets/images/png/setting.png');
+let filterImg1 = require('./../../../../assets/images/png/filter.png');
 
 const FabricProcessInListUI = ({route, navigation, ...props}) => {
   const [isListOpen, set_ListOpen] = useState(false);
@@ -31,13 +35,17 @@ const FabricProcessInListUI = ({route, navigation, ...props}) => {
   const [filterArray, set_filterArray] = useState([]);
   const [ItemsArray, set_ItemsArray] = useState([]);
   const [recName, set_recName] = useState(undefined);
+  const [showFilteredList, set_showFilteredList] = useState(false);
+  const [filterCount, set_filterCount] = useState(0);
+
 
   const [categories, set_categories]=useState([
-    { id: "batchNo", value: "Batch No" },
-    { id: "orderNo", value: "Order No" },
-    { id: "designName", value: "Design Name" },
-    { id: "BrandName", value: "Brand Name" }
+    { id: "batchNo", fid:"batchname" ,value: "Batch No" },
+    { id: "orderNo", fid: "orderNo", value: "Order No" },
+    { id: "designName",fid: "designName", value: "Design Name" },
+    { id: "BrandName", fid: "brandName", value: "Brand Name" }
   ])
+
   const [isFilterVisible, setFilterVisible] = useState(false);
 
   let isKeyboard = useRef(false);
@@ -58,8 +66,12 @@ const FabricProcessInListUI = ({route, navigation, ...props}) => {
     props.popOkBtnAction();
   };
 
-  const applyFilterFxn = (types, Ids) => {
+  const applyFilterFxn = (types, Ids, count) => {
+    console.log("applyFilterFxn", types, Ids);
     props.applyFilterFxn(types, Ids);
+    set_filterCount(count)
+    set_showFilteredList(true);
+    setFilterVisible(false);
   };
 
   
@@ -90,11 +102,12 @@ const FabricProcessInListUI = ({route, navigation, ...props}) => {
   
     const styleArray = filterArray.filter(item => {
       return (
-        (item?.OrderNo?.toLowerCase().includes(searchTerm)) ||
-        (item?.DesignNo?.toLowerCase().includes(searchTerm)) ||
+        (item?.orderNo?.toLowerCase().includes(searchTerm)) ||
+        (item?.designName?.toLowerCase().includes(searchTerm)) ||
         (item?.brandName?.toLowerCase().includes(searchTerm)) ||
         (item?.batchname?.toLowerCase().includes(searchTerm)) ||   
-        (item?.inMenuName?.toLowerCase().includes(searchTerm))     
+        (item?.inMenuName?.toLowerCase().includes(searchTerm)) ||
+        (item?.matchingName?.toLowerCase().includes(searchTerm)) 
       );
     });
   
@@ -119,11 +132,20 @@ const FabricProcessInListUI = ({route, navigation, ...props}) => {
     props.fetchMore(true);
   }
 
+  const clearFilter=()=>{
+    onRefresh();
+  }
+
   const onRefresh = () => {
     set_refreshing(true);
     props.fetchMore(false); 
     set_refreshing(false);
+    set_filterCount(0);
+    set_showFilteredList(false);
+    setFilterVisible(false);
   };
+
+
 
 
   const createPage = () => {
@@ -173,23 +195,24 @@ const FabricProcessInListUI = ({route, navigation, ...props}) => {
               flex: 0.7,
               alignItems: 'center',
               flexDirection: 'column',
-              justifyContent: 'space-evenly',
+              justifyContent: 'space-around',
             }}>
             <TouchableOpacity onPress={() => handlePdf(item)}>
               <Image
-                source={require('././../../../../assets/images/png/pdf.png')}
+                source={require('././../../../../assets/images/png/pdf2.png')}
                 style={{height: 25, width: 20}}
               />
             </TouchableOpacity>
             {item?.inMenuName ==="Checking/Cutting In" && (
               <TouchableOpacity onPress={() => handleScan(item)}>
                 <Image
-                  source={require('././../../../../assets/images/png/scan.png')}
+                  source={require('././../../../../assets/images/png/barcode_download.png')}
                   style={{height: 20, width: 20}}
                 />
               </TouchableOpacity>
             )}
           </View>
+         
         </View>
 
       </View>
@@ -214,49 +237,252 @@ const FabricProcessInListUI = ({route, navigation, ...props}) => {
 
       <View style={CommonStyles.headerStyle}>
         {filterArray ? (
-          <View style={{flexDirection: 'row', width: '100%', marginBottom: 10}}>
-            <View style={{width: '67%'}}>
-              <View
-                style={{
-                  width: '100%',
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  borderWidth: 1,
-                  borderColor: 'black',
-                  borderRadius: 5,
-                }}>
-                <Image
-                  source={searchImg}
-                  style={{height: 15, width: 15, marginLeft: 15}}
-                />
-                <TextInput
-                   style={[
-                    styles.input,
-                    Platform.OS === 'ios' && { paddingVertical: 17 }, // Apply padding only for iOS
-                  ]}
-                  underlineColorAndroid="transparent"
-                  placeholder="Search "
-                  placeholderTextColor="#7F7F81"
-                  autoCapitalize="none"
-                  value={recName}
-                  onFocus={() => (isKeyboard.current = true)}
-                  onChangeText={text => {
-                    filterPets(text);
-                  }}
-                />
-              </View>
-            </View>
-            <View style={{width: '30%', marginLeft: '2%'}}>
+          // <View style={{flexDirection: 'row', width: '100%', marginBottom: 10}}>
+          //   <View style={{}}>
+          //     <View
+          //       style={{
+          //         width: '100%',
+          //         flexDirection: 'row',
+          //         alignItems: 'center',
+          //         borderWidth: 1,
+          //         borderColor: 'black',
+          //         borderRadius: 5,
+          //       }}>
+          //       <Image
+          //         source={searchImg}
+          //         style={{height: 15, width: 15, marginLeft: 15}}
+          //       />
+          //       <TextInput
+          //          style={[
+          //           styles.input,
+          //           Platform.OS === 'ios' && { paddingVertical: 17 }, // Apply padding only for iOS
+          //         ]}
+          //         underlineColorAndroid="transparent"
+          //         placeholder="Search "
+          //         placeholderTextColor="#7F7F81"
+          //         autoCapitalize="none"
+          //         value={recName}
+          //         onFocus={() => (isKeyboard.current = true)}
+          //         onChangeText={text => {
+          //           filterPets(text);
+          //         }}
+          //       />
+          //     </View>
+          //   </View>
+          //     <TouchableOpacity
+          //       style={{}}
+          //       onPress={() => {
+          //         set_showFilteredList(!showFilteredList)
+          //       }}>
+          //         <Image
+          //         source={filterImg}
+          //         style={{height: 25, width: 25, marginLeft: 15, tintColor:color.color2}}
+          //       />
+          //       <Text style={{}}>{showFilteredList ? "  filter " : "  filter"}</Text>
+                
+          //     </TouchableOpacity>
+          //     <TouchableOpacity
+          //       style={styles.leftButtonstyle1}
+          //       onPress={() => {
+          //         createPage();
+          //       }}>
+          //       <Image
+          //         source={addImg}
+          //         style={{height: 45, width: 45, marginLeft: 15, tintColor:color.color2}}
+          //       />
+          //     </TouchableOpacity>
+          // </View>
+        //   <View style={{ flexDirection: 'row', width: '100%', marginBottom: 10, alignItems: 'center' }}>
+        //   {/* Search and Filter Combined */}
+        //   <View
+        //     style={{
+        //       flexDirection: 'row',
+        //       alignItems: 'center',
+        //       borderWidth: 1,
+        //       borderColor: '#D1D1D1',
+        //       borderRadius: 20,
+        //       backgroundColor: '#F9F9F9',
+        //       paddingHorizontal: 15,
+        //       paddingVertical: 8,
+        //       flex: 1, // Ensures the box takes appropriate space
+        //       shadowColor: '#000',
+        //       shadowOffset: { width: 0, height: 2 },
+        //       shadowOpacity: 0.1,
+        //       shadowRadius: 4,
+        //       elevation: 3,
+        //     }}
+        //   >
+        //     <Image
+        //       source={searchImg}
+        //       style={{ height: 18, width: 18, tintColor: '#7F7F81', marginRight: 10 }}
+        //     />
+        //     <TextInput
+        //       style={{ flex: 1, color: '#000' }}
+        //       underlineColorAndroid="transparent"
+        //       placeholder="Search"
+        //       placeholderTextColor="#A0A0A0"
+        //       autoCapitalize="none"
+        //       value={recName}
+        //       onFocus={() => (isKeyboard.current = true)}
+        //       onChangeText={(text) => {
+        //         filterPets(text);
+        //       }}
+        //     />
+        //     <TouchableOpacity
+        //       onPress={() => {
+        //         set_showFilteredList(!showFilteredList);
+        //       }}
+        //     >
+        //       <Image
+        //         source={filterImg}
+        //         style={{ height: 18, width: 18, tintColor: '#7F7F81', marginLeft: 10 }}
+        //       />
+        //     </TouchableOpacity>
+        //   </View>
+        
+        //   {/* Add Button */}
+        //   <TouchableOpacity
+        //     style={{
+        //       marginLeft: 10,
+        //       height: 45,
+        //       width: 45,
+        //       borderRadius: 22.5,
+        //       backgroundColor: '#007BFF', 
+        //       justifyContent: 'center',
+        //       alignItems: 'center',
+        //       shadowColor: '#000',
+        //       shadowOffset: { width: 0, height: 2 },
+        //       shadowOpacity: 0.1,
+        //       shadowRadius: 4,
+        //       elevation: 3,
+        //     }}
+        //     onPress={() => {
+        //       createPage();
+        //     }}
+        //   >
+        //     <Image
+        //       source={addImg}
+        //       style={{ height: 25, width: 25, tintColor: '#FFF' }} 
+        //     />
+        //   </TouchableOpacity>
+        // </View>
+
+        <View style={{ flexDirection: 'row', width: '100%', marginBottom: 10, alignItems: 'center' }}>
+  {/* Search Bar */}
+  <View
+    style={{
+      flexDirection: 'row',
+      alignItems: 'center',
+      flex: 1, // Allows the search bar to take up available space
+      borderWidth: 1,
+      borderColor: '#D1D1D1',
+      borderRadius: 20,
+      backgroundColor: '#F9F9F9',
+      paddingHorizontal: 15,
+      // paddingVertical: 5,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 3,
+    }}
+  >
+    <Image
+      source={searchImg}
+      style={{ height: 18, width: 18, tintColor: '#7F7F81', marginRight: 10 }}
+    />
+    <TextInput
+      style={{ flex: 1, color: '#000' }}
+      underlineColorAndroid="transparent"
+      placeholder="Search"
+      placeholderTextColor="#A0A0A0"
+      autoCapitalize="none"
+      value={recName}
+      onFocus={() => (isKeyboard.current = true)}
+      onChangeText={(text) => {
+        filterPets(text);
+      }}
+    />
+  </View>
+
+  {/* Filter Button */}
+  <TouchableOpacity
+    style={{
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginLeft: 10,
+      paddingHorizontal: 15,
+      paddingVertical: 8,
+      borderWidth: 1,
+      borderColor: '#D1D1D1',
+      borderRadius: 20,
+      backgroundColor: '#F9F9F9',
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 3,
+    }}
+    onPress={() => {
+      set_showFilteredList(true);
+      setFilterVisible(!isFilterVisible);
+    }}
+  >
+    <Image
+      source={filterImg}
+      style={{ height: 25, width: 25, tintColor: showFilteredList ? color.color2 : '#7F7F81', marginRight: 10 }}
+    />
+    {
+      filterCount ?
+      <Text style={{ color: '#7F7F81', fontSize: 14, backgroundColor:color.color2, borderRadius:30,color:'#fff', padding:5 }}>{filterCount}</Text> :
+      <Text style={{ color: '#7F7F81', fontSize: 14 }}>{"Filter"}</Text> 
+    }
+    
+    
+  </TouchableOpacity>
+
+  {/* Add Button */}
+  {/* <TouchableOpacity
+    style={{
+      marginLeft: 10,
+      height: 45,
+      width: 45,
+      borderRadius: 22.5,
+      backgroundColor: color.color2,
+      justifyContent: 'center',
+      alignItems: 'center',
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 3,
+    }}
+    onPress={() => {
+      createPage();
+    }}
+  >
+    <Image
+      source={addImg}
+      style={{ height: 25, width: 25, tintColor: '#FFF' }} 
+    />
+  </TouchableOpacity> */}
               <TouchableOpacity
-                style={styles.leftButtonstyle}
+                style={styles.leftButtonstyle1}
                 onPress={() => {
                   createPage();
                 }}>
-                <Text style={[styles.leftBtnTextStyle]}>{'Create'}</Text>
+                <Image
+                  source={addImg}
+                  style={{height: 40, width: 40, marginLeft: 15, tintColor:color.color2}}
+                />
               </TouchableOpacity>
-            </View>
-          </View>
+</View>
+
+
         ) : null}
+
+
         {filterArray && filterArray.length > 0 ? (
           <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
             <Text
@@ -283,11 +509,22 @@ const FabricProcessInListUI = ({route, navigation, ...props}) => {
             </Text>
             {/* <Text style={[CommonStyles.tylesHeaderTextStyle, { flex: 0.4, textAlign: 'center', }]}>{'PDF'}</Text> */}
           </View>
-        ) : null}
+        ) :  <View style = {CommonStyles.noRecordsFoundStyle}>
+        {!props.MainLoading ? <Text style={[CommonStyles.tylesHeaderTextStyle, {fontSize: 18}]}>{Constant.noRecFound}</Text> : null}
+    </View>}
 
         <View style={CommonStyles.listStyle}>
-          {filterArray && filterArray.length > 0 ? (
-            <FlatList
+        {showFilteredList ?
+        (<FlatList
+            data={filterArray}
+            renderItem={renderItem}
+            keyExtractor={(item, index) => "" + index}
+            showsVerticalScrollIndicator = {false}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
+          />):
+            (<FlatList
               data={filterArray}
               renderItem={renderItem}
               keyExtractor={(item, index) => '' + index}
@@ -298,28 +535,20 @@ const FabricProcessInListUI = ({route, navigation, ...props}) => {
               refreshControl={
                 <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
               }
-            />
-          ) : (
-            <View style={CommonStyles.noRecordsFoundStyle}>
-              {!props.isLoading ? (
-                <Text
-                  style={[CommonStyles.tylesHeaderTextStyle, {fontSize: 18}]}>
-                  {Constant.noRecFound}
-                </Text>
-              ) : null}
-            </View>
-          )}
+            />)}
+         
         </View>
       </View>
 
       <View style={styles.container}>
-      <Button title="Open Filter" onPress={() => setFilterVisible(true)} />
+      {/* <Button title="Open Filter"  /> */}
       <FilterModal
         isVisible={isFilterVisible}
         categoriesList={categories}
         selectedCategoryListAPI={'getSelectedCategoryListFBI'}
         onClose={() => setFilterVisible(false)}
-        applyFilterFxn={() => applyFilterFxn(types, Ids)}
+        applyFilterFxn={applyFilterFxn}
+        clearFilter={clearFilter}
       />
     </View>
 
@@ -359,7 +588,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   input:{
-color:"black"
+   color:"black"
   },
   leftBtnTextStyle: {
     color: 'white',
@@ -370,7 +599,7 @@ color:"black"
     textAlign: 'center',
   },
   leftButtonstyle: {
-    backgroundColor: color.color2,
+    // backgroundColor: color.color2,
     // flex:1,
     height: hp('6%'),
     borderRadius: hp('0.5%'),

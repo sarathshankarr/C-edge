@@ -7,6 +7,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
 const StichingOutComponent = ({ navigation, route, ...props }) => {
 
+  const ListSize=10;
+
   const [itemsArray, set_itemsArray] = useState([]);
   const [isLoading, set_isLoading] = useState(false);
   const [isPopUp, set_isPopUp] = useState(false);
@@ -15,13 +17,17 @@ const StichingOutComponent = ({ navigation, route, ...props }) => {
   const [popUpRBtnTitle, set_popUpRBtnTitle] = useState(undefined);
   const [isPopupLeft, set_isPopupLeft] = useState(false);
 
-  React.useEffect(() => {
-    getInitialData(route.params?.styleId,route.params?.soId);
-  }, []);
+  const [MainLoading, set_MainLoading] = useState(false);
+  const [page, setpage] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+
+  // React.useEffect(() => {
+  //   getInitialData();
+  // }, []);
 
   useFocusEffect(
     React.useCallback(() => {
-      getInitialData(route.params?.styleId,route.params?.soId);
+      getInitialData(0, true);
     }, [])
 );
 
@@ -29,14 +35,23 @@ const StichingOutComponent = ({ navigation, route, ...props }) => {
     navigation.navigate('Main');
   };
 
-  const getInitialData = async (styleId,soID) => {
+  const getInitialData = async (page = 0, reload = false) => {
 
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
 
+    const fromRecord = reload ? 0 : page * ListSize;
+    const toRecord = fromRecord + ListSize - 1;
 
-    set_isLoading(true);
+    set_isLoading(!reload);
+    set_MainLoading(reload);
+
+    console.log("from : ",fromRecord, "to : ",  toRecord);
+
+   try {
+
+    // set_isLoading(true);
     let obj = {
       "menuId": 12,
       "searchKeyValue": "",
@@ -45,18 +60,26 @@ const StichingOutComponent = ({ navigation, route, ...props }) => {
       "locIds": 0,
       "brandIds": 0,
       "compIds": usercompanyId,
-      "fromRecord": 0,
-      "toRecord": 999,
+      "fromRecord": fromRecord,
+      "toRecord": toRecord,
       "username": userName,
       "password" : userPsd
   }
 
     let stichingOutAPIObj = await APIServiceCall.stichingOutDetails(obj);
-    set_isLoading(false);
+    // set_isLoading(false);
     if(stichingOutAPIObj && stichingOutAPIObj.statusData){
 
       if(stichingOutAPIObj && stichingOutAPIObj.responseData){
-        set_itemsArray(stichingOutAPIObj.responseData)
+        // set_itemsArray(stichingOutAPIObj.responseData);
+        set_itemsArray(prevItems => reload 
+          ? stichingOutAPIObj.responseData 
+          : [...prevItems, ...stichingOutAPIObj.responseData] 
+        );
+
+        if(stichingOutAPIObj?.responseData?.length < ListSize-1){
+          setHasMore(false);
+        }
       } 
 
     } else {
@@ -66,6 +89,10 @@ const StichingOutComponent = ({ navigation, route, ...props }) => {
     if(stichingOutAPIObj && stichingOutAPIObj.error) {
       popUpAction(Constant.SERVICE_FAIL_MSG,Constant.DefaultAlert_MSG,'OK', true,false)
     }
+  }finally{
+    set_isLoading(false);
+    set_MainLoading(false);
+  }
 
   };
 
@@ -86,6 +113,21 @@ const StichingOutComponent = ({ navigation, route, ...props }) => {
     popUpAction(undefined,undefined,'', false,false)
   }
 
+  const fetchMore= (more) =>{
+    console.log("fetch more ==> ", hasMore, isLoading );
+    
+    if(more){
+      if(!hasMore || MainLoading || isLoading) return;
+      const next =page + 1  ;
+      setpage(next);
+      getInitialData(next, false);
+    }else{
+      setpage(0);
+      getInitialData(0, true);
+      setHasMore(true);
+    }
+  }
+
   return (
 
     <StichingOutUI
@@ -99,6 +141,8 @@ const StichingOutComponent = ({ navigation, route, ...props }) => {
       backBtnAction = {backBtnAction}
       actionOnRow = {actionOnRow}
       popOkBtnAction = {popOkBtnAction}
+      fetchMore={fetchMore}
+      MainLoading = {MainLoading}
     />
 
   );

@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import {View,StyleSheet,TouchableOpacity,Text,FlatList,Image,TextInput} from 'react-native';
+import {View,StyleSheet,TouchableOpacity,Text,FlatList,Image,TextInput, RefreshControl, ActivityIndicator} from 'react-native';
 import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
 import * as Constant from "./../../../utils/constants/constant";
 import CommonStyles from "./../../../utils/commonStyles/commonStyles";
@@ -15,6 +15,8 @@ const CuttingMainUI = ({route, ...props }) => {
   const [filterArray, set_filterArray] = useState(undefined);
   const [recName, set_recName] = useState(undefined);
   let isKeyboard = useRef(false);
+  const [refreshing, set_refreshing] = useState(false);
+
 
   React.useEffect(() => {
 
@@ -63,6 +65,16 @@ const CuttingMainUI = ({route, ...props }) => {
         set_filterArray([]);
       }
     }
+  };
+
+  const fetchMore=()=>{
+    props.fetchMore(true);
+  }
+
+  const onRefresh = () => {
+    set_refreshing(true);
+    props.fetchMore(false); 
+    set_refreshing(false);
   };
 
   // const renderItem = ({ item, index }) => {
@@ -156,16 +168,28 @@ const renderItem = ({ item, index }) => {
           <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:3,textAlign:'left'}]}>{'Style Details'}</Text>
           <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:1}]}>{'Location'}</Text>
         </View>: <View style = {CommonStyles.noRecordsFoundStyle}>
-            {!props.isLoading ? <Text style={[CommonStyles.tylesHeaderTextStyle, {fontSize: 18}]}>{Constant.noRecFound}</Text> : null}
+            {!props.MainLoading ? <Text style={[CommonStyles.tylesHeaderTextStyle, {fontSize: 18}]}>{Constant.noRecFound}</Text> : null}
         </View>}
 
         <View style={CommonStyles.listStyle}>
-          <FlatList
+          {/* <FlatList
             data={filterArray}
             renderItem={renderItem}
             keyExtractor={(item, index) => "" + index}
             showsVerticalScrollIndicator = {false}
-          />
+          /> */}
+             <FlatList
+              data={filterArray}
+              renderItem={renderItem}
+              keyExtractor={(item, index) => '' + index}
+              showsVerticalScrollIndicator={false}
+              onEndReached={() => fetchMore()}
+              onEndReachedThreshold={0.2}
+              ListFooterComponent={() => props.isLoading && <ActivityIndicator size="large" />}
+              refreshControl={
+                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+              }
+            />
         </View>
       </View>  
 
@@ -182,7 +206,7 @@ const renderItem = ({ item, index }) => {
         />
       </View> : null}
 
-      {props.isLoading === true ? <LoaderComponent isLoader={true} loaderText = {Constant.LOADER_MESSAGE } isButtonEnable = {false} /> : null} 
+      {props.MainLoading === true ? <LoaderComponent isLoader={true} loaderText = {Constant.LOADER_MESSAGE } isButtonEnable = {false} /> : null} 
 
     </View>
   );
