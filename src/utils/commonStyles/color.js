@@ -1,7 +1,7 @@
 export default  color={
 
     //main color
-   // color2: '#17BEB4',      // GREEN  
+   // color2: '#26A69A',      // GREEN  
    color2: '#1F74BA',   //BLUE
 // color1:'#2F74BA',      // GREEN DARK COLOR 
 

@@ -42,15 +42,16 @@ const FabricProcessInList = ({ route }) => {
 
   const fetchMore= (more) =>{
     console.log("fetch more ==> ", hasMore, isLoading );
-    if(!hasMore || MainLoading || isLoading) return;
-
+    
     if(more){
+      if(!hasMore || MainLoading || isLoading) return;
       const next =page + 1  ;
       setpage(next);
       getInitialData(next, false);
     }else{
       setpage(0);
       getInitialData(0, true);
+      setHasMore(true);
     }
   }
 
@@ -60,7 +61,9 @@ const FabricProcessInList = ({ route }) => {
     
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
-    set_isLoading(true);
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+
+    set_isLoading(!reload);
     set_MainLoading(reload);
 
     const fromRecord = reload ? 0 : page * ListSize;
@@ -76,7 +79,8 @@ const FabricProcessInList = ({ route }) => {
         "fromRecord": fromRecord,
         "toRecord": toRecord,
         "searchKeyValue": "",
-        "styleSearchDropdown": "-1"
+        "styleSearchDropdown": "-1",
+        // "compIds": usercompanyId
     }
       let LISTAPIOBJ = await APIServiceCall.loadAllFabricProcessInList(obj);
       set_isLoading(false);
@@ -111,11 +115,11 @@ const FabricProcessInList = ({ route }) => {
 
   const getFilteredList = async (types, Ids) => {
 
+    set_MainLoading(true);
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
 
-    set_isLoading(true);
     let obj =  {
       "username": userName,
        "password": userPsd,
@@ -130,7 +134,7 @@ const FabricProcessInList = ({ route }) => {
 
   
     let stichingOutAPIObj = await APIServiceCall.getFilteredListFBI(obj);
-    set_isLoading(false);
+    set_MainLoading(false);
     
     if(stichingOutAPIObj && stichingOutAPIObj.statusData){
 

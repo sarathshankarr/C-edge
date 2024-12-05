@@ -6,6 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { useFocusEffect } from '@react-navigation/native';
 const FinishingStyleComponent = ({ navigation, route, ...props }) => {
+   const ListSize=10;
 
     const [itemsArray, set_itemsArray] = useState([]);
     const [isLoading, set_isLoading] = useState(false);
@@ -15,13 +16,17 @@ const FinishingStyleComponent = ({ navigation, route, ...props }) => {
     const [popUpRBtnTitle, set_popUpRBtnTitle] = useState(undefined);
     const [isPopupLeft, set_isPopupLeft] = useState(false);
 
-  React.useEffect(() => {   
-    getInitialData();
-  }, []);
+    const [MainLoading, set_MainLoading] = useState(false);
+    const [page, setpage] = useState(0);
+    const [hasMore, setHasMore] = useState(true); 
+
+  // React.useEffect(() => {   
+  //   getInitialData();
+  // }, []);
   
   useFocusEffect(
     React.useCallback(() => {
-      getInitialData();
+       getInitialData(0, true);
     }, [])
 );
 
@@ -29,7 +34,7 @@ const FinishingStyleComponent = ({ navigation, route, ...props }) => {
     navigation.navigate('Main');
   };
 
-  const getInitialData = async () => {
+  const getInitialData = async (page = 0, reload = false) => {
 
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
@@ -37,7 +42,16 @@ const FinishingStyleComponent = ({ navigation, route, ...props }) => {
     let brandIds = await AsyncStorage.getItem('brandIds');
     let usercompanyId = await AsyncStorage.getItem('companyId');
     
-    set_isLoading(true);
+    const fromRecord = reload ? 0 : page * ListSize;
+    const toRecord = fromRecord + ListSize - 1;
+
+    set_isLoading(!reload);
+    set_MainLoading(reload);
+
+    console.log("from : ",fromRecord, "to : ",  toRecord);
+
+   try {
+
     let obj = {
         "menuId": 40,
         "searchKeyValue": "",
@@ -46,8 +60,8 @@ const FinishingStyleComponent = ({ navigation, route, ...props }) => {
         "locIds": locIds ? locIds : 0,
       "brandIds":brandIds ? brandIds: 0 ,
         "compIds": usercompanyId,
-        "fromRecord": 0,
-        "toRecord": 999,
+        "fromRecord": fromRecord,
+        "toRecord": toRecord,
         "username": userName,
         "password" : userPsd
     }    
@@ -58,7 +72,15 @@ const FinishingStyleComponent = ({ navigation, route, ...props }) => {
     if(loadFinisfAPIObj && loadFinisfAPIObj.statusData){
 
       if(loadFinisfAPIObj && loadFinisfAPIObj.responseData){
-        set_itemsArray(loadFinisfAPIObj.responseData)
+        // set_itemsArray(loadFinisfAPIObj.responseData)
+        set_itemsArray(prevItems => reload 
+          ? loadFinisfAPIObj.responseData 
+          : [...prevItems, ...loadFinisfAPIObj.responseData] 
+        );
+
+        if(loadFinisfAPIObj?.responseData?.length < ListSize-1){
+          setHasMore(false);
+        }
       } 
 
     } else {
@@ -68,6 +90,10 @@ const FinishingStyleComponent = ({ navigation, route, ...props }) => {
     if(loadFinisfAPIObj && loadFinisfAPIObj.error) {
       popUpAction(Constant.SERVICE_FAIL_MSG,Constant.DefaultAlert_MSG,'OK', true,false)
     }
+  }finally{
+    set_isLoading(false);
+    set_MainLoading(false);
+  }
 
   };
 
@@ -87,6 +113,22 @@ const FinishingStyleComponent = ({ navigation, route, ...props }) => {
     popUpAction(undefined,undefined,'', false,false)
   }
 
+  const fetchMore= (more) =>{
+    console.log("fetch more ==> ", hasMore, isLoading );
+    
+    if(more){
+      if(!hasMore || MainLoading || isLoading) return;
+      const next =page + 1  ;
+      setpage(next);
+      getInitialData(next, false);
+    }else{
+      setpage(0);
+      getInitialData(0, true);
+      setHasMore(true);
+    }
+  }
+
+
   return (
 
     <FinishingStyleUI
@@ -100,6 +142,8 @@ const FinishingStyleComponent = ({ navigation, route, ...props }) => {
       backBtnAction = {backBtnAction}
       actionOnRow = {actionOnRow}
       popOkBtnAction = {popOkBtnAction}
+      fetchMore={fetchMore}
+      MainLoading = {MainLoading}
     />
 
   );

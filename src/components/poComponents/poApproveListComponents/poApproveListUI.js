@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, StyleSheet, TouchableOpacity, Text, FlatList, Image, TextInput } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Text, FlatList, Image, TextInput, RefreshControl, ActivityIndicator } from 'react-native';
 import { heightPercentageToDP as hp, widthPercentageToDP as wp, } from "react-native-responsive-screen";
 import CommonStyles from "../../../utils/commonStyles/commonStyles";
 import HeaderComponent from '../../../utils/commonComponents/headerComponent';
@@ -17,6 +17,8 @@ const POApproveUI = ({ route, ...props }) => {
   const [filterArray, set_filterArray] = useState(undefined);
   const [recName, set_recName] = useState(undefined);
   let isKeyboard = useRef(false);
+  const [refreshing, set_refreshing] = useState(false);
+
 
 
 
@@ -79,6 +81,16 @@ const POApproveUI = ({ route, ...props }) => {
     );
   };
 
+  const fetchMore=()=>{
+    props.fetchMore(true);
+  }
+
+  const onRefresh = () => {
+    set_refreshing(true);
+    props.fetchMore(false); 
+    set_refreshing(false);
+  };
+
   return (
 
     <View style={[CommonStyles.mainComponentViewStyle]}>
@@ -119,19 +131,27 @@ const POApproveUI = ({ route, ...props }) => {
           <Text style={[CommonStyles.tylesHeaderTextStyle, { flex: 1.5, textAlign: 'center', }]}>{'Vendor'}</Text>
           <Text style={[CommonStyles.tylesHeaderTextStyle, { flex: 1, textAlign: 'center', }]}>{'RM/Fabric'}</Text>
           <Text style={[CommonStyles.tylesHeaderTextStyle, { flex: 1.2, textAlign: 'right', marginRight: wp('2%'), }]}>{'Total Price'}</Text>
-        </View> : null}
+        </View> : <View style = {CommonStyles.noRecordsFoundStyle}>
+          {!props.MainLoading ? <Text style={[CommonStyles.tylesHeaderTextStyle, {fontSize: 18}]}>{Constant.noRecFound}</Text> : null}
+      </View>}
 
         <View style={CommonStyles.listStyle}>
-          {filterArray && filterArray.length > 0 ? <FlatList
-            data={filterArray}
-            renderItem={renderItem}
-            keyExtractor={(item, index) => "" + index}
-            showsVerticalScrollIndicator={false}
-          /> : <View style = {CommonStyles.noRecordsFoundStyle}>
-          {!props.isLoading ? <Text style={[CommonStyles.tylesHeaderTextStyle, {fontSize: 18}]}>{Constant.noRecFound}</Text> : null}
-      </View>}
+        <FlatList
+              data={filterArray}
+              renderItem={renderItem}
+              keyExtractor={(item, index) => '' + index}
+              showsVerticalScrollIndicator={false}
+              onEndReached={() => fetchMore()}
+              onEndReachedThreshold={0.2}
+              ListFooterComponent={() => props.isLoading && <ActivityIndicator size="large" />}
+              refreshControl={
+                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+              }
+            />
         </View>
       </View>
+
+
       {props.isPopUp ? <View style={CommonStyles.customPopUpStyle}>
         <AlertComponent
           header={props.popUpAlert}
@@ -145,7 +165,7 @@ const POApproveUI = ({ route, ...props }) => {
         />
       </View> : null}
 
-      {props.isLoading === true ? <LoaderComponent isLoader={true} loaderText={Constant.LOADER_MESSAGE} isButtonEnable={false} /> : null}
+      {props.MainLoading === true ? <LoaderComponent isLoader={true} loaderText={Constant.LOADER_MESSAGE} isButtonEnable={false} /> : null}
     </View>
   );
 }

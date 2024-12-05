@@ -14,19 +14,27 @@ import {
 import color from '../commonStyles/color';
 import CustomCheckBox from './CustomCheckBox';
 import  * as APIServiceCall from './../../utils/apiCalls/apiCallsComponent';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const FilterModal = ({isVisible, onClose, categoriesList, selectedCategoryListAPI,applyFilterFxn}) => {
+const FilterModal = ({isVisible, onClose, categoriesList, selectedCategoryListAPI,applyFilterFxn,clearFilter}) => {
 
   const [selectedCategory, setSelectedCategory] = useState('Cuisines'); 
   const [searchText, setSearchText] = useState(''); 
   const [isLoading, set_isLoading] = useState(false);
   const [selectedCategoryItems, set_selectedCategoryItems] = useState([]);
+  const [selectedCategoryFilteredItems, set_selectedCategoryFilteredItems] = useState([]);
   const [selectedIndices, setSelectedIndices] = useState([]); 
 
 
 
-  // Filtered right-side list based on search text
-  const filteredItems =  [];
+  const handleFilterList=(text='')=>{
+    const property = selectedCategory?.fid;
+    const filtered = selectedCategoryItems.filter((item) =>item[property].toUpperCase().includes(text.toUpperCase() || ''));
+    console.log("selected category",property,text, filtered);
+    set_selectedCategoryFilteredItems(filtered);
+    setSearchText(text);
+  }
+
 
   const toggleSelection = (index) => {
     setSelectedIndices((prevSelected) => {
@@ -62,7 +70,9 @@ const FilterModal = ({isVisible, onClose, categoriesList, selectedCategoryListAP
       if(categoreisListAPIOBJ && categoreisListAPIOBJ.statusData){
   
         if(categoreisListAPIOBJ && categoreisListAPIOBJ.responseData){
-          set_selectedCategoryItems(categoreisListAPIOBJ.responseData)
+          set_selectedCategoryItems(categoreisListAPIOBJ.responseData);
+          set_selectedCategoryFilteredItems(categoreisListAPIOBJ.responseData);
+          console.log("reponse data from API :",categoreisListAPIOBJ.responseData )
         } 
   
       } else {
@@ -79,15 +89,23 @@ const FilterModal = ({isVisible, onClose, categoriesList, selectedCategoryListAP
 
 
     const handleSelectCategory=(item)=>{
-      setSelectedCategory(item.id);
+      setSelectedCategory(item);
       setSearchText('');
-      // getSelectedCategoryListFBI(selectedCategoryListAPI, item.id);
+      getSelectedCategoryListFBI(selectedCategoryListAPI, item.id);
+      setSelectedIndices([]);
     }
 
     const handleAppyFilter=()=>{
       const ids=selectedIndices.join(',');
+      const count=selectedIndices.length;
       const type=selectedCategory.id
-      applyFilterFxn(type, ids)
+      applyFilterFxn(type, ids, count);
+    }
+
+    const handleClearFilter=()=>{
+      clearFilter();
+      setSelectedIndices([]);
+      setSearchText('');
     }
 
 
@@ -125,7 +143,7 @@ const FilterModal = ({isVisible, onClose, categoriesList, selectedCategoryListAP
               <TouchableOpacity
                 style={[
                   styles.categoryItem,
-                  item.id === selectedCategory && styles.selectedCategory,
+                  item.id === selectedCategory.id && styles.selectedCategory,
                 ]}
                 onPress={() => handleSelectCategory(item)}>
                 <Text
@@ -143,7 +161,7 @@ const FilterModal = ({isVisible, onClose, categoriesList, selectedCategoryListAP
           <View style={styles.rightSide}>
             <View style={styles.dynamicFilterHeader}>
               <Text style={styles.dynamicFilterText}>
-                Filter by {selectedCategory}
+                Filter by {selectedCategory.value}
               </Text>
               <View
                 style={[
@@ -158,7 +176,7 @@ const FilterModal = ({isVisible, onClose, categoriesList, selectedCategoryListAP
               style={styles.searchBar}
               placeholder={`Search`}
               value={searchText}
-              onChangeText={setSearchText}
+              onChangeText={handleFilterList}
             />
 
             {/* Right-Side List */}
@@ -168,15 +186,15 @@ const FilterModal = ({isVisible, onClose, categoriesList, selectedCategoryListAP
                 </View>
             ) : (
             <FlatList
-              data={filteredItems}
-              keyExtractor={item => item}
+              data={selectedCategoryFilteredItems}
+              keyExtractor={(item, index) => `batchname-${index}`}
               renderItem={({ item, index }) => (
                 <View style={styles.itemContainer}>
                   <CustomCheckBox
                         isChecked={selectedIndices.includes(index)}
                         onToggle={() => toggleSelection(index)}
                     />
-                  <Text style={styles.itemText}>{item}</Text>
+                  <Text style={styles.itemText}>{item[selectedCategory.fid]}</Text>
                 </View>
               )}
               ListEmptyComponent={
@@ -191,10 +209,7 @@ const FilterModal = ({isVisible, onClose, categoriesList, selectedCategoryListAP
         <View style={styles.footer}>
           <TouchableOpacity
             style={styles.clearButton}
-            onPress={() => {
-              setSelectedCategory('Cuisines');
-              setSearchText('');
-            }}>
+            onPress={() => handleClearFilter()}>
             <Text style={styles.clearText}>Clear Filters</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.applyButton} onPress={()=>handleAppyFilter()}>
@@ -298,6 +313,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     marginBottom: 10,
     backgroundColor: '#f9f9f9',
+    color:'#000'
   },
   itemContainer: {
     paddingVertical: 10,

@@ -4,8 +4,11 @@ import * as Constant from "../../../utils/constants/constant";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import LocationWiseRMFabInvUI from './LocationWiseRMFabInvUI'
+import { useFocusEffect } from '@react-navigation/native';
 
 const LocationWiseRMFabInv = ({ navigation, route, ...props }) => {
+
+  const ListSize=10;
 
   const [itemsArray, set_itemsArray] = useState([]);
   const [isLoading, set_isLoading] = useState(false);
@@ -14,41 +17,68 @@ const LocationWiseRMFabInv = ({ navigation, route, ...props }) => {
   const [popUpAlert, set_popUpAlert] = useState(undefined);
   const [popUpRBtnTitle, set_popUpRBtnTitle] = useState(undefined);
   const [isPopupLeft, set_isPopupLeft] = useState(false);
+  const [MainLoading, set_MainLoading] = useState(false);
+  const [page, setpage] = useState(0);
+  const [hasMore, setHasMore] = useState(true); 
 
-  React.useEffect(() => {   
-    getInitialData();
-  }, []);
+
+  // React.useEffect(() => {   
+  //      getInitialData(0, true);
+  // }, []);
+
+  useFocusEffect(
+    React.useCallback(() => {
+       getInitialData(0, true);
+    }, [])
+  );
+
+
 
   const backBtnAction = () => {
     navigation.goBack();
   };
 
-  const getInitialData = async () => {
+  const getInitialData = async (page = 0, reload = false) => {
 
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
 
-    set_isLoading(true);
+    const fromRecord = reload ? 0 : page * ListSize;
+    const toRecord = fromRecord + ListSize - 1;
+
+    set_isLoading(!reload);
+    set_MainLoading(reload);
+
+    console.log("from : ",fromRecord, "to : ",  toRecord);
+    try {
+    // set_isLoading(true);
     let obj = {
         "searchKeyValue": "",
-        "styleSearchDropdown": "-1",//mandatory
+        "styleSearchDropdown": "-1",
         // "dataFilter": "120Days",
-        "fromRecord": 0, //mandatory
-        "toRecord": 999, //mandatory
-        "userName": userName,  //mandatory
-        "userPwd": userPsd ,  //mandatory
+        "fromRecord": fromRecord, 
+        "toRecord": toRecord, 
+        "userName": userName,  
+        "userPwd": userPsd ,  
         "compIds": usercompanyId,
 
     }
 
     let locationWiseRMFabInvAPIOBJ = await APIServiceCall.locationWiseRMFabInvAPI(obj);
-    set_isLoading(false);
+    // set_isLoading(false);
     
     if(locationWiseRMFabInvAPIOBJ && locationWiseRMFabInvAPIOBJ.statusData){
 
       if(locationWiseRMFabInvAPIOBJ && locationWiseRMFabInvAPIOBJ.responseData){
-        set_itemsArray(locationWiseRMFabInvAPIOBJ.responseData)
+        // set_itemsArray(locationWiseRMFabInvAPIOBJ.responseData)
+        set_itemsArray(prevItems => reload 
+          ? locationWiseRMFabInvAPIOBJ.responseData 
+          : [...prevItems, ...locationWiseRMFabInvAPIOBJ.responseData] 
+        );
+        if(locationWiseRMFabInvAPIOBJ?.responseData?.length < ListSize-1){
+          setHasMore(false);
+        }
       } 
 
     } else {
@@ -58,6 +88,10 @@ const LocationWiseRMFabInv = ({ navigation, route, ...props }) => {
     if(locationWiseRMFabInvAPIOBJ && locationWiseRMFabInvAPIOBJ.error) {
       popUpAction(Constant.SERVICE_FAIL_MSG,Constant.DefaultAlert_MSG,'OK', true,false)
     }
+  }finally{
+    set_isLoading(false);
+    set_MainLoading(false);
+  }
 
   };
 
@@ -77,6 +111,21 @@ const LocationWiseRMFabInv = ({ navigation, route, ...props }) => {
     popUpAction(undefined,undefined,'', false,false)
   }
 
+  const fetchMore= (more) =>{
+    console.log("fetch more ==> ", hasMore, isLoading );
+    
+    if(more){
+      if(!hasMore || MainLoading || isLoading) return;
+      const next =page + 1  ;
+      setpage(next);
+      getInitialData(next, false);
+    }else{
+      getInitialData(0, true);
+      setpage(0);
+      setHasMore(true);
+    }
+  }
+
   return (
 
     <LocationWiseRMFabInvUI
@@ -90,6 +139,8 @@ const LocationWiseRMFabInv = ({ navigation, route, ...props }) => {
       backBtnAction = {backBtnAction}
       actionOnRow = {actionOnRow}
       popOkBtnAction = {popOkBtnAction}
+      fetchMore={fetchMore}
+      MainLoading = {MainLoading}
     />
 
   );
