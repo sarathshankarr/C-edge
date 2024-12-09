@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
         minHeight: hp('20%'),
         maxHeight: hp('60%'),
         backgroundColor: 'white',
-        borderRadius: 10,
+        borderRadius: 5,
         shadowColor: "black",
         shadowOffset: {
             width: 0,

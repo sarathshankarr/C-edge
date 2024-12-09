@@ -130,7 +130,7 @@ const StoreApproveListUI = ({route, ...props }) => {
           
         </View>}
 
-        {filterArray && filterArray.length > 0 ? <View style={{flexDirection :'row', justifyContent:'space-between'}}>
+        {filterArray && filterArray.length > 0 ? <View style={CommonStyles.listCommonHeader}>
           <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:0.5,textAlign:'left'}]}>{'SId'}</Text>
           <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:1,textAlign:'center',}]}>{'Style'}</Text>
           <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:1,textAlign:'center',}]}>{'Approved Date'}</Text>

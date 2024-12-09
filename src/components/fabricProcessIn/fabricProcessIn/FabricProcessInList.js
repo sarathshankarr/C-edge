@@ -125,13 +125,14 @@ const FabricProcessInList = ({ route }) => {
        "password": userPsd,
        "menuId": 587,
        "fromRecord": 0,
-       "toRecord": 25,
+       "toRecord": 999,
        "searchKeyValue": "",
        "styleSearchDropdown": "-1",
        "categoryType" : types,
        "categoryIds" : Ids
      }
 
+     console.log("requested filtered body ==> ", obj)
   
     let stichingOutAPIObj = await APIServiceCall.getFilteredListFBI(obj);
     set_MainLoading(false);

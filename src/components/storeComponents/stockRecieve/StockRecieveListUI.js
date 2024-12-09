@@ -132,7 +132,7 @@ const StockRecieveListUI = ({ route, ...props }) => {
 
         </View>}
 
-        {filterArray && filterArray.length > 0 ? <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+        {filterArray && filterArray.length > 0 ? <View style={CommonStyles.listCommonHeader}>
           <Text style={[CommonStyles.tylesHeaderTextStyle, { flex: 0.5, textAlign: 'left' }]}>{'SId'}</Text>
           <Text style={[CommonStyles.tylesHeaderTextStyle, { flex: 1, textAlign: 'center', }]}>{'Style'}</Text>
           <View style={{ flex: 1 }}>

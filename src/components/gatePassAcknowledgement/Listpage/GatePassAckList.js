@@ -90,6 +90,44 @@ const GatePassAckList = ({ navigation, route, ...props }) => {
 
   };
 
+  const getFilteredList = async (types, Ids) => {
+
+    set_MainLoading(true);
+    let userName = await AsyncStorage.getItem('userName');
+    let userPsd = await AsyncStorage.getItem('userPsd');
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+
+    let obj =  {
+      "username": userName,
+       "password": userPsd,
+       "menuId": 759,
+       "categoryType" : types,
+       "categoryIds" : Ids
+     }
+
+     console.log("requested filtered body ==> ", obj);
+  
+    let stichingOutAPIObj = await APIServiceCall.getFilteredListGPA(obj);
+    set_MainLoading(false);
+    
+    if(stichingOutAPIObj && stichingOutAPIObj.statusData){
+
+      if(stichingOutAPIObj && stichingOutAPIObj.responseData){
+        set_itemsArray(stichingOutAPIObj.responseData)
+      } 
+
+    } else {
+      popUpAction(Constant.SERVICE_FAIL_MSG,Constant.DefaultAlert_MSG,'OK', true,false);
+    }
+
+    if(stichingOutAPIObj && stichingOutAPIObj.error) {
+      popUpAction(Constant.SERVICE_FAIL_MSG,Constant.DefaultAlert_MSG,'OK', true,false)
+    }
+
+  };
+
+
+
   const actionOnRow = (item,index) => {
     navigation.navigate('GatePassAckEdit', {id:item?.id});
   };
@@ -135,6 +173,8 @@ const GatePassAckList = ({ navigation, route, ...props }) => {
       popOkBtnAction = {popOkBtnAction}
       fetchMore={fetchMore}
       MainLoading = {MainLoading}
+      applyFilterFxn={getFilteredList}
+
     />
 
   );

@@ -160,7 +160,7 @@ const LocationWiseRMFabInvUI = ({route, ...props }) => {
           <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:1.2,textAlign:'center',}]}>{'Total qty'}</Text>
         </View>: null} */}
 
-        {filterArray && filterArray.length > 0 ? <View style={{flexDirection :'row', justifyContent:'space-between'}}>
+        {filterArray && filterArray.length > 0 ? <View style={CommonStyles.listCommonHeader}>
           <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:3,textAlign:'left'}]}>{'Style Details'}</Text>
           {/* <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:1,textAlign:'center',}]}>{'Color'}</Text>
           <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:1,textAlign:'center',}]}>{'WO'}</Text> */}

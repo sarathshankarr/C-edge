@@ -164,7 +164,7 @@ const renderItem = ({ item, index }) => {
           <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:1,textAlign:'center',}]}>{'WO'}</Text>
           <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:1,textAlign:'right',}]}>{'Location'}</Text>
         </View>: null} */}
-        {filterArray && filterArray.length > 0 ? <View style={{flexDirection :'row'}}>
+        {filterArray && filterArray.length > 0 ? <View style={CommonStyles.listCommonHeader1}>
           <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:3,textAlign:'left'}]}>{'Style Details'}</Text>
           <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:1}]}>{'Location'}</Text>
         </View>: <View style = {CommonStyles.noRecordsFoundStyle}>

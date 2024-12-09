@@ -163,7 +163,7 @@ const StyleManageUI = ({route, ...props}) => {
         ) : null}
 
         {filterArray && filterArray.length > 0 ? (
-          <View style={{flexDirection: 'row'}}>
+          <View style={CommonStyles.listCommonHeader1}>
             <Text
               style={[
                 CommonStyles.tylesHeaderTextStyle,

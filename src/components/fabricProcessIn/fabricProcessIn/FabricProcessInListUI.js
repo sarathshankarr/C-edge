@@ -37,13 +37,15 @@ const FabricProcessInListUI = ({route, navigation, ...props}) => {
   const [recName, set_recName] = useState(undefined);
   const [showFilteredList, set_showFilteredList] = useState(false);
   const [filterCount, set_filterCount] = useState(0);
+  const [isFiltering, setIsFiltering] = useState(false); 
+
 
 
   const [categories, set_categories]=useState([
-    { id: "batchNo", fid:"batchname" ,value: "Batch No" },
-    { id: "orderNo", fid: "orderNo", value: "Order No" },
-    { id: "designName",fid: "designName", value: "Design Name" },
-    { id: "BrandName", fid: "brandName", value: "Brand Name" }
+    { id: "batchNo", fid:"batchname" ,value: "Batch No" , idxId:"batchId"},
+    { id: "orderNo", fid: "orderNo", value: "Order No" , idxId:"orderId"},
+    { id: "designName",fid: "designName", value: "Design Name" , idxId:"designId"},
+    { id: "BrandName", fid: "brandName", value: "Brand Name" , idxId:"brandId"}
   ])
 
   const [isFilterVisible, setFilterVisible] = useState(false);
@@ -76,43 +78,28 @@ const FabricProcessInListUI = ({route, navigation, ...props}) => {
 
   
 
-  // const filterPets = name => {
-  //   const styleArray = filterArray.filter(item => {
-  //     const searchTerm = name;
-  //     return (
-  //       item?.OrderNo.includes(searchTerm) ||
-  //       item?.DesignNo.includes(searchTerm) ||
-  //       item?.brandName?.includes(searchTerm)
-  //     );
-  //   });
-
-  //   if (styleArray && styleArray.length > 0) {
-  //     set_filterArray(styleArray);
-  //   } else {
-  //     set_filterArray([]);
-  //   }
-  // };
-
   const filterPets = (name) => {
-    const searchTerm = name.toString().toLowerCase().trim();  
+    const searchTerm = name.toString().toLowerCase().trim(); 
+     set_recName(name); 
     if(searchTerm.length===0){
       set_filterArray(ItemsArray);
+      setIsFiltering(false);
       return;
     }
-  
-    const styleArray = filterArray.filter(item => {
+    setIsFiltering(true); 
+
+    const styleArray = ItemsArray.filter(item => {
       return (
-        (item?.orderNo?.toLowerCase().includes(searchTerm)) ||
-        (item?.designName?.toLowerCase().includes(searchTerm)) ||
-        (item?.brandName?.toLowerCase().includes(searchTerm)) ||
-        (item?.batchname?.toLowerCase().includes(searchTerm)) ||   
-        (item?.inMenuName?.toLowerCase().includes(searchTerm)) ||
-        (item?.matchingName?.toLowerCase().includes(searchTerm)) 
+        (item?.orderNo!=="" && item?.orderNo?.toLowerCase().includes(searchTerm)) ||
+        (item?.designName!=="" && item?.designName?.toLowerCase().includes(searchTerm)) ||
+        (item?.brandName!=="" &&item?.brandName?.toLowerCase().includes(searchTerm)) ||
+        (item?.batchname!=="" &&item?.batchname?.toLowerCase().includes(searchTerm)) ||   
+        (item?.inMenuName!=="" &&item?.inMenuName?.toLowerCase().includes(searchTerm)) ||
+        (item?.matchingName!=="" &&item?.matchingName?.toLowerCase().includes(searchTerm)) 
       );
     });
   
-    // Update filtered array
-    set_filterArray(styleArray.length > 0 ? styleArray : []);
+    set_filterArray(styleArray|| []);
   };
   
   const actionOnRow = (item, index) => {
@@ -129,7 +116,10 @@ const FabricProcessInListUI = ({route, navigation, ...props}) => {
   };
 
   const fetchMore=()=>{
-    props.fetchMore(true);
+    if (!isFiltering) { 
+      props.fetchMore(true);
+    }
+    // props.fetchMore(true);
   }
 
   const clearFilter=()=>{
@@ -141,8 +131,10 @@ const FabricProcessInListUI = ({route, navigation, ...props}) => {
     props.fetchMore(false); 
     set_refreshing(false);
     set_filterCount(0);
+    set_recName('');
     set_showFilteredList(false);
     setFilterVisible(false);
+    setIsFiltering(false);
   };
 
 
@@ -237,136 +229,6 @@ const FabricProcessInListUI = ({route, navigation, ...props}) => {
 
       <View style={CommonStyles.headerStyle}>
         {filterArray ? (
-          // <View style={{flexDirection: 'row', width: '100%', marginBottom: 10}}>
-          //   <View style={{}}>
-          //     <View
-          //       style={{
-          //         width: '100%',
-          //         flexDirection: 'row',
-          //         alignItems: 'center',
-          //         borderWidth: 1,
-          //         borderColor: 'black',
-          //         borderRadius: 5,
-          //       }}>
-          //       <Image
-          //         source={searchImg}
-          //         style={{height: 15, width: 15, marginLeft: 15}}
-          //       />
-          //       <TextInput
-          //          style={[
-          //           styles.input,
-          //           Platform.OS === 'ios' && { paddingVertical: 17 }, // Apply padding only for iOS
-          //         ]}
-          //         underlineColorAndroid="transparent"
-          //         placeholder="Search "
-          //         placeholderTextColor="#7F7F81"
-          //         autoCapitalize="none"
-          //         value={recName}
-          //         onFocus={() => (isKeyboard.current = true)}
-          //         onChangeText={text => {
-          //           filterPets(text);
-          //         }}
-          //       />
-          //     </View>
-          //   </View>
-          //     <TouchableOpacity
-          //       style={{}}
-          //       onPress={() => {
-          //         set_showFilteredList(!showFilteredList)
-          //       }}>
-          //         <Image
-          //         source={filterImg}
-          //         style={{height: 25, width: 25, marginLeft: 15, tintColor:color.color2}}
-          //       />
-          //       <Text style={{}}>{showFilteredList ? "  filter " : "  filter"}</Text>
-                
-          //     </TouchableOpacity>
-          //     <TouchableOpacity
-          //       style={styles.leftButtonstyle1}
-          //       onPress={() => {
-          //         createPage();
-          //       }}>
-          //       <Image
-          //         source={addImg}
-          //         style={{height: 45, width: 45, marginLeft: 15, tintColor:color.color2}}
-          //       />
-          //     </TouchableOpacity>
-          // </View>
-        //   <View style={{ flexDirection: 'row', width: '100%', marginBottom: 10, alignItems: 'center' }}>
-        //   {/* Search and Filter Combined */}
-        //   <View
-        //     style={{
-        //       flexDirection: 'row',
-        //       alignItems: 'center',
-        //       borderWidth: 1,
-        //       borderColor: '#D1D1D1',
-        //       borderRadius: 20,
-        //       backgroundColor: '#F9F9F9',
-        //       paddingHorizontal: 15,
-        //       paddingVertical: 8,
-        //       flex: 1, // Ensures the box takes appropriate space
-        //       shadowColor: '#000',
-        //       shadowOffset: { width: 0, height: 2 },
-        //       shadowOpacity: 0.1,
-        //       shadowRadius: 4,
-        //       elevation: 3,
-        //     }}
-        //   >
-        //     <Image
-        //       source={searchImg}
-        //       style={{ height: 18, width: 18, tintColor: '#7F7F81', marginRight: 10 }}
-        //     />
-        //     <TextInput
-        //       style={{ flex: 1, color: '#000' }}
-        //       underlineColorAndroid="transparent"
-        //       placeholder="Search"
-        //       placeholderTextColor="#A0A0A0"
-        //       autoCapitalize="none"
-        //       value={recName}
-        //       onFocus={() => (isKeyboard.current = true)}
-        //       onChangeText={(text) => {
-        //         filterPets(text);
-        //       }}
-        //     />
-        //     <TouchableOpacity
-        //       onPress={() => {
-        //         set_showFilteredList(!showFilteredList);
-        //       }}
-        //     >
-        //       <Image
-        //         source={filterImg}
-        //         style={{ height: 18, width: 18, tintColor: '#7F7F81', marginLeft: 10 }}
-        //       />
-        //     </TouchableOpacity>
-        //   </View>
-        
-        //   {/* Add Button */}
-        //   <TouchableOpacity
-        //     style={{
-        //       marginLeft: 10,
-        //       height: 45,
-        //       width: 45,
-        //       borderRadius: 22.5,
-        //       backgroundColor: '#007BFF', 
-        //       justifyContent: 'center',
-        //       alignItems: 'center',
-        //       shadowColor: '#000',
-        //       shadowOffset: { width: 0, height: 2 },
-        //       shadowOpacity: 0.1,
-        //       shadowRadius: 4,
-        //       elevation: 3,
-        //     }}
-        //     onPress={() => {
-        //       createPage();
-        //     }}
-        //   >
-        //     <Image
-        //       source={addImg}
-        //       style={{ height: 25, width: 25, tintColor: '#FFF' }} 
-        //     />
-        //   </TouchableOpacity>
-        // </View>
-
         <View style={{ flexDirection: 'row', width: '100%', marginBottom: 10, alignItems: 'center' }}>
   {/* Search Bar */}
   <View
@@ -399,9 +261,7 @@ const FabricProcessInListUI = ({route, navigation, ...props}) => {
       autoCapitalize="none"
       value={recName}
       onFocus={() => (isKeyboard.current = true)}
-      onChangeText={(text) => {
-        filterPets(text);
-      }}
+      onChangeText={filterPets}
     />
   </View>
 
@@ -442,31 +302,6 @@ const FabricProcessInListUI = ({route, navigation, ...props}) => {
     
   </TouchableOpacity>
 
-  {/* Add Button */}
-  {/* <TouchableOpacity
-    style={{
-      marginLeft: 10,
-      height: 45,
-      width: 45,
-      borderRadius: 22.5,
-      backgroundColor: color.color2,
-      justifyContent: 'center',
-      alignItems: 'center',
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.1,
-      shadowRadius: 4,
-      elevation: 3,
-    }}
-    onPress={() => {
-      createPage();
-    }}
-  >
-    <Image
-      source={addImg}
-      style={{ height: 25, width: 25, tintColor: '#FFF' }} 
-    />
-  </TouchableOpacity> */}
               <TouchableOpacity
                 style={styles.leftButtonstyle1}
                 onPress={() => {
@@ -484,7 +319,7 @@ const FabricProcessInListUI = ({route, navigation, ...props}) => {
 
 
         {filterArray && filterArray.length > 0 ? (
-          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+          <View style={CommonStyles.listCommonHeader}>
             <Text
               style={[
                 CommonStyles.tylesHeaderTextStyle,

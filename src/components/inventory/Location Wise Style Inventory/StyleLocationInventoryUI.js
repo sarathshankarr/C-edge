@@ -62,24 +62,6 @@ const StyleLocationInventoryUI = ({route, ...props }) => {
     set_refreshing(false);
   };
 
-  // const renderItem = ({ item, index }) => {
-
-  //   return (
-
-  //     <TouchableOpacity onPress={() => actionOnRow(item,index)} style={CommonStyles.cellBackViewStyle}>
-
-  //       <View style={{flexDirection :'row', justifyContent:'space-between', alignItems:'center'}}>
-  //         <Text style={[CommonStyles.tylesTextStyle,{flex:1.5,textAlign:'left'}]}>{item.styleNo}</Text>
-  //         <Text style={[CommonStyles.tylesTextStyle,{flex:1.5,textAlign:'center'}]}>{item.color}</Text>
-  //         <Text style={[CommonStyles.tylesTextStyle,{flex:1,textAlign:'center'}]}>{item.wNo}</Text>
-  //         <Text style={[CommonStyles.tylesTextStyle,{flex:1.2,textAlign:'center'}]}>{item.totalQty}</Text>
-          
-  //       </View>
-
-  //     </TouchableOpacity>
-        
-  //   );
-  // };
   
   const renderItem = ({ item, index }) => {
     return (
@@ -156,7 +138,7 @@ const StyleLocationInventoryUI = ({route, ...props }) => {
           <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:1.2,textAlign:'center',}]}>{'Total qty'}</Text>
         </View>: null} */}
 
-        {filterArray && filterArray.length > 0 ? <View style={{flexDirection :'row', justifyContent:'space-between'}}>
+        {filterArray && filterArray.length > 0 ? <View style={CommonStyles.listCommonHeader}>
           <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:3,textAlign:'left'}]}>{'Style Details'}</Text>
           {/* <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:1,textAlign:'center',}]}>{'Color'}</Text>
           <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:1,textAlign:'center',}]}>{'WO'}</Text> */}
@@ -187,6 +169,7 @@ const StyleLocationInventoryUI = ({route, ...props }) => {
               }
             />
         </View>
+        <View style={{height:450}}/>
       </View>  
 
       {props.isPopUp ? <View style={CommonStyles.customPopUpStyle}>

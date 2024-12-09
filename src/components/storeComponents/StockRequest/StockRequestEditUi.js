@@ -11,6 +11,7 @@ import TextInputComponent from '../../../utils/commonComponents/textInputCompone
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import BottomComponent from '../../../utils/commonComponents/bottomComponent';
 import CustomCheckBox from '../../../utils/commonComponents/CustomCheckBox';
+import color from '../../../utils/commonStyles/color';
 
 let downArrowImg = require('./../../../../assets/images/png/dropDownImg.png');
 
@@ -470,7 +471,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderColor: '#ddd',
     padding: 7,
-    backgroundColor: '#5177c0',
+    backgroundColor: color.color2,
     alignItems: 'center'
   },
   table_head_captions2: {

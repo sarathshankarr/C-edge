@@ -159,11 +159,11 @@ const StichingOutUI = ({route, ...props }) => {
         </View>: null}
          */}
 
-        {filterArray && filterArray.length > 0 ? <View style={{flexDirection :'row'}}>
+        {filterArray && filterArray.length > 0 ? <View style={CommonStyles.listCommonHeader1}>
           <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:3,textAlign:'left'}]}>{'Style Details'}</Text>
           <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:1}]}>{'Total Qty'}</Text>
         </View>: <View style = {CommonStyles.noRecordsFoundStyle}>
-            {!props.isLoading ? <Text style={[CommonStyles.tylesHeaderTextStyle, {fontSize: 18}]}>{Constant.noRecFound}</Text> : null}
+            {!props.MainLoading ? <Text style={[CommonStyles.tylesHeaderTextStyle, {fontSize: 18}]}>{Constant.noRecFound}</Text> : null}
         </View>}
 
         <View style={CommonStyles.listStyle}>
