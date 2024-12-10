@@ -149,7 +149,7 @@ const FinishingOutListUI = ({route, ...props }) => {
           
         </View>
 
-        {props.itemsArray && props.itemsArray.length > 0 ? <View style={{flexDirection :'row', justifyContent:'space-between'}}>
+        {props.itemsArray && props.itemsArray.length > 0 ? <View style={CommonStyles.listCommonHeader1}>
           <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:1.5,textAlign:'left'}]}>{'Style Details'}</Text>
           {/* <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:1,textAlign:'center',}]}>{'Color'}</Text>
           <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:1,textAlign:'center',}]}>{'WO'}</Text> */}

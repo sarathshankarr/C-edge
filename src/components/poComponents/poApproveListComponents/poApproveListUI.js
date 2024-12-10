@@ -126,7 +126,7 @@ const POApproveUI = ({ route, ...props }) => {
 
         </View> : null}
 
-        {filterArray && filterArray.length > 0 ? <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+        {filterArray && filterArray.length > 0 ? <View style={CommonStyles.listCommonHeader1}>
           <Text style={[CommonStyles.tylesHeaderTextStyle, { flex: 1.5, textAlign: 'left' }]}>{'PO'}</Text>
           <Text style={[CommonStyles.tylesHeaderTextStyle, { flex: 1.5, textAlign: 'center', }]}>{'Vendor'}</Text>
           <Text style={[CommonStyles.tylesHeaderTextStyle, { flex: 1, textAlign: 'center', }]}>{'RM/Fabric'}</Text>

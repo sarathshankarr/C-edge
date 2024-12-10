@@ -159,7 +159,7 @@ const StockRequestListUI = ({navigation, route, ...props}) => {
 
       <View style={CommonStyles.headerStyle}>
         {props.itemsArray && props.itemsArray.length > 0 ? (
-          <View style={{flexDirection: 'row', width: '100%'}}>
+          <View style={{flexDirection: 'row', width: '100%',marginBottom:10}}>
             <View style={{width: '67%'}}>
               <View
                 style={{
@@ -169,6 +169,7 @@ const StockRequestListUI = ({navigation, route, ...props}) => {
                   borderWidth: 1,
                   borderColor: 'black',
                   borderRadius: 5,
+                  
                 }}>
                 <Image
                   source={searchImg}
@@ -203,7 +204,7 @@ const StockRequestListUI = ({navigation, route, ...props}) => {
         ) : null}
 
         {filterArray && filterArray.length > 0 ? (
-          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+          <View style={CommonStyles.listCommonHeader}>
             <Text
               style={[
                 CommonStyles.tylesHeaderTextStyle,

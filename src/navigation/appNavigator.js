@@ -58,14 +58,16 @@ import EnterOtp from '../components/forgetPassword/EnterOtp';
 import ConfirmPassword from '../components/forgetPassword/ConfirmPassword';
 import GatePassAckList from '../components/gatePassAcknowledgement/Listpage/GatePassAckList';
 import GatePassAckEdit from '../components/gatePassAcknowledgement/EditPage/GatePassAckEdit';
+import Splash from '../pages/splash/splash';
 
 
 const Stack = createNativeStackNavigator();
 
 const AppStack = () => {
   return (
-    <Stack.Navigator initialRouteName="LoginComponent" screenOptions={{ gestureEnabled: false }}>
+    <Stack.Navigator initialRouteName="SplashComponent" screenOptions={{ gestureEnabled: false }}>
       <Stack.Screen name="LoginComponent" component={LoginComponent} options={{ headerShown: false }} />
+      <Stack.Screen name="SplashComponent" component={Splash} options={{ headerShown: false }} />
       <Stack.Screen name="HomeScreenComponent" component={HomeScreenComponent} options={{ headerShown: false }} />
       <Stack.Screen name="POApprovalComponent" component={POApprovalComponent} options={{ headerShown: false }} />
       <Stack.Screen name="POApproveListComponent" component={POApproveListComponent} options={{ headerShown: false }} />

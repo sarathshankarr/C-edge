@@ -1,32 +1,148 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useRef} from 'react';
 import {
+  Animated,
   Image,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
   Modal,
+  ScrollView,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as APIServiceCall from './../../utils/apiCalls/apiCallsComponent';
 import color from '../../utils/commonStyles/color';
+import {Easing} from 'react-native';
 
-const Sidebar = ({navigation, route}) => {
+const dropdownMenus = {
+  style: {
+    label: 'Style Management',
+    icon: require('../../../assets/images/png/shirt.png'),
+    style: [
+      {
+        label: 'Style',
+        route: 'StyleManageComponent',
+        src: require('../../../assets/images/png/stylee.png'),
+      },
+      {
+        label: 'Design Directory Approval',
+        route: 'DDAList',
+        src: require('../../../assets/images/png/approve.png'),
+      },
+    ],
+  },
+  order: {
+    label: 'Order Management',
+    icon: require('../../../assets/images/png/orderrr.png'),
+    style: [
+      {
+        label: 'PO Approval',
+        route: 'POApproveListComponent',
+        src: require('../../../assets/images/png/validation.png'),
+      },
+    ],
+  },
+  store: {
+    label: 'Store Management',
+    icon: require('../../../assets/images/png/store.png'),
+    style: [
+      {
+        label: 'Store Request',
+        route: 'StockRequestList',
+        src: require('../../../assets/images/png/stockRequest.png'),
+      },
+      {
+        label: 'Store Approval',
+        route: 'StoreApproveListComponent',
+        src: require('../../../assets/images/png/stockApproval.png'),
+      },
+      {
+        label: 'Store Recieve',
+        route: 'StockRecieveList',
+        src: require('../../../assets/images/png/stockRecieve.png'),
+      },
+    ],
+  },
+  inventory: {
+    label: 'Inventory',
+    icon: require('../../../assets/images/png/inventoryy.png'),
+    style: [
+      {
+        label: 'Location Wise Style Inventory',
+        route: 'StyleLocationInventory',
+        src: require('../../../assets/images/png/location.png'),
+      },
+      {
+        label: 'Location wise RM/Fabric Inventory',
+        route: 'LocationWiseRMFabInv',
+        src: require('../../../assets/images/png/locationicon.png'),
+      },
+      {
+        label: 'Style Wise RM/Fabric Inventory',
+        route: 'LocationStyleWiseInventory',
+        src: require('../../../assets/images/png/locationicon.png'),
+      },
+    ],
+  },
+  inhouseProduction: {
+    label: 'Inhouse Production',
+    icon: require('../../../assets/images/png/inbox-in.png'),
+    style: [
+      {
+        label: 'Cutting in',
+        route: 'CuttingMainComponent',
+        src: require('../../../assets/images/png/cut.png'),
+      },
+      {
+        label: 'Stitching in',
+        route: 'StichingInComponent',
+        src: require('../../../assets/images/png/stitch.png'),
+      },
+      {
+        label: 'Finishing in',
+        route: 'FinishingStyleComponent',
+        src: require('../../../assets/images/png/finishingg.png'),
+      },
+      {
+        label: 'Fabric Process in',
+        route: 'FabricProcessInList',
+        src: require('../../../assets/images/png/fabric.png'),
+      },
+      {
+        label: 'Gate Pass Acknowledgement',
+        route: 'GatePassAckList',
+        src: require('../../../assets/images/png/growth.png'),
+      },
+    ],
+  },
+  outwardProcess: {
+    label: 'Outward Process',
+    icon: require('../../../assets/images/png/out-of-the-box.png'),
+    style: [
+      {
+        label: 'Stitching Out',
+        route: 'StichingOutComponent',
+        src: require('../../../assets/images/png/stitch.png'),
+      },
+      {
+        label: 'Finishing Out',
+        route: 'FinishingOutListComponent',
+        src: require('../../../assets/images/png/finishingg.png'),
+      },
+    ],
+  },
+};
+
+const Sidebar = ({navigation}) => {
   const [userName, set_userName] = useState('');
   const [admin, set_admin] = useState('');
+
   const [modalVisible, setModalVisible] = useState(false);
+  const [openDropdown, setOpenDropdown] = React.useState(null);
+  const [selectedDropdown, setSelectedDropdown] = useState(null);
+  const [tempBackgroundEffect, setTempBackgroundEffect] = useState({}); // Track effect per dropdown
 
-  const [styleDropdownVisible, setStyleDropdownVisible] = useState(false);
-  const [orderDropdownVisible, setOrderDropdownVisible] = useState(false);
-
-  const toggleDropdown = dropdown => {
-    if (dropdown === 'style') {
-      setStyleDropdownVisible(!styleDropdownVisible);
-      setOrderDropdownVisible(false);
-    } else if (dropdown === 'order') {
-      setOrderDropdownVisible(!orderDropdownVisible);
-      setStyleDropdownVisible(false);
-    }
+  const toggleDropdown = key => {
+    setOpenDropdown(prev => (prev === key ? null : key));
   };
 
   useEffect(() => {
@@ -44,17 +160,6 @@ const Sidebar = ({navigation, route}) => {
       set_admin(admin);
     }
   };
-  const goToHome = () => {
-    navigation.navigate('Main');
-  };
-
-  const goToNotifications = () => {
-    navigation.navigate('Notifications');
-  };
-
-  const goToOrder = () => {
-    navigation.navigate('DashboardComponent');
-  };
 
   const handleLogout = async () => {
     try {
@@ -71,7 +176,6 @@ const Sidebar = ({navigation, route}) => {
       await AsyncStorage.removeItem('companyIds');
       await AsyncStorage.removeItem('brandIds');
       await AsyncStorage.removeItem('CurrentCompanyLocations');
-      // navigation.closeDrawer();
       navigation.reset({
         index: 0,
         routes: [{name: 'LoginComponent'}],
@@ -101,275 +205,91 @@ const Sidebar = ({navigation, route}) => {
       );
     }
 
-    // await AsyncStorage.removeItem('save_username');
-    // await AsyncStorage.removeItem('save_password');
-    // await AsyncStorage.removeItem('save_code');
+    await AsyncStorage.removeItem('save_username');
+    await AsyncStorage.removeItem('save_password');
+    await AsyncStorage.removeItem('save_code');
 
     console.log('response ====> ', updateUserAPIObj);
     handleLogout();
   };
 
-  //   return (
-  //     <View style={styles.container}>
+  const renderDropdown = (key, menu) => {
+    const isSelected = selectedDropdown === key;
+    const hasTempBackgroundEffect = tempBackgroundEffect[key];
+    const animationValue = useRef(new Animated.Value(0)).current;
 
-  //       <View style={{ backgroundColor: '#1F74BA' }}>
+    const handleDropdownPress = () => {
+      setSelectedDropdown(isSelected ? null : key);
+      toggleDropdown(key);
 
-  //         <View style={styles.header}>
-  //           <TouchableOpacity >
-  //             <Image
-  //               style={[styles.img, { borderRadius: 30, tintColor: '#fff' }]}
-  //               source={require('../../../assets/images/png/profile.png')}
-  //             />
-  //           </TouchableOpacity>
-  //         <View>
-  //           <Text style={{ color: '#fff', fontSize: 20 }}>Profile</Text>
-  //           {userName && (
-  //             <Text style={styles.usertxt}>
-  //               {userName}
-  //             </Text>
-  //           )}
-  //         </View>
-  //         </View>
-  //       </View>
+      // Trigger background color effect for this dropdown
+      setTempBackgroundEffect({[key]: true});
+      setTimeout(() => setTempBackgroundEffect({[key]: false}), 2000);
 
-  //       <TouchableOpacity onPress={goToHome} style={styles.homeheader}>
-  //         <Image style={styles.homeimg} source={require('../../../assets/images/png/homeN.png')} />
-  //         <Text style={styles.hometxt}>Home</Text>
-  //       </TouchableOpacity>
-  //       <TouchableOpacity onPress={goToNotifications} style={styles.categorieshead}>
-  //         <Image
-  //           style={styles.categoriesimg}
-  //           source={require('../../../assets/images/png/notificationN.png')}
-  //         />
-  //         <Text style={styles.categoriestxt}>Notification</Text>
-  //       </TouchableOpacity>
-  //       <TouchableOpacity onPress={goToOrder} style={styles.orderhead}>
-  //         <Image
-  //           style={styles.orderimg}
-  //           source={require('../../../assets/images/png/gear.png')}
-  //         />
-  //         <Text style={styles.ordertxt}>Settings</Text>
-  //       </TouchableOpacity>
+      // Animate dropdown height
+      Animated.timing(animationValue, {
+        toValue: isSelected ? 0 : menu.style.length * 60, 
+        duration: 300,
+        useNativeDriver: false, 
+      }).start();
+    };
 
-  //       <Modal
-  //         animationType="slide"
-  //         transparent={true}
-  //         visible={modalVisible}
-  //         onRequestClose={() => {
-  //           setModalVisible(!modalVisible);
-  //         }}>
-  //         <View style={styles.modalContainer}>
-  //           <View style={styles.modalContent}>
-  //             <TouchableOpacity
-  //               style={styles.modalButton}
-  //               >
-  //               <Text style={{ color: 'red', fontSize:17, textAlign:'center', marginBottom:10 }}>Are you sure you want to delete your account?</Text>
-  //             </TouchableOpacity>
-  //             <View style={{flexDirection:'row', justifyContent:'space-around'}}>
-  //               <TouchableOpacity
-  //                 style={styles.modalCancelButton}
-  //                 onPress={handleDeleteUser}>
-  //                 <Text style={{ color: 'white' }}>Yes</Text>
-  //               </TouchableOpacity>
-  //               <TouchableOpacity
-  //                 style= {[styles.modalCancelButton, {backgroundColor: 'green'}]}
-  //                 onPress={() => setModalVisible(false)}>
-  //                 <Text style={{ color: 'white' }}>Cancel</Text>
-  //               </TouchableOpacity>
-  //             </View>
-  //           </View>
-  //         </View>
-  //       </Modal>
+    return (
+      <View>
+        {/* Parent Dropdown */}
+        <TouchableOpacity
+          style={[
+            styles.dropdownHeader,
+            isSelected && styles.selectedDropdownHeader,
+            hasTempBackgroundEffect && styles.tempBackgroundEffect,
+          ]}
+          onPress={handleDropdownPress}>
+          <View style={styles.dropdownTitle}>
+            <Image
+              style={[styles.navIcon, isSelected && styles.selectedIcon]}
+              source={menu.icon}
+            />
+            <Text style={[styles.navText, isSelected && styles.selectedText]}>
+              {menu.label}
+            </Text>
+          </View>
 
-  //       <View style={styles.logoutContainer}>
-  //         <TouchableOpacity onPress={handleLogout} style={styles.logoutbox}>
-  //           <Image
-  //             resizeMode="contain"
-  //             style={[
-  //               styles.logoutimg,
-  //               { tintColor: '#fff', height: 20, width: 20 },
-  //             ]}
-  //             source={require('../../../assets/images/png/logOut.png')}
-  //           />
-  //           <Text style={styles.logouttxt}>Logout</Text>
-  //         </TouchableOpacity>
-  //       </View>
-  //       <TouchableOpacity onPress={() => {
-  //         setModalVisible(true)
-  //       }} style={styles.deleteAccount}>
-  //         <Image
-  //           style={{width:30, height:30, tintColor:'red'}}
-  //           source={require('../../../assets/images/png/bin.png')}
-  //         />
-  //         <Text style={styles.deleteText}>Delete Account</Text>
-  //       </TouchableOpacity>
+          <Image
+            style={styles.dropdownIcon}
+            source={
+              openDropdown === key
+                ? require('../../../assets/images/png/down-arrow.png')
+                : require('../../../assets/images/png/chevron.png')
+            }
+          />
+        </TouchableOpacity>
 
-  //     </View>
-  //   );
-  // };
-
-  // const styles = StyleSheet.create({
-  //   container: {
-  //     flex: 1,
-  //     backgroundColor: '#fff',
-  //     marginTop:20,
-  //     padding:15,
-  //   },
-  //   header: {
-  //     flexDirection: 'row',
-  //     alignItems: 'center',
-  //     padding:15,
-  //     borderRadius:25,
-  //     backgroundColor:'#1f74ba'
-  //   },
-  //   img: {
-  //     height: 35,
-  //     width: 35,
-  //     marginVertical: 10,
-  //   },
-  //   usertxt: {
-  //     // marginLeft: 20,
-  //     fontSize: 20,
-  //     // marginHorizontal: 10,
-  //     marginVertical: 10,
-  //     color: '#fff',
-  //   },
-  //   homeheader: {
-  //     flexDirection: 'row',
-  //     alignItems: 'center',
-  //     marginHorizontal: 10,
-  //     marginVertical: 25,
-  //   },
-  //   homeimg: {
-  //     height: 25,
-  //     width: 25,
-  //     tintColor:'#1F74BA'
-  //   },
-  //   hometxt: {
-  //     fontSize: 16,
-  //     marginLeft: 10,
-  //     color: '#000000',
-  //   },
-  //   categorieshead: {
-  //     flexDirection: 'row',
-  //     alignItems: 'center',
-  //     marginHorizontal: 10,
-  //   },
-  //   categoriesimg: {
-  //     height: 25,
-  //     width: 25,
-  //     tintColor:'#1F74BA'
-
-  //   },
-  //   categoriestxt: {
-  //     fontSize: 16,
-  //     marginLeft: 10,
-  //     color: '#000000'
-  //   },
-  //   orderhead: {
-  //     flexDirection: 'row',
-  //     alignItems: 'center',
-  //     marginHorizontal: 10,
-  //     marginTop: 20,
-  //   },
-  //   deleteAccount: {
-  //     flexDirection: 'row',
-  //     justifyContent: 'center',
-  //     alignItems: 'center',
-  //     marginTop: 5,
-  //     position: 'absolute',
-  //     bottom: 20,
-  //     left: 0,
-  //     right: 0,
-  //     // elevation:5,
-  //     // borderTopWidth:2,
-  //     borderColor:'#000',
-  //     // padding:20,
-  //     // borderRadius:30
-
-  //   },
-  //   orderimg: {
-  //     height: 25,
-  //     width: 25,
-  //     tintColor:'#1F74BA'
-
-  //   },
-
-  //   ordertxt: {
-  //     fontSize: 16,
-  //     marginLeft: 10,
-  //     color: '#000000',
-  //   },
-  //   deleteText: {
-  //     fontSize: 16,
-  //     marginLeft:20,
-  //     color: 'red',
-  //     fontWeight: 'bold'
-  //   },
-
-  //   logoutContainer: {
-  //     position: 'absolute',
-  //     // bottom: 0,
-  //     // left: 0,
-  //     // right: 0,
-  //     bottom: 80,
-  //     left: 0,
-  //     right: 0,
-  //   },
-  //   logoutbox: {
-  //     borderWidth: 1,
-  //     borderColor: '#390050',
-  //     backgroundColor: '#5177c0',
-  //     borderRadius: 15,
-  //     paddingVertical: 12,
-  //     flexDirection: 'row',
-  //     marginHorizontal: 30,
-  //     justifyContent: 'center',
-  //   },
-  //   logoutimg: {
-  //     height: 20,
-  //     width: 15,
-  //     marginRight: 8,
-  //   },
-  //   logouttxt: {
-  //     textAlign: 'center',
-  //     color: '#fff',
-  //     fontSize: 15,
-  //     fontWeight: 'bold',
-  //   },
-
-  //   modalContainer: {
-  //     flex: 1,
-  //     justifyContent: 'flex-end',
-  //     backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  //   },
-  //   modalContent: {
-  //     backgroundColor: '#fff',
-  //     padding: 20,
-  //     borderTopLeftRadius: 20,
-  //     borderTopRightRadius: 20,
-  //   },
-  //   modalButton: {
-  //     paddingVertical: 15,
-  //     // borderBottomWidth: 1,
-  //     // borderBottomColor: '#ccc',
-  //   },
-  //   modalCancelButton: {
-  //     paddingVertical: 15,
-  //     alignItems: 'center',
-  //     backgroundColor: 'red',
-  //     borderRadius: 10,
-  //     marginTop: 10,
-  //     width:'25%',
-  //   },
-
-  // });
-
-  // export default Sidebar;
+        {/* Child Items */}
+        {openDropdown === key && (
+          <Animated.View
+            style={[
+              styles.animatedDropdownContent,
+              {height: animationValue},
+              styles.dropdownContent,
+            ]}>
+            {menu.style.map((item, index) => (
+              <TouchableOpacity
+                key={`${index}-${item.route}`}
+                style={styles.dropdownItem}
+                onPress={() => navigation.navigate(item.route)}>
+                <Image style={styles.navIcon} source={item.src} />
+                <Text style={styles.navText}>{item.label}</Text>
+              </TouchableOpacity>
+            ))}
+          </Animated.View>
+        )}
+      </View>
+    );
+  };
 
   return (
     <View style={styles.container}>
-      {/* Header Section */}
+      {/* Header */}
       <View style={styles.headerContainer}>
         <View style={styles.header}>
           <TouchableOpacity>
@@ -380,7 +300,7 @@ const Sidebar = ({navigation, route}) => {
           </TouchableOpacity>
           <View>
             {/* <Text style={styles.headerTitle}>Hi,  {userName}</Text>
-          <Text style={styles.headerSubtitle}>{admin ? admin : "Profile"}</Text> */}
+                <Text style={styles.headerSubtitle}>{admin ? admin : "Profile"}</Text> */}
 
             <Text style={styles.headerTitle}>Profile</Text>
             <Text style={styles.headerSubtitle}>{userName}</Text>
@@ -388,253 +308,97 @@ const Sidebar = ({navigation, route}) => {
         </View>
       </View>
 
-      {/* Navigation Options */}
-      <View
-        style={{marginTop: 10, borderRadius: 10, backgroundColor: '#F5F5F5'}}>
-        <TouchableOpacity onPress={goToHome} style={styles.homeheader}>
-          <Image
-            style={styles.homeimg}
-            source={require('../../../assets/images/png/homeN.png')}
+      {/* Navigation */}
+      <ScrollView
+        style={styles.scrollContainer}
+        contentContainerStyle={styles.scrollContent}>
+        <View style={styles.navContainer}>
+          <NavItem
+            title="Home"
+            icon={require('../../../assets/images/png/homeN.png')}
+            onPress={() => navigation.navigate('NewComponent')}
           />
-          <Text style={styles.hometxt}>Home</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={goToNotifications}
-          style={styles.categorieshead}>
-          <Image
-            style={styles.categoriesimg}
-            source={require('../../../assets/images/png/notificationN.png')}
+          <NavItem
+            title="Notifications"
+            icon={require('../../../assets/images/png/notificationN.png')}
+            onPress={() => navigation.navigate('Notifications')}
           />
-          <Text style={styles.categoriestxt}>Notification</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={goToOrder} style={styles.orderhead}>
-          <Image
-            style={styles.orderimg}
-            source={require('../../../assets/images/png/gear.png')}
+          <NavItem
+            title="Settings"
+            icon={require('../../../assets/images/png/gear.png')}
+            onPress={() => navigation.navigate('DashboardComponent')}
           />
-          <Text style={styles.ordertxt}>Settings</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Management Section */}
-      <View
-        style={{marginTop: 10, borderRadius: 10, backgroundColor: '#F5F5F5'}}>
-        <Text
-          style={{
-            fontSize: 20,
-            fontWeight: 'bold',
-            marginBottom: 20,
-            color: '#000',
-            textAlign: 'left',
-            marginHorizontal: 10,
-          }}>
-          Management
-        </Text>
-
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}>
-          <TouchableOpacity
-            onPress={() => toggleDropdown('style')}
-            style={styles.homeheader}>
-            <Image
-              style={styles.homeimg}
-              source={require('../../../assets/images/png/shirt.png')}
-            />
-            <Text style={styles.hometxt}>Style Management</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => toggleDropdown('style')}>
-            <Image
-              style={styles.homeimg}
-              source={
-                styleDropdownVisible
-                  ? require('../../../assets/images/png/down-arrow.png')
-                  : require('../../../assets/images/png/chevron.png')
-              }
-            />
-          </TouchableOpacity>
         </View>
-        {styleDropdownVisible && (
-          <View
-            style={{
-              backgroundColor: '#FFF',
-              // marginHorizontal: 20,
-              borderRadius: 8,
-              padding: 10,
-              marginBottom: 10,
-              marginLeft: 25,
-              elevation: 3,
-              shadowColor: '#000', // Shadow color for iOS
-              shadowOffset: {width: 0, height: 2}, // Offset for the shadow
-              shadowOpacity: 0.25, // Opacity of the shadow
-              shadowRadius: 3.84, // Radius for the shadow blur
-            }}>
-            <TouchableOpacity
-              onPress={() => navigation.navigate('StyleManageComponent')}
-              style={{flexDirection: 'row', alignItems: 'center'}}>
-              {/* <Image
-              style={styles.categoriesimg}
-              source={require('../../../assets/images/png/chevron.png')}
-            /> */}
-              <Text
-                style={{
-                  fontSize: 14,
-                  color: '#000',
-                  paddingVertical: 5,
-                }}>
-                Style
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => navigation.navigate('DDAList')}
-              style={{flexDirection: 'row', alignItems: 'center'}}>
-              {/* <Image
-              style={styles.categoriesimg}
-              source={require('../../../assets/images/png/chevron.png')}
-            /> */}
-              <Text
-                style={{
-                  fontSize: 14,
-                  color: '#000',
-                  paddingVertical: 5,
-                  elevation: 3,
-                  shadowColor: '#000', // Shadow color for iOS
-                  shadowOffset: {width: 0, height: 2}, // Offset for the shadow
-                  shadowOpacity: 0.25, // Opacity of the shadow
-                  shadowRadius: 3.84, // Radius for the shadow blur
-                }}>
-                Design Directory Approval
-              </Text>
-            </TouchableOpacity>
-          </View>
-        )}
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}>
-          <TouchableOpacity
-            onPress={() => toggleDropdown('order')}
-            style={styles.homeheader}>
-            <Image
-              style={styles.categoriesimg}
-              source={require('../../../assets/images/png/orderrr.png')}
-            />
-            <Text style={styles.hometxt}>Order Management</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => toggleDropdown('order')}>
-            <Image
-              style={styles.homeimg}
-              source={
-                orderDropdownVisible
-                  ? require('../../../assets/images/png/down-arrow.png')
-                  : require('../../../assets/images/png/chevron.png')
-              }
-            />
-          </TouchableOpacity>
-        </View>
-        {orderDropdownVisible && (
-          <View
-            style={{
-              backgroundColor: '#FFF',
-              // marginHorizontal: 20,
-              borderRadius: 8,
-              padding: 10,
-              marginBottom: 10,
-              marginLeft: 25,
-              elevation: 3,
-              shadowColor: '#000', // Shadow color for iOS
-              shadowOffset: {width: 0, height: 2}, // Offset for the shadow
-              shadowOpacity: 0.25, // Opacity of the shadow
-              shadowRadius: 3.84, // Radius for the shadow blur
-            }}>
-            <TouchableOpacity
-              onPress={() => navigation.navigate('POApproveListComponent')}
-              style={{flexDirection: 'row', alignItems: 'center'}}>
-              {/* <Image
-              style={styles.categoriesimg}
-              source={require('../../../assets/images/png/chevron.png')}
-            /> */}
-              <Text
-                style={{
-                  fontSize: 14,
-                  color: '#000',
-                  paddingVertical: 5,
-                  elevation: 3,
-                  shadowColor: '#000', // Shadow color for iOS
-                  shadowOffset: {width: 0, height: 2}, // Offset for the shadow
-                  shadowOpacity: 0.25, // Opacity of the shadow
-                  shadowRadius: 3.84, // Radius for the shadow blur
-                }}>
-                PO Approval
-              </Text>
-            </TouchableOpacity>
-          </View>
-        )}
-      </View>
 
-      {/* Logout and Delete Account */}
-      <View style={styles.logoutContainer}>
-        <TouchableOpacity onPress={handleLogout} style={styles.logoutbox}>
+        {Object.entries(dropdownMenus).map(([key, menu], index) => (
+          <View key={index}>
+            {renderDropdown(key, menu)}
+          </View>
+        ))}
+      </ScrollView>
+
+      {/* Logout and Delete */}
+      <View style={styles.bottomSection}>
+        <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
           <Image
-            resizeMode="contain"
-            style={[
-              styles.logoutimg,
-              {tintColor: '#fff', height: 20, width: 20},
-            ]}
+            style={styles.logoutIcon}
             source={require('../../../assets/images/png/logOut.png')}
           />
-          <Text style={styles.logouttxt}>Logout</Text>
+          <Text style={styles.logoutText}>Logout</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.deleteButton}>
+          <Image
+            style={styles.deleteIcon}
+            source={require('../../../assets/images/png/bin.png')}
+          />
+          <Text style={styles.deleteText}>Delete Account</Text>
         </TouchableOpacity>
       </View>
-      <TouchableOpacity
-        onPress={() => {
-          setModalVisible(true);
-        }}
-        style={styles.deleteAccount}>
-        <Image
-          style={{width: 30, height: 30, tintColor: 'red'}}
-          source={require('../../../assets/images/png/bin.png')}
-        />
-        <Text style={styles.deleteText}>Delete Account</Text>
-      </TouchableOpacity>
 
-      {/* Modal */}
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => {
-          setModalVisible(!modalVisible);
-        }}>
+{/* <View style={styles.bottomSection}>
+  <TouchableOpacity
+    onPress={handleLogout}
+    style={[styles.actionButton, styles.logoutButton]}
+  >
+    <Image
+      style={styles.iconStyle}
+      source={require('../../../assets/images/png/logOut.png')}
+    />
+    <Text style={[styles.textStyle, styles.logoutText]}>Logout</Text>
+  </TouchableOpacity>
+
+  <TouchableOpacity
+    onPress={() => setModalVisible(true)}
+    style={[styles.actionButton, styles.deleteButton]}
+  >
+    <Image
+      style={styles.iconStyle}
+      source={require('../../../assets/images/png/bin.png')}
+    />
+    <Text style={[styles.textStyle, styles.deleteText]}>Delete Account</Text>
+  </TouchableOpacity>
+</View> */}
+
+
+
+      {/* Delete Modal */}
+      <Modal animationType="slide" transparent visible={modalVisible}>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <TouchableOpacity style={styles.modalButton}>
-              <Text
-                style={{
-                  color: 'red',
-                  fontSize: 17,
-                  textAlign: 'center',
-                  marginBottom: 10,
-                }}>
-                Are you sure you want to delete your account?
-              </Text>
-            </TouchableOpacity>
-            <View
-              style={{flexDirection: 'row', justifyContent: 'space-around'}}>
+            <Text style={styles.modalText}>
+              Are you sure you want to delete your account?
+            </Text>
+            <View style={styles.modalActions}>
               <TouchableOpacity
-                style={styles.modalCancelButton}
-                onPress={handleDeleteUser}>
-                <Text style={{color: 'white'}}>Yes</Text>
+                onPress={handleDeleteUser}
+                style={styles.modalButton}>
+                <Text style={styles.modalButtonText}>Yes</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.modalCancelButton, {backgroundColor: 'green'}]}
-                onPress={() => setModalVisible(false)}>
-                <Text style={{color: 'white'}}>Cancel</Text>
+                onPress={() => setModalVisible(false)}
+                style={[styles.modalButton, styles.cancelButton]}>
+                <Text style={styles.modalButtonText}>Cancel</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -643,16 +407,24 @@ const Sidebar = ({navigation, route}) => {
     </View>
   );
 };
+
+// Reusable Components
+const NavItem = ({title, icon, onPress}) => (
+  <TouchableOpacity style={styles.navItem} onPress={onPress}>
+    <Image style={styles.navIcon} source={icon} />
+    <Text style={styles.navText}>{title}</Text>
+  </TouchableOpacity>
+);
+
 export default Sidebar;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    // marginTop: 10,
-    padding: 15,
   },
-
+  scrollContainer: {flex: 1},
+  scrollContent: {paddingBottom: 20},
   // Header styles
   headerContainer: {
     backgroundColor: color.color2,
@@ -660,6 +432,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
+    margin: 15,
     // borderRadius:5,
   },
   header: {
@@ -671,7 +444,7 @@ const styles = StyleSheet.create({
     width: 50,
     borderRadius: 25,
     marginRight: 15,
-    backgroundColor: '#ffffff50', // Placeholder for profile picture
+    backgroundColor: '#ffffff50',
   },
   headerTitle: {
     color: '#fff',
@@ -684,136 +457,191 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
 
-  // Sidebar button styles
-  homeheader: {
+  dropdownTitle: {flexDirection: 'row', alignItems: 'center'},
+
+  dropdownIcon: {
+    width: 15,
+    height: 15,
+  },
+  dropdownContent: {
+    paddingLeft: 20,
+    marginTop: 5,
+  },
+  dropdownItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginHorizontal: 10,
-    marginVertical: 15,
-  },
-  homeimg: {
-    height: 25,
-    width: 25,
-    tintColor: color.color2,
-  },
-  hometxt: {
-    fontSize: 16,
-    marginLeft: 10,
-    color: '#000000',
-  },
-  categorieshead: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginHorizontal: 10,
-  },
-  categoriesimg: {
-    height: 25,
-    width: 25,
-    tintColor: color.color2,
-  },
-  categoriestxt: {
-    fontSize: 16,
-    marginLeft: 10,
-    color: '#000000',
-  },
-  orderhead: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginHorizontal: 10,
-    marginTop: 20,
-    marginVertical: 25,
-  },
-  orderimg: {
-    height: 25,
-    width: 25,
-    tintColor: color.color2,
-  },
-  ordertxt: {
-    fontSize: 16,
-    marginLeft: 10,
-    color: '#000000',
+    marginVertical: 5,
+    paddingVertical: 8,
+    marginLeft:10
   },
 
-  // Logout and Delete Account
-  logoutContainer: {
-    position: 'absolute',
-    bottom: 100,
-    left: 0,
-    right: 0,
-    alignItems: 'center',
-  },
-  logoutbox: {
+  profileImage: {width: 50, height: 50, marginRight: 15, borderRadius: 25},
+  userName: {fontSize: 18, fontWeight: 'bold', color: '#fff'},
+  navContainer: {marginTop: 10, paddingHorizontal: 25},
+  navItem: {
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: color.color2,
-    borderRadius: 25,
-    // borderBottomLeftRadius: 10,
-    // borderBottomRightRadius: 10,
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 5,
-    marginHorizontal: 30,
-    width: '80%',
-    shadowColor: '#000', // Shadow color for iOS
-    shadowOffset: {width: 0, height: 2}, // Offset for the shadow
-    shadowOpacity: 0.25, // Opacity of the shadow
-    shadowRadius: 3.84, // Radius for the shadow blur
+      alignItems: 'center',
+      paddingVertical: 10,
+      borderRadius: 5,
+      marginVertical: 5,
+      borderBottomWidth:1,
+      borderColor:'#EAEAEA',
   },
-  logoutimg: {
-    height: 20,
-    width: 20,
-    marginRight: 8,
-    tintColor: '#fff',
-  },
-  logouttxt: {
-    textAlign: 'center',
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
+  navIcon: {width: 25, height: 25, marginRight: 15, tintColor: color.color2},
+  navText: {fontSize: 16, color: '#333',flexDirection:'row',flexWrap: 'wrap',flex: 1,textAlign: 'left',},
 
-  deleteAccount: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    position: 'absolute',
-    bottom: 30,
-    left: 0,
-    right: 0,
-  },
-  deleteText: {
-    fontSize: 16,
-    marginLeft: 10,
-    color: '#D9534F',
-    fontWeight: '600',
-  },
+bottomSection: {flexDirection: 'row', justifyContent: 'space-around', marginTop: 'auto', padding: 20},
+logoutButton: {alignItems: 'center'},
+logoutIcon: {width: 30, height: 30, tintColor:color.color2},
+logoutText: {color: '#333', marginTop: 5, fontSize: 14},
+deleteButton: {alignItems: 'center'},
+deleteIcon: {width: 30, height: 30, tintColor:color.color2},
+deleteText: {color: '#f00', marginTop: 5, fontSize: 14},
 
-  // Modal styles
+// bottomSection: {
+//   marginTop: 'auto',
+//   padding: 15,
+//   borderTopWidth: 1,
+//   borderTopColor: '#ddd', // Add a subtle divider
+//   backgroundColor: '#f9f9f9',
+// },
+// actionButton: {
+//   flexDirection: 'row',
+//   alignItems: 'center',
+//   padding: 12,
+//   borderRadius: 8,
+//   marginBottom: 10,
+//   backgroundColor: '#ffffff',
+//   shadowColor: '#000',
+//   shadowOffset: { width: 0, height: 2 },
+//   shadowOpacity: 0.1,
+//   shadowRadius: 4,
+//   elevation: 3, // For Android shadow
+// },
+// logoutButton: {
+//   // backgroundColor: '#f9f9f9', // Neutral for logout
+// },
+// deleteButton: {
+//   // backgroundColor: '#ffeeee', // Slight red tint for delete
+// },
+// iconStyle: {
+//   width: 24,
+//   height: 24,
+//   marginRight: 12, // Space between icon and text
+// },
+// textStyle: {
+//   fontSize: 16,
+//   fontWeight: '500',
+// },
+// logoutText: {
+//   color: '#333',
+// },
+// deleteText: {
+//   color: '#d32f2f', // Red shade for delete
+// },
+
+
+
   modalContainer: {
     flex: 1,
-    justifyContent: 'flex-end',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
   },
   modalContent: {
+    width: 300,
     backgroundColor: '#fff',
     padding: 20,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  modalText: {fontSize: 16, marginBottom: 20, textAlign: 'center'},
+  modalActions: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
   },
   modalButton: {
-    paddingVertical: 15,
-  },
-  modalCancelButton: {
-    paddingVertical: 15,
+    flex: 1,
+    padding: 10,
     alignItems: 'center',
-    backgroundColor: 'red',
-    borderRadius: 10,
-    marginTop: 10,
-    width: '25%',
+    borderRadius: 5,
+    backgroundColor: '#4CAF50',
+    margin: 5,
+  },
+  cancelButton: {backgroundColor: '#d9534f'},
+  modalButtonText: {color: '#fff', fontSize: 14, fontWeight: 'bold'},
+
+  dropdownHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 10,
+    paddingHorizontal: 25,
+    // backgroundColor: '#f7f7f7',
+    borderRadius: 5,
+    marginVertical: 5,
+    borderBottomWidth:1,
+    borderColor:'#EAEAEA',
+  },
+  selectedDropdownHeader: {
+    borderLeftWidth: 5,
+    borderColor: color.color2,
+    elevation: 5,
+    backgroundColor: '#fff',
+  },
+  tempBackgroundEffect: {
+    backgroundColor: '#f7f7f7',
+  },
+  selectedIcon: {
+    tintColor: color.color2,
+  },
+
+  selectedText: {
+    color: color.color2,
+  },
+  animatedDropdownContent: {
+    overflow: 'hidden', // Ensures content is clipped during animation
+    backgroundColor: '#fff', // Optional: Subtle background color
+    borderRadius: 5, // Optional: Rounded edges for dropdown
+    marginTop: 5,
   },
 });
+
+// take logout and delete ====================
+
+
+{/* <View style={styles.footer}>
+        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+          <Image
+            style={styles.logoutIcon}
+            source={require('../../../assets/images/png/logOut.png')}
+          />
+          <Text style={styles.logoutText}>Logout</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.deleteAccountButton}
+          onPress={() => setModalVisible(true)}>
+          <Image
+            style={styles.deleteIcon}
+            source={require('../../../assets/images/png/bin.png')}
+          />
+          <Text style={styles.deleteText}>Delete Account</Text>
+        </TouchableOpacity>
+      </View> */}
+// footer: {marginTop: 'auto', paddingHorizontal: 15},
+  // logoutButton: {
+  //   flexDirection: 'row',
+  //   alignItems: 'center',
+  //   marginVertical: 10,
+  // },
+  // logoutIcon: {width: 20, height: 20, marginRight: 10},
+  // logoutText: {fontSize: 16, color: '#E74C3C'},
+  // deleteAccountButton: {
+  //   flexDirection: 'row',
+  //   alignItems: 'center',
+  //   marginVertical: 10,
+  // },
+  // deleteIcon: {width: 20, height: 20, marginRight: 10},
+  // deleteText: {fontSize: 16, color: '#E74C3C'},

@@ -1,6 +1,7 @@
 import {StyleSheet} from 'react-native';
 import {widthPercentageToDP as wp,heightPercentageToDP as hp} from 'react-native-responsive-screen';
 import fonts from '../../utils/commonStyles/fonts';
+import color from './color';
 
 const CommonStyles = StyleSheet.create({
 
@@ -46,7 +47,7 @@ const CommonStyles = StyleSheet.create({
         width: wp('6%'),
         height: hp('6%'),
         resizeMode: 'contain',
-        tintColor:'#1F74BA'
+        tintColor:color.color2
     },
 
     bottomViewComponentStyleCTR : {
@@ -76,7 +77,7 @@ const CommonStyles = StyleSheet.create({
     },
 
     headerView : {
-        backgroundColor:'white',
+        backgroundColor:'red',
         width:wp('100%'),
         height:hp('8%'),
         justifyContent:'center',
@@ -106,6 +107,7 @@ const CommonStyles = StyleSheet.create({
         flex:1,
         backgroundColor:'white',
         alignItems :'center',
+        backgroundColor: '#f0f0f0'
     },
   
     headerStyle : {
@@ -123,8 +125,9 @@ const CommonStyles = StyleSheet.create({
   
     listStyle : {
         width:wp('90%'),
-        height:hp('70%'),
-        backgroundColor:'white',
+        height:hp('75%'),
+        backgroundColor:'#fff',
+        // backgroundColor: '#f0f0f0',
         marginTop: hp("2%"),
         marginBottom: hp("5%"),
          
@@ -139,14 +142,38 @@ const CommonStyles = StyleSheet.create({
     },
   
     cellBackViewStyle : {
-        borderBottomWidth:1,
-        borderColor:'#EAEAEA',
-        backgroundColor:'white',
+        // borderBottomWidth:1,
+        // borderColor:'#EAEAEA',
+        backgroundColor:'#fff',
         minHeight: hp("8%"),
-        width: wp("90%"),
+        // width: wp("90%"),
         alignItems:'center',
         justifyContent:'center',
+        elevation:10,
+        borderRadius:10,
+        marginBottom:5,
+        paddingHorizontal:15,
+        paddingVertical:10,
+        margin:1,
         
+    },
+    listCommonHeader:{
+        flexDirection :'row',
+        justifyContent:'space-between',
+        backgroundColor:color.color2, 
+        alignItems:'center',
+        borderRadius:5,
+        paddingHorizontal:5, 
+        paddingVertical:5
+    },
+    listCommonHeader1:{
+        flexDirection :'row',
+        justifyContent:'space-between',
+        backgroundColor:color.color2, 
+        alignItems:'center',
+        borderRadius:5,
+        paddingHorizontal:5, 
+        paddingVertical:10
     },
   
     tylesTextStyle : {
@@ -160,9 +187,10 @@ const CommonStyles = StyleSheet.create({
     tylesHeaderTextStyle : {
         fontSize : fonts.fontXSmall,
         fontWeight : '700',
-        color:'black',
+        color:'#fff',
         marginLeft : wp('0.2%'),
         marginRight : wp('0.2%'),
+        
     },
 
     topSubViewStyle : {

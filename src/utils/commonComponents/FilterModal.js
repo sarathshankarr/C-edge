@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   Modal,
   View,
@@ -18,19 +18,35 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const FilterModal = ({isVisible, onClose, categoriesList, selectedCategoryListAPI,applyFilterFxn,clearFilter}) => {
 
-  const [selectedCategory, setSelectedCategory] = useState('Cuisines'); 
+  const [selectedCategory, setSelectedCategory] = useState(''); 
   const [searchText, setSearchText] = useState(''); 
   const [isLoading, set_isLoading] = useState(false);
   const [selectedCategoryItems, set_selectedCategoryItems] = useState([]);
   const [selectedCategoryFilteredItems, set_selectedCategoryFilteredItems] = useState([]);
   const [selectedIndices, setSelectedIndices] = useState([]); 
 
+  const [prepopulateSelectedCategory, setPrepopulateSelectedCategory] = useState('');
+  const [prepoluateIndices, setPrepoluateIndices] = useState([]); 
+  const [prepopulateFilterList, setprepopulateFilterList] = useState([]); 
+
+
+useEffect(()=>{
+  if(prepopulateSelectedCategory){
+    setSelectedCategory(prepopulateSelectedCategory)
+  }
+  if(prepoluateIndices){
+    setSelectedIndices(prepoluateIndices)
+  }
+  if(prepopulateFilterList){
+    set_selectedCategoryFilteredItems(prepopulateFilterList)
+  }
+},[isVisible])
 
 
   const handleFilterList=(text='')=>{
     const property = selectedCategory?.fid;
     const filtered = selectedCategoryItems.filter((item) =>item[property].toUpperCase().includes(text.toUpperCase() || ''));
-    console.log("selected category",property,text, filtered);
+    // console.log("selected category",property,text, filtered);
     set_selectedCategoryFilteredItems(filtered);
     setSearchText(text);
   }
@@ -72,7 +88,7 @@ const FilterModal = ({isVisible, onClose, categoriesList, selectedCategoryListAP
         if(categoreisListAPIOBJ && categoreisListAPIOBJ.responseData){
           set_selectedCategoryItems(categoreisListAPIOBJ.responseData);
           set_selectedCategoryFilteredItems(categoreisListAPIOBJ.responseData);
-          console.log("reponse data from API :",categoreisListAPIOBJ.responseData )
+          // console.log("reponse data from API :",categoreisListAPIOBJ.responseData )
         } 
   
       } else {
@@ -96,16 +112,32 @@ const FilterModal = ({isVisible, onClose, categoriesList, selectedCategoryListAP
     }
 
     const handleAppyFilter=()=>{
-      const ids=selectedIndices.join(',');
+      // const ids=selectedIndices.join(',');
+      const ids = selectedIndices.map(id => {
+        const prop = selectedCategory.idxId;
+        return selectedCategoryItems[id]?.[prop];
+    }).join(',');
+    
+
       const count=selectedIndices.length;
+
+      // console.log("selected ids " , ids, selectedCategoryFilteredItems)
+
       const type=selectedCategory.id
       applyFilterFxn(type, ids, count);
+      setPrepoluateIndices(selectedIndices);
+      setPrepopulateSelectedCategory(selectedCategory);
+      setprepopulateFilterList(selectedCategoryItems);
     }
 
     const handleClearFilter=()=>{
       clearFilter();
       setSelectedIndices([]);
       setSearchText('');
+      setPrepoluateIndices([])
+      setPrepopulateSelectedCategory('');
+      setSelectedCategory('');
+      setprepopulateFilterList([])
     }
 
 

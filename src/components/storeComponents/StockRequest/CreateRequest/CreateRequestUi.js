@@ -26,6 +26,7 @@ import CustomCheckBox from '../../../../utils/commonComponents/CustomCheckBox';
 import {RadioButton} from 'react-native-paper';
 import * as APIServiceCall from '../../../../utils/apiCalls/apiCallsComponent';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import color from '../../../../utils/commonStyles/color';
 
 let downArrowImg = require('./../../../../../assets/images/png/dropDownImg.png');
 let closeImg = require('./../../../../../assets/images/png/close1.png');
@@ -1398,7 +1399,7 @@ const CreateRequestUi = ({route, ...props}) => {
               <TouchableOpacity
                 onPress={addRow}
                 style={{
-                  backgroundColor: '#1F74BA',
+                  backgroundColor: color.color2,
                   paddingVertical: 10,
                   paddingHorizontal: 20,
                   borderRadius: 5,
@@ -1806,7 +1807,7 @@ const styles = StyleSheet.create({
     borderColor: '#ddd',
     paddingVertical: 10,
     paddingHorizontal: 5,
-    backgroundColor: '#5177c0',
+    backgroundColor: color.color2,
     alignItems: 'center',
   },
 

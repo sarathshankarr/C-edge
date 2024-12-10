@@ -145,7 +145,7 @@ const DDAListUi = ({ route, ...props }) => {
         </View>
 
 
-       { filterArray && filterArray.length > 0 ? <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+       { filterArray && filterArray.length > 0 ? <View style={CommonStyles.listCommonHeader}>
           <Text style={[CommonStyles.tylesHeaderTextStyle, { textAlign: 'center', flex: 1 }]}>Design   Name</Text>
           <Text style={[CommonStyles.tylesHeaderTextStyle, { textAlign: 'center', flex: 1 }]}>Design     Type</Text>
           <Text style={[CommonStyles.tylesHeaderTextStyle, { textAlign: 'center', flex: 1 }]}>Approved By &  Date</Text>
