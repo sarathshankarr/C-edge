@@ -8,6 +8,7 @@ import LoaderComponent from './../../../utils/commonComponents/loaderComponent';
 import AlertComponent from './../../../utils/commonComponents/alertComponent';
 import FilterModal from '../../../utils/commonComponents/FilterModal';
 import color from '../../../utils/commonStyles/color';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 let searchImg = require('./../../../../assets/images/png/searchIcon.png');
 let filterImg = require('./../../../../assets/images/png/setting.png');
@@ -24,11 +25,11 @@ const GatePassAckListUI = ({route, ...props }) => {
   const [filterCount, set_filterCount] = useState(0);
   const [isFiltering, setIsFiltering] = useState(false); 
   const [isFilterVisible, setFilterVisible] = useState(false);
+  const [filterReqBody, setfilterReqBody] = useState({}); 
 
 
   const [categories, set_categories]=useState([
     { id: "docno", fid:"docno" ,value: "Document No" , idxId:"docno"},
-    { id: "id", fid: "id", value: "ID" , idxId:"id"},
     { id: "docdate",fid: "docdatestr", value: "Document Date" , idxId:"docdate"},
     { id: "customer", fid: "vendorname", value: "Vendor/Customer" , idxId:"customer"}
   ]);
@@ -39,9 +40,22 @@ const GatePassAckListUI = ({route, ...props }) => {
 
     if(props.itemsArray){
       set_filterArray(props.itemsArray);
+      set_ItemsArray(props.itemsArray);
     }
-    // console.log("itemsArray from Props ==> ", props?.itemsArray)
+    getRequestBody();
   }, [props.itemsArray]);
+
+  const getRequestBody = async() => {
+    let userName = await AsyncStorage.getItem('userName');
+    let userPsd = await AsyncStorage.getItem('userPsd');
+    let Obj={  
+      "menuId": 759,
+      "username": userName,
+      "password" : userPsd,
+      "categoryType" : ""
+  }
+  setfilterReqBody(Obj)
+  };
 
   const backBtnAction = () => {
     props.backBtnAction();
@@ -62,7 +76,7 @@ const GatePassAckListUI = ({route, ...props }) => {
     }
   }
 
-  const filterPets = (recName) => {
+  const filterPets = (name) => {
     const searchTerm = name.toString().toLowerCase().trim(); 
     set_recName(name); 
    if(searchTerm.length===0){
@@ -73,7 +87,7 @@ const GatePassAckListUI = ({route, ...props }) => {
    setIsFiltering(true); 
 
       let nestedFilter = props.itemsArray;
-      const styleArray = nestedFilter.filter(style => (style?.docno.toUpperCase().includes(recName.toUpperCase()) || style?.vendorname.toUpperCase().includes(recName.toUpperCase()) ));
+      const styleArray = nestedFilter.filter(style => (style?.docno.toUpperCase().includes(name.toUpperCase()) || style?.vendorname.toUpperCase().includes(name.toUpperCase()) ));
 
       if(styleArray && styleArray.length > 0) {
         set_filterArray(styleArray);
@@ -90,6 +104,7 @@ const GatePassAckListUI = ({route, ...props }) => {
     set_filterCount(count)
     set_showFilteredList(true);
     setFilterVisible(false);
+    set_recName('');
   };
 
 
@@ -306,6 +321,7 @@ const GatePassAckListUI = ({route, ...props }) => {
 
       <View style={styles.container}>
       {/* <Button title="Open Filter"  /> */}
+      
       <FilterModal
         isVisible={isFilterVisible}
         categoriesList={categories}
@@ -313,6 +329,8 @@ const GatePassAckListUI = ({route, ...props }) => {
         onClose={() => setFilterVisible(false)}
         applyFilterFxn={applyFilterFxn}
         clearFilter={clearFilter}
+        reqBody={filterReqBody}
+
       />
     </View>
 

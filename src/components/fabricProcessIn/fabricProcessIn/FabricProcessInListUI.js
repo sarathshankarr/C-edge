@@ -23,6 +23,7 @@ import * as Constant from '../../../utils/constants/constant';
 import AlertComponent from '../../../utils/commonComponents/alertComponent';
 import color from '../../../utils/commonStyles/color';
 import FilterModal from '../../../utils/commonComponents/FilterModal';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 let searchImg = require('./../../../../assets/images/png/searchIcon.png');
 let addImg = require('./../../../../assets/images/png/addition.png');
 let addImg1 = require('./../../../../assets/images/png/add.png');
@@ -38,6 +39,7 @@ const FabricProcessInListUI = ({route, navigation, ...props}) => {
   const [showFilteredList, set_showFilteredList] = useState(false);
   const [filterCount, set_filterCount] = useState(0);
   const [isFiltering, setIsFiltering] = useState(false); 
+  const [filterReqBody, setfilterReqBody] = useState({}); 
 
 
 
@@ -58,7 +60,19 @@ const FabricProcessInListUI = ({route, navigation, ...props}) => {
     if (props?.itemsArray) {
       console.log('List ===> ', props?.itemsArray[2]);
     }
+    getRequestBody();
   }, [props?.itemsArray]);
+
+  const getRequestBody = async() => {
+    let userName = await AsyncStorage.getItem('userName');
+    let userPsd = await AsyncStorage.getItem('userPsd');
+    let Obj={  
+      "username": userName,
+      "password" : userPsd,
+      "categoryType" : ""
+  }
+  setfilterReqBody(Obj)
+  };
 
   const backBtnAction = () => {
     props.backBtnAction();
@@ -74,6 +88,8 @@ const FabricProcessInListUI = ({route, navigation, ...props}) => {
     set_filterCount(count)
     set_showFilteredList(true);
     setFilterVisible(false);
+    set_recName('');
+
   };
 
   
@@ -384,6 +400,7 @@ const FabricProcessInListUI = ({route, navigation, ...props}) => {
         onClose={() => setFilterVisible(false)}
         applyFilterFxn={applyFilterFxn}
         clearFilter={clearFilter}
+        reqBody={filterReqBody}
       />
     </View>
 

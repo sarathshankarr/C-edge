@@ -472,7 +472,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginVertical: 5,
     paddingVertical: 8,
-    marginLeft:10
+    marginLeft:25
   },
 
   profileImage: {width: 50, height: 50, marginRight: 15, borderRadius: 25},

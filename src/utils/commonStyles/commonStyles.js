@@ -126,8 +126,10 @@ const CommonStyles = StyleSheet.create({
     listStyle : {
         width:wp('90%'),
         height:hp('75%'),
-        backgroundColor:'#fff',
+        // backgroundColor:'#fff',
         // backgroundColor: '#f0f0f0',
+        // backgroundColor: 'transparent', 
+
         marginTop: hp("2%"),
         marginBottom: hp("5%"),
          
@@ -160,7 +162,7 @@ const CommonStyles = StyleSheet.create({
     listCommonHeader:{
         flexDirection :'row',
         justifyContent:'space-between',
-        backgroundColor:color.color2, 
+        backgroundColor:'lightgray', 
         alignItems:'center',
         borderRadius:5,
         paddingHorizontal:5, 
@@ -169,7 +171,7 @@ const CommonStyles = StyleSheet.create({
     listCommonHeader1:{
         flexDirection :'row',
         justifyContent:'space-between',
-        backgroundColor:color.color2, 
+        backgroundColor:'lightgray', 
         alignItems:'center',
         borderRadius:5,
         paddingHorizontal:5, 
@@ -187,7 +189,7 @@ const CommonStyles = StyleSheet.create({
     tylesHeaderTextStyle : {
         fontSize : fonts.fontXSmall,
         fontWeight : '700',
-        color:'#fff',
+        color:'#000',
         marginLeft : wp('0.2%'),
         marginRight : wp('0.2%'),
         
