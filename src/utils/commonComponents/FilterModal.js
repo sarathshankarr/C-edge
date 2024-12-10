@@ -16,7 +16,7 @@ import CustomCheckBox from './CustomCheckBox';
 import  * as APIServiceCall from './../../utils/apiCalls/apiCallsComponent';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const FilterModal = ({isVisible, onClose, categoriesList, selectedCategoryListAPI,applyFilterFxn,clearFilter}) => {
+const FilterModal = ({isVisible, onClose, categoriesList, selectedCategoryListAPI,applyFilterFxn,clearFilter,reqBody}) => {
 
   const [selectedCategory, setSelectedCategory] = useState(''); 
   const [searchText, setSearchText] = useState(''); 
@@ -65,16 +65,16 @@ useEffect(()=>{
 
     const getSelectedCategoryListFBI = async (functionName, id) => {
 
-      let userName = await AsyncStorage.getItem('userName');
-      let userPsd = await AsyncStorage.getItem('userPsd');
+      // let userName = await AsyncStorage.getItem('userName');
+      // let userPsd = await AsyncStorage.getItem('userPsd');
       // let usercompanyId = await AsyncStorage.getItem('companyId');
   
       set_isLoading(true);
-      let obj =  {
-        "username": userName,
-        "password": userPsd,
-        "categoryType" : id
-      }
+
+      let obj = reqBody;
+      obj.categoryType=id;
+
+      console.log("rightside  req body", obj)
   
       // let categoreisListAPIOBJ = await APIServiceCall.getSelectedCategoryListFBI(obj);
       // if (typeof APIServiceCall[functionName] === 'function') {

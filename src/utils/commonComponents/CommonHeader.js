@@ -872,7 +872,8 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     width: '100%',
-    marginTop: '20%'
+    marginTop: '20%',
+    // backgroundColor:'transparent'
   },
   modalContent: {
     backgroundColor: '#fff',

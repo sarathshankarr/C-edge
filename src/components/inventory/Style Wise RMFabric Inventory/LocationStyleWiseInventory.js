@@ -95,6 +95,51 @@ const LocationStyleWiseInventory = ({ navigation, route, ...props }) => {
 
   };
 
+
+  const getFilteredList = async (types, Ids) => {
+
+    set_MainLoading(true);
+    let userName = await AsyncStorage.getItem('userName');
+    let userPsd = await AsyncStorage.getItem('userPsd');
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+
+    let obj =    {
+      "menuId": 168,//mandatory
+      "searchKeyValue": "",
+      "styleSearchDropdown": "-1",//mandatory
+      "dataFilter": "0",
+      "locIds": 0,
+      "brandIds": 0,
+      "compIds": 0,
+      "fromRecord": 0, //mandatory
+      "toRecord": 25, //mandatory
+      "userName":userName,  //mandatory
+      "userPwd":userPsd,   //mandatory
+      "categoryType" : types,
+         "categoryIds" : Ids
+  }
+
+     console.log("requested filtered body ==> ", obj);
+  
+    let stichingOutAPIObj = await APIServiceCall.getFiltered_StyleWiseFabricRmInventory(obj);
+    set_MainLoading(false);
+    
+    if(stichingOutAPIObj && stichingOutAPIObj.statusData){
+
+      if(stichingOutAPIObj && stichingOutAPIObj.responseData){
+        set_itemsArray(stichingOutAPIObj.responseData)
+      } 
+
+    } else {
+      popUpAction(Constant.SERVICE_FAIL_MSG,Constant.DefaultAlert_MSG,'OK', true,false);
+    }
+
+    if(stichingOutAPIObj && stichingOutAPIObj.error) {
+      popUpAction(Constant.SERVICE_FAIL_MSG,Constant.DefaultAlert_MSG,'OK', true,false)
+    }
+
+  };
+
   const actionOnRow = (item,index) => {
     console.log('actionOnRow class ', item)
   };
@@ -142,6 +187,7 @@ const LocationStyleWiseInventory = ({ navigation, route, ...props }) => {
       popOkBtnAction = {popOkBtnAction}
       fetchMore={fetchMore}
       MainLoading = {MainLoading}
+      applyFilterFxn={getFilteredList}
     />
 
   );

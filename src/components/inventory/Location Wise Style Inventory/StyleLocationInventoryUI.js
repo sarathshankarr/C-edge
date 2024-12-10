@@ -6,8 +6,11 @@ import CommonStyles from "../../../utils/commonStyles/commonStyles";
 import HeaderComponent from '../../../utils/commonComponents/headerComponent';
 import LoaderComponent from '../../../utils/commonComponents/loaderComponent';
 import AlertComponent from '../../../utils/commonComponents/alertComponent';
+import FilterModal from '../../../utils/commonComponents/FilterModal';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 let searchImg = require('./../../../../assets/images/png/searchIcon.png');
+let filterImg = require('./../../../../assets/images/png/setting.png');
 
 const StyleLocationInventoryUI = ({route, ...props }) => {
 
@@ -16,13 +19,55 @@ const StyleLocationInventoryUI = ({route, ...props }) => {
   let isKeyboard = useRef(false);
   const [refreshing, set_refreshing] = useState(false);
 
+
+  const [ItemsArray, set_ItemsArray] = useState([]);
+  const [showFilteredList, set_showFilteredList] = useState(false);
+  const [filterCount, set_filterCount] = useState(0);
+  const [isFiltering, setIsFiltering] = useState(false); 
+  const [isFilterVisible, setFilterVisible] = useState(false);
+  const [filterReqBody, setfilterReqBody] = useState({}); 
+
+
+  const [categories, set_categories]=useState([
+    { id: "styleNames", fid:"styleNo" ,value: "Style " , idxId:"styleId"},
+    { id: "colorNames", fid: "color", value: "Color" , idxId:"colorId"},
+    { id: "locationName",fid: "locationName", value: "Location" , idxId:"locationId"},
+  ]);
+
+
   React.useEffect(() => {
 
     if(props.itemsArray){
       set_filterArray(props.itemsArray);
+      set_ItemsArray(props.itemsArray);
     }
-    
+    getRequestBody();
+
   }, [props.itemsArray]);
+
+  const getRequestBody = async() => {
+    let userName = await AsyncStorage.getItem('userName');
+    let userPsd = await AsyncStorage.getItem('userPsd');
+    let Obj={
+      "menuId": 93,
+      "searchKeyValue": "",
+      "styleSearchDropdown": "-1",
+      "dataFilter": "0",
+      "locIds": 0,
+      "brandIds": 0,
+      "compIds": 0,
+      "fromRecord": 0, 
+      "toRecord": 25, 
+      "userName":userName,  
+      "userPwd":userPsd,   
+      "categoryType" : "",
+      "categoryIds" : ""
+  }
+
+  
+  setfilterReqBody(Obj)
+  };
+
 
   const backBtnAction = () => {
     props.backBtnAction();
@@ -36,30 +81,72 @@ const StyleLocationInventoryUI = ({route, ...props }) => {
     props.popOkBtnAction();
   };
 
-  const filterPets = (recName) => {
+  // const filterPets = (name) => {
 
-    if(isKeyboard.current === true) {
+  //   if(isKeyboard.current === true) {
       
-      set_recName(recName);
-      let nestedFilter = props.itemsArray;
-      const styleArray = nestedFilter.filter(style => (style.locationName.toUpperCase().includes(recName.toUpperCase()) || style.color.toUpperCase().includes(recName.toUpperCase()) || style.styleNo.toUpperCase().includes(recName.toUpperCase())));
+  //     set_recName(name);
+  //     const styleArray = ItemsArray.filter(style => (style.locationName.toUpperCase().includes(name.toUpperCase()) || style.color.toUpperCase().includes(name.toUpperCase()) || style.styleNo.toUpperCase().includes(name.toUpperCase())));
+
+  //     if(styleArray && styleArray.length > 0) {
+  //       set_filterArray(styleArray);
+  //     } else {
+  //       set_filterArray([]);
+  //     }
+  //   }
+  // };
+
+  const filterPets = (name) => {
+    const searchTerm = name.toString().toLowerCase().trim(); 
+    set_recName(name); 
+   if(searchTerm.length===0){
+     set_filterArray(ItemsArray);
+     setIsFiltering(false);
+     return;
+   }
+   setIsFiltering(true); 
+
+      const styleArray = ItemsArray.filter(style => (style.locationName.toUpperCase().includes(name.toUpperCase()) || style.size.toUpperCase().includes(name.toUpperCase())|| style.color.toUpperCase().includes(name.toUpperCase()) || style.styleNo.toUpperCase().includes(name.toUpperCase())));
 
       if(styleArray && styleArray.length > 0) {
         set_filterArray(styleArray);
       } else {
         set_filterArray([]);
       }
-    }
+    
   };
 
   const fetchMore=()=>{
-    props.fetchMore(true);
+    if (!isFiltering) { 
+      props.fetchMore(true);
+    }
   }
 
-  const onRefresh = async() => {
+
+  const applyFilterFxn = (types, Ids, count) => {
+    console.log("applyFilterFxn", types, Ids);
+    props.applyFilterFxn(types, Ids);
+    set_filterCount(count)
+    set_showFilteredList(true);
+    setFilterVisible(false);
+    set_recName('');
+
+  };
+
+
+  const clearFilter=()=>{
+    onRefresh();
+  }
+
+  const onRefresh = () => {
     set_refreshing(true);
-    await props.fetchMore(false); 
+    props.fetchMore(false); 
     set_refreshing(false);
+    set_filterCount(0);
+    set_recName('');
+    set_showFilteredList(false);
+    setFilterVisible(false);
+    setIsFiltering(false);
   };
 
   
@@ -114,7 +201,7 @@ const StyleLocationInventoryUI = ({route, ...props }) => {
 
       <View style={CommonStyles.headerStyle}>
 
-        {props.itemsArray && props.itemsArray.length > 0 ? <View style={CommonStyles.searchBarStyle}>
+        {/* {props.itemsArray && props.itemsArray.length > 0 ? <View style={CommonStyles.searchBarStyle}>
                               
           <View style={[CommonStyles.searchInputContainerStyle]}>
             <Image source={searchImg} style={CommonStyles.searchImageStyle} />
@@ -129,14 +216,85 @@ const StyleLocationInventoryUI = ({route, ...props }) => {
               />
           </View> 
           
-        </View> : null}
+        </View> : null} */}
+        {filterArray ? (
+        <View style={{ flexDirection: 'row', width: '100%', marginBottom: 10, alignItems: 'center' }}>
+  {/* Search Bar */}
+  <View
+    style={{
+      flexDirection: 'row',
+      alignItems: 'center',
+      flex: 1, // Allows the search bar to take up available space
+      borderWidth: 1,
+      borderColor: '#D1D1D1',
+      borderRadius: 20,
+      backgroundColor: '#F9F9F9',
+      paddingHorizontal: 15,
+      // paddingVertical: 5,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 3,
+    }}
+  >
+    <Image
+      source={searchImg}
+      style={{ height: 18, width: 18, tintColor: '#7F7F81', marginRight: 10 }}
+    />
+    <TextInput
+      style={{ flex: 1, color: '#000' }}
+      underlineColorAndroid="transparent"
+      placeholder="Search"
+      placeholderTextColor="#A0A0A0"
+      autoCapitalize="none"
+      value={recName}
+      onFocus={() => (isKeyboard.current = true)}
+      onChangeText={filterPets}
+    />
+  </View>
 
-        {/* {filterArray && filterArray.length > 0 ? <View style={{flexDirection :'row', justifyContent:'space-between'}}>
-          <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:1.5,textAlign:'left'}]}>{'Style'}</Text>
-          <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:1.5,textAlign:'center',}]}>{'Color'}</Text>
-          <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:1,textAlign:'center',}]}>{'WO'}</Text>
-          <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:1.2,textAlign:'center',}]}>{'Total qty'}</Text>
-        </View>: null} */}
+  {/* Filter Button */}
+  <TouchableOpacity
+    style={{
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginLeft: 10,
+      paddingHorizontal: 15,
+      paddingVertical: 8,
+      borderWidth: 1,
+      borderColor: '#D1D1D1',
+      borderRadius: 20,
+      backgroundColor: '#F9F9F9',
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 3,
+    }}
+    onPress={() => {
+      set_showFilteredList(true);
+      setFilterVisible(!isFilterVisible);
+    }}
+  >
+    <Image
+      source={filterImg}
+      style={{ height: 25, width: 25, tintColor: showFilteredList ? color.color2 : '#7F7F81', marginRight: 10 }}
+    />
+    {
+      filterCount ?
+      <Text style={{ color: '#7F7F81', fontSize: 14, backgroundColor:color.color2, borderRadius:30,color:'#fff', padding:5 }}>{filterCount}</Text> :
+      <Text style={{ color: '#7F7F81', fontSize: 14 }}>{"Filter"}</Text> 
+    }
+  </TouchableOpacity>
+
+</View>
+
+
+        ) : null}
+
+
 
         {filterArray && filterArray.length > 0 ? <View style={CommonStyles.listCommonHeader}>
           <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:3,textAlign:'left'}]}>{'Style Details'}</Text>
@@ -150,27 +308,45 @@ const StyleLocationInventoryUI = ({route, ...props }) => {
         </View>}
 
         <View style={CommonStyles.listStyle}>
-          {/* <FlatList
+        {showFilteredList ?
+        (<FlatList
             data={filterArray}
             renderItem={renderItem}
             keyExtractor={(item, index) => "" + index}
             showsVerticalScrollIndicator = {false}
-          /> */}
-           <FlatList
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
+          />):
+            (<FlatList
               data={filterArray}
               renderItem={renderItem}
               keyExtractor={(item, index) => '' + index}
               showsVerticalScrollIndicator={false}
               onEndReached={() => fetchMore()}
               onEndReachedThreshold={0.2}
-              ListFooterComponent={() => props.isLoading  && <ActivityIndicator size="large" />}
+              ListFooterComponent={() => props.isLoading && <ActivityIndicator size="large" />}
               refreshControl={
                 <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
               }
-            />
+            />)}
         </View>
         <View style={{height:450}}/>
       </View>  
+
+      <View style={styles.container}>
+      {/* <Button title="Open Filter"  /> */}
+      <FilterModal
+        isVisible={isFilterVisible}
+        categoriesList={categories}
+        selectedCategoryListAPI={'getSelectedCategoryList_LocationwiseStyleInv'}
+        onClose={() => setFilterVisible(false)}
+        applyFilterFxn={applyFilterFxn}
+        clearFilter={clearFilter}
+        reqBody={filterReqBody}
+
+      />
+    </View>
 
       {props.isPopUp ? <View style={CommonStyles.customPopUpStyle}>
         <AlertComponent
@@ -192,3 +368,13 @@ const StyleLocationInventoryUI = ({route, ...props }) => {
 }
   
   export default StyleLocationInventoryUI;
+
+  
+  const styles = StyleSheet.create({
+
+    container: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+  })
