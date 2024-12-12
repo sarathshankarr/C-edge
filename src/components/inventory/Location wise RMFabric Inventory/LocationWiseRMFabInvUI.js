@@ -52,6 +52,8 @@ const LocationWiseRMFabInvUI = ({route, ...props }) => {
   const getRequestBody = async() => {
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
     let Obj={
       "menuId": 95,//mandatory
       "searchKeyValue": "",
@@ -59,13 +61,14 @@ const LocationWiseRMFabInvUI = ({route, ...props }) => {
       "dataFilter": "0",
       "locIds": 0,
       "brandIds": 0,
-      "compIds": 0,
       "fromRecord": 0, //mandatory
       "toRecord": 25, //mandatory
       "userName":userName,  //mandatory
       "userPwd":userPsd,   //mandatory
       "categoryType" : "rmFabricTypeNames",
-      "categoryIds" : ""
+      "categoryIds" : "",
+      "compIds": usercompanyId,
+      "company":JSON.parse(companyObj),
   }
   setfilterReqBody(Obj)
   };

@@ -62,6 +62,7 @@ const FabricProcessInList = ({ route }) => {
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
 
     set_isLoading(!reload);
     set_MainLoading(reload);
@@ -80,7 +81,8 @@ const FabricProcessInList = ({ route }) => {
         "toRecord": toRecord,
         "searchKeyValue": "",
         "styleSearchDropdown": "-1",
-        // "compIds": usercompanyId
+        "compIds": usercompanyId,
+        "company":JSON.parse(companyObj),
     }
       let LISTAPIOBJ = await APIServiceCall.loadAllFabricProcessInList(obj);
       set_isLoading(false);
@@ -119,6 +121,7 @@ const FabricProcessInList = ({ route }) => {
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');    
 
     let obj =  {
       "username": userName,
@@ -129,10 +132,12 @@ const FabricProcessInList = ({ route }) => {
        "searchKeyValue": "",
        "styleSearchDropdown": "-1",
        "categoryType" : types,
-       "categoryIds" : Ids
+       "categoryIds" : Ids,
+       "compIds": usercompanyId,
+       "company":JSON.parse(companyObj),
      }
 
-     console.log("requested filtered body ==> ", obj)
+    //  console.log("requested filtered body ==> ", obj)
   
     let stichingOutAPIObj = await APIServiceCall.getFilteredListFBI(obj);
     set_MainLoading(false);
@@ -210,13 +215,17 @@ const FabricProcessInList = ({ route }) => {
 const handlePdf = async (item) => {
   let userName = await AsyncStorage.getItem('userName');
   let userPsd = await AsyncStorage.getItem('userPsd');
+  let usercompanyId = await AsyncStorage.getItem('companyId');
+  let companyObj = await AsyncStorage.getItem('companyObj');
   set_isLoading(true);
 
   let obj = {
       "menuId": 587,
       "so_style_id": item.so_style_id,
       "username": userName,
-      "password": userPsd
+      "password": userPsd,
+      "compIds": usercompanyId,
+      "company":JSON.parse(companyObj),
   }
 
   const apiUrl = APIServiceCall.downloadPdf();
@@ -272,13 +281,17 @@ const handlePdf = async (item) => {
 const handleScan = async (item) => {
   let userName = await AsyncStorage.getItem('userName');
   let userPsd = await AsyncStorage.getItem('userPsd');
+  let usercompanyId = await AsyncStorage.getItem('companyId');
+  let companyObj = await AsyncStorage.getItem('companyObj');
   set_isLoading(true);
 
   let obj = {
       "menuId": 587,
       "so_style_id": item.so_style_id,
       "username": userName,
-      "password": userPsd
+      "password": userPsd,
+      "compIds": usercompanyId,
+      "company":JSON.parse(companyObj),
   };
 
   const apiUrl = APIServiceCall.downloadQrPdf();

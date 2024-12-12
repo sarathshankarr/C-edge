@@ -912,7 +912,7 @@ export async function stichingOutDetails(jsonValue) {
         return obj;
     }
 
-    console.log("URL ==>", Environment.uri + "stitchingout/loadAllCTRRequestForCutting", "Json Object ==>", jsonValue)
+    // console.log("URL ==>", Environment.uri + "stitchingout/loadAllCTRRequestForCutting", "Json Object ==>", jsonValue)
 
     await fetch(Environment.uri + "stitchingout/loadAllCTRRequestForCutting",
         {
@@ -924,7 +924,7 @@ export async function stichingOutDetails(jsonValue) {
             body: JSON.stringify(jsonValue),
         }
     ).then((response) => response.json()).then(async (data) => {
-        console.log('stichingOutDetails list ', data[0])
+        // console.log('stichingOutDetails list ', data[0])
 
         if (data) {
             statusData = true;
@@ -1040,7 +1040,7 @@ export async function editStichingInDetails(jsonValue) {
         obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
         return obj;
     }
-    console.log("url ==>", Environment.uri + "stitching/stitchingInEdit", "JSON VALUE ==>", jsonValue)
+    // console.log("url ==>", Environment.uri + "stitching/stitchingInEdit", "JSON VALUE ==>", jsonValue)
     await fetch(Environment.uri + "stitching/stitchingInEdit",
         {
             method: "POST",
@@ -1461,7 +1461,7 @@ export async function EditDDA(jsonValue) {
         obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
         return obj;
     }
-    console.log("url ==>", Environment.uri + "designdirectory/editdesigndirectory", "JSON VALUE ==>", jsonValue)
+    // console.log("url ==>", Environment.uri + "designdirectory/editdesigndirectory", "JSON VALUE ==>", jsonValue)
     await fetch(Environment.uri + "designdirectory/editdesigndirectory",
         {
             method: "POST",
@@ -1672,7 +1672,7 @@ export async function GetEditStockAprroveDetails(jsonValue) {
         obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
         return obj;
     }
-    console.log("url ==>", Environment.uri + "stockapprove/getStockDetails", "JSON VALUE ==>", jsonValue)
+    // console.log("url ==>", Environment.uri + "stockapprove/getStockDetails", "JSON VALUE ==>", jsonValue)
     await fetch(Environment.uri + "stockapprove/getStockDetails",
         {
             method: "POST",
@@ -1798,7 +1798,7 @@ export async function GetEditStockRecieveDetails(jsonValue) {
         obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
         return obj;
     }
-    console.log("url ==>", Environment.uri + "stockapprove/getStockReceive", "JSON VALUE ==>", jsonValue)
+    // console.log("url ==>", Environment.uri + "stockapprove/getStockReceive", "JSON VALUE ==>", jsonValue)
     await fetch(Environment.uri + "stockapprove/getStockReceive",
         {
             method: "POST",
@@ -1840,7 +1840,7 @@ export async function GetEditStockRequestDetails(jsonValue) {
         obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
         return obj;
     }
-    console.log("url ==>", Environment.uri + "stockapprove/editStockRequest", "JSON VALUE ==>", jsonValue)
+    // console.log("url ==>", Environment.uri + "stockapprove/editStockRequest", "JSON VALUE ==>", jsonValue)
     await fetch(Environment.uri + "stockapprove/editStockRequest",
         {
             method: "POST",
@@ -2601,7 +2601,7 @@ export async function GetStyleStatusFlow(jsonValue) {
         obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
         return obj;
     }
-    console.log("url ==>", Environment.uri + "styleapi/getStyleProcessList");
+    // console.log("url ==>", Environment.uri + "styleapi/getStyleProcessList");
 
     await fetch(Environment.uri + "styleapi/getStyleProcessList",
         {
@@ -3243,7 +3243,7 @@ export async function getEditDetailsOfFabricProcessIn(jsonValue) {
         obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
         return obj;
     }
-    console.log("url ==>", Environment.uri + "fabricprocessinapi/apiFabricProcessOutAdd", "JSON VALUE ==>", jsonValue)
+    // console.log("url ==>", Environment.uri + "fabricprocessinapi/apiFabricProcessOutAdd", "JSON VALUE ==>", jsonValue)
     await fetch(Environment.uri + "fabricprocessinapi/apiFabricProcessOutAdd",
         {
             method: "POST",
@@ -3455,7 +3455,7 @@ export async function getEditDetailsGatePassAuck(jsonValue) {
         obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
         return obj;
     }
-    console.log("url ==>", Environment.uri + "gatepassacknowledgmentapi/editGatePassAcknowledgementApi", "JSON VALUE ==>", jsonValue)
+    // console.log("url ==>", Environment.uri + "gatepassacknowledgmentapi/editGatePassAcknowledgementApi", "JSON VALUE ==>", jsonValue)
     await fetch(Environment.uri + "gatepassacknowledgmentapi/editGatePassAcknowledgementApi",
         {
             method: "POST",
@@ -3927,3 +3927,328 @@ export async function getFiltered_LocationwiseRMFabricInventory(jsonValue) {
     return obj;
 };
 // ===========
+
+export async function getSelectedCategoryList_StockApproveRequest(jsonValue) {
+
+    let returnError = undefined;
+    let statusData = undefined;
+    let responseData = undefined;
+    let logoutData = false;
+    let obj = undefined;
+
+    let internet = await internetCheck();
+    if (!internet) {
+        obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
+        return obj;
+    }
+    console.log("URL", Environment.uri + "stockapprove/loadAllStylesStockApprove");
+    await fetch(Environment.uri + "stockapprove/loadAllStylesStockApprove",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            },
+            body: JSON.stringify(jsonValue),
+        }
+    ).then((response) => response.json()).then(async (data) => {
+        if (data) {
+            statusData = true;
+            responseData = data
+        } else {
+            statusData = undefined;
+        }
+
+    }).catch((error) => {
+        console.log('GatePassAckList error ', error)
+        returnError = error;
+    });
+
+    obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet }
+    return obj;
+};
+export async function getFiltered_StockApproveRequest(jsonValue) {
+
+    let returnError = undefined;
+    let statusData = undefined;
+    let responseData = undefined;
+    let logoutData = false;
+    let obj = undefined;
+
+    let internet = await internetCheck();
+    if (!internet) {
+        obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
+        return obj;
+    }
+    console.log("URL", Environment.uri + "stockapprove/loadAllStylesStockApproveCategoryType");
+    await fetch(Environment.uri + "stockapprove/loadAllStylesStockApproveCategoryType",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            },
+            body: JSON.stringify(jsonValue),
+        }
+    ).then((response) => response.json()).then(async (data) => {
+        if (data) {
+            statusData = true;
+            responseData = data
+        } else {
+            statusData = undefined;
+        }
+
+    }).catch((error) => {
+        console.log('GatePassAckList error ', error)
+        returnError = error;
+    });
+
+    obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet }
+    return obj;
+};
+
+//============
+
+export async function getSelectedCategoryList_StockRecieve(jsonValue) {
+
+    let returnError = undefined;
+    let statusData = undefined;
+    let responseData = undefined;
+    let logoutData = false;
+    let obj = undefined;
+
+    let internet = await internetCheck();
+    if (!internet) {
+        obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
+        return obj;
+    }
+    console.log("URL", Environment.uri + "stockapprove/loadAllStockRecSearchCategory");
+    await fetch(Environment.uri + "stockapprove/loadAllStockRecSearchCategory",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            },
+            body: JSON.stringify(jsonValue),
+        }
+    ).then((response) => response.json()).then(async (data) => {
+        if (data) {
+            statusData = true;
+            responseData = data
+        } else {
+            statusData = undefined;
+        }
+
+    }).catch((error) => {
+        console.log('GatePassAckList error ', error)
+        returnError = error;
+    });
+
+    obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet }
+    return obj;
+};
+export async function getFiltered_StockRecieve(jsonValue) {
+
+    let returnError = undefined;
+    let statusData = undefined;
+    let responseData = undefined;
+    let logoutData = false;
+    let obj = undefined;
+
+    let internet = await internetCheck();
+    if (!internet) {
+        obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
+        return obj;
+    }
+    console.log("URL", Environment.uri + "stockapprove/loadAllStockRecSearchCategoryType");
+    await fetch(Environment.uri + "stockapprove/loadAllStockRecSearchCategoryType",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            },
+            body: JSON.stringify(jsonValue),
+        }
+    ).then((response) => response.json()).then(async (data) => {
+        if (data) {
+            statusData = true;
+            responseData = data
+        } else {
+            statusData = undefined;
+        }
+
+    }).catch((error) => {
+        console.log('GatePassAckList error ', error)
+        returnError = error;
+    });
+
+    obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet }
+    return obj;
+};
+
+//============
+
+export async function getSelectedCategoryList_stichingout(jsonValue) {
+
+    let returnError = undefined;
+    let statusData = undefined;
+    let responseData = undefined;
+    let logoutData = false;
+    let obj = undefined;
+
+    let internet = await internetCheck();
+    if (!internet) {
+        obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
+        return obj;
+    }
+    console.log("get cat -> stitching out", Environment.uri + "stitchingout/loadAllCTRRequestForCuttingSearchCategory");
+    await fetch(Environment.uri + "stitchingout/loadAllCTRRequestForCuttingSearchCategory",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            },
+            body: JSON.stringify(jsonValue),
+        }
+    ).then((response) => response.json()).then(async (data) => {
+        if (data) {
+            statusData = true;
+            responseData = data
+        } else {
+            statusData = undefined;
+        }
+
+    }).catch((error) => {
+        console.log('Cat List stitching out  error ', error)
+        returnError = error;
+    });
+
+    obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet }
+    return obj;
+};
+
+export async function getFiltered_StichingOut(jsonValue) {
+
+    let returnError = undefined;
+    let statusData = undefined;
+    let responseData = undefined;
+    let logoutData = false;
+    let obj = undefined;
+
+    let internet = await internetCheck();
+    if (!internet) {
+        obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
+        return obj;
+    }
+    console.log("URL", Environment.uri + "stitchingout/loadAllCTRRequestForCuttingSearchCategoryType");
+    await fetch(Environment.uri + "stitchingout/loadAllCTRRequestForCuttingSearchCategoryType",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            },
+            body: JSON.stringify(jsonValue),
+        }
+    ).then((response) => response.json()).then(async (data) => {
+        if (data) {
+            statusData = true;
+            responseData = data
+        } else {
+            statusData = undefined;
+        }
+
+    }).catch((error) => {
+        console.log('GatePassAckList error ', error)
+        returnError = error;
+    });
+
+    obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet }
+    return obj;
+};
+
+// ==========================================
+
+export async function getSelectedCategoryList_finishingOut(jsonValue) {
+
+    let returnError = undefined;
+    let statusData = undefined;
+    let responseData = undefined;
+    let logoutData = false;
+    let obj = undefined;
+
+    let internet = await internetCheck();
+    if (!internet) {
+        obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
+        return obj;
+    }
+    console.log("URL", Environment.uri + "finishingout/loadAllDataFinishingOutSearchCategory");
+    await fetch(Environment.uri + "finishingout/loadAllDataFinishingOutSearchCategory",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            },
+            body: JSON.stringify(jsonValue),
+        }
+    ).then((response) => response.json()).then(async (data) => {
+        if (data) {
+            statusData = true;
+            responseData = data
+        } else {
+            statusData = undefined;
+        }
+
+    }).catch((error) => {
+        console.log('finishing out cat list  error ', error)
+        returnError = error;
+    });
+
+    obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet }
+    return obj;
+};
+export async function getFiltered_finishingOut(jsonValue) {
+
+    let returnError = undefined;
+    let statusData = undefined;
+    let responseData = undefined;
+    let logoutData = false;
+    let obj = undefined;
+
+    let internet = await internetCheck();
+    if (!internet) {
+        obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
+        return obj;
+    }
+    console.log("URL", Environment.uri + "finishingout/loadAllDataFinishingOutSearchCategoryType");
+    await fetch(Environment.uri + "finishingout/loadAllDataFinishingOutSearchCategoryType",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            },
+            body: JSON.stringify(jsonValue),
+        }
+    ).then((response) => response.json()).then(async (data) => {
+        if (data) {
+            statusData = true;
+            responseData = data
+        } else {
+            statusData = undefined;
+        }
+
+    }).catch((error) => {
+        console.log('finshing out search  error ', error)
+        returnError = error;
+    });
+
+    obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet }
+    return obj;
+};
+
+// ================================================

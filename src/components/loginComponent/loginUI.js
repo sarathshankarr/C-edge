@@ -420,9 +420,9 @@ const styles = StyleSheet.create({
     fontFamily:'serif'
   },
   titleHighlight: {
-    // color: '#3BC3FF',
+    color: '#3BC3FF',
     // color: 'purple',
-    color: color.color2,
+    // color: color.color2,
     // color: '#000',
 
     fontWeight: '600',

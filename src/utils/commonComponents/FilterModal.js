@@ -45,22 +45,42 @@ useEffect(()=>{
 
   const handleFilterList=(text='')=>{
     const property = selectedCategory?.fid;
-    const filtered = selectedCategoryItems.filter((item) =>item[property].toUpperCase().includes(text.toUpperCase() || ''));
-    // console.log("selected category",property,text, filtered);
+    // const filtered = selectedCategoryItems.filter((item) =>item[property].toUpperCase().includes(text.toUpperCase() || ''));
+    const filtered = selectedCategoryItems.filter((item) => {
+      const value = item[property];
+      const searchValue = text.toUpperCase() || '';
+      return typeof value === 'string'
+        ? value.toUpperCase().includes(searchValue)
+        : value.toString().includes(searchValue);
+    });
+        
     set_selectedCategoryFilteredItems(filtered);
     setSearchText(text);
   }
 
 
-  const toggleSelection = (index) => {
-    setSelectedIndices((prevSelected) => {
-        if (prevSelected.includes(index)) {
-            return prevSelected.filter((i) => i !== index);
-        } else {
-            return [...prevSelected, index];
-        }
-    });
+//   const toggleSelection = (index) => {
+//     setSelectedIndices((prevSelected) => {
+//         if (prevSelected.includes(index)) {
+//             return prevSelected.filter((i) => i !== index);
+//         } else {
+//             return [...prevSelected, index];
+//         }
+//     });
+// };
+
+const toggleSelection = (item) => {
+  setSelectedIndices((prevSelected) => {
+      const exists = prevSelected.some((i) => i === item);
+      
+      if (exists) {
+          return prevSelected.filter((i) => i !== item);
+      } else {
+          return [...prevSelected, item];
+      }
+  });
 };
+
 
 
     const getSelectedCategoryListFBI = async (functionName, id) => {
@@ -74,7 +94,7 @@ useEffect(()=>{
       let obj = reqBody;
       obj.categoryType=id;
 
-      console.log("rightside  req body", obj)
+      console.log("rightside  req body", obj, functionName, id);
   
       // let categoreisListAPIOBJ = await APIServiceCall.getSelectedCategoryListFBI(obj);
       // if (typeof APIServiceCall[functionName] === 'function') {
@@ -88,7 +108,6 @@ useEffect(()=>{
         if(categoreisListAPIOBJ && categoreisListAPIOBJ.responseData){
           set_selectedCategoryItems(categoreisListAPIOBJ.responseData);
           set_selectedCategoryFilteredItems(categoreisListAPIOBJ.responseData);
-          // console.log("reponse data from API :",categoreisListAPIOBJ.responseData )
         } 
   
       } else {
@@ -100,7 +119,6 @@ useEffect(()=>{
         // popUpAction(Constant.SERVICE_FAIL_MSG,Constant.DefaultAlert_MSG,'OK', true,false);
         console.log("categoreisListAPIOBJ ===> ", categoreisListAPIOBJ.error)
       }
-  
     };
 
 
@@ -112,17 +130,19 @@ useEffect(()=>{
     }
 
     const handleAppyFilter=()=>{
-      // const ids=selectedIndices.join(',');
-      const ids = selectedIndices.map(id => {
-        const prop = selectedCategory.idxId;
-        return selectedCategoryItems[id]?.[prop];
-    }).join(',');
-    
+
+    const ids = selectedIndices
+    .map(item => {
+      const prop = selectedCategory.idxId; 
+      return item[prop]; 
+    })
+    .join(',');
+  
+  console.log(" Selected Indices ids", ids); 
+  
+   
 
       const count=selectedIndices.length;
-
-      // console.log("selected ids " , ids, selectedCategoryFilteredItems)
-
       const type=selectedCategory.id
       applyFilterFxn(type, ids, count);
       setPrepoluateIndices(selectedIndices);
@@ -223,8 +243,8 @@ useEffect(()=>{
               renderItem={({ item, index }) => (
                 <View style={styles.itemContainer}>
                   <CustomCheckBox
-                        isChecked={selectedIndices.includes(index)}
-                        onToggle={() => toggleSelection(index)}
+                        isChecked={selectedIndices.includes(item)}
+                        onToggle={() => toggleSelection(item)}
                     />
                   <Text style={styles.itemText}>{item[selectedCategory.fid]}</Text>
                 </View>

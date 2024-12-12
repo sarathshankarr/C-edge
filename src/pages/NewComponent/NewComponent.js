@@ -31,10 +31,10 @@ const TabNavigator = () => (
           <Image
             source={itemsArray.find(item => item.name === route.name)?.img}
             style={{
-              width: focused ? 35 : 30,
-              height: focused ? 35 : 30,
-              // tintColor: '#1F74BA',
-              tintColor: color.color2,
+              width: focused ? 35 : 25,
+              height: focused ? 35 : 25,
+              tintColor:focused ?  color.color4 : color.color2,
+              // tintColor: color.color2,
             }}
           />
         </View>

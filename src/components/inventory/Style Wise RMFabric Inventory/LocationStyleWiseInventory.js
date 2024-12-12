@@ -102,7 +102,7 @@ const LocationStyleWiseInventory = ({ navigation, route, ...props }) => {
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
-
+    let companyObj = await AsyncStorage.getItem('companyObj');
     let obj =    {
       "menuId": 168,//mandatory
       "searchKeyValue": "",
@@ -110,16 +110,17 @@ const LocationStyleWiseInventory = ({ navigation, route, ...props }) => {
       "dataFilter": "0",
       "locIds": 0,
       "brandIds": 0,
-      "compIds": 0,
       "fromRecord": 0, //mandatory
       "toRecord": 25, //mandatory
       "userName":userName,  //mandatory
       "userPwd":userPsd,   //mandatory
       "categoryType" : types,
-         "categoryIds" : Ids
+         "categoryIds" : Ids,
+         "compIds": usercompanyId,
+         "company":JSON.parse(companyObj),
   }
 
-     console.log("requested filtered body ==> ", obj);
+    //  console.log("requested filtered body ==> ", obj);
   
     let stichingOutAPIObj = await APIServiceCall.getFiltered_StyleWiseFabricRmInventory(obj);
     set_MainLoading(false);

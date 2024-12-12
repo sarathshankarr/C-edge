@@ -6,7 +6,10 @@ import CommonStyles from "../../../utils/commonStyles/commonStyles";
 import HeaderComponent from '../../../utils/commonComponents/headerComponent';
 import LoaderComponent from '../../../utils/commonComponents/loaderComponent';
 import AlertComponent from '../../../utils/commonComponents/alertComponent';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import FilterModal from '../../../utils/commonComponents/FilterModal';
 let searchImg = require('./../../../../assets/images/png/searchIcon.png');
+let filterImg = require('./../../../../assets/images/png/setting.png');
 
 const FinishingOutListUI = ({route, ...props }) => {
 
@@ -16,14 +19,56 @@ const FinishingOutListUI = ({route, ...props }) => {
   const [refreshing, set_refreshing] = useState(false);
 
 
+  const [ItemsArray, set_ItemsArray] = useState([]);
+  const [showFilteredList, set_showFilteredList] = useState(false);
+  const [filterCount, set_filterCount] = useState(0);
+  const [isFiltering, setIsFiltering] = useState(false); 
+  const [isFilterVisible, setFilterVisible] = useState(false);
+  const [filterReqBody, setfilterReqBody] = useState({}); 
+
+
+  const [categories, set_categories]=useState([
+    // { id: "rmFabricTypeNames", fid:"rmFabricTypeNames" ,value: "RM/Fabric Type " , idxId:"rmFabricTypeNames"},
+    // { id: "barndsVal",fid: "barndsVal", value: "Brand/Project" , idxId:"barndsVal"},
+    
+    { id: "styleNames", fid: "styleno", value: "Style No" , idxId:"styleId"},
+    { id: "colorNames",fid: "color", value: "Color" , idxId:"colorid"},
+    { id: "workordernumber",fid: "wono", value: "W.O NO" , idxId:"wono"},
+  ]);
+
+
   React.useEffect(() => {
 
     if(props.itemsArray){
       set_filterArray(props.itemsArray);
+      set_ItemsArray(props.itemsArray);
     }
+    getRequestBody();
     
   }, [props.itemsArray]);
 
+  const getRequestBody = async() => {
+    let userName = await AsyncStorage.getItem('userName');
+    let userPsd = await AsyncStorage.getItem('userPsd');
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
+    let Obj=  {
+      "menuId": 41,
+      "categoryIds": "",
+      "categoryType": "",
+      "dataFilter": "60Days",
+      "locIds": 0,
+      "brandIds": 0,
+      "fromRecord": 0,
+      "toRecord": 25,
+      "username": userName,
+      "password" : userPsd,
+      "compIds": usercompanyId,
+      "company":JSON.parse(companyObj)
+  }
+
+  setfilterReqBody(Obj)
+  };
   const backBtnAction = () => {
     props.backBtnAction();
   };
@@ -37,54 +82,79 @@ const FinishingOutListUI = ({route, ...props }) => {
   };
 
   const fetchMore=()=>{
-    props.fetchMore(true);
+    if (!isFiltering) { 
+      props.fetchMore(true);
+    }
+  }
+
+  const applyFilterFxn = (types, Ids, count) => {
+    console.log("applyFilterFxn", types, Ids);
+    props.applyFilterFxn(types, Ids);
+    set_filterCount(count)
+    set_showFilteredList(true);
+    setFilterVisible(false);
+  };
+
+
+  const clearFilter=()=>{
+    onRefresh();
   }
 
   const onRefresh = () => {
     set_refreshing(true);
     props.fetchMore(false); 
     set_refreshing(false);
+    set_filterCount(0);
+    set_recName('');
+    set_showFilteredList(false);
+    setFilterVisible(false);
+    setIsFiltering(false);
   };
 
-  const filterPets = (recName) => {
 
-    if(isKeyboard.current === true) {
-      set_recName(recName)
+  // const filterPets = (recName) => {
+
+  //   if(isKeyboard.current === true) {
+  //     set_recName(recName)
       
-      let newData = props.itemsArray.filter(function(item) {
-        let itemData = item ? item.color.toUpperCase() : "".toUpperCase();
-        const textData = recName.toUpperCase();
-        return itemData.indexOf(textData) > -1;
-      });
+  //     let newData = props.itemsArray.filter(function(item) {
+  //       let itemData = item ? item.color.toUpperCase() : "".toUpperCase();
+  //       const textData = recName.toUpperCase();
+  //       return itemData.indexOf(textData) > -1;
+  //     });
           
-      console.log('Filter ', newData);
+  //     console.log('Filter ', newData);
 
-      let nestedFilter = props.itemsArray;
-      const styleArray = nestedFilter.filter(style => (style.styleno.toString().toUpperCase().includes(recName.toUpperCase()) || style.color.toUpperCase().includes(recName.toUpperCase()) || style.wono.toString().toUpperCase().includes(recName.toUpperCase())));
+  //     let nestedFilter = props.itemsArray;
+
+  //     if(styleArray && styleArray.length > 0) {
+  //       set_filterArray(styleArray);
+  //     } else {
+  //       set_filterArray([]);
+  //     }
+  //   }
+  // };
+
+  const filterPets = (name) => {
+    const searchTerm = name.toString().toLowerCase().trim(); 
+    set_recName(name); 
+   if(searchTerm.length===0){
+     set_filterArray(ItemsArray);
+     setIsFiltering(false);
+     return;
+   }
+   setIsFiltering(true); 
+
+      const styleArray = ItemsArray.filter(style => (style.styleno.toString().toUpperCase().includes(name.toUpperCase()) || style.color.toUpperCase().includes(name.toUpperCase()) || style.wono.toString().toUpperCase().includes(name.toUpperCase())));
 
       if(styleArray && styleArray.length > 0) {
         set_filterArray(styleArray);
       } else {
         set_filterArray([]);
       }
-    }
+    
   };
 
-  // const renderItem = ({ item, index }) => {
-  //   return (
-
-  //     <TouchableOpacity onPress={() => actionOnRow(item,index)} style={CommonStyles.cellBackViewStyle}>
-
-  //       <View style={{flexDirection :'row', justifyContent:'space-between', alignItems:'center'}}>
-  //         <Text style={[CommonStyles.tylesTextStyle,{flex:1.5,textAlign:'left'}]}>{item.styleno}</Text>
-  //         <Text style={[CommonStyles.tylesTextStyle,{flex:1,textAlign:'center'}]}>{item.color}</Text>
-  //         <Text style={[CommonStyles.tylesTextStyle,{flex:1,textAlign:'center'}]}>{item.wono}</Text>
-  //         <Text style={[CommonStyles.tylesTextStyle,{flex:1.2,textAlign:'right',marginRight:wp('2%')}]}>{item.totalQty}<Text style={[CommonStyles.tylesTextStyle,{flex:1.5,textAlign:'right',marginRight:wp('2%')}]}>{'/'+item.finishingOutQty}</Text></Text>
-  //       </View>
-
-  //     </TouchableOpacity>  
-  //   );
-  // };
 
   const renderItem = ({ item, index }) => {
     return (
@@ -132,22 +202,84 @@ const FinishingOutListUI = ({route, ...props }) => {
 
       <View style={CommonStyles.headerStyle}>
 
-          <View style={CommonStyles.searchBarStyle}>
-                              
-          <View style={[CommonStyles.searchInputContainerStyle]}>
-            <Image source={searchImg} style={CommonStyles.searchImageStyle} />
-              <TextInput style={CommonStyles.searchTextInputStyle}
-                underlineColorAndroid="transparent"
-                placeholder="Search by Color"
-                placeholderTextColor="#7F7F81"
-                autoCapitalize="none"
-                value = {recName}
-                onFocus={ () => isKeyboard.current = true }
-                onChangeText={(name) => {filterPets(name)}}
-              />
-          </View> 
-          
-        </View>
+      {filterArray ? (
+        <View style={{ flexDirection: 'row', width: '100%', marginBottom: 10, alignItems: 'center' }}>
+  {/* Search Bar */}
+  <View
+    style={{
+      flexDirection: 'row',
+      alignItems: 'center',
+      flex: 1, // Allows the search bar to take up available space
+      borderWidth: 1,
+      borderColor: '#D1D1D1',
+      borderRadius: 20,
+      backgroundColor: '#F9F9F9',
+      paddingHorizontal: 15,
+      // paddingVertical: 5,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 3,
+    }}
+  >
+    <Image
+      source={searchImg}
+      style={{ height: 18, width: 18, tintColor: '#7F7F81', marginRight: 10 }}
+    />
+    <TextInput
+      style={{ flex: 1, color: '#000' }}
+      underlineColorAndroid="transparent"
+      placeholder="Search"
+      placeholderTextColor="#A0A0A0"
+      autoCapitalize="none"
+      value={recName}
+      onFocus={() => (isKeyboard.current = true)}
+      onChangeText={filterPets}
+    />
+  </View>
+
+  {/* Filter Button */}
+  <TouchableOpacity
+    style={{
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginLeft: 10,
+      paddingHorizontal: 15,
+      paddingVertical: 8,
+      borderWidth: 1,
+      borderColor: '#D1D1D1',
+      borderRadius: 20,
+      backgroundColor: '#F9F9F9',
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 3,
+    }}
+    onPress={() => {
+      set_showFilteredList(true);
+      setFilterVisible(!isFilterVisible);
+    }}
+  >
+    <Image
+      source={filterImg}
+      style={{ height: 25, width: 25, tintColor: showFilteredList ? color.color2 : '#7F7F81', marginRight: 10 }}
+    />
+    {
+      filterCount ?
+      <Text style={{ color: '#7F7F81', fontSize: 14, backgroundColor:color.color2, borderRadius:30,color:'#fff', padding:5 }}>{filterCount}</Text> :
+      <Text style={{ color: '#7F7F81', fontSize: 14 }}>{"Filter"}</Text> 
+    }
+    
+    
+  </TouchableOpacity>
+
+</View>
+
+
+        ) : null}
 
         {props.itemsArray && props.itemsArray.length > 0 ? <View style={CommonStyles.listCommonHeader1}>
           <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:1.5,textAlign:'left'}]}>{'Style Details'}</Text>
@@ -159,13 +291,17 @@ const FinishingOutListUI = ({route, ...props }) => {
         </View>}
 
         <View style={CommonStyles.listStyle}>
-          {/* <FlatList
+        {showFilteredList ?
+        (<FlatList
             data={filterArray}
             renderItem={renderItem}
             keyExtractor={(item, index) => "" + index}
             showsVerticalScrollIndicator = {false}
-          /> */}
-           <FlatList
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
+          />):
+            (<FlatList
               data={filterArray}
               renderItem={renderItem}
               keyExtractor={(item, index) => '' + index}
@@ -176,9 +312,19 @@ const FinishingOutListUI = ({route, ...props }) => {
               refreshControl={
                 <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
               }
-            />
+            />)}
         </View>
       </View>  
+
+      <FilterModal
+        isVisible={isFilterVisible}
+        categoriesList={categories}
+        selectedCategoryListAPI={'getSelectedCategoryList_finishingOut'}
+        onClose={() => setFilterVisible(false)}
+        applyFilterFxn={applyFilterFxn}
+        clearFilter={clearFilter}
+        reqBody={filterReqBody}
+      />
 
       {props.isPopUp ? <View style={CommonStyles.customPopUpStyle}>
         <AlertComponent

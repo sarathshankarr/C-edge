@@ -30,8 +30,8 @@ const GatePassAckListUI = ({route, ...props }) => {
 
   const [categories, set_categories]=useState([
     { id: "docno", fid:"docno" ,value: "Document No" , idxId:"docno"},
-    { id: "docdate",fid: "docdatestr", value: "Document Date" , idxId:"docdate"},
-    { id: "customer", fid: "vendorname", value: "Vendor/Customer" , idxId:"customer"}
+    { id: "docdate",fid: "docdatestr", value: "Document Date" , idxId:"docdatestr"},
+    { id: "customer", fid: "vendorname", value: "Vendor/Customer" , idxId:"vendorid"}
   ]);
 
   let isKeyboard = useRef(false);
@@ -48,11 +48,16 @@ const GatePassAckListUI = ({route, ...props }) => {
   const getRequestBody = async() => {
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
+    
     let Obj={  
       "menuId": 759,
       "username": userName,
       "password" : userPsd,
-      "categoryType" : ""
+      "categoryType" : "",
+      "compIds": usercompanyId,
+      "company":JSON.parse(companyObj),
   }
   setfilterReqBody(Obj)
   };
