@@ -9,12 +9,14 @@ export default  color={
    //input bgs light version
    lightcolor:'#9DE4DC',
    // lightcolor:'skyblue',
-
-   //color 3 for border color
    color3:'#DDD'  ,          // GREEN BORDER
 
-   //buttons color 
-   color4:"#5177c0" ,     // signle btn
-   color5:"#5177c0"      // two btns
+   //color 3 for bottom navigation  dark
+   color4:"#007167"  ,          // dark green  
+   color5:'#DDD'  ,          // GREEN BORDER
+
+   // //buttons color 
+   // color4:"#5177c0" ,     // signle btn
+   // color5:"#5177c0"      // two btns
 }
 

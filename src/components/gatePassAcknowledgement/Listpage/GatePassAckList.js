@@ -38,6 +38,7 @@ const GatePassAckList = ({ navigation, route, ...props }) => {
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
 
     const fromRecord = reload ? 0 : page * ListSize;
     const toRecord = fromRecord + ListSize - 1;
@@ -55,7 +56,9 @@ const GatePassAckList = ({ navigation, route, ...props }) => {
       "fromRecord": fromRecord,
       "toRecord": toRecord,
       "searchValue": "",
-      "searchDropdown": "-1"
+      "searchDropdown": "-1",
+      "compIds": usercompanyId,
+      "company":JSON.parse(companyObj),
     }
 
 
@@ -96,16 +99,18 @@ const GatePassAckList = ({ navigation, route, ...props }) => {
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
-
+    let companyObj = await AsyncStorage.getItem('companyObj');
     let obj =  {
       "username": userName,
        "password": userPsd,
        "menuId": 759,
        "categoryType" : types,
-       "categoryIds" : Ids
+       "categoryIds" : Ids,
+       "compIds": usercompanyId,
+       "company":JSON.parse(companyObj),
      }
 
-     console.log("requested filtered body ==> ", obj);
+    //  console.log("requested filtered body ==> ", obj);
   
     let stichingOutAPIObj = await APIServiceCall.getFilteredListGPA(obj);
     set_MainLoading(false);

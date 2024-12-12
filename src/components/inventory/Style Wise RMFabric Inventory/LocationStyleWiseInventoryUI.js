@@ -51,6 +51,8 @@ const LocationStyleWiseInventoryUI = ({route, ...props }) => {
   const getRequestBody = async() => {
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
     let Obj={
       "menuId": 168,
       "searchKeyValue": "",
@@ -58,13 +60,14 @@ const LocationStyleWiseInventoryUI = ({route, ...props }) => {
       "dataFilter": "0",
       "locIds": 0,
       "brandIds": 0,
-      "compIds": 0,
       "fromRecord": 0, 
       "toRecord": 25, 
       "userName":userName,  
       "userPwd":userPsd,   
       "categoryType" : "",
-      "categoryIds" : ""
+      "categoryIds" : "",
+      "compIds": usercompanyId,
+      "company":JSON.parse(companyObj),
   }
   setfilterReqBody(Obj)
   };

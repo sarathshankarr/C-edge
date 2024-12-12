@@ -53,7 +53,7 @@ const CuttingMainComponent = ({ navigation, route, ...props }) => {
         "styleSearchDropdown": "-1",
         "dataFilter": "",
         "locIds": locIds ? locIds : 0,
-      "brandIds":brandIds ? brandIds: 0 ,
+        "brandIds":brandIds ? brandIds: 0 ,
         "compIds": usercompanyId,
         "fromRecord": fromRecord,
         "toRecord": toRecord,

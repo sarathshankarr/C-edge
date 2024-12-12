@@ -101,24 +101,25 @@ const StyleLocationInventory = ({ navigation, route, ...props }) => {
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
-
+    let companyObj = await AsyncStorage.getItem('companyObj');
     let obj =  {
       "searchKeyValue": "",
       "styleSearchDropdown": "-1",
       "dataFilter": "0",
       "locIds": 0,
       "brandIds": 0,
-      "compIds": 0,
       "fromRecord": 0, 
       "toRecord": 25, 
       "userName": userName,
        "userPwd": userPsd,
        "menuId": 93,
        "categoryType" : types,
-       "categoryIds" : Ids
+       "categoryIds" : Ids,
+       "compIds": usercompanyId,
+       "company":JSON.parse(companyObj),
   }
 
-     console.log("requested filtered body ==> ", obj);
+    //  console.log("requested filtered body ==> ", obj);
   
     let stichingOutAPIObj = await APIServiceCall.getFilteredList_LocationwiseStyleInv(obj);
     set_MainLoading(false);
