@@ -32,7 +32,9 @@ const StockRecieveList = ({ navigation, route, ...props }) => {
 
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
+
     let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
 
     const fromRecord = reload ? 0 : page * ListSize;
     const toRecord = fromRecord + ListSize - 1;
@@ -50,7 +52,8 @@ const StockRecieveList = ({ navigation, route, ...props }) => {
       "toRecord": toRecord,
       "username": userName,
       "password" : userPsd,
-      "compIds": usercompanyId,
+       "compIds": usercompanyId,
+       "company":JSON.parse(companyObj),
 
   }
 
@@ -90,13 +93,18 @@ const StockRecieveList = ({ navigation, route, ...props }) => {
     set_MainLoading(true);
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
+
     let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
 
     let obj = {
       "username":userName,
       "password":userPsd,
       "categoryType" : types,
-      "categoryIds" : Ids
+      "categoryIds" : Ids,
+      "compIds": usercompanyId,
+      "company":JSON.parse(companyObj),
+
   }
     //  console.log("requested filtered body ==> ", obj);
   

@@ -40,6 +40,7 @@ const StichingOutComponent = ({ navigation, route, ...props }) => {
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
 
     const fromRecord = reload ? 0 : page * ListSize;
     const toRecord = fromRecord + ListSize - 1;
@@ -59,7 +60,8 @@ const StichingOutComponent = ({ navigation, route, ...props }) => {
       "dataFilter": "",
       "locIds": 0,
       "brandIds": 0,
-      "compIds": usercompanyId,
+       "compIds": usercompanyId,
+       "company":JSON.parse(companyObj),
       "fromRecord": fromRecord,
       "toRecord": toRecord,
       "username": userName,
@@ -102,14 +104,15 @@ const StichingOutComponent = ({ navigation, route, ...props }) => {
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
-
+    let companyObj = await AsyncStorage.getItem('companyObj');
     let obj = {
       "menuId": 12,
       "dataFilter": "60Days",
       "locIds": 0,
       "brandIds": 0,
-      "compIds": 0,
-      "fromRecord": 0,
+      "compIds": usercompanyId,
+      "company":JSON.parse(companyObj),
+     "fromRecord": 0,
       "toRecord": 25,
       "username":userName,
       "password":userPsd,

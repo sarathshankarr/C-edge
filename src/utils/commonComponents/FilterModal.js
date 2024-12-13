@@ -28,6 +28,7 @@ const FilterModal = ({isVisible, onClose, categoriesList, selectedCategoryListAP
   const [prepopulateSelectedCategory, setPrepopulateSelectedCategory] = useState('');
   const [prepoluateIndices, setPrepoluateIndices] = useState([]); 
   const [prepopulateFilterList, setprepopulateFilterList] = useState([]); 
+  const [searchCacheResults, setSearchCacheResults] = useState({}); 
 
 
 useEffect(()=>{

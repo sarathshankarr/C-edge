@@ -105,7 +105,7 @@ const CuttingSaveUI = ({ route, ...props }) => {
     let userPsd = await AsyncStorage.getItem('userPsd');
     let userId = await AsyncStorage.getItem('userId');
     let usercompanyId = await AsyncStorage.getItem('companyId');
-
+    let companyObj = await AsyncStorage.getItem('companyObj');
 
     let temValid = false;
 
@@ -142,7 +142,8 @@ const CuttingSaveUI = ({ route, ...props }) => {
       "password": userPsd,
       "userId": userId,
       "compIds": usercompanyId,
-      "sizeDetails": enterSizesArray,
+      "company":JSON.parse(companyObj),
+     "sizeDetails": enterSizesArray,
       "actualcon": actualConsumption,
       "batchId": batchId ? batchId : 0,
       "unitprice": unitPrice ? unitPrice : 0,

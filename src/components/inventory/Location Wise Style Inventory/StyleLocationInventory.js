@@ -41,8 +41,10 @@ const StyleLocationInventory = ({ navigation, route, ...props }) => {
 
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
-    let usercompanyId = await AsyncStorage.getItem('companyId');
 
+
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
 
     const fromRecord = reload ? 0 : page * ListSize;
     const toRecord = fromRecord + ListSize - 1;
@@ -61,7 +63,8 @@ const StyleLocationInventory = ({ navigation, route, ...props }) => {
         "toRecord": toRecord, //mandatory
         "userName": userName,  //mandatory
         "userPwd": userPsd ,  //mandatory
-        "compIds": usercompanyId,
+       "compIds": usercompanyId,
+       "company":JSON.parse(companyObj),
 
     }
 

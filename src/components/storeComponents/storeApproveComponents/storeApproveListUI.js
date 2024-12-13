@@ -51,11 +51,16 @@ const StoreApproveListUI = ({route, ...props }) => {
   const getRequestBody = async() => {
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
     let Obj={
       "username":userName,
       "password":userPsd,
       "categoryType":"",
-      "categoryIds" : ""
+      "categoryIds" : "",
+      "compIds": usercompanyId,
+      "company":JSON.parse(companyObj),
+
   }
   setfilterReqBody(Obj)
   };

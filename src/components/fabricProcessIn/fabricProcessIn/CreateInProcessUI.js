@@ -485,11 +485,17 @@ const CreateInProcessUI = ({ route, navigation, ...props }) => {
 
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
+
     props.set_isLoading(true);
     let obj = {
       "username": userName,
       "password": userPsd,
       "menuId": processId,
+      "compIds": usercompanyId,
+      "company":JSON.parse(companyObj),
+
     }
     let STOREDETAILSAPIObj = await APIServiceCall.getBatchNoListByProcessId(obj);
     props.set_isLoading(false);
@@ -515,6 +521,9 @@ const CreateInProcessUI = ({ route, navigation, ...props }) => {
 
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
+
     props.set_isLoading(true);
     const s = batchNoId.split('_');
     const a = s[0];
@@ -522,6 +531,9 @@ const CreateInProcessUI = ({ route, navigation, ...props }) => {
     let obj = {
       "username": userName,
       "password": userPsd,
+      "compIds": usercompanyId,
+      "company":JSON.parse(companyObj),
+
       // "menuId": processId === "591" ? "591" : '0',
       "menuId": 0,
       "batchId": b,
@@ -587,11 +599,16 @@ const CreateInProcessUI = ({ route, navigation, ...props }) => {
 
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
     props.set_isLoading(true);
 
     let obj = {
       "username": userName,
       "password": userPsd,
+      "compIds": usercompanyId,
+      "company":JSON.parse(companyObj),
+
     }
 
     let STOREDETAILSAPIObj = await APIServiceCall.getBatchDetailsByBatchId2(obj);
@@ -624,12 +641,18 @@ const CreateInProcessUI = ({ route, navigation, ...props }) => {
 
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
+
     props.set_isLoading(true);
     let obj = {
       "username": userName,
       "password": userPsd,
       "designId": designNoId,
-      "orderNo": OrderNoId
+      "orderNo": OrderNoId,
+      "compIds": usercompanyId,
+      "company":JSON.parse(companyObj),
+
     }
     let STOREDETAILSAPIObj = await APIServiceCall.getApiItemDetails(obj);
     props.set_isLoading(false);
@@ -654,11 +677,17 @@ const CreateInProcessUI = ({ route, navigation, ...props }) => {
 
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
+
     props.set_isLoading(true);
     let obj = {
       "username": userName,
       "password": userPsd,
       "designId": OrderNoId,
+      "compIds": usercompanyId,
+      "company":JSON.parse(companyObj),
+
     }
     let STOREDETAILSAPIObj = await APIServiceCall.getDesignNoListIfPrinting(obj);
     props.set_isLoading(false);
@@ -693,6 +722,10 @@ const CreateInProcessUI = ({ route, navigation, ...props }) => {
 
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
+
+
     props.set_isLoading(true);
     const s = batchNoId.split('_');
     const a = s[0];
@@ -702,6 +735,9 @@ const CreateInProcessUI = ({ route, navigation, ...props }) => {
       "password": userPsd,
       "orderId": OrderNoId,
       "batchNo": a,
+      "compIds": usercompanyId,
+      "company":JSON.parse(companyObj),
+
     }
     let STOREDETAILSAPIObj = await APIServiceCall.getDesignNoListIfNotPrinting(obj);
     props.set_isLoading(false);
@@ -730,6 +766,9 @@ const CreateInProcessUI = ({ route, navigation, ...props }) => {
 
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
+
     props.set_isLoading(true);
     const s = batchNoId.split('_');
     const a = s[0];
@@ -740,6 +779,9 @@ const CreateInProcessUI = ({ route, navigation, ...props }) => {
       "batchId": b,
       "orderId": OrderNoId,
       "designId": designNoId,
+      "compIds": usercompanyId,
+      "company":JSON.parse(companyObj),
+
     }
     let STOREDETAILSAPIObj = await APIServiceCall.getMatchingNoList(obj);
     props.set_isLoading(false);
@@ -770,6 +812,8 @@ const CreateInProcessUI = ({ route, navigation, ...props }) => {
 
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
     props.set_isLoading(true);
     let obj = {
       "username": userName,
@@ -780,7 +824,10 @@ const CreateInProcessUI = ({ route, navigation, ...props }) => {
       "batchNo" : 0,
       "matchingId": mId,
       "newdesignNo":designNoId,
-      "processId" : processId
+      "processId" : processId,
+      "compIds": usercompanyId,
+      "company":JSON.parse(companyObj),
+
     }
     let STOREDETAILSAPIObj = await APIServiceCall.getBatchListAfterPriniting(obj);
     props.set_isLoading(false);
@@ -812,6 +859,8 @@ const CreateInProcessUI = ({ route, navigation, ...props }) => {
 
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
     const s = batchNoId?.split('_');
     const a = s[0];
     const b = s[1];
@@ -823,7 +872,10 @@ const CreateInProcessUI = ({ route, navigation, ...props }) => {
       "batchNo" : a ? a : 0,
       "matchingId": mId,
       "newdesignNo":designNoId,
-      "processid" : processId
+      "processid" : processId,
+      "compIds": usercompanyId,
+      "company":JSON.parse(companyObj),
+
     }
     
     let STOREDETAILSAPIObj = await APIServiceCall.getfabIssuedafterPrinting(obj);

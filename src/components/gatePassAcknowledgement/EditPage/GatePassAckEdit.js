@@ -38,11 +38,18 @@ const GatePassAckEdit = ({ navigation, route, ...props }) => {
 
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
+
+
     set_isLoading(true);
     let obj = {
       "id" : id,
       "username": userName,
-      "password" : userPsd
+      "password" : userPsd,
+      "compIds": usercompanyId,
+      "company":JSON.parse(companyObj),
+
     }      
     let EditFabricProcessInObj = await APIServiceCall.getEditDetailsGatePassAuck(obj);
     set_isLoading(false);
@@ -86,10 +93,14 @@ const GatePassAckEdit = ({ navigation, route, ...props }) => {
 
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
 
     tempObj.username = userName;
     tempObj.password = userPsd;
     tempObj.menuId=759;
+    tempObj.compIds=usercompanyId;
+    tempObj.company=JSON.parse(companyObj);
     
 
     console.log(" edit saving Obj ===> ", tempObj);

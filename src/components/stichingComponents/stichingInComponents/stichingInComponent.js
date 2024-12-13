@@ -40,7 +40,7 @@ const StichingInComponent = ({ navigation, route, ...props }) => {
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
-
+    let companyObj = await AsyncStorage.getItem('companyObj');
     const fromRecord = reload ? 0 : page * ListSize;
     const toRecord = fromRecord + ListSize - 1;
 
@@ -58,7 +58,8 @@ const StichingInComponent = ({ navigation, route, ...props }) => {
         "locIds": 0,
         "brandIds": 0,
         "compIds": usercompanyId,
-        "fromRecord": fromRecord, 
+        "company":JSON.parse(companyObj),
+         "fromRecord": fromRecord, 
         "toRecord": toRecord, 
         "userName": userName, 
         "userPwd": userPsd   

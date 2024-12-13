@@ -112,7 +112,7 @@ const LocationWiseRMFabInvUI = ({route, ...props }) => {
    }
    setIsFiltering(true); 
 
-      const styleArray = ItemsArray.filter(style => (style.locationName.toUpperCase().includes(recName.toUpperCase()) || style.rmFabName.toUpperCase().includes(recName.toUpperCase()) || style.uom.toUpperCase().includes(recName.toUpperCase())));
+      const styleArray = ItemsArray.filter(style => (style.locationName?.toUpperCase().includes(name?.toUpperCase()) || style.rmFabName.toUpperCase().includes(name?.toUpperCase()) || style.uom.toUpperCase().includes(name?.toUpperCase())));
 
       if(styleArray && styleArray.length > 0) {
         set_filterArray(styleArray);

@@ -42,7 +42,9 @@ const LocationWiseRMFabInv = ({ navigation, route, ...props }) => {
 
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
+
     let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
 
     const fromRecord = reload ? 0 : page * ListSize;
     const toRecord = fromRecord + ListSize - 1;
@@ -61,7 +63,8 @@ const LocationWiseRMFabInv = ({ navigation, route, ...props }) => {
         "toRecord": toRecord, 
         "userName": userName,  
         "userPwd": userPsd ,  
-        "compIds": usercompanyId,
+       "compIds": usercompanyId,
+       "company":JSON.parse(companyObj),
 
     }
 

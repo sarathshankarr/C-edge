@@ -42,12 +42,13 @@ const CreateRequest = ({ navigation, route, ...props }) => {
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
-
+    let companyObj = await AsyncStorage.getItem('companyObj');
     set_isLoading(true);
     let obj = {
       "username": userName,
       "password": userPsd,
       "compIds": usercompanyId,
+      "company":JSON.parse(companyObj),
 
     }
 
@@ -76,12 +77,13 @@ const CreateRequest = ({ navigation, route, ...props }) => {
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
-
+    let companyObj = await AsyncStorage.getItem('companyObj');
     set_isLoading(true);
     let obj = {
       "username": userName,
       "password": userPsd,
       "compIds": usercompanyId,
+      "company":JSON.parse(companyObj),
 
     }
 
@@ -108,10 +110,15 @@ const CreateRequest = ({ navigation, route, ...props }) => {
 
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
     set_isLoading(true);
     let obj = {
       "username": userName,
       "password": userPsd,
+      "compIds": usercompanyId,
+      "company":JSON.parse(companyObj),
+
     }
 
     let STOREDETAILSAPIObj = await APIServiceCall.getMenus(obj);
@@ -138,12 +145,13 @@ const CreateRequest = ({ navigation, route, ...props }) => {
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
-
+    let companyObj = await AsyncStorage.getItem('companyObj');
     set_isLoading(true);
     let obj = {
       "username": userName,
       "password": userPsd,
       "compIds": usercompanyId,
+      "company":JSON.parse(companyObj),
 
     }
     console.log("geeeeeeeeeeeeee==> ", obj);
@@ -171,12 +179,13 @@ const CreateRequest = ({ navigation, route, ...props }) => {
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
-
+    let companyObj = await AsyncStorage.getItem('companyObj');
     set_isLoading(true);
     let obj = {
       "username": userName,
       "password": userPsd,
       "compIds": usercompanyId,
+      "company":JSON.parse(companyObj),
 
     }
 
@@ -205,13 +214,14 @@ const CreateRequest = ({ navigation, route, ...props }) => {
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
-
+    let companyObj = await AsyncStorage.getItem('companyObj');
     set_isLoading(true);
     let obj = {
       "username": userName,
       "password": userPsd,
-      "compIds": usercompanyId
-    }
+      "compIds": usercompanyId,
+      "company":JSON.parse(companyObj),
+   }
 
     let STOREDETAILSAPIObj = await APIServiceCall.getStockTypes(obj);
     set_isLoading(false);
@@ -274,10 +284,15 @@ const CreateRequest = ({ navigation, route, ...props }) => {
 
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
 
     let obj = {
       "username": userName,
       "password": userPsd,
+      "compIds": usercompanyId,
+      "company":JSON.parse(companyObj),
+
       "processId": tempObj.processId,
       "woStyleId": tempObj.woStyleId,
       "trimId": tempObj.trimId,
