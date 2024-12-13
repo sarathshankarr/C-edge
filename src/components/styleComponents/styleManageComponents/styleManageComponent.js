@@ -43,8 +43,9 @@ const StyleManageComponent = ({ navigation, route, ...props }) => {
     let userPsd = await AsyncStorage.getItem('userPsd');
     let locIds = await AsyncStorage.getItem('CurrentCompanyLocations');
     let brandIds = await AsyncStorage.getItem('brandIds');
-    let usercompanyId = await AsyncStorage.getItem('companyId');
 
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
 
     const fromRecord = reload ? 0 : page * ListSize;
     const toRecord = fromRecord + ListSize - 1;
@@ -62,12 +63,13 @@ const StyleManageComponent = ({ navigation, route, ...props }) => {
       "dataFilter": "60Days",
       "locIds": locIds ? locIds : 0,
       "brandIds": brandIds ? brandIds : 0,
-      "compIds": usercompanyId,
       "fromRecord": fromRecord,
       "toRecord": toRecord,
       "username": userName,
       "password": userPsd,
       "flag": 1,
+      "compIds": usercompanyId,
+      "company":JSON.parse(companyObj),
     }
 
     console.log('req obj for list ===> ', obj);
@@ -139,7 +141,6 @@ const StyleManageComponent = ({ navigation, route, ...props }) => {
   }
 
   return (
-
     <StyleManageUI
       itemsArray={itemsArray}
       isLoading={isLoading}
@@ -154,7 +155,6 @@ const StyleManageComponent = ({ navigation, route, ...props }) => {
       fetchMore={fetchMore}
       MainLoading = {MainLoading}
     />
-
   );
 
 }

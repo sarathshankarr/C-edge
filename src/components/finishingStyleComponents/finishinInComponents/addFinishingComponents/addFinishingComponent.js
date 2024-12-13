@@ -28,7 +28,7 @@ const AddFinishingComponent = ({ navigation, route, ...props }) => {
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
-
+    let companyObj = await AsyncStorage.getItem('companyObj');
 
     let obj = {
       "menuId": 40,
@@ -37,6 +37,7 @@ const AddFinishingComponent = ({ navigation, route, ...props }) => {
       "username": userName,
       "password" : userPsd,  
       "compIds": usercompanyId,
+      "company":JSON.parse(companyObj),
 
     }    
 

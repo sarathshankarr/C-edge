@@ -137,23 +137,6 @@ const StockRecieveEditUi = ({ route, ...props }) => {
         />
       </View>
 
-      {/* <View style={{ marginTop: hp('3%'), width:wp('90%') }}>
-
-        <View style={{ flexDirection: 'row' }}>
-          <Text style={[CommonStyles.tylesHeaderTextStyle, { textAlign: 'left' }]}>{'Style(Color) : '}</Text>
-          <Text style={[CommonStyles.tylesHeaderTextStyle, { textAlign: 'left' }]}>{props.itemsObj ? props.itemsObj.fabric : null}</Text>
-        </View>
-
-      </View>
-
-      <View style = {{marginTop:hp('3%'),width:wp('90%'),marginBottom:hp('2%')}}>
-
-        <View style = {{flexDirection:'row'}}>
-          <Text style={[CommonStyles.tylesHeaderTextStyle,{textAlign:'left'}]}>{'Approved Date : '}</Text>
-          <Text style={[CommonStyles.tylesHeaderTextStyle,{textAlign:'left'}]}>{props.itemsObj ? props.itemsObj.approvedDateStr : null}</Text>
-        </View>
-        
-      </View> */}
 
       <View style={{ marginBottom: hp('5%') }}>
 

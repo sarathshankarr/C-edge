@@ -32,7 +32,7 @@ const SaveStichingOutComponent = ({ navigation, route, ...props }) => {
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
-
+    let companyObj = await AsyncStorage.getItem('companyObj');
     set_isLoading(true);
     let obj = {
       "menuId": 12,
@@ -41,6 +41,7 @@ const SaveStichingOutComponent = ({ navigation, route, ...props }) => {
       "username": userName,
       "password" : userPsd,
       "compIds": usercompanyId,
+      "company":JSON.parse(companyObj),
 
     }
 
@@ -68,11 +69,13 @@ const SaveStichingOutComponent = ({ navigation, route, ...props }) => {
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
     let userId = await AsyncStorage.getItem('userId');
-
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
     obj.username = userName;
     obj.password = userPsd;
     obj.userId = userId;
-
+    obj.compIds = usercompanyId;
+    obj.company = JSON.parse(companyObj);
 
     let saveCuttingAPIObj = await APIServiceCall.saveStitchingOutDetails(obj);
     set_isLoading(false);

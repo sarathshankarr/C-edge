@@ -62,13 +62,16 @@ const FinishingOutListUI = ({route, ...props }) => {
       "fromRecord": 0,
       "toRecord": 25,
       "username": userName,
-      "password" : userPsd,
+      "password": userPsd,
       "compIds": usercompanyId,
-      "company":JSON.parse(companyObj)
-  }
+      "company":JSON.parse(companyObj),
 
+   }
   setfilterReqBody(Obj)
   };
+
+
+  
   const backBtnAction = () => {
     props.backBtnAction();
   };

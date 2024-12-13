@@ -57,11 +57,16 @@ const POApprovalComponent = ({ navigation, route, ...props }) => {
 
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
+
     set_isLoading(true);
     let obj = {
-      poNumber: poNumber,
-      userName: userName,
-      userPwd: userPsd
+      "poNumber": poNumber,
+      "userName": userName,
+      "userPwd": userPsd,
+      "compIds": usercompanyId,
+      "company":JSON.parse(companyObj),
     }
 
     let poEditAPIObj = await APIServiceCall.poApproveEditAPIService(obj);
@@ -118,6 +123,9 @@ const POApprovalComponent = ({ navigation, route, ...props }) => {
 
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
+
     set_isLoading(true);
     //reject = 3
     let obj = {
@@ -131,6 +139,8 @@ const POApprovalComponent = ({ navigation, route, ...props }) => {
       "menuId": 4,      // mandatory
       "userName": userName,  // mandatory
       "userPwd": userPsd, // mandatory
+      "compIds": usercompanyId,
+     "company":JSON.parse(companyObj),
     }
 
     let poApproveAPIObj = await APIServiceCall.poApproveAPIService(obj);

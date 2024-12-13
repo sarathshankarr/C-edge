@@ -31,11 +31,18 @@ const StockRequestEdit = ({ navigation, route, ...props }) => {
 
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
+
+
     set_isLoading(true);
     let obj = {
       "username": userName,
       "password": userPsd,
       "requestId": stockId,
+      "compIds": usercompanyId,
+      "company":JSON.parse(companyObj),
+
     }
 
     let STOREDETAILSAPIObj = await APIServiceCall.GetEditStockRequestDetails(obj);
@@ -97,11 +104,13 @@ const StockRequestEdit = ({ navigation, route, ...props }) => {
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
-
+    let companyObj = await AsyncStorage.getItem('companyObj');
 
     let obj = {
       "username": userName,
       "password": userPsd,
+      "compIds": usercompanyId,
+      "company":JSON.parse(companyObj),
       "processId":0,
       "woStyleId":tempObj.styleId,
       "trimId":tempObj.fabricId,
@@ -113,8 +122,6 @@ const StockRequestEdit = ({ navigation, route, ...props }) => {
       "fabricQty":tempObj.fabricqty,
       "uom":tempObj.uomfabric,
       "rmDetails":tempObj.requestDetails,
-      "compIds": usercompanyId,
-
     }
     console.log("saving obj ==>", obj);
 

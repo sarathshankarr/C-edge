@@ -203,12 +203,16 @@ const CreateRequestUi = ({route, ...props}) => {
   const getFabricByStyleId1 = async () => {
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
     props.setLoad(true);
     let obj = {
-      username: userName,
-      password: userPsd,
-      processId: 0,
-      woStyleId: stylesId,
+      "username": userName,
+      "password": userPsd,
+      "compIds": usercompanyId,
+      "company":JSON.parse(companyObj),
+      "processId": 0,
+      "woStyleId": stylesId,
     };
     let STOREDETAILSAPIObj = await APIServiceCall.getFabricByStyleId(obj);
     props.setLoad(false);
@@ -311,14 +315,18 @@ const CreateRequestUi = ({route, ...props}) => {
   const getFabricByfabricId = async () => {
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
     // set_isLoading(true);
     props.setLoad(true);
 
     let obj = {
-      username: userName,
-      password: userPsd,
-      processId: 0,
-      woStyleId: fabricId,
+      "username": userName,
+      "password": userPsd,
+      "processId": 0,
+      "woStyleId": fabricId,
+      "compIds": usercompanyId,
+      "company":JSON.parse(companyObj),
     };
 
     let STOREDETAILSAPIObj = await APIServiceCall.getFabricByfabricId(obj);
@@ -375,14 +383,19 @@ const CreateRequestUi = ({route, ...props}) => {
   const getStockbyTypeId = async (rowId, stockTId) => {
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
     // set_isLoading(true);
     props.setLoad(true);
 
     let obj = {
-      username: userName,
-      password: userPsd,
-      processId: 0,
-      trimTypeId: stockTId,
+      "username": userName,
+      "password": userPsd,
+      "processId": 0,
+      "trimTypeId": stockTId,
+      "compIds": usercompanyId,
+      "company":JSON.parse(companyObj),
+
     };
 
     let STOREDETAILSAPIObj = await APIServiceCall.getTrimsByTypeId(obj);
@@ -428,12 +441,17 @@ const CreateRequestUi = ({route, ...props}) => {
   const getStockQty = async (rowId, trimId) => {
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
     props.setLoad(true);
 
     let obj = {
-      username: userName,
-      password: userPsd,
-      trimId: trimId,
+      "username": userName,
+      "password": userPsd,
+      "trimId": trimId,
+      "compIds": usercompanyId,
+      "company":JSON.parse(companyObj),
+
     };
 
     let STOREDETAILSAPIObj = await APIServiceCall.getStockQty(obj);
@@ -471,18 +489,22 @@ const CreateRequestUi = ({route, ...props}) => {
   const getRmQtyByLot = async () => {
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
     // set_isLoading(true);
     props.setLoad(true);
 
     let obj = {
-      username: userName,
-      password: userPsd,
-      processId: 0,
-      woStyleId: 0,
-      trimId: 175,
-      locationId: 1,
-      lotId: 1,
-      sizeId: 0,
+      "username": userName,
+      "password": userPsd,
+      "compIds": usercompanyId,
+      "company":JSON.parse(companyObj),
+      "processId": 0,
+      "woStyleId": 0,
+      "trimId": 175,
+      "locationId": 1,
+      "lotId": 1,
+      "sizeId": 0,
     };
 
     let STOREDETAILSAPIObj = await APIServiceCall.getRmQtyByLot(obj);
@@ -521,17 +543,22 @@ const CreateRequestUi = ({route, ...props}) => {
   const getRmQtyByLocation = async () => {
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
     // set_isLoading(true);
     props.setLoad(true);
 
     let obj = {
-      username: userName,
-      password: userPsd,
-      processId: 0,
-      woStyleId: 0,
-      trimId: 175,
-      locationId: 1,
-      lotId: 1,
+      "username": userName,
+      "password": userPsd,
+      "compIds": usercompanyId,
+      "company":JSON.parse(companyObj),
+
+      "processId": 0,
+      "woStyleId": 0,
+      "trimId": 175,
+      "locationId": 1,
+      "lotId": 1,
     };
 
     let STOREDETAILSAPIObj = await APIServiceCall.getRmQtyByLocation(obj);
@@ -570,17 +597,22 @@ const CreateRequestUi = ({route, ...props}) => {
   const getFabQtyByLocation = async () => {
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
     // set_isLoading(true);
     props.setLoad(true);
 
     let obj = {
-      username: userName,
-      password: userPsd,
-      processId: 0,
-      woStyleId: 0,
-      trimId: 266,
-      locationId: 1,
-      lotId: 0,
+      "username": userName,
+      "password": userPsd,
+      "compIds": usercompanyId,
+      "company":JSON.parse(companyObj),
+
+      "processId": 0,
+      "woStyleId": 0,
+      "trimId": 266,
+      "locationId": 1,
+      "lotId": 0,
     };
 
     let STOREDETAILSAPIObj = await APIServiceCall.getFabQtyByLocation(obj);

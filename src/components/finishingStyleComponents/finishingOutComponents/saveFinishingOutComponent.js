@@ -36,7 +36,7 @@ const SaveFininshingOutComponent = ({ navigation, route, ...props }) => {
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
-
+    let companyObj = await AsyncStorage.getItem('companyObj');
     set_isLoading(true);
     let obj = {
       "menuId": 41,
@@ -45,6 +45,7 @@ const SaveFininshingOutComponent = ({ navigation, route, ...props }) => {
       "username": userName,
       "password" : userPsd,
       "compIds": usercompanyId,
+      "company":JSON.parse(companyObj),
 
     }      
     console.log('Fini Out Add--->,',obj)
@@ -137,12 +138,15 @@ const SaveFininshingOutComponent = ({ navigation, route, ...props }) => {
     let userPsd = await AsyncStorage.getItem('userPsd');
     let userId = await AsyncStorage.getItem('userId');
     let usercompanyId = await AsyncStorage.getItem('companyId');
-
+    let companyObj = await AsyncStorage.getItem('companyObj');
 
     tempObj.username = userName;
     tempObj.password = userPsd;
     tempObj.userId = userId;
     tempObj.compIds = usercompanyId;
+    tempObj.company = JSON.parse(companyObj);
+
+
 
 
     set_isLoading(true);   

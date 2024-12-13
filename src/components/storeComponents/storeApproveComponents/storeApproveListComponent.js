@@ -33,7 +33,7 @@ const StoreApproveListComponent = ({ navigation, route, ...props }) => {
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
-
+    let companyObj = await AsyncStorage.getItem('companyObj');
     const fromRecord = reload ? 0 : page * ListSize;
     const toRecord = fromRecord + ListSize - 1;
 
@@ -51,6 +51,7 @@ const StoreApproveListComponent = ({ navigation, route, ...props }) => {
       "username": userName,
       "password" : userPsd,
       "compIds": usercompanyId,
+      "company":JSON.parse(companyObj),
 
   }
 
@@ -91,10 +92,12 @@ const StoreApproveListComponent = ({ navigation, route, ...props }) => {
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
-
+    let companyObj = await AsyncStorage.getItem('companyObj');
     let obj = {
       "username":userName,
       "password":userPsd,
+      "compIds": usercompanyId,
+      "company":JSON.parse(companyObj),
       "categoryType" : types,
       "categoryIds" : Ids
   }

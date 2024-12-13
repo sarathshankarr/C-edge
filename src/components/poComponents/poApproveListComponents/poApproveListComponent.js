@@ -48,6 +48,7 @@ const POApproveListComponent = ({ navigation, route, ...props }) => {
     let locIds = await AsyncStorage.getItem('CurrentCompanyLocations');
     let brandIds = await AsyncStorage.getItem('brandIds');
     let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
 
     const fromRecord = reload ? 0 : page * ListSize;
     const toRecord = fromRecord + ListSize - 1;
@@ -66,11 +67,12 @@ const POApproveListComponent = ({ navigation, route, ...props }) => {
       "dataFilter": "120Days", 
       "locIds": locIds ? locIds : 0,
       "brandIds":brandIds ? brandIds: 0 ,
-      "compIds": usercompanyId,
       "fromRecord": fromRecord,
       "toRecord": toRecord,
       "userName":userName,
-      "userPwd": userPsd
+      "userPwd": userPsd,
+      "compIds": usercompanyId,
+      "company":JSON.parse(companyObj),
   }
 
   // console.log("list pos req obj ===> ", obj);

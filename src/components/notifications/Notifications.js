@@ -39,12 +39,15 @@ const Notifications = ({ navigation, route, ...props }) => {
     let userId = await AsyncStorage.getItem('userId');
     let roleId = await AsyncStorage.getItem('roleId');
     let companyId = await AsyncStorage.getItem('companyId');
-
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
     set_isLoading(true);
     let obj = {
       "userId": userId,
       "roleId": roleId,
-      "companyId": companyId
+      "companyId": companyId,
+      "compIds": usercompanyId,
+      "company":JSON.parse(companyObj),
     }
 
 
@@ -75,13 +78,17 @@ const Notifications = ({ navigation, route, ...props }) => {
     let userId = await AsyncStorage.getItem('userId');
     let roleId = await AsyncStorage.getItem('roleId');
     let companyId = await AsyncStorage.getItem('companyId');
-
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
 
     let Obj = {
       "userId": userId,
       "roleId": roleId,
       "companyId": companyId,
       "msgId": latestId,
+      "compIds": usercompanyId,
+      "company":JSON.parse(companyObj),
+
     }
 
     set_isLoading(true);
@@ -109,11 +116,16 @@ const Notifications = ({ navigation, route, ...props }) => {
     let userId = await AsyncStorage.getItem('userId');
     let roleId = await AsyncStorage.getItem('roleId');
     let companyId = await AsyncStorage.getItem('companyId');
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
     let Obj = {
       "userId": userId,
       "roleId": roleId,
       "companyId": companyId,
       "msgId": latestId,
+      "compIds": usercompanyId,
+      "company":JSON.parse(companyObj),
+
       // "userId": 1,
       // "roleId": 1,
       // "companyId": 1,

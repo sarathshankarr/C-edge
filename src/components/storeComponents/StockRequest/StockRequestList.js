@@ -34,6 +34,9 @@ const StockRequestList = ({ navigation, route, ...props }) => {
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
 
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
+
     const fromRecord = reload ? 0 : page * ListSize;
     const toRecord = fromRecord + ListSize - 1;
 
@@ -50,7 +53,10 @@ const StockRequestList = ({ navigation, route, ...props }) => {
       "fromRecord": 0,
       "toRecord": 999,
       "username": userName,
-      "password" : userPsd
+      "password" : userPsd,
+      "compIds": usercompanyId,
+      "company":JSON.parse(companyObj),
+
   }
 
     let stockStylesAPIObj = await APIServiceCall.stockApproveListDetails(obj);
@@ -90,12 +96,15 @@ const StockRequestList = ({ navigation, route, ...props }) => {
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
-
+    let companyObj = await AsyncStorage.getItem('companyObj');
     let obj = {
       "username":userName,
       "password":userPsd,
       "categoryType" : types,
-      "categoryIds" : Ids
+      "categoryIds" : Ids,
+      "compIds": usercompanyId,
+      "company":JSON.parse(companyObj),
+
   }
     //  console.log("requested filtered body ==> ", obj);
   

@@ -102,7 +102,7 @@ const DDAList = ({ navigation, route, ...props }) => {
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
-
+    let companyObj = await AsyncStorage.getItem('companyObj');
     let obj = {
       "searchKeyValue": "",
       "styleSearchDropdown": "-1",
@@ -113,6 +113,7 @@ const DDAList = ({ navigation, route, ...props }) => {
       "userName": userName,
       "userPwd": userPsd,
       "compIds": usercompanyId,
+      "company":JSON.parse(companyObj),
 
     }
     console.log("getInitialData==>", prev, next);

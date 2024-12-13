@@ -32,11 +32,16 @@ const StoreApproveEdit = ({ navigation, route, ...props }) => {
 
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
     set_isLoading(true);
     let obj = {
       "stockId": stockId,
       "username": userName,
-      "password": userPsd
+      "password": userPsd,
+      "compIds": usercompanyId,
+      "company":JSON.parse(companyObj),
+
     }
 
     let STOREDETAILSAPIObj = await APIServiceCall.GetEditStockAprroveDetails(obj);
@@ -121,11 +126,15 @@ const StoreApproveEdit = ({ navigation, route, ...props }) => {
 
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
-
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
   
     let obj = {
       "username": userName,
       "password": userPsd,
+      "compIds": usercompanyId,
+      "company":JSON.parse(companyObj),
+
       "stockRequest": tempObj,
     }
 

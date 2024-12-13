@@ -226,9 +226,10 @@ const Sidebar = ({navigation}) => {
       setTempBackgroundEffect({[key]: true});
       setTimeout(() => setTempBackgroundEffect({[key]: false}), 2000);
 
+      console.log("slected dropdown ====> ", menu.style[0].label==="Location Wise Style Inventory");
       // Animate dropdown height
       Animated.timing(animationValue, {
-        toValue: isSelected ? 0 : menu.style.length * 60, 
+        toValue: isSelected ? 0 : menu.style[0].label==="Location Wise Style Inventory" ? menu.style.length * 80 : menu.style.length * 60, 
         duration: 300,
         useNativeDriver: false, 
       }).start();
@@ -318,7 +319,17 @@ const Sidebar = ({navigation}) => {
             icon={require('../../../assets/images/png/homeN.png')}
             onPress={() => navigation.navigate('NewComponent')}
           />
-          <NavItem
+        </View>
+      
+
+        {Object.entries(dropdownMenus).map(([key, menu], index) => (
+          <View key={index}>
+            {renderDropdown(key, menu)}
+          </View>
+        ))}
+
+      <View style={styles.navContainer}>
+        <NavItem
             title="Notifications"
             icon={require('../../../assets/images/png/notificationN.png')}
             onPress={() => navigation.navigate('Notifications')}
@@ -329,12 +340,6 @@ const Sidebar = ({navigation}) => {
             onPress={() => navigation.navigate('DashboardComponent')}
           />
         </View>
-
-        {Object.entries(dropdownMenus).map(([key, menu], index) => (
-          <View key={index}>
-            {renderDropdown(key, menu)}
-          </View>
-        ))}
       </ScrollView>
 
       {/* Logout and Delete */}

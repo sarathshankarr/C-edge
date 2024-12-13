@@ -49,6 +49,8 @@ const StichingOutUI = ({route, ...props }) => {
   const getRequestBody = async() => {
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
     let Obj=   {
       "menuId": 12,
       "categoryIds": "",
@@ -56,8 +58,9 @@ const StichingOutUI = ({route, ...props }) => {
       "dataFilter": "60Days",
       "locIds": 0,
       "brandIds": 0,
-      "compIds": 0,
-      "fromRecord": 0,
+      "compIds": usercompanyId,
+      "company":JSON.parse(companyObj),
+     "fromRecord": 0,
       "toRecord": 25,
       "username": userName,
       "password" : userPsd

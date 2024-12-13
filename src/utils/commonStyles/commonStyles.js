@@ -129,7 +129,6 @@ const CommonStyles = StyleSheet.create({
         // backgroundColor:'#fff',
         // backgroundColor: '#f0f0f0',
         // backgroundColor: 'transparent', 
-
         marginTop: hp("2%"),
         marginBottom: hp("5%"),
          
@@ -151,13 +150,12 @@ const CommonStyles = StyleSheet.create({
         // width: wp("90%"),
         alignItems:'center',
         justifyContent:'center',
-        elevation:10,
+        elevation:8,
         borderRadius:10,
         marginBottom:5,
         paddingHorizontal:15,
         paddingVertical:10,
         margin:1,
-        
     },
     listCommonHeader:{
         flexDirection :'row',

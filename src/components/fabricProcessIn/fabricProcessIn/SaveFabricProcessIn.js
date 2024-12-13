@@ -40,12 +40,17 @@ const SaveFabricProcessIn = ({ navigation, route, ...props }) => {
 
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
     set_isLoading(true);
     let obj = {
       "menuId": 588,
       "fptid":id,
       "username": userName,
-      "password" : userPsd
+      "password" : userPsd,
+      "compIds": usercompanyId,
+      "company":JSON.parse(companyObj),
+
     }      
     let EditFabricProcessInObj = await APIServiceCall.getEditDetailsOfFabricProcessIn(obj);
     // console.log('Fabric process in edit  data ====> ,',JSON.stringify(EditFabricProcessInObj))
@@ -90,9 +95,12 @@ const SaveFabricProcessIn = ({ navigation, route, ...props }) => {
 
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
-
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
     tempObj.username = userName;
     tempObj.password = userPsd;
+    tempObj.compIds = usercompanyId;
+    tempObj.company = JSON.parse(companyObj);
     tempObj.menuId=588;
     tempObj.fptid=fptid;
     tempObj.fpt_id=fptid;

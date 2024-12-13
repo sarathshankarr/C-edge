@@ -39,11 +39,16 @@ const CreateInProcessComponent = ({ route }) => {
 
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
     set_isLoading(true);
     let obj = {
       "username": userName,
       "password": userPsd,
-      "menuId": 587
+      "menuId": 587,
+      "compIds": usercompanyId,
+      "company":JSON.parse(companyObj),
+
     }
     let LISTAPIOBJ = await APIServiceCall.GetProcessList(obj);
     set_isLoading(false);
@@ -170,11 +175,13 @@ const CreateInProcessComponent = ({ route }) => {
   const submitAction = async (tempObj) => {
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
-
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
 
     tempObj.username = userName;
     tempObj.password = userPsd;
-
+    tempObj.compIds = usercompanyId;
+    tempObj.company = JSON.parse(companyObj);
 
     console.log("saving obj ==>", tempObj);
 
