@@ -38,6 +38,7 @@ const CuttingMainComponent = ({ navigation, route, ...props }) => {
     let brandIds = await AsyncStorage.getItem('brandIds');
     let usercompanyId = await AsyncStorage.getItem('companyId');
     let companyObj = await AsyncStorage.getItem('companyObj');
+    
     const fromRecord = reload ? 0 : page * ListSize;
     const toRecord = fromRecord + ListSize - 1;
 

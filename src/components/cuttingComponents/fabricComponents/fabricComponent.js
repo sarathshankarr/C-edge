@@ -42,6 +42,8 @@ const [itemsArray, set_itemsArray] = useState([]);
 
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
 
     set_isLoading(true);
     let obj = {
@@ -49,7 +51,9 @@ const [itemsArray, set_itemsArray] = useState([]);
         "styleId":id,
         "soId":sid,
         "username": userName,
-        "password" : userPsd
+        "password" : userPsd,
+        "compIds": usercompanyId,
+        "company":JSON.parse(companyObj),
     }
 
     let fabricAPIObj = await APIServiceCall.getFabricDetails(obj);

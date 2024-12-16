@@ -32,8 +32,8 @@ console.log('Item ',item)
 
       <TouchableOpacity onPress={() => actionOnRow(item,index)} style={CommonStyles.cellBackViewStyle}>
 
-        <View style={[CommonStyles.cellBackViewStyle,{flexDirection :'row'}]}>
-          <Text style={[CommonStyles.tylesTextStyle,{flex:1,textAlign:'center'}]}>{item.size}</Text>
+        <View style={[{flexDirection :'row'}]}>
+            <Text style={[CommonStyles.tylesTextStyle,{flex:1,textAlign:'center'}]}>{item.size}</Text>
             <Text style={[CommonStyles.tylesTextStyle,{flex:2,textAlign:'center',}]}>{item.sizeQty}</Text>
         </View>
 
@@ -60,16 +60,17 @@ console.log('Item ',item)
 
       <View style={CommonStyles.headerStyle}>
 
-        {props.itemObj? <View style={{flexDirection :'row', justifyContent:'space-between'}}>
-          <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:1,textAlign:'left'}]}>{'Style'}</Text>
-          <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:1.5,textAlign:'center',}]}>{'Fabric'}</Text>
+        {props.itemObj? <View style={{flexDirection :'row'}}>
+          <Text style={[CommonStyles.tylesHeaderTextStyle]}>{'Style : '}</Text>
+          <Text style={[CommonStyles.tylesHeaderTextStyle]}>{props.itemObj.styleName}</Text>
+
         </View> : <View style = {CommonStyles.noRecordsFoundStyle}>
             <Text style={[CommonStyles.tylesHeaderTextStyle]}>{Constant.noRecFound}</Text>
         </View>}
 
-        {props.itemObj ? <View style={{flexDirection :'row', justifyContent:'space-between'}}>
-          <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:1,textAlign:'left'}]}>{props.itemObj.styleName}</Text>
-          <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:1.5,textAlign:'center',}]}>{props.itemObj.fabricName}</Text>
+        {props.itemObj ? <View style={{flexDirection :'row'}}>
+        <Text style={[CommonStyles.tylesHeaderTextStyle]}>{'Fabric : '}</Text>
+          <Text style={[CommonStyles.tylesHeaderTextStyle]}>{props.itemObj.fabricName || "-"}</Text>
         </View> : null}
 
         {props.itemObj && props.itemObj.styleSizeDataResponseList && props.itemObj.styleSizeDataResponseList.length > 0 ? <View style={CommonStyles.listStyle}>

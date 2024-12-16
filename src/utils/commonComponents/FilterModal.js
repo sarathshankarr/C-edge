@@ -41,6 +41,9 @@ useEffect(()=>{
   if(prepopulateFilterList){
     set_selectedCategoryFilteredItems(prepopulateFilterList)
   }
+
+  setSearchCacheResults({});
+
 },[isVisible])
 
 
@@ -95,7 +98,7 @@ const toggleSelection = (item) => {
       let obj = reqBody;
       obj.categoryType=id;
 
-      console.log("rightside  req body", obj, functionName, id);
+      console.log("rightside  req body", functionName, id);
   
       // let categoreisListAPIOBJ = await APIServiceCall.getSelectedCategoryListFBI(obj);
       // if (typeof APIServiceCall[functionName] === 'function') {
@@ -109,6 +112,10 @@ const toggleSelection = (item) => {
         if(categoreisListAPIOBJ && categoreisListAPIOBJ.responseData){
           set_selectedCategoryItems(categoreisListAPIOBJ.responseData);
           set_selectedCategoryFilteredItems(categoreisListAPIOBJ.responseData);
+          // setSearchCacheResults(prevLists => ({
+          //   ...prevLists,
+          //   [id] : categoreisListAPIOBJ.responseData
+          // }))
         } 
   
       } else {
@@ -128,6 +135,17 @@ const toggleSelection = (item) => {
       setSearchText('');
       getSelectedCategoryListFBI(selectedCategoryListAPI, item.id);
       setSelectedIndices([]);
+
+      // const ide=item.id;
+      // // console.log("why not ===> ",searchCacheResults.ide);
+      // if(searchCacheResults[ide]){
+      //   set_selectedCategoryItems(searchCacheResults[ide]);
+      //   set_selectedCategoryFilteredItems(searchCacheResults[ide]);
+      //   console.log("Caching ......");
+      // }else{
+      //   getSelectedCategoryListFBI(selectedCategoryListAPI, item.id);
+      // }
+      // setSelectedIndices([]);
     }
 
     const handleAppyFilter=()=>{
@@ -150,6 +168,8 @@ const toggleSelection = (item) => {
       setPrepopulateSelectedCategory(selectedCategory);
       setprepopulateFilterList(selectedCategoryItems);
     }
+
+    // console.log("cache Obj ===> ", Object.keys(searchCacheResults));
 
     const handleClearFilter=()=>{
       clearFilter();

@@ -105,7 +105,7 @@ const ViewTimeSummaryUI = ({route, ...props }) => {
     listStyle : {
       width:wp('90%'),
       height:hp('62%'),
-      backgroundColor:'white',
+      // backgroundColor:'white',
       marginTop: hp("2%"),
     },
 

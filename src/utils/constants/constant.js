@@ -26,10 +26,10 @@ export const PO_Rejected_MSG = 'Purchase order Rejected';
 export const Thankyou_Alert_MSG = 'Thank you!';
 export const noRecFound = 'No records found';
 export const noNotifications = 'You have no notifications !';
-export const validate_Fields_Msg = 'Please fill all the mandatory field before submiting';
-export const validate_Fields_ = 'Please fill atleast one size field before submiting';
-export const validate_location_ = 'Please Select the Location before Submitting !';
-export const validate_EnterQty =(check)=> `Please enter the Quatity of ${check} less than remaining Quantity`;
+export const validate_Fields_Msg = 'Please fill all the mandatory field before submitting';
+export const validate_Fields_ = 'Please fill atleast one size field before submitting';
+export const validate_location_ = 'Please select the location before submitting !';
+export const validate_EnterQty =(check)=> `Please enter the quantity of ${check} less than remaining quantity`;
 export const Wrong_Code_Msg="Invalid Code', 'Please enter a valid customer code."
 export const PO_Rejected_MSG_WITHOUT_REMARKS = 'Please fill the Remarks Before Rejecting ';
 export const SELECT_STATUS = 'Please Select the Status to Proceed';

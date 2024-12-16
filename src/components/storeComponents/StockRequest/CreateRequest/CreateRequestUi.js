@@ -856,7 +856,7 @@ const CreateRequestUi = ({route, ...props}) => {
               alignItems: 'center',
               justifyContent: 'center',
               marginTop: hp('3%'),
-              backgroundColor: '#ffffff',
+              // backgroundColor: '#ffffff',
             }}>
             <View style={{flexDirection: 'column', marginTop: hp('1%')}}>
               <View
@@ -1065,7 +1065,7 @@ const CreateRequestUi = ({route, ...props}) => {
               alignItems: 'center',
               justifyContent: 'center',
               marginTop: hp('2%'),
-              backgroundColor: '#f8f8f8',
+              // backgroundColor: '#f8f8f8',
             }}>
             <TouchableOpacity
               style={{
@@ -1074,6 +1074,8 @@ const CreateRequestUi = ({route, ...props}) => {
                 borderColor: '#D8D8D8',
                 borderRadius: hp('0.5%'),
                 width: wp('90%'),
+                              backgroundColor: '#fff',
+
               }}
               onPress={() => {
                 set_showFabricList(!showFabricList);
@@ -1255,7 +1257,7 @@ const CreateRequestUi = ({route, ...props}) => {
               alignItems: 'center',
               justifyContent: 'center',
               marginTop: hp('2%'),
-              backgroundColor: '#ffffff',
+              // backgroundColor: '#ffffff',
             }}>
             <TouchableOpacity
               style={{
@@ -1264,6 +1266,7 @@ const CreateRequestUi = ({route, ...props}) => {
                 borderColor: '#D8D8D8',
                 borderRadius: hp('0.5%'),
                 width: wp('90%'),
+                backgroundColor: '#ffffff'
               }}
               onPress={() => {
                 set_showProcessList(!showProcessList);
@@ -1313,7 +1316,7 @@ const CreateRequestUi = ({route, ...props}) => {
               alignItems: 'center',
               justifyContent: 'center',
               marginTop: hp('2%'),
-              backgroundColor: '#ffffff',
+              // backgroundColor: '#ffffff',
             }}>
             <TouchableOpacity
               style={{
@@ -1322,6 +1325,7 @@ const CreateRequestUi = ({route, ...props}) => {
                 borderColor: '#D8D8D8',
                 borderRadius: hp('0.5%'),
                 width: wp('90%'),
+                backgroundColor: '#ffffff'
               }}
               onPress={() => {
                 set_showUnitMasterList(!showUnitMasterList);
@@ -1391,7 +1395,7 @@ const CreateRequestUi = ({route, ...props}) => {
                 {
                   alignItems: 'center',
                   marginLeft: 10,
-                  backgroundColor: 'white',
+                  // backgroundColor: 'white',
                 },
               ]}>
               {'Comments  :'}
