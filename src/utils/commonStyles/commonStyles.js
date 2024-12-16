@@ -64,7 +64,7 @@ const CommonStyles = StyleSheet.create({
         elevation: 25,
     },
     bottomViewComponentStyle : {
-        height:hp('16%'),
+        height:hp('12%'),
         width:wp('100%'),
         backgroundColor:'white',
         position:"absolute",

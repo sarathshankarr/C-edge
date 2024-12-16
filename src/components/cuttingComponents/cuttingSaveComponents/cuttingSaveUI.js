@@ -150,9 +150,7 @@ const CuttingSaveUI = ({ route, ...props }) => {
       "companyLocation": locationId ? locationId : 0,
     }
     console.log('Submit details ', obj);
-return ;
     props.submitAction(obj);
-
   }
 
   const untiPriceValue = (value, index) => {

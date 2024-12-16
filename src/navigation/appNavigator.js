@@ -59,6 +59,7 @@ import ConfirmPassword from '../components/forgetPassword/ConfirmPassword';
 import GatePassAckList from '../components/gatePassAcknowledgement/Listpage/GatePassAckList';
 import GatePassAckEdit from '../components/gatePassAcknowledgement/EditPage/GatePassAckEdit';
 import Splash from '../pages/splash/splash';
+import Settings from '../components/settings/Settings';
 
 
 const Stack = createNativeStackNavigator();
@@ -123,6 +124,7 @@ const AppStack = () => {
       <Stack.Screen name="ConfirmPassword" component={ConfirmPassword} options={{ headerShown: false }} /> 
       <Stack.Screen name="GatePassAckList" component={GatePassAckList} options={{ headerShown: false }} /> 
       <Stack.Screen name="GatePassAckEdit" component={GatePassAckEdit} options={{ headerShown: false }} /> 
+      <Stack.Screen name="Settings" component={Settings} options={{ headerShown: true }} /> 
     </Stack.Navigator>
   );
 };

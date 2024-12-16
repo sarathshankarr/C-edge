@@ -15,12 +15,12 @@ const BottomTab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
 const itemsArray = [
-  { id: 1, name: 'Dashboard', component: Dashboard, img: require('./../../../assets/images/png/dashboard11.png') },
   // { id: 2, name: 'Order Management', component: OrderManagement, img: require('./../../../assets/images/png/orderrr.png') },
   // { id: 3, name: 'Style Management', component: StyleManagement, img: require('./../../../assets/images/png/shirt.png') },
-  { id: 4, name: 'Production', component: Production, img: require('./../../../assets/images/png/production.png') },
-  { id: 5, name: 'Inventory', component: Inventory, img: require('./../../../assets/images/png/inventoryy.png') },
-  { id: 6, name: 'Store Management', component: StoreManagement, img: require('./../../../assets/images/png/store.png') },
+  { id: 1, name: 'Production', component: Production, img: require('./../../../assets/images/png/production.png') },
+  { id: 2, name: 'Inventory', component: Inventory, img: require('./../../../assets/images/png/inventoryy.png') },
+  { id: 3, name: 'Store Management', component: StoreManagement, img: require('./../../../assets/images/png/store.png') },
+  { id: 4, name: 'Dashboard', component: Dashboard, img: require('./../../../assets/images/png/dashboard11.png') },
 ];
 
 const TabNavigator = () => (

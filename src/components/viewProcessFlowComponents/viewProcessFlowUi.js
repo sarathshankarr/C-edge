@@ -76,16 +76,18 @@ const ViewProcessFlowUI = ({route, ...props }) => {
           <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:1.5,textAlign:'right',marginRight:wp('2%')}]}>{'Processed Qty'}</Text>
         </View>
 
-      </View>  
-
-      <View style={{alignItems:'center',width:hp('90%'),alignSelf:'center',marginBottom:hp('35%')}}>
+        {props.itemsArray.styleresponselist && <View style={CommonStyles.listStyle}>
         <FlatList
           data={props.itemsArray.styleresponselist}
           renderItem={renderItem}
           keyExtractor={(item, index) => "" + index}
           showsVerticalScrollIndicator = {false}
         />
-      </View>
+      </View>}
+
+      </View>  
+
+   
 
       {props.isPopUp ? <View style={CommonStyles.customPopUpStyle}>
         <AlertComponent

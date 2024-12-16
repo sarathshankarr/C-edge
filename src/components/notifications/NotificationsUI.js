@@ -113,33 +113,15 @@ const NotificationsUI = ({ route, ...props }) => {
 
       <View style={CommonStyles.headerStyle}>
 
-        {/* {filterArray ? <View style={CommonStyles.searchBarStyle}>
-                            
-          <View style={[CommonStyles.searchInputContainerStyle]}>
-            <Image source={searchImg} style={CommonStyles.searchImageStyle} />
-              <TextInput style={CommonStyles.searchTextInputStyle}
-                underlineColorAndroid="transparent"
-                placeholder="Search by Vendor"
-                placeholderTextColor="#7F7F81"
-                autoCapitalize="none"
-                value = {recName}
-                onFocus={ () => isKeyboard.current = true }
-                onChangeText={(name) => {filterPets(name)}}
-              />
-            </View> 
-                      
-        </View> : null} */}
-
-
         <View style={styles.listStyle1}>
           {filterArray && filterArray.length > 0 ? <FlatList
             data={filterArray}
             renderItem={renderItem}
             keyExtractor={(item, index) => "" + index}
             showsVerticalScrollIndicator={false}
-          /> : <View style={{ marginTop: wp('10%'), alignItems: 'center', justifyContent: 'center' }}>
-            {!props.isLoading && props.itemsArray && props?.itemsArray?.length === 0 ? <Text style={[CommonStyles.tylesHeaderTextStyle]}>{Constant.noNotifications}</Text> : null}
-          </View>}
+          /> : <View style = {CommonStyles.noRecordsFoundStyle}>
+          {!props.isLoading ? <Text style={[CommonStyles.tylesHeaderTextStyle, {fontSize: 18}]}>{Constant.noRecFound}</Text> : null}
+      </View>}
         </View>
       </View>
       {props.isPopUp ? <View style={CommonStyles.customPopUpStyle}>
@@ -198,7 +180,7 @@ const styles = StyleSheet.create({
   },
   listStyle1: {
     width: wp('90%'),
-    backgroundColor: 'white',
+    // backgroundColor: 'white',
     marginTop: hp("2%"),
     marginBottom: hp("5%"),
 
@@ -248,7 +230,6 @@ const styles = StyleSheet.create({
     // fontSize: 16, 
     // fontWeight: 'bold', 
   },
-
 });
 
 

@@ -41,6 +41,7 @@ const CreateInProcessComponent = ({ route }) => {
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
     let companyObj = await AsyncStorage.getItem('companyObj');
+    
     set_isLoading(true);
     let obj = {
       "username": userName,

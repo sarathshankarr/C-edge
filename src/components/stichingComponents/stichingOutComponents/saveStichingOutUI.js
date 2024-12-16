@@ -133,10 +133,10 @@ const SaveStichingOutUI = ({ route, ...props }) => {
 
       <View style={{ marginTop: hp('3%') }}>
 
-        <View style={{ flexDirection: 'row' }}>
+        {/* <View style={{ flexDirection: 'row' }}>
           <Text style={[CommonStyles.tylesHeaderTextStyle, { textAlign: 'left' }]}>{'Style - '}</Text>
           <Text style={[CommonStyles.tylesHeaderTextStyle, { textAlign: 'left' }]}>{props.itemsObj ? props.itemsObj.styleName : null}</Text>
-        </View>
+        </View> */}
 
       </View>
 
@@ -158,11 +158,12 @@ const SaveStichingOutUI = ({ route, ...props }) => {
             <TextInputComponent
               inputText={props.itemsObj ? props.itemsObj.styleName : undefined}
               labelText={'Style Name'}
+              placeholder={'Style Name'}
               isEditable={false}
               maxLengthVal={50}
               autoCapitalize={"none"}
               isBackground={'#dedede'}
-              setValue={(textAnswer) => { untiPriceValue(textAnswer) }}
+              // setValue={(textAnswer) => { untiPriceValue(textAnswer) }}
             />
           </View>
 
@@ -175,7 +176,7 @@ const SaveStichingOutUI = ({ route, ...props }) => {
               maxLengthVal={50}
               autoCapitalize={"none"}
               isBackground={'#dedede'}
-              setValue={(textAnswer) => { untiPriceValue(textAnswer) }}
+              // setValue={(textAnswer) => { untiPriceValue(textAnswer) }}
             />
 
           </View>

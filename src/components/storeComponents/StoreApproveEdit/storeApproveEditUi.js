@@ -254,7 +254,7 @@ const StoreApproveEditUi = ({ route, ...props }) => {
           </View>)}
 
           <View style={{ width: '90%', marginTop: 10, marginBottom: 30, marginHorizontal: 15 }}>
-            <Text style={[CommonStyles.tylesHeaderTextStyle, { alignItems: 'center', marginLeft: 10, backgroundColor: 'white' }]}>{'Remarks  :'}</Text>
+            <Text style={[CommonStyles.tylesHeaderTextStyle, { alignItems: 'center', marginLeft: 10, }]}>{'Remarks  :'}</Text>
             <View style={{ borderWidth: 1, borderColor: 'black', marginTop: 15, borderRadius: 10, backgroundColor: 'white', width: '100%' }}>
               {/* <View style={{ marginTop: 20, marginBottom: 30 }}>
             <Text style={[CommonStyles.tylesHeaderTextStyle, { alignItems: 'center', marginLeft: 10, backgroundColor: 'white' }]}>{'Remarks  :'}</Text>

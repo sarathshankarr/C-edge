@@ -337,13 +337,13 @@ const Sidebar = ({navigation}) => {
           <NavItem
             title="Settings"
             icon={require('../../../assets/images/png/gear.png')}
-            onPress={() => navigation.navigate('DashboardComponent')}
+            onPress={() => navigation.navigate('Settings')}
           />
         </View>
       </ScrollView>
 
       {/* Logout and Delete */}
-      <View style={styles.bottomSection}>
+      {/* <View style={styles.bottomSection}>
         <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
           <Image
             style={styles.logoutIcon}
@@ -359,7 +359,7 @@ const Sidebar = ({navigation}) => {
           />
           <Text style={styles.deleteText}>Delete Account</Text>
         </TouchableOpacity>
-      </View>
+      </View> */}
 
 {/* <View style={styles.bottomSection}>
   <TouchableOpacity
@@ -420,6 +420,16 @@ const NavItem = ({title, icon, onPress}) => (
     <Text style={styles.navText}>{title}</Text>
   </TouchableOpacity>
 );
+
+// const NavItem = ({ title, icon, onPress }) => (
+//   <TouchableOpacity style={styles.navItem} onPress={onPress}>
+//     <View style={styles.navIconContainer}>
+//       <Image style={styles.navIcon} source={icon} />
+//     </View>
+//     <Text style={styles.navText}>{title}</Text>
+//   </TouchableOpacity>
+// );
+
 
 export default Sidebar;
 
@@ -494,6 +504,44 @@ const styles = StyleSheet.create({
   },
   navIcon: {width: 25, height: 25, marginRight: 15, tintColor: color.color2},
   navText: {fontSize: 16, color: '#333',flexDirection:'row',flexWrap: 'wrap',flex: 1,textAlign: 'left',},
+
+  // navContainer: {
+  //   flexDirection: 'row',
+  //   justifyContent: 'space-around',
+  //   paddingVertical: 20,
+  //   backgroundColor: '#f8f9fa',
+  //   borderTopWidth: 1,
+  //   borderTopColor: '#eaeaea',
+  // },
+  // navItem: {
+  //   alignItems: 'center',
+  //   justifyContent: 'center',
+  // },
+  // navIconContainer: {
+  //   width: 50,
+  //   height: 50,
+  //   borderRadius: 25,
+  //   backgroundColor: color.color2,
+  //   alignItems: 'center',
+  //   justifyContent: 'center',
+  //   marginBottom: 8,
+  //   shadowColor: '#000',
+  //   shadowOpacity: 0.1,
+  //   shadowOffset: { width: 0, height: 2 },
+  //   shadowRadius: 4,
+  //   elevation: 3,
+  // },
+  // navIcon: {
+  //   width: 24,
+  //   height: 24,
+  //   tintColor: '#fff',
+  // },
+  // navText: {
+  //   fontSize: 14,
+  //   fontWeight: '500',
+  //   color: '#495057',
+  // },
+  
 
 bottomSection: {flexDirection: 'row', justifyContent: 'space-around', marginTop: 'auto', padding: 20},
 logoutButton: {alignItems: 'center'},
