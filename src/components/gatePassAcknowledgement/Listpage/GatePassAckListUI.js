@@ -219,7 +219,10 @@ const GatePassAckListUI = ({route, ...props }) => {
       style={{ height: 18, width: 18, tintColor: '#7F7F81', marginRight: 10 }}
     />
     <TextInput
-      style={{ flex: 1, color: '#000' }}
+    style={[
+      {flex: 1, color: '#000' },
+      Platform.OS === 'ios' && {paddingVertical: 12}, // Apply padding only for iOS
+    ]}
       underlineColorAndroid="transparent"
       placeholder="Search"
       placeholderTextColor="#A0A0A0"
