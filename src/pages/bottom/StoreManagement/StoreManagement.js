@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
   shadowRadius: 3.84, // Radius for the shadow blur
   },
   heading: {
-    fontSize: 20,
+    fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 15,
     color: '#333', // Dark grey heading text color
@@ -81,8 +81,8 @@ const styles = StyleSheet.create({
     width:80,
   },
   icon: {
-    width: 40,
-    height: 40,
+    width: 30,
+    height: 30,
     resizeMode: 'contain',
     marginBottom: 10, 
     tintColor:color.color2,

@@ -360,21 +360,21 @@ const CommonHeader = ({ title, showDrawerButton }) => {
 
 
 
-  const handleSelectCompany = async (id , name) => {
-    console.log("changin compnay===> ", id, name);
-    setselectedCompanyId(id);
-    setselectedCompanyName(name);
-    setshowCompanyList(false);
-    await getCompanyObj(id);
+  // const handleSelectCompany = async (id , name) => {
+  //   console.log("changin compnay===> ", id, name);
+  //   setselectedCompanyId(id);
+  //   setselectedCompanyName(name);
+  //   setshowCompanyList(false);
+  //   await getCompanyObj(id);
 
-  };
+  // };
 
-  const openDropdown = () => {
-    dropdownButtonRef.current.measure((fx, fy, width, height, px, py) => {
-      setDropdownPosition({ top: py + height, left: px, width });
-      setshowCompanyList(true);
-    });
-  };
+  // const openDropdown = () => {
+  //   dropdownButtonRef.current.measure((fx, fy, width, height, px, py) => {
+  //     setDropdownPosition({ top: py + height, left: px, width });
+  //     setshowCompanyList(true);
+  //   });
+  // };
 
   return (
     <View style={styles.header}>
@@ -397,7 +397,7 @@ const CommonHeader = ({ title, showDrawerButton }) => {
           </TouchableOpacity>
         )}
 
-        {Object.keys(companyList).length > 0 && <View style={styles.companyDropdownContainer}>
+        {/* {Object.keys(companyList).length > 0 && <View style={styles.companyDropdownContainer}>
 
           <TouchableOpacity
             ref={dropdownButtonRef}
@@ -447,7 +447,27 @@ const CommonHeader = ({ title, showDrawerButton }) => {
               </TouchableOpacity>
             </Modal>
           )}
-        </View>}
+        </View>} */}
+        {/* <Text style={{color:'#fff', fontWeight:'bold', marginLeft:15,fontSize:22,fontFamily:'serif'}}>C-EDGE</Text> */}
+        <Text 
+         style={{
+           color: '#FFFFFF', 
+           fontWeight: 'bold', 
+           marginLeft: 20, 
+           fontSize: 24, 
+           fontFamily: 'serif', 
+           letterSpacing: 1, 
+           textTransform: 'uppercase', 
+           alignSelf: 'center'
+         }}
+        >
+          C-EDGE
+        </Text>
+
+
+
+
+
 
       </View>
 
@@ -460,7 +480,6 @@ const CommonHeader = ({ title, showDrawerButton }) => {
         >
           <Image
             resizeMode="contain"
-
             // source={require('../../../assets/images/png/searchIcon.png')}
             // source={require('../../../assets/images/png/actionItem.png')}
             source={require('../../../assets/images/png/sort.png')}

@@ -5,16 +5,16 @@ import color from '../../../utils/commonStyles/color';
 const Production = ({ navigation }) => {
 
   const inwardProcess = [
-    { id: 1, name: 'Cutting In', component: 'CuttingMainComponent', image: require('../../../../assets/images/png/cut.png') },
-    { id: 2, name: 'Stitching In', component: 'StichingInComponent', image: require('../../../../assets/images/png/stitch.png') },
-    { id: 3, name: 'Finishing In', component: 'FinishingStyleComponent', image: require('../../../../assets/images/png/finishingg.png') },
-    { id: 4, name: 'Fabric Process In', component: 'FabricProcessInList', image: require('../../../../assets/images/png/fabric.png') },
-    { id: 5, name: 'Gate Pass Acknowledgement', component: 'GatePassAckList', image: require('../../../../assets/images/png/growth.png') },
+    { id: 1, name: 'Cutting In', component: 'CuttingMainComponent', image: require('../../../../assets/images/png/scissors.png') },
+    { id: 2, name: 'Stitching In', component: 'StichingInComponent', image: require('../../../../assets/images/png/sewing.png') },
+    { id: 3, name: 'Finishing In', component: 'FinishingStyleComponent', image: require('../../../../assets/images/png/success.png') },
+    { id: 4, name: 'Fabric Process In', component: 'FabricProcessInList', image: require('../../../../assets/images/png/fabricProce.png') },
+    { id: 5, name: 'Gate Pass Acknowledgement', component: 'GatePassAckList', image: require('../../../../assets/images/png/acknowledge.png') },
   ];
 
   const outwardProcess = [   
-    { id: 1, name: 'Stitching Out', component: 'StichingOutComponent', image: require('../../../../assets/images/png/stitch.png') },
-    { id: 2, name: 'Finishing Out', component: 'FinishingOutListComponent', image: require('../../../../assets/images/png/finishingg.png') },
+    { id: 1, name: 'Stitching Out', component: 'StichingOutComponent', image: require('../../../../assets/images/png/sewing.png') },
+    { id: 2, name: 'Finishing Out', component: 'FinishingOutListComponent', image: require('../../../../assets/images/png/success.png') },
   ];
 
   const handleDemoClick = (component) => {
@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84, // Radius for the shadow blur
   },
   heading: {
-    fontSize: 20,
+    fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 10,
     color: '#333', // Dark grey heading text color
@@ -81,10 +81,12 @@ const styles = StyleSheet.create({
   iconItem: {
     marginRight: 20,
     alignItems: 'center',
+    width:80,
+
   },
   icon: {
-    width: 40,
-    height: 40,
+    width: 30,
+    height: 30,
     resizeMode: 'contain',
     marginBottom: 10,
     tintColor:color.color2, 

@@ -5,11 +5,11 @@ import color from '../../../utils/commonStyles/color';
 const Inventory = ({ navigation }) => {
 
   const inwardProcess = [
-    { id: 1, name: 'Location Wise Style Inventory', component: 'StyleLocationInventory', image: require('../../../../assets/images/png/location.png') },
+    { id: 1, name: 'Location Wise Style Inventory', component: 'StyleLocationInventory', image: require('../../../../assets/images/png/tracking.png') },
   ];
   const outwardProcess = [
-    { id: 1, name: 'Location wise RM/Fabric Inventory', component: 'LocationWiseRMFabInv', image: require('../../../../assets/images/png/locationicon.png') },
-    { id: 2, name: 'Style Wise RM/Fabric Inventory', component: 'LocationStyleWiseInventory', image: require('../../../../assets/images/png/locationicon.png') },
+    { id: 1, name: 'Location wise RM/Fabric Inventory', component: 'LocationWiseRMFabInv', image: require('../../../../assets/images/png/consignment.png') },
+    { id: 2, name: 'Style Wise RM/Fabric Inventory', component: 'LocationStyleWiseInventory', image: require('../../../../assets/images/png/inventory.png') },
   ];
   
   const handleDemoClick = (component) => {
@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
     // borderColor:'black',
   },
   heading: {
-    fontSize: 20,
+    fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 10,
     color: '#333', // Dark grey heading text color
@@ -77,8 +77,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   icon: {
-    width: 40,
-    height: 40,
+    width: 30,
+    height: 30,
     resizeMode: 'contain',
     marginBottom: 10, 
     tintColor:color.color2,
