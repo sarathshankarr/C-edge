@@ -330,6 +330,7 @@ import axios from 'axios';
 import * as APIServiceCall from './../../utils/apiCalls/apiCallsComponent';
 import { setUrlInGlobal } from '../../config/environment/environmentConfig';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import color from '../../utils/commonStyles/color';
 
 
 let hideImg = require('./../../../assets/images/png/hide-password.png');
@@ -507,9 +508,13 @@ const ConfirmPassword = ({ navigation, route, ...props }) => {
         <View style={styles.inputContainer}>
           <View style={styles.inputWrapper}>
             <TextInput
+            style={[
+              styles.input,
+              Platform.OS === 'ios' && {paddingVertical: 12}, // Apply padding only for iOS
+            ]}
               placeholder="New Password"
               placeholderTextColor="#7F7F81"
-              style={styles.input}
+              // style={styles.input}
               secureTextEntry={showPassword1}
                    value={newPassword}
                    onChangeText={(userPswd) => setNewPassword(userPswd)}
@@ -526,9 +531,13 @@ const ConfirmPassword = ({ navigation, route, ...props }) => {
         <View style={styles.inputContainer}>
           <View style={styles.inputWrapper}>
             <TextInput
+            style={[
+              styles.input,
+              Platform.OS === 'ios' && {paddingVertical: 12}, // Apply padding only for iOS
+            ]}
               placeholder="Confirm Password"
               placeholderTextColor="#7F7F81"
-              style={styles.input}
+              // style={styles.input}
               secureTextEntry={showPassword2}
                    value={confirmNewPassword}
                   onChangeText={(userPswd) => setConfirmNewPassword(userPswd)}
@@ -611,10 +620,9 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: '500',
-    color: '#1F74BA',
+    color: color.color2,
     fontFamily: 'serif',
     marginBottom: 30,
-    // textAlign: 'left',
     marginTop: 60,
   },
   titleHighlight: {
@@ -642,7 +650,7 @@ const styles = StyleSheet.create({
   inputIcon: {
     width: 20,
     height: 20,
-    tintColor: '#1F74BA',
+    tintColor: color.color2,
     // tintColor: '#000',
     resizeMode: 'contain',
   },
@@ -677,7 +685,7 @@ const styles = StyleSheet.create({
   // Login Button
   loginBtnStyle: {
     width: '80%',
-    backgroundColor: '#1F74BA',
+    backgroundColor: color.color2,
     paddingVertical: 12,
     borderRadius: 25,
     justifyContent: 'center',

@@ -361,6 +361,7 @@ import LoaderComponent from './../../utils/commonComponents/loaderComponent';
 import AlertComponent from './../../utils/commonComponents/alertComponent';
 import {CONFIRM_OTP, REQUEST_OTP} from '../../utils/apiCalls/apiCallsComponent';
 import axios from 'axios';
+import color from '../../utils/commonStyles/color';
 
 let Logo = require('./../../../assets/images/png/Logo.png');
 
@@ -686,7 +687,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: '500',
-    color: '#1F74BA',
+    color:color.color2,
     fontFamily: 'serif',
     marginBottom: 30,
     // textAlign: 'left',
@@ -712,7 +713,7 @@ const styles = StyleSheet.create({
   // Login Button
   loginBtnStyle: {
     width: '80%',
-    backgroundColor: '#1F74BA',
+    backgroundColor: color.color2,
     paddingVertical: 12,
     borderRadius: 25,
     justifyContent: 'center',
@@ -750,7 +751,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   resendText: {
-    color: '#1F74BA',
+    color: color.color2,
     fontSize: 16,
     fontWeight: 'bold',
   },
