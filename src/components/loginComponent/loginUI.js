@@ -280,9 +280,12 @@ const LoginUI = ({route, ...props}) => {
         <View style={styles.inputContainer}>
           <View style={styles.inputWrapper}>
             <TextInput
+             style={[
+              styles.input,
+              Platform.OS === 'ios' && {paddingVertical: 12}, // Apply padding only for iOS
+            ]}
               placeholder="Code"
               placeholderTextColor="#7F7F81"
-              style={styles.input}
               value={props.code}
               onChangeText={text => setCode(text)}
             />
@@ -298,9 +301,12 @@ const LoginUI = ({route, ...props}) => {
         <View style={styles.inputContainer}>
           <View style={styles.inputWrapper}>
             <TextInput
+             style={[
+              styles.input,
+              Platform.OS === 'ios' && {paddingVertical: 12}, // Apply padding only for iOS
+            ]}
               placeholder="Email"
               placeholderTextColor="#7F7F81"
-              style={styles.input}
               value={props.userName}
               onChangeText={text => validateUser(text)}
             />
@@ -313,8 +319,11 @@ const LoginUI = ({route, ...props}) => {
         <View style={styles.inputContainer}>
           <View style={styles.inputWrapper}>
             <TextInput
+             style={[
+              styles.input,
+              Platform.OS === 'ios' && {paddingVertical: 12}, // Apply padding only for iOS
+            ]}
               placeholder="Password"
-              style={styles.input}
               value={props.userPswd}
               placeholderTextColor="#7F7F81"
               secureTextEntry={props.isHidePassword}
