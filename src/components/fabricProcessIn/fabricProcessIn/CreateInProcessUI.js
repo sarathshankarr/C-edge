@@ -933,7 +933,7 @@ const CreateInProcessUI = ({ route, navigation, ...props }) => {
       <KeyboardAwareScrollView enableOnAndroid={true} extraHeight={130} extraScrollHeight={130} showsVerticalScrollIndicator={false} style={{ marginBottom: hp('15%') }}>
         <View style={{ marginBottom: hp('5%'), width: '90%', marginHorizontal: wp('5%') }}>
 
-          <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: hp('2%') }} >
+          <View style={{ alignItems: 'center', justifyContent: 'center',backgroundColor:"#fff", marginTop: hp('2%') }} >
 
             <TouchableOpacity style={{ flexDirection: 'row', borderWidth: 0.5, borderColor: "#D8D8D8", borderRadius: hp("0.5%"), width: wp("90%"), }} onPress={() => { set_showProcessList(!showProcessList) }}>
 
@@ -1005,7 +1005,7 @@ const CreateInProcessUI = ({ route, navigation, ...props }) => {
             onCancel={hideDatePicker}
           />
 
-          <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: hp('2%') }} >
+          <View style={{ alignItems: 'center', justifyContent: 'center',backgroundColor:"#fff", marginTop: hp('2%') }} >
 
             <TouchableOpacity style={{ flexDirection: 'row', borderWidth: 0.5, borderColor: "#D8D8D8", borderRadius: hp("0.5%"), width: wp("90%"), }} onPress={() => { set_showShiftList(!showShiftList) }}>
 
@@ -1051,7 +1051,7 @@ const CreateInProcessUI = ({ route, navigation, ...props }) => {
             />
           </View>
 
-          <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: hp('2%') }} >
+          <View style={{ alignItems: 'center', justifyContent: 'center',backgroundColor:"#fff", marginTop: hp('2%') }} >
 
             <TouchableOpacity style={{ flexDirection: 'row', borderWidth: 0.5, borderColor: "#D8D8D8", borderRadius: hp("0.5%"), width: wp("90%"), }} onPress={() => { set_showBatchNoList(!showBatchNoList) }}>
 
@@ -1142,7 +1142,7 @@ const CreateInProcessUI = ({ route, navigation, ...props }) => {
             />
           </View>
 
-          <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: hp('2%') }} >
+          <View style={{ alignItems: 'center', justifyContent: 'center',backgroundColor:"#fff", marginTop: hp('2%') }} >
 
             <TouchableOpacity style={{ flexDirection: 'row', borderWidth: 0.5, borderColor: "#D8D8D8", borderRadius: hp("0.5%"), width: wp("90%"), }} onPress={() => { set_showMachineNoList(!showMachineNoList) }}>
 
@@ -1201,7 +1201,7 @@ const CreateInProcessUI = ({ route, navigation, ...props }) => {
             />
           </View>}
 
-          <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: hp('2%') }} >
+          <View style={{ alignItems: 'center', justifyContent: 'center',backgroundColor:"#fff", marginTop: hp('2%') }} >
 
             <TouchableOpacity style={{ flexDirection: 'row', borderWidth: 0.5, borderColor: "#D8D8D8", borderRadius: hp("0.5%"), width: wp("90%"), }} onPress={() => { set_showattendedByList(!showattendedByList) }}>
 

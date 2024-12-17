@@ -255,7 +255,7 @@ const toggleSelection = (item) => {
             {/* Right-Side List */}
             {isLoading ? (
                 <View style={styles.loaderContainer}>
-                    <ActivityIndicator size="large" color="#0000ff" />
+                    <ActivityIndicator size="large" color={color.color2} />
                 </View>
             ) : (
             <FlatList
