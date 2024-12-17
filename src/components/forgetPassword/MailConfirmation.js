@@ -254,6 +254,7 @@ import { CUSTOMER_URL } from '../../config/environment/environmentConfig';
 import { REQUEST_OTP } from '../../utils/apiCalls/apiCallsComponent';
 import { isValidUrl } from '../../utils/helper/helper';
 import axios from 'axios';
+import color from '../../utils/commonStyles/color';
 
 let lock = require('./../../../assets/images/png/padlock.png');
 let Logo = require('./../../../assets/images/png/Logo.png');
@@ -379,9 +380,13 @@ const MailConfirmation = ({ navigation, route, }) => {
         <View style={styles.inputContainer}>
           <View style={styles.inputWrapper}>
             <TextInput
+            style={[
+              styles.input,
+              Platform.OS === 'ios' && {paddingVertical: 12}, // Apply padding only for iOS
+            ]}
               placeholder="Code"
               placeholderTextColor="#7F7F81"
-              style={styles.input}
+              // style={styles.input}
               value={code}
               onChangeText={(text) => setCode(text)}
             />
@@ -393,9 +398,13 @@ const MailConfirmation = ({ navigation, route, }) => {
         <View style={styles.inputContainer}>
           <View style={styles.inputWrapper}>
             <TextInput
+            style={[
+              styles.input,
+              Platform.OS === 'ios' && {paddingVertical: 12}, // Apply padding only for iOS
+            ]}
               placeholder="Email"
               placeholderTextColor="#7F7F81"
-              style={styles.input}
+              // style={styles.input}
               value={email}
               onChangeText={(text) => setEmail(text)}
             />
@@ -464,7 +473,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: '500',
-    color: '#1F74BA',
+    color: color.color2,
     fontFamily: 'serif',
     marginBottom: 30,
     // textAlign: 'left',
@@ -494,7 +503,7 @@ const styles = StyleSheet.create({
   inputIcon: {
     width: 20,
     height: 20,
-    tintColor: '#1F74BA',
+    tintColor: color.color2,
     // tintColor: '#000',
     resizeMode: 'contain',
   },
@@ -529,7 +538,7 @@ const styles = StyleSheet.create({
   // Login Button
   loginBtnStyle: {
     width: '80%',
-    backgroundColor: '#1F74BA',
+    backgroundColor: color.color2,
     paddingVertical: 12,
     borderRadius: 25,
     justifyContent: 'center',
