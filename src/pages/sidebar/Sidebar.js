@@ -69,17 +69,17 @@ const dropdownMenus = {
       {
         label: 'Location Wise Style Inventory',
         route: 'StyleLocationInventory',
-        src: require('../../../assets/images/png/location.png'),
+        src: require('../../../assets/images/png/tracking.png'),
       },
       {
         label: 'Location wise RM/Fabric Inventory',
         route: 'LocationWiseRMFabInv',
-        src: require('../../../assets/images/png/locationicon.png'),
+        src: require('../../../assets/images/png/consignment.png'),
       },
       {
         label: 'Style Wise RM/Fabric Inventory',
         route: 'LocationStyleWiseInventory',
-        src: require('../../../assets/images/png/locationicon.png'),
+        src: require('../../../assets/images/png/inventory.png'),
       },
     ],
   },
@@ -90,27 +90,27 @@ const dropdownMenus = {
       {
         label: 'Cutting in',
         route: 'CuttingMainComponent',
-        src: require('../../../assets/images/png/cut.png'),
+        src: require('../../../assets/images/png/scissors.png'),
       },
       {
         label: 'Stitching in',
         route: 'StichingInComponent',
-        src: require('../../../assets/images/png/stitch.png'),
+        src: require('../../../assets/images/png/sewing.png'),
       },
       {
         label: 'Finishing in',
         route: 'FinishingStyleComponent',
-        src: require('../../../assets/images/png/finishingg.png'),
+        src: require('../../../assets/images/png/success.png'),
       },
       {
         label: 'Fabric Process in',
         route: 'FabricProcessInList',
-        src: require('../../../assets/images/png/fabric.png'),
+        src: require('../../../assets/images/png/fabricProce.png'),
       },
       {
         label: 'Gate Pass Acknowledgement',
         route: 'GatePassAckList',
-        src: require('../../../assets/images/png/growth.png'),
+        src: require('../../../assets/images/png/acknowledge.png'),
       },
     ],
   },
@@ -121,12 +121,12 @@ const dropdownMenus = {
       {
         label: 'Stitching Out',
         route: 'StichingOutComponent',
-        src: require('../../../assets/images/png/stitch.png'),
+        src: require('../../../assets/images/png/sewing.png'),
       },
       {
         label: 'Finishing Out',
         route: 'FinishingOutListComponent',
-        src: require('../../../assets/images/png/finishingg.png'),
+        src: require('../../../assets/images/png/success.png'),
       },
     ],
   },
@@ -246,15 +246,17 @@ const Sidebar = ({navigation}) => {
           ]}
           onPress={handleDropdownPress}>
           <View style={styles.dropdownTitle}>
+          <View style={styles.navIconContainer}>
             <Image
               style={[styles.navIcon, isSelected && styles.selectedIcon]}
               source={menu.icon}
-            />
+              />
+          </View>
             <Text style={[styles.navText, isSelected && styles.selectedText]}>
               {menu.label}
             </Text>
           </View>
-
+          <View style={{ marginLeft:-10}}>
           <Image
             style={styles.dropdownIcon}
             source={
@@ -263,6 +265,7 @@ const Sidebar = ({navigation}) => {
                 : require('../../../assets/images/png/chevron.png')
             }
           />
+          </View>
         </TouchableOpacity>
 
         {/* Child Items */}
@@ -278,7 +281,9 @@ const Sidebar = ({navigation}) => {
                 key={`${index}-${item.route}`}
                 style={styles.dropdownItem}
                 onPress={() => navigation.navigate(item.route)}>
+                <View style={styles.navIconContainer}>
                 <Image style={styles.navIcon} source={item.src} />
+                </View>
                 <Text style={styles.navText}>{item.label}</Text>
               </TouchableOpacity>
             ))}
@@ -342,48 +347,7 @@ const Sidebar = ({navigation}) => {
         </View>
       </ScrollView>
 
-      {/* Logout and Delete */}
-      {/* <View style={styles.bottomSection}>
-        <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
-          <Image
-            style={styles.logoutIcon}
-            source={require('../../../assets/images/png/logOut.png')}
-          />
-          <Text style={styles.logoutText}>Logout</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.deleteButton}>
-          <Image
-            style={styles.deleteIcon}
-            source={require('../../../assets/images/png/bin.png')}
-          />
-          <Text style={styles.deleteText}>Delete Account</Text>
-        </TouchableOpacity>
-      </View> */}
-
-{/* <View style={styles.bottomSection}>
-  <TouchableOpacity
-    onPress={handleLogout}
-    style={[styles.actionButton, styles.logoutButton]}
-  >
-    <Image
-      style={styles.iconStyle}
-      source={require('../../../assets/images/png/logOut.png')}
-    />
-    <Text style={[styles.textStyle, styles.logoutText]}>Logout</Text>
-  </TouchableOpacity>
-
-  <TouchableOpacity
-    onPress={() => setModalVisible(true)}
-    style={[styles.actionButton, styles.deleteButton]}
-  >
-    <Image
-      style={styles.iconStyle}
-      source={require('../../../assets/images/png/bin.png')}
-    />
-    <Text style={[styles.textStyle, styles.deleteText]}>Delete Account</Text>
-  </TouchableOpacity>
-</View> */}
+     
 
 
 
@@ -413,22 +377,16 @@ const Sidebar = ({navigation}) => {
   );
 };
 
-// Reusable Components
-const NavItem = ({title, icon, onPress}) => (
+
+
+const NavItem = ({ title, icon, onPress }) => (
   <TouchableOpacity style={styles.navItem} onPress={onPress}>
-    <Image style={styles.navIcon} source={icon} />
+    <View style={styles.navIconContainer}>
+      <Image style={styles.navIcon} source={icon} />
+    </View>
     <Text style={styles.navText}>{title}</Text>
   </TouchableOpacity>
 );
-
-// const NavItem = ({ title, icon, onPress }) => (
-//   <TouchableOpacity style={styles.navItem} onPress={onPress}>
-//     <View style={styles.navIconContainer}>
-//       <Image style={styles.navIcon} source={icon} />
-//     </View>
-//     <Text style={styles.navText}>{title}</Text>
-//   </TouchableOpacity>
-// );
 
 
 export default Sidebar;
@@ -439,7 +397,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   scrollContainer: {flex: 1},
-  scrollContent: {paddingBottom: 20},
+  scrollContent: {paddingBottom:20},
   // Header styles
   headerContainer: {
     backgroundColor: color.color2,
@@ -486,63 +444,33 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginVertical: 5,
-    paddingVertical: 8,
-    marginLeft:25
+    paddingVertical: 3,
+    marginLeft:25,
   },
 
   profileImage: {width: 50, height: 50, marginRight: 15, borderRadius: 25},
   userName: {fontSize: 18, fontWeight: 'bold', color: '#fff'},
-  navContainer: {marginTop: 10, paddingHorizontal: 25},
+  navContainer: {marginTop: 10, paddingHorizontal: 15},
+  navIconContainer: {
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#e9ecef',
+    borderRadius: 20,
+    marginRight: 15,
+  },
   navItem: {
     flexDirection: 'row',
       alignItems: 'center',
-      paddingVertical: 10,
+      paddingVertical: 5,
       borderRadius: 5,
       marginVertical: 5,
       borderBottomWidth:1,
       borderColor:'#EAEAEA',
   },
-  navIcon: {width: 25, height: 25, marginRight: 15, tintColor: color.color2},
-  navText: {fontSize: 16, color: '#333',flexDirection:'row',flexWrap: 'wrap',flex: 1,textAlign: 'left',},
-
-  // navContainer: {
-  //   flexDirection: 'row',
-  //   justifyContent: 'space-around',
-  //   paddingVertical: 20,
-  //   backgroundColor: '#f8f9fa',
-  //   borderTopWidth: 1,
-  //   borderTopColor: '#eaeaea',
-  // },
-  // navItem: {
-  //   alignItems: 'center',
-  //   justifyContent: 'center',
-  // },
-  // navIconContainer: {
-  //   width: 50,
-  //   height: 50,
-  //   borderRadius: 25,
-  //   backgroundColor: color.color2,
-  //   alignItems: 'center',
-  //   justifyContent: 'center',
-  //   marginBottom: 8,
-  //   shadowColor: '#000',
-  //   shadowOpacity: 0.1,
-  //   shadowOffset: { width: 0, height: 2 },
-  //   shadowRadius: 4,
-  //   elevation: 3,
-  // },
-  // navIcon: {
-  //   width: 24,
-  //   height: 24,
-  //   tintColor: '#fff',
-  // },
-  // navText: {
-  //   fontSize: 14,
-  //   fontWeight: '500',
-  //   color: '#495057',
-  // },
-  
-
+navIcon: {width: 20, height: 20, tintColor: color.color2},
+navText: {fontSize: 16, color: '#333',flexDirection:'row',flexWrap: 'wrap',flex: 1,textAlign: 'left',},
 bottomSection: {flexDirection: 'row', justifyContent: 'space-around', marginTop: 'auto', padding: 20},
 logoutButton: {alignItems: 'center'},
 logoutIcon: {width: 30, height: 30, tintColor:color.color2},
@@ -550,51 +478,6 @@ logoutText: {color: '#333', marginTop: 5, fontSize: 14},
 deleteButton: {alignItems: 'center'},
 deleteIcon: {width: 30, height: 30, tintColor:color.color2},
 deleteText: {color: '#f00', marginTop: 5, fontSize: 14},
-
-// bottomSection: {
-//   marginTop: 'auto',
-//   padding: 15,
-//   borderTopWidth: 1,
-//   borderTopColor: '#ddd', // Add a subtle divider
-//   backgroundColor: '#f9f9f9',
-// },
-// actionButton: {
-//   flexDirection: 'row',
-//   alignItems: 'center',
-//   padding: 12,
-//   borderRadius: 8,
-//   marginBottom: 10,
-//   backgroundColor: '#ffffff',
-//   shadowColor: '#000',
-//   shadowOffset: { width: 0, height: 2 },
-//   shadowOpacity: 0.1,
-//   shadowRadius: 4,
-//   elevation: 3, // For Android shadow
-// },
-// logoutButton: {
-//   // backgroundColor: '#f9f9f9', // Neutral for logout
-// },
-// deleteButton: {
-//   // backgroundColor: '#ffeeee', // Slight red tint for delete
-// },
-// iconStyle: {
-//   width: 24,
-//   height: 24,
-//   marginRight: 12, // Space between icon and text
-// },
-// textStyle: {
-//   fontSize: 16,
-//   fontWeight: '500',
-// },
-// logoutText: {
-//   color: '#333',
-// },
-// deleteText: {
-//   color: '#d32f2f', // Red shade for delete
-// },
-
-
-
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -629,8 +512,8 @@ deleteText: {color: '#f00', marginTop: 5, fontSize: 14},
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 10,
-    paddingHorizontal: 25,
+    paddingVertical: 5,
+    paddingHorizontal: 15,
     // backgroundColor: '#f7f7f7',
     borderRadius: 5,
     marginVertical: 5,
@@ -661,11 +544,19 @@ deleteText: {color: '#f00', marginTop: 5, fontSize: 14},
   },
 });
 
-// take logout and delete ====================
+
+// Reusable Components
+// const NavItem = ({title, icon, onPress}) => (
+//   <TouchableOpacity style={styles.navItem} onPress={onPress}>
+//     <Image style={styles.navIcon} source={icon} />
+//     <Text style={styles.navText}>{title}</Text>
+//   </TouchableOpacity>
+// );
 
 
-{/* <View style={styles.footer}>
-        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+ {/* Logout and Delete */}
+      {/* <View style={styles.bottomSection}>
+        <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
           <Image
             style={styles.logoutIcon}
             source={require('../../../assets/images/png/logOut.png')}
@@ -673,9 +564,7 @@ deleteText: {color: '#f00', marginTop: 5, fontSize: 14},
           <Text style={styles.logoutText}>Logout</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.deleteAccountButton}
-          onPress={() => setModalVisible(true)}>
+        <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.deleteButton}>
           <Image
             style={styles.deleteIcon}
             source={require('../../../assets/images/png/bin.png')}
@@ -683,18 +572,27 @@ deleteText: {color: '#f00', marginTop: 5, fontSize: 14},
           <Text style={styles.deleteText}>Delete Account</Text>
         </TouchableOpacity>
       </View> */}
-// footer: {marginTop: 'auto', paddingHorizontal: 15},
-  // logoutButton: {
-  //   flexDirection: 'row',
-  //   alignItems: 'center',
-  //   marginVertical: 10,
-  // },
-  // logoutIcon: {width: 20, height: 20, marginRight: 10},
-  // logoutText: {fontSize: 16, color: '#E74C3C'},
-  // deleteAccountButton: {
-  //   flexDirection: 'row',
-  //   alignItems: 'center',
-  //   marginVertical: 10,
-  // },
-  // deleteIcon: {width: 20, height: 20, marginRight: 10},
-  // deleteText: {fontSize: 16, color: '#E74C3C'},
+
+{/* <View style={styles.bottomSection}>
+  <TouchableOpacity
+    onPress={handleLogout}
+    style={[styles.actionButton, styles.logoutButton]}
+  >
+    <Image
+      style={styles.iconStyle}
+      source={require('../../../assets/images/png/logOut.png')}
+    />
+    <Text style={[styles.textStyle, styles.logoutText]}>Logout</Text>
+  </TouchableOpacity>
+
+  <TouchableOpacity
+    onPress={() => setModalVisible(true)}
+    style={[styles.actionButton, styles.deleteButton]}
+  >
+    <Image
+      style={styles.iconStyle}
+      source={require('../../../assets/images/png/bin.png')}
+    />
+    <Text style={[styles.textStyle, styles.deleteText]}>Delete Account</Text>
+  </TouchableOpacity>
+</View> */}

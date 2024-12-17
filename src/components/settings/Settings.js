@@ -13,12 +13,16 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import color from '../../utils/commonStyles/color';
+import * as APIServiceCall from './../../utils/apiCalls/apiCallsComponent';
+import { extractLocationIds } from '../../utils/constants/constant';
 
 const SettingsSidebar = ({navigation}) => {
   const [userName, setUserName] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
   const [showCompanyList, setshowCompanyList] = useState(false);
   const [companyList, setcompanyList] = useState({});
+  const [selectedCompanyName, setselectedCompanyName] = useState('')
+  const [selectedCompanyId, setselectedCompanyId] = useState(0);
 
   useEffect(() => {
     const fetchUserName = async () => {
@@ -28,6 +32,7 @@ const SettingsSidebar = ({navigation}) => {
     fetchUserName();
     getCompaniesList();
   }, []);
+
 
   const getCompaniesList = async () => {
     try {
@@ -39,8 +44,8 @@ const SettingsSidebar = ({navigation}) => {
 
       if (Object.keys(parsedList).length > 0) {
         const [[firstKey, firstValue]] = Object.entries(parsedList);
-        // setselectedCompanyId(firstKey);
-        // setselectedCompanyName(firstValue);
+        setselectedCompanyId(firstKey);
+        setselectedCompanyName(firstValue);
         console.log('setselectedCompanyId  ', firstKey, firstValue);
       } else {
         console.log('No companies found');
@@ -49,6 +54,7 @@ const SettingsSidebar = ({navigation}) => {
       console.error('Error fetching companies list: ', error);
     }
   };
+
 
   const handleLogout = async () => {
     try {
@@ -76,10 +82,10 @@ const SettingsSidebar = ({navigation}) => {
 
   const handleSelectCompany = async (id, name) => {
     console.log('changin compnay===> ', id, name);
-    // setselectedCompanyId(id);
-    // setselectedCompanyName(name);
-    // setshowCompanyList(false);
-    // await getCompanyObj(id);
+    setselectedCompanyId(id);
+    setselectedCompanyName(name);
+    setshowCompanyList(false);
+    await getCompanyObj(id);
   };
 
   const handleDeleteUser = async () => {
@@ -112,6 +118,43 @@ const SettingsSidebar = ({navigation}) => {
 
   const handleSearch = () => {};
 
+
+  const getCompanyObj = async (newCompanyID) => {
+    
+
+    let obj = {
+      "companyId": newCompanyID
+    }
+
+    let GETNEWCOMPANYOBJ = await APIServiceCall.getNewCompanyObject(obj);
+    // set_isLoading(false);
+
+    if (GETNEWCOMPANYOBJ && GETNEWCOMPANYOBJ.statusData) {
+
+      if (GETNEWCOMPANYOBJ && GETNEWCOMPANYOBJ.responseData) {
+        // console.log("GETNEWCOMPANYOBJ No : ", GETNEWCOMPANYOBJ.responseData);
+        await AsyncStorage.setItem('companyObj', JSON.stringify(GETNEWCOMPANYOBJ.responseData));
+        await AsyncStorage.setItem('companyId', (newCompanyID).toString());
+        
+        let locIds = await AsyncStorage.getItem('locIds');
+        const extractedLocationIds = await extractLocationIds(locIds, newCompanyID)
+        await AsyncStorage.setItem('CurrentCompanyLocations', extractedLocationIds);
+         
+        let curr = await AsyncStorage.getItem('companyId');
+         console.log("CurrentCompanyLocation" , curr);
+      }
+    } else {
+      // popUpAction(Constant.SERVICE_FAIL_MSG, Constant.DefaultAlert_MSG, 'OK', true, false);
+      console.log("Error in Fetching GETNEWCOMPANYOBJ==> ")
+    }
+
+    if (GETNEWCOMPANYOBJ && GETNEWCOMPANYOBJ.error) {
+      // popUpAction(Constant.SERVICE_FAIL_MSG, Constant.DefaultAlert_MSG, 'OK', true, false)
+      console.log("Error in  GETNEWCOMPANYOBJ ==> ", GETNEWCOMPANYOBJ.error)
+    }
+
+  };
+
   return (
     <View style={styles.container}>
       {/* Profile Section */}
@@ -129,6 +172,11 @@ const SettingsSidebar = ({navigation}) => {
       {/* Settings List */}
       <ScrollView style={styles.settingsContainer}>
         <SettingItem
+          title={selectedCompanyName ? selectedCompanyName : "No Company Selected"}
+          icon={require('./../../../assets/images/png/office.png')}
+          onPress={() => console.log("Current company")}
+        />
+        <SettingItem
           title="Change Company"
           icon={require('./../../../assets/images/png/swap.png')}
           onPress={() => setshowCompanyList(!showCompanyList)}
@@ -143,11 +191,11 @@ const SettingsSidebar = ({navigation}) => {
           icon={require('./../../../assets/images/png/notification.png')}
           onPress={() => navigation.navigate('Notifications')}
         />
-        <SettingItem
+        {/* <SettingItem
           title="Appearance"
           icon={require('./../../../assets/images/png/color-palette.png')}
           onPress={() => console.log('AppearanceSettings')}
-        />
+        /> */}
         <SettingItem
           title="Logout"
           icon={require('./../../../assets/images/png/logOut.png')}
@@ -184,10 +232,10 @@ const SettingsSidebar = ({navigation}) => {
       </Modal>
 
       <Modal
-  transparent
-  animationType="slide"
-  visible={showCompanyList}
-  onRequestClose={() => setshowCompanyList(false)}
+      animationType="slide"
+      transparent={true}
+      visible={showCompanyList}
+      onRequestClose={() => setshowCompanyList(false)}
 >
   <TouchableWithoutFeedback onPress={() => setshowCompanyList(false)}>
     <View style={styles.companyModalOverlay} />
@@ -195,7 +243,14 @@ const SettingsSidebar = ({navigation}) => {
   <View style={styles.companyModalContainer}>
     {/* Heading */}
     <View style={styles.companyModalHeader}>
+      <View/>
       <Text style={styles.companyModalHeaderText}>Company List</Text>
+      <TouchableOpacity onPress={()=>setshowCompanyList(false)}>
+                  <Image
+                    source={require('./../../../assets/images/png/close.png')}
+                    style={{width: 30, height: 30, tintColor: color.color2}}
+                  />
+         </TouchableOpacity>
     </View>
 
     {/* Search Bar */}
@@ -335,6 +390,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(0,0,0,0.6)',
+    borderRadius: 15,
+
   },
   modalContent: {
     width: '85%',
@@ -384,20 +441,25 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   companyModalContainer: {
-    backgroundColor: '#fff',
+    backgroundColor: 'white',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 10,
     height: '70%',
-    // borderTopLeftRadius: 20,
-    // borderTopRightRadius: 20,
     // overflow: 'hidden',
-    paddingHorizontal: 16,
     paddingVertical: 8,
-    borderRadius:15
+    position: 'absolute',
+    bottom: 0,
+    width: '100%',
+
   },
   companyModalHeader: {
     paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: '#ddd',
     alignItems: 'center',
+    flexDirection:'row',
+    justifyContent:'space-between'
   },
   companyModalHeaderText: {
     fontSize: 18,
