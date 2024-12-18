@@ -33,7 +33,7 @@ const FinishingOutListUI = ({route, ...props }) => {
     
     { id: "styleNames", fid: "styleno", value: "Style No" , idxId:"styleId"},
     { id: "colorNames",fid: "color", value: "Color" , idxId:"colorid"},
-    { id: "workordernumber",fid: "wono", value: "W.O NO" , idxId:"wono"},
+    // { id: "workordernumber",fid: "wono", value: "W.O NO" , idxId:"wono"},
   ]);
 
 

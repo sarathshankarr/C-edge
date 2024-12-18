@@ -66,13 +66,12 @@ const StichingInComponent = ({ navigation, route, ...props }) => {
     }
 
     let stichingOutAPIObj = await APIServiceCall.stichingInDetails(obj);
-    console.log(" Stiching in List ",stichingOutAPIObj?.responseData && stichingOutAPIObj?.responseData?.length>0 ? stichingOutAPIObj?.responseData[0]:"[]" )
-    // set_isLoading(false);
+    
     
     if(stichingOutAPIObj && stichingOutAPIObj.statusData){
 
       if(stichingOutAPIObj && stichingOutAPIObj.responseData){
-        set_itemsArray(stichingOutAPIObj.responseData);
+        // set_itemsArray(stichingOutAPIObj.responseData);
         set_itemsArray(prevItems => reload 
           ? stichingOutAPIObj.responseData 
           : [...prevItems, ...stichingOutAPIObj.responseData] 
@@ -93,6 +92,51 @@ const StichingInComponent = ({ navigation, route, ...props }) => {
     set_isLoading(false);
     set_MainLoading(false);
   }
+
+  };
+
+  const getFilteredList = async (types, Ids) => {
+
+    set_MainLoading(true);
+    let userName = await AsyncStorage.getItem('userName');
+    let userPsd = await AsyncStorage.getItem('userPsd');
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
+    let obj = {
+      "menuId": 161,//mandatory
+      "searchKeyValue": "",
+      "styleSearchDropdown": "-1",//mandatory
+      "dataFilter": "0",
+      "locIds": 0,
+      "brandIds": 0,
+      "fromRecord": 0, 
+      "toRecord": 1000, 
+      "userName":userName,
+      "userPwd":userPsd,
+      "categoryType" : types,
+      "categoryIds" : Ids,
+      "compIds": usercompanyId,
+      "company":JSON.parse(companyObj),
+  }
+  
+    //  console.log("requested filtered body ==> ", obj);
+  
+    let stichingOutAPIObj = await APIServiceCall.getFiltered_stitchingIn(obj);
+    set_MainLoading(false);
+    
+    if(stichingOutAPIObj && stichingOutAPIObj.statusData){
+
+      if(stichingOutAPIObj && stichingOutAPIObj.responseData){
+        set_itemsArray(stichingOutAPIObj.responseData)
+      } 
+
+    } else {
+      popUpAction(Constant.SERVICE_FAIL_MSG,Constant.DefaultAlert_MSG,'OK', true,false);
+    }
+
+    if(stichingOutAPIObj && stichingOutAPIObj.error) {
+      popUpAction(Constant.SERVICE_FAIL_MSG,Constant.DefaultAlert_MSG,'OK', true,false)
+    }
 
   };
 
@@ -141,6 +185,7 @@ const StichingInComponent = ({ navigation, route, ...props }) => {
       popOkBtnAction = {popOkBtnAction}
       fetchMore={fetchMore}
       MainLoading = {MainLoading}
+      applyFilterFxn={getFilteredList}
     />
 
   );

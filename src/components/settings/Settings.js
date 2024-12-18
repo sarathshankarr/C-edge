@@ -171,16 +171,16 @@ const SettingsSidebar = ({navigation}) => {
 
       {/* Settings List */}
       <ScrollView style={styles.settingsContainer}>
-        <SettingItem
+       {selectedCompanyId ?  <SettingItem
           title={selectedCompanyName ? selectedCompanyName : "No Company Selected"}
           icon={require('./../../../assets/images/png/office.png')}
           onPress={() => console.log("Current company")}
-        />
-        <SettingItem
+        /> : null}
+        {selectedCompanyId ? <SettingItem
           title="Change Company"
           icon={require('./../../../assets/images/png/swap.png')}
           onPress={() => setshowCompanyList(!showCompanyList)}
-        />
+        /> : null}
         {/* <SettingItem
           title="Change Password"
           icon={require('./../../../assets/images/png/key.png')}
