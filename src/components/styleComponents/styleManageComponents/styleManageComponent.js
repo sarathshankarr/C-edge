@@ -107,6 +107,51 @@ const StyleManageComponent = ({ navigation, route, ...props }) => {
 
   };
 
+  const getFilteredList = async (types, Ids) => {
+
+    set_MainLoading(true);
+    let userName = await AsyncStorage.getItem('userName');
+    let userPsd = await AsyncStorage.getItem('userPsd');
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
+    let obj = {
+      "menuId": 161,//mandatory
+      "searchKeyValue": "",
+      "styleSearchDropdown": "-1",//mandatory
+      "dataFilter": "0",
+      "locIds": 0,
+      "brandIds": 0,
+      "fromRecord": 0, 
+      "toRecord": 1000, 
+      "userName":userName,
+      "userPwd":userPsd,
+      "categoryType" : types,
+      "categoryIds" : Ids,
+      "compIds": usercompanyId,
+      "company":JSON.parse(companyObj),
+  }
+  
+    //  console.log("requested filtered body ==> ", obj);
+  
+    let stichingOutAPIObj = await APIServiceCall.getFiltered_style(obj);
+    set_MainLoading(false);
+    
+    if(stichingOutAPIObj && stichingOutAPIObj.statusData){
+
+      if(stichingOutAPIObj && stichingOutAPIObj.responseData){
+        set_itemsArray(stichingOutAPIObj.responseData)
+      } 
+
+    } else {
+      popUpAction(Constant.SERVICE_FAIL_MSG,Constant.DefaultAlert_MSG,'OK', true,false);
+    }
+
+    if(stichingOutAPIObj && stichingOutAPIObj.error) {
+      popUpAction(Constant.SERVICE_FAIL_MSG,Constant.DefaultAlert_MSG,'OK', true,false)
+    }
+
+  };
+
   const fetchMore= (more) =>{
     console.log("fetch more ==> ", hasMore, isLoading );
     
@@ -154,6 +199,7 @@ const StyleManageComponent = ({ navigation, route, ...props }) => {
       popOkBtnAction={popOkBtnAction}
       fetchMore={fetchMore}
       MainLoading = {MainLoading}
+      applyFilterFxn={getFilteredList}
     />
   );
 

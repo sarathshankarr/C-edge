@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { View, TouchableOpacity, Image, Text, StyleSheet, Modal, ScrollView, TextInput, ActivityIndicator, Alert, FlatList } from 'react-native';
+import { View, TouchableOpacity, Image, Text, StyleSheet, Modal, ScrollView, TextInput, ActivityIndicator, Alert, FlatList, TouchableWithoutFeedback } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as APIServiceCall from './../apiCalls/apiCallsComponent'
@@ -467,8 +467,6 @@ const CommonHeader = ({ title, showDrawerButton }) => {
 
 
 
-
-
       </View>
 
       <View style={styles.leftSection}>
@@ -510,7 +508,7 @@ const CommonHeader = ({ title, showDrawerButton }) => {
         onRequestClose={() => {
           setModalVisible(!modalVisible);
         }}>
-
+      <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
 
@@ -748,6 +746,7 @@ const CommonHeader = ({ title, showDrawerButton }) => {
 
           </View>
         </View>
+        </TouchableWithoutFeedback>
       </Modal>
 
     </View>
