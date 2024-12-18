@@ -114,23 +114,25 @@ const StyleManageComponent = ({ navigation, route, ...props }) => {
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
     let companyObj = await AsyncStorage.getItem('companyObj');
-    let obj = {
-      "menuId": 161,//mandatory
+    let obj ={
+      "menuId": 30,
       "searchKeyValue": "",
-      "styleSearchDropdown": "-1",//mandatory
-      "dataFilter": "0",
+      "styleSearchDropdown": "-1",
+      "dataFilter": "60Days",
       "locIds": 0,
       "brandIds": 0,
-      "fromRecord": 0, 
-      "toRecord": 1000, 
-      "userName":userName,
-      "userPwd":userPsd,
+      "compIds": 0,
+      "fromRecord": 0,
+      "toRecord": 20,
+      "flag": 1,
+      "username": userName,
+      "password" : userPsd,
       "categoryType" : types,
       "categoryIds" : Ids,
       "compIds": usercompanyId,
       "company":JSON.parse(companyObj),
+      "process":"Created",
   }
-  
     //  console.log("requested filtered body ==> ", obj);
   
     let stichingOutAPIObj = await APIServiceCall.getFiltered_style(obj);

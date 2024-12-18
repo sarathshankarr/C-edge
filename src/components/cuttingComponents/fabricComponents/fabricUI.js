@@ -63,7 +63,7 @@ const FabricUI = ({ route, ...props }) => {
 
       <View style={CommonStyles.headerStyle}>
 
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+        <View style={CommonStyles.listCommonHeader1}>
           <Text style={[CommonStyles.tylesHeaderTextStyle, { flex: 1.5, textAlign: 'left' }]}>{'Fabric Name'}</Text>
           <Text style={[CommonStyles.tylesHeaderTextStyle, { flex: 1, textAlign: 'center', }]}>{'Total Qty'}</Text>
           <Text style={[CommonStyles.tylesHeaderTextStyle, { flex: 1, textAlign: 'center', }]}>{'Cut Qty'}</Text>

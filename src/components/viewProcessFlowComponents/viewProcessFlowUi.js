@@ -49,41 +49,48 @@ const ViewProcessFlowUI = ({route, ...props }) => {
           isChatEnable={false}
           isTImerEnable={false}
           isTitleHeaderEnable={true}
-          title={'View Details'}
+          title={'Production Summary '}
           backBtnAction = {() => backBtnAction()}
         />
       </View>  
 
       <View style={CommonStyles.headerStyle}>
 
-        {props.itemsArray ? <View style={{flexDirection :'row', justifyContent:'space-between'}}>
-          <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:1,textAlign:'left'}]}>{'Style'}</Text>
-          <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:1,textAlign:'center',}]}>{'Fabric'}</Text>
-        </View> : <View style = {CommonStyles.noRecordsFoundStyle}>
-            <Text style={[CommonStyles.tylesHeaderTextStyle]}>{Constant.noRecFound}</Text>
-        </View>}
+         <View style={{flexDirection :'row', justifyContent:'space-between'}}>
+          <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:0.5,textAlign:'left'}]}>{'Style'}</Text>
+          <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:0.3}]}>{' :  '}</Text>
+          <Text style={[CommonStyles.tylesTextStyle,{flex:3,textAlign:'left'}]}>{props.itemsArray.styleName}</Text>
+        </View> 
 
-        {props.itemsArray ? <View style={{flexDirection :'row', justifyContent:'space-between',marginTop:hp('2%')}}>
+        {/* {props.itemsArray ? <View style={{flexDirection :'row', justifyContent:'space-between',marginTop:hp('2%')}}>
           <Text style={[CommonStyles.tylesTextStyle,{flex:1,textAlign:'left'}]}>{props.itemsArray.styleName}</Text>
           <Text style={[CommonStyles.tylesTextStyle,{flex:1,textAlign:'center',}]}>{props.itemsArray.fabricName}</Text>
         </View> : <View style = {CommonStyles.noRecordsFoundStyle}>
             <Text style={[CommonStyles.tylesHeaderTextStyle]}>{Constant.noRecFound}</Text>
-        </View>}
+        </View>} */}
 
-        <View style={{flexDirection :'row', justifyContent:'space-between', alignItems:'center',marginTop:hp('4%')}}>
+        <View style={{flexDirection :'row', justifyContent:'space-between',marginTop:hp('2%'), marginBottom:hp('1%')}}>
+          <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:0.5,textAlign:'left',}]}>{'Fabric'}</Text>
+          <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:0.3}]}>{' :    '}</Text>
+          <Text style={[CommonStyles.tylesTextStyle,{flex:3,textAlign:'left'}]}>{props.itemsArray.fabricName}</Text>
+        </View> 
+
+        <View style={CommonStyles.listCommonHeader1}>
           <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:2,textAlign:'left'}]}>{'Process Name'}</Text>
           <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:1,textAlign:'center'}]}>{'Total Qty'}</Text>
           <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:1.5,textAlign:'right',marginRight:wp('2%')}]}>{'Processed Qty'}</Text>
         </View>
 
-        {props.itemsArray.styleresponselist && <View style={CommonStyles.listStyle}>
+        {props.itemsArray.styleresponselist ?  (<View style={CommonStyles.listStyle}>
         <FlatList
           data={props.itemsArray.styleresponselist}
           renderItem={renderItem}
           keyExtractor={(item, index) => "" + index}
           showsVerticalScrollIndicator = {false}
         />
-      </View>}
+      </View>) :<View style = {CommonStyles.noRecordsFoundStyle}>
+        {!props.isLoading ? <Text style={[CommonStyles.tylesHeaderTextStyle, {fontSize: 18}]}>{Constant.noRecFound}</Text> : null}
+      </View> }
 
       </View>  
 

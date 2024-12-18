@@ -295,7 +295,7 @@ const FinishingStyleUI = ({route, ...props }) => {
         </View>
         
         
-                ) : null}
+           ) : null}
 
         { props.itemsArray && props.itemsArray.length > 0 ? <View style={CommonStyles.listCommonHeader1}>
           <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:1.5,textAlign:'left'}]}>{'Style Details'}</Text>

@@ -22,6 +22,7 @@ import BottomComponent from '../../../utils/commonComponents/bottomComponent';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import {formatDateIntoDMY} from '../../../utils/constants/constant';
 import {RadioButton, TextInput} from 'react-native-paper';
+import color from '../../../utils/commonStyles/color';
 
 let downArrowImg = require('./../../../../assets/images/png/dropDownImg.png');
 const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
@@ -422,6 +423,8 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
               alignItems: 'center',
               justifyContent: 'center',
               marginTop: hp('2%'),
+              backgroundColor:'#fff',
+              borderRadius:10
             }}>
             <TouchableOpacity
               style={{
@@ -526,6 +529,8 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
               alignItems: 'center',
               justifyContent: 'center',
               marginTop: hp('2%'),
+              backgroundColor:'#fff',
+              borderRadius:10
             }}>
             <TouchableOpacity
               style={{
@@ -648,7 +653,7 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
             <View style={{position: 'relative'}}>
               <Text
                 style={{
-                  backgroundColor: '#5177c0',
+                  backgroundColor: color.color2,
                   color: 'white',
                   padding: 3,
                   paddingHorizontal: 10,
@@ -677,6 +682,8 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
               alignItems: 'center',
               justifyContent: 'center',
               marginTop: hp('2%'),
+              backgroundColor:'#fff',
+              borderRadius:10
             }}>
             <TouchableOpacity
               style={{
@@ -749,6 +756,8 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
               alignItems: 'center',
               justifyContent: 'center',
               marginTop: hp('2%'),
+              backgroundColor:'#fff',
+              borderRadius:10
             }}>
             <TouchableOpacity
               style={{
@@ -883,7 +892,7 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
             <View style={{position: 'relative'}}>
               <Text
                 style={{
-                  backgroundColor: '#5177c0',
+                  backgroundColor: color.color2,
                   color: 'white',
                   padding: 3,
                   paddingHorizontal: 10,
@@ -910,7 +919,7 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
             <View style={{position: 'relative'}}>
               <Text
                 style={{
-                  backgroundColor: '#5177c0',
+                  backgroundColor: color.color2,
                   color: 'white',
                   padding: 3,
                   paddingHorizontal: 10,
@@ -937,7 +946,7 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
             <View style={{position: 'relative'}}>
               <Text
                 style={{
-                  backgroundColor: '#5177c0',
+                  backgroundColor: color.color2,
                   color: 'white',
                   padding: 3,
                   paddingHorizontal: 10,
@@ -964,7 +973,7 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
             <View style={{position: 'relative'}}>
               <Text
                 style={{
-                  backgroundColor: '#5177c0',
+                  backgroundColor: color.color2,
                   color: 'white',
                   padding: 3,
                   paddingHorizontal: 10,
@@ -991,7 +1000,7 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
             <View style={{position: 'relative'}}>
               <Text
                 style={{
-                  backgroundColor: '#5177c0',
+                  backgroundColor: color.color2,
                   color: 'white',
                   padding: 3,
                   paddingHorizontal: 10,
@@ -1018,7 +1027,7 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
             <View style={{position: 'relative'}}>
               <Text
                 style={{
-                  backgroundColor: '#5177c0',
+                  backgroundColor: color.color2,
                   color: 'white',
                   padding: 3,
                   paddingHorizontal: 10,
@@ -1088,7 +1097,7 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
                         />
                          <Text
                           style={{
-                            backgroundColor: '#5177c0',
+                            backgroundColor: color.color2,
                             color: '#000',
                             padding: 2,
                             paddingHorizontal: 10,
@@ -1247,7 +1256,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderColor: '#ddd',
     padding: 7,
-    backgroundColor: '#5177c0',
+    backgroundColor: color.color2,
     alignItems: 'center',
   },
   table_head_captions: {

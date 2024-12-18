@@ -23,7 +23,9 @@ const Inventory = ({ navigation }) => {
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.iconsContainer}>
           {inwardProcess.map((item) => (
             <TouchableOpacity key={item.id} style={styles.iconItem} onPress={() => handleDemoClick(item.component)}>
+              <View style={styles.navIconContainer}>
               <Image source={item.image} style={styles.icon} />
+              </View>
               <Text style={styles.iconText}>{item.name}</Text>
             </TouchableOpacity>
           ))}
@@ -34,7 +36,9 @@ const Inventory = ({ navigation }) => {
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.iconsContainer}>
           {outwardProcess.map((item) => (
             <TouchableOpacity key={item.id} style={styles.iconItem} onPress={() => handleDemoClick(item.component)}>
+              <View style={styles.navIconContainer}>
               <Image source={item.image} style={styles.icon} />
+              </View>
               <Text style={styles.iconText}>{item.name}</Text>
             </TouchableOpacity>
           ))}
@@ -57,9 +61,9 @@ const styles = StyleSheet.create({
     padding: 10,
     elevation:3,
     shadowColor: '#000', // Shadow color for iOS
-  shadowOffset: { width: 0, height: 2 }, // Offset for the shadow
-  shadowOpacity: 0.25, // Opacity of the shadow
-  shadowRadius: 3.84, // Radius for the shadow blur
+    shadowOffset: { width: 0, height: 2 }, // Offset for the shadow
+    shadowOpacity: 0.25, // Opacity of the shadow
+    shadowRadius: 3.84, // Radius for the shadow blur
     // borderColor:'black',
   },
   heading: {
@@ -75,18 +79,28 @@ const styles = StyleSheet.create({
   iconItem: {
     marginRight: 20,
     alignItems: 'center',
+    width:100,
+  },
+  navIconContainer: {
+    width: 55,
+    height: 55,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#e9ecef',
+    borderRadius: 30,
+    marginBottom: 10,
   },
   icon: {
     width: 30,
     height: 30,
     resizeMode: 'contain',
-    marginBottom: 10, 
-    tintColor:color.color2,
+    tintColor: color.color2,
   },
   iconText: {
     textAlign: 'center',
-    color: '#555', 
-    width:120,
+    color: '#555',
+    fontSize: 14,
+    fontWeight: '500',
   },
 });
 

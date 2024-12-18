@@ -82,10 +82,10 @@ const SaveFinishingOutUI = ({ route, ...props }) => {
       </View>
 
 
-      <View style={{ marginTop: hp('3%'), flexDirection: 'row', width: '90%' }}>
+      {/* <View style={{ marginTop: hp('3%'), flexDirection: 'row', width: '90%' }}>
         <Text style={[CommonStyles.tylesHeaderTextStyle, { textAlign: 'left' }]}>{'Style - '}</Text>
         <Text style={[CommonStyles.tylesHeaderTextStyle, { textAlign: 'left' }]}>{props.itemsObj ? props.itemsObj.styleName : null}</Text>
-      </View>
+      </View> */}
 
 
       <View style={{ marginBottom: hp('5%') }}>
