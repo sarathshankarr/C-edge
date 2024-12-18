@@ -58,7 +58,7 @@ const FinishingStyleComponent = ({ navigation, route, ...props }) => {
         "styleSearchDropdown": "-1",
         "dataFilter": "",
         "locIds": locIds ? locIds : 0,
-      "brandIds":brandIds ? brandIds: 0 ,
+        "brandIds":brandIds ? brandIds: 0 ,
         "fromRecord": fromRecord,
         "toRecord": toRecord,
         "username": userName,

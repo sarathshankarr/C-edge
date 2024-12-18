@@ -29,7 +29,9 @@ const Production = ({ navigation }) => {
           <View style={{ flexDirection: 'row', alignItems: 'flex-start', flexWrap: 'wrap' }}>
           {inwardProcess.map((item) => (
             <TouchableOpacity key={item.id} style={[styles.iconItem, {marginBottom:15}]} onPress={() => handleDemoClick(item.component)}>
+              <View style={styles.navIconContainer}>
               <Image source={item.image} style={styles.icon} />
+              </View>
               <Text style={styles.iconText}>{item.name}</Text>
             </TouchableOpacity>
           ))}
@@ -41,7 +43,9 @@ const Production = ({ navigation }) => {
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.iconsContainer}>
           {outwardProcess.map((item) => (
             <TouchableOpacity key={item.id} style={styles.iconItem} onPress={() => handleDemoClick(item.component)}>
+            <View style={styles.navIconContainer}>
               <Image source={item.image} style={styles.icon} />
+              </View>
               <Text style={styles.iconText}>{item.name}</Text>
             </TouchableOpacity>
           ))}
@@ -55,24 +59,24 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#f0f0f0', // Light grey background
+    backgroundColor: '#f0f0f0', 
   },
   section: {
     marginBottom: 20,
-    backgroundColor: 'white', // Light grey background
+    backgroundColor: 'white', 
     borderRadius: 9,
     padding: 10,
-    elevation: 5, // Works on Android
-    shadowColor: '#000', // Shadow color for iOS
-    shadowOffset: { width: 0, height: 2 }, // Offset for the shadow
-    shadowOpacity: 0.25, // Opacity of the shadow
-    shadowRadius: 3.84, // Radius for the shadow blur
+    elevation: 5,
+    shadowColor: '#000', 
+    shadowOffset: { width: 0, height: 2 }, 
+    shadowOpacity: 0.25, 
+    shadowRadius: 3.84,
   },
   heading: {
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 10,
-    color: '#333', // Dark grey heading text color
+    color: '#333', 
   },
   iconsContainer: {
     flexDirection: 'row',
@@ -82,19 +86,30 @@ const styles = StyleSheet.create({
     marginRight: 20,
     alignItems: 'center',
     width:80,
-
+  },
+  navIconContainer: {
+    width: 55,
+    height: 55,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#e9ecef',
+    borderRadius: 30,
+    marginBottom: 10,
   },
   icon: {
     width: 30,
     height: 30,
     resizeMode: 'contain',
-    marginBottom: 10,
-    tintColor:color.color2, 
+    tintColor: color.color2,
   },
   iconText: {
     textAlign: 'center',
-    color: '#555', 
+    color: '#555',
+    fontSize: 14,
+    fontWeight: '500',
   },
 });
 
 export default Production;
+
+

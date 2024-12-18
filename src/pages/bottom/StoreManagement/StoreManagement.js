@@ -26,7 +26,9 @@ const StoreManagement = ({ navigation }) => {
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.iconsContainer}>
           {inwardProcess.map((item) => (
             <TouchableOpacity key={item.id} style={styles.iconItem} onPress={() => handleDemoClick(item.component)}>
+              <View style={styles.navIconContainer}>
               <Image source={item.image} style={styles.icon} />
+              </View>
               <Text style={styles.iconText}>{item.name}</Text>
             </TouchableOpacity>
           ))}
@@ -80,18 +82,28 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width:80,
   },
+  navIconContainer: {
+    width: 55,
+    height: 55,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#e9ecef',
+    borderRadius: 30,
+    marginBottom: 10,
+  },
   icon: {
     width: 30,
     height: 30,
     resizeMode: 'contain',
-    marginBottom: 10, 
-    tintColor:color.color2,
+    tintColor: color.color2,
   },
   iconText: {
     textAlign: 'center',
-    color: '#555', 
-    flexWrap:'wrap'
+    color: '#555',
+    fontSize: 14,
+    fontWeight: '500',
   },
+
 });
 
 export default StoreManagement;

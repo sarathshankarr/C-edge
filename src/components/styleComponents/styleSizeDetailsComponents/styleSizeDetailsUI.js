@@ -60,7 +60,7 @@ console.log('Item ',item)
 
       <View style={CommonStyles.headerStyle}>
 
-        {props.itemObj? <View style={{flexDirection :'row'}}>
+        {/* {props.itemObj? <View style={{flexDirection :'row'}}>
           <Text style={[CommonStyles.tylesHeaderTextStyle]}>{'Style : '}</Text>
           <Text style={[CommonStyles.tylesHeaderTextStyle]}>{props.itemObj.styleName}</Text>
 
@@ -71,22 +71,41 @@ console.log('Item ',item)
         {props.itemObj ? <View style={{flexDirection :'row'}}>
         <Text style={[CommonStyles.tylesHeaderTextStyle]}>{'Fabric : '}</Text>
           <Text style={[CommonStyles.tylesHeaderTextStyle]}>{props.itemObj.fabricName || "-"}</Text>
-        </View> : null}
+        </View> : null} */}
 
-        {props.itemObj && props.itemObj.styleSizeDataResponseList && props.itemObj.styleSizeDataResponseList.length > 0 ? <View style={CommonStyles.listStyle}>
-          {<View style={{flexDirection :'row'}}>
+        <View style={{flexDirection :'row', justifyContent:'space-between'}}>
+          <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:0.5,textAlign:'left'}]}>{'Style'}</Text>
+          <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:0.3}]}>{' :  '}</Text>
+          <Text style={[CommonStyles.tylesTextStyle,{flex:3,textAlign:'left'}]}>{props.itemObj.styleName}</Text>
+        </View> 
+
+        <View style={{flexDirection :'row', justifyContent:'space-between'}}>
+          <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:0.5,textAlign:'left'}]}>{'Fabric'}</Text>
+          <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:0.3}]}>{' :  '}</Text>
+          <Text style={[CommonStyles.tylesTextStyle,{flex:3,textAlign:'left'}]}>{props.itemObj.fabricName}</Text>
+        </View> 
+
+        {props.itemObj && props.itemObj.styleSizeDataResponseList && props.itemObj.styleSizeDataResponseList.length > 0 ? 
+          <View style={[CommonStyles.listCommonHeader1, {marginTop:10}]}>
             <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:1,textAlign:'center'}]}>{'Size'}</Text>
             <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:2,textAlign:'center',}]}>{'Quantity'}</Text>
             {/* <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:1,textAlign:'left'}]}>{'L'}</Text>
             <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:1,textAlign:'left',}]}>{'XL'}</Text> */}
-          </View> }
+          </View> 
+          : null}
+
+
+          {props.itemObj && props.itemObj.styleSizeDataResponseList && props.itemObj.styleSizeDataResponseList.length > 0 ? <View style={CommonStyles.listStyle}>
           <FlatList
             data={itemObj}
             renderItem={renderItem}
             keyExtractor={(item, index) => "" + index}
             showsVerticalScrollIndicator = {false}
           />
-        </View> : null}
+          </View> :<View style = {CommonStyles.noRecordsFoundStyle}>
+        {!props.isLoading ? <Text style={[CommonStyles.tylesHeaderTextStyle, {fontSize: 18}]}>{Constant.noRecFound}</Text> : null}
+      </View>}
+       
       </View>  
 
       {props.isPopUp ? <View style={CommonStyles.customPopUpStyle}>

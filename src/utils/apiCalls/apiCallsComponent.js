@@ -4510,8 +4510,8 @@ export async function getSelectedCategoryList_style(jsonValue) {
         obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
         return obj;
     }
-    console.log("URL", Environment.uri + "stitching/apiSearchloadAllCategory");
-    await fetch(Environment.uri + "stitching/apiSearchloadAllCategory",
+    console.log("URL", Environment.uri + "styleapi/loadAllStylesSearchCategory");
+    await fetch(Environment.uri + "styleapi/loadAllStylesSearchCategory",
         {
             method: "POST",
             headers: {
@@ -4549,8 +4549,8 @@ export async function getFiltered_style(jsonValue) {
         obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
         return obj;
     }
-    console.log("URL", Environment.uri + "stitching/apiSearchloadAllCategoryType");
-    await fetch(Environment.uri + "stitching/apiSearchloadAllCategoryType",
+    console.log("URL", Environment.uri + "styleapi/loadAllStylesSearchCategoryType");
+    await fetch(Environment.uri + "styleapi/loadAllStylesSearchCategoryType",
         {
             method: "POST",
             headers: {

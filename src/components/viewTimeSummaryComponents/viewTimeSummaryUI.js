@@ -50,7 +50,7 @@ const ViewTimeSummaryUI = ({route, ...props }) => {
           isChatEnable={false}
           isTImerEnable={false}
           isTitleHeaderEnable={true}
-          title={'Style List'}
+          title={'View Time and Action'}
           backBtnAction = {() => backBtnAction()}
         />
       </View>  
@@ -64,14 +64,20 @@ const ViewTimeSummaryUI = ({route, ...props }) => {
           </View>
         </View> */}
 
-        <View style={styles.listStyle}>
-          <View style={{flexDirection :'row', justifyContent:'space-between'}}>
+       {/* <View style={styles.listStyle}> */}
+          <View style={[CommonStyles.listCommonHeader1, {flexDirection :'row', justifyContent:'space-between'}]}>
             <Text style={[styles.tylesHeaderTextStyle,{flex:1,textAlign:'left'}]}>{'Process'}</Text>
             <Text style={[styles.tylesHeaderTextStyle,{flex:1.5,textAlign:'center',}]}>{'Start Date'}</Text>
             <Text style={[styles.tylesHeaderTextStyle,{flex:1.5,textAlign:'center',}]}>{'End Date'}</Text>
             <Text style={[styles.tylesHeaderTextStyle,{flex:1.5,textAlign:'center',}]}>{'Actual Start Date'}</Text>
             <Text style={[styles.tylesHeaderTextStyle,{flex:1.5,textAlign:'center',}]}>{'Actual End Date'}</Text>
           </View>
+
+        {/* </View> */}
+      
+
+        {props.itemsArray && props.itemsArray.length > 0 ?
+        <View style={styles.listStyle}>
           <FlatList
             data={props.itemsArray}
             renderItem={renderItem}
@@ -79,7 +85,13 @@ const ViewTimeSummaryUI = ({route, ...props }) => {
             showsVerticalScrollIndicator = {false}
           />
         </View>
+        : <View style = {CommonStyles.noRecordsFoundStyle}>
+        {!props.isLoading ? <Text style={[CommonStyles.tylesHeaderTextStyle, {fontSize: 18}]}>{Constant.noRecFound}</Text> : null}
+      </View>}
+
       </View>  
+
+      
       {props.isPopUp ? <View style={CommonStyles.customPopUpStyle}>
         <AlertComponent
           header = {props.popUpAlert}

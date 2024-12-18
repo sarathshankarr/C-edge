@@ -72,9 +72,10 @@ const styles = StyleSheet.create({
         minHeight : hp('20%'),
         justifyContent: "center",
         alignItems: "center",
-        borderWidth:0.1,
-        backgroundColor : '#ffffff',
-        borderRadius : 5,
+        // borderWidth:0.1,
+        backgroundColor : '#fff',
+        borderRadius : 10,
+        elevation:5
     },
 
     dogStyle: {

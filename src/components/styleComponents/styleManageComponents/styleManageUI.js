@@ -45,8 +45,9 @@ const StyleManageUI = ({route, ...props}) => {
 
 
   const [categories, set_categories]=useState([    
-    { id: "styleNames", fid: "styleNo", value: "Style No" , idxId:"styleId"},
-    { id: "colorNames",fid: "color", value: "Color" , idxId:"colorId"},
+    { id: "STYLE_NO", fid: "styleNo", value: "Style No" , idxId:"styleId"},
+    { id: "COLOR",fid: "color", value: "Color" , idxId:"colorId"},
+    { id: "stts",fid: "color", value: "Color" , idxId:"colorId"},
   ]);
 
 
@@ -66,22 +67,27 @@ const StyleManageUI = ({route, ...props}) => {
     let usercompanyId = await AsyncStorage.getItem('companyId');
     let companyObj = await AsyncStorage.getItem('companyObj');
     let Obj=  {
-      "menuId": 161,
+      "menuId": 30,
       "searchKeyValue": "",
       "styleSearchDropdown": "-1",
-      "dataFilter": "0",
+      "dataFilter": "60Days",
       "locIds": 0,
       "brandIds": 0,
       "compIds": 0,
-      "fromRecord": 0, 
-      "toRecord": 1000, 
-      "userName":userName,
-      "userPwd": userPsd,
-      "categoryIds": "",
-      "categoryType": "",
+      "fromRecord": 0,
+      "toRecord": 20,
+      "flag": 1,
+      "username": userName,
+      "password" : userPsd,
+      "categoryType" : "",
+      "categoryIds" :"",
       "compIds": usercompanyId,
       "company":JSON.parse(companyObj),
+      "process":"Created",
   }
+
+
+  
   setfilterReqBody(Obj)
   };
 
