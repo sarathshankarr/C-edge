@@ -880,7 +880,7 @@ export async function addCuttingDetails(jsonValue) {
             body: JSON.stringify(jsonValue),
         }
     ).then((response) => response.json()).then(async (data) => {
-        console.log('addCuttingDetails--- ', data)
+        // console.log('addCuttingDetails--- ', data)
 
         if (data) {
             statusData = true;

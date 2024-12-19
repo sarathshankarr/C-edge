@@ -83,8 +83,8 @@ const styles = StyleSheet.create({
     width:80,
   },
   navIconContainer: {
-    width: 55,
-    height: 55,
+    width: 50,
+    height: 50,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#e9ecef',
@@ -92,8 +92,8 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   icon: {
-    width: 30,
-    height: 30,
+    width: 27,
+    height: 27,
     resizeMode: 'contain',
     tintColor: color.color2,
   },
