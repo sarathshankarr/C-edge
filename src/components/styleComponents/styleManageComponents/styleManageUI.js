@@ -45,9 +45,9 @@ const StyleManageUI = ({route, ...props}) => {
 
 
   const [categories, set_categories]=useState([    
-    { id: "STYLE_NO", fid: "styleNo", value: "Style No" , idxId:"styleId"},
+    { id: "STYLE_NO", fid: "styleName", value: "Style No" , idxId:"styleId"},
     { id: "COLOR",fid: "color", value: "Color" , idxId:"colorId"},
-    { id: "stts",fid: "color", value: "Color" , idxId:"colorId"},
+    { id: "stts",fid: "process", value: "Style Status" , idxId:"process"},
   ]);
 
 

@@ -203,23 +203,6 @@ const StyleLocationInventoryUI = ({route, ...props }) => {
       </View>  
 
       <View style={CommonStyles.headerStyle}>
-
-        {/* {props.itemsArray && props.itemsArray.length > 0 ? <View style={CommonStyles.searchBarStyle}>
-                              
-          <View style={[CommonStyles.searchInputContainerStyle]}>
-            <Image source={searchImg} style={CommonStyles.searchImageStyle} />
-              <TextInput style={CommonStyles.searchTextInputStyle}
-                underlineColorAndroid="transparent"
-                placeholder="Search"
-                placeholderTextColor="#7F7F81"
-                autoCapitalize="none"
-                value = {recName}
-                onFocus={ () => isKeyboard.current = true }
-                onChangeText={(name) => {filterPets(name)}}
-              />
-          </View> 
-          
-        </View> : null} */}
         {filterArray ? (
         <View style={{ flexDirection: 'row', width: '100%', marginBottom: 10, alignItems: 'center' }}>
   {/* Search Bar */}

@@ -11,7 +11,7 @@ const HeaderComponent = ({navigation, route,isChatEnable,isTImerEnable,isSetting
     };
     return (
 
-        <View style={{flex:1,backgroundColor:color.color2}}>
+        <View style={{flex:1,backgroundColor:color.color2, paddingVertical: 17}}>
             <View style={[styles.headerView]}>
                 <View style={{flexDirection:'row', position:'absolute'}}>
 
@@ -36,8 +36,8 @@ const styles = StyleSheet.create({
     headerView : {
         justifyContent:'center',
         flex:1,
-        borderBottomWidth:1,
-        borderBottomColor : '#dedede',
+        // borderBottomWidth:1,
+        // borderBottomColor : '#dedede',
     },
 
     headerSelectionView : {

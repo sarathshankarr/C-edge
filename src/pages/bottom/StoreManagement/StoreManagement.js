@@ -20,6 +20,9 @@ const StoreManagement = ({ navigation }) => {
   };
 
   return (
+    <ScrollView
+    style={styles.scrollContainer}
+    contentContainerStyle={styles.scrollContent}>
     <View style={styles.container}>
       <View style={styles.section}>
         <Text style={styles.heading}>Store Management </Text>
@@ -46,6 +49,7 @@ const StoreManagement = ({ navigation }) => {
         </ScrollView>
       </View> */}
     </View>
+    </ScrollView>
   );
 };
 
@@ -103,6 +107,8 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '500',
   },
+  scrollContainer: {flex: 1},
+  scrollContent: {paddingBottom:20},
 
 });
 
