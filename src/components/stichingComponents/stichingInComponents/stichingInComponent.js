@@ -119,9 +119,11 @@ const StichingInComponent = ({ navigation, route, ...props }) => {
       "company":JSON.parse(companyObj),
   }
   
-    //  console.log("requested filtered body ==> ", obj);
   
+    //  console.log("requested filtered body ==> ", obj);
+    
     let stichingOutAPIObj = await APIServiceCall.getFiltered_stitchingIn(obj);
+     console.log("response  filtered body ==> ", stichingOutAPIObj.responseData);
     set_MainLoading(false);
     
     if(stichingOutAPIObj && stichingOutAPIObj.statusData){

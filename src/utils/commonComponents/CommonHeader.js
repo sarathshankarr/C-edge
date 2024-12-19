@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { View, TouchableOpacity, Image, Text, StyleSheet, Modal, ScrollView, TextInput, ActivityIndicator, Alert, FlatList, TouchableWithoutFeedback } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -6,7 +6,7 @@ import * as APIServiceCall from './../apiCalls/apiCallsComponent'
 import { heightPercentageToDP as hp, widthPercentageToDP as wp, } from "react-native-responsive-screen";
 import TextInputComponent from './textInputComponent';
 import { extractLocationIds } from '../constants/constant';
-import color from '../commonStyles/color';
+import { ColorContext } from '../../components/colorTheme/colorTheme';
 
 
 const CommonHeader = ({ title, showDrawerButton }) => {
@@ -36,6 +36,10 @@ const CommonHeader = ({ title, showDrawerButton }) => {
     left: 0,
     width: 0,
   });
+
+  const { colors } = useContext(ColorContext);
+  const styles = getStyles(colors);
+
 
 
   let downArrowImg = require('./../../../assets/images/png/dropDownImg.png');
@@ -753,14 +757,14 @@ const CommonHeader = ({ title, showDrawerButton }) => {
   );
 };
 
-const styles = StyleSheet.create({
+const getStyles = (colors) => StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 10,
     paddingVertical: 17,
-    backgroundColor: color.color2,
+    backgroundColor: colors.color2,
   },
   leftSection: {
     flexDirection: 'row',
@@ -971,7 +975,7 @@ const styles = StyleSheet.create({
     borderWidth: 0.5,
     borderColor: '#D8D8D8',
     borderRadius: hp("0.5%"),
-    backgroundColor: color.color2,
+    backgroundColor: colors.color2,
   },
 
   buttonText: {

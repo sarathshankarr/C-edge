@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useContext } from 'react';
 import {View,StyleSheet,TouchableOpacity,Text,FlatList,Image,TextInput, RefreshControl, ActivityIndicator} from 'react-native';
 import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
 import * as Constant from "./../../../utils/constants/constant";
@@ -7,14 +7,15 @@ import HeaderComponent from '../../../utils/commonComponents/headerComponent';
 import LoaderComponent from './../../../utils/commonComponents/loaderComponent';
 import AlertComponent from './../../../utils/commonComponents/alertComponent';
 import FilterModal from '../../../utils/commonComponents/FilterModal';
-import color from '../../../utils/commonStyles/color';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { ColorContext } from '../../colorTheme/colorTheme';
 
 let searchImg = require('./../../../../assets/images/png/searchIcon.png');
 let filterImg = require('./../../../../assets/images/png/setting.png');
 
 
 const GatePassAckListUI = ({route, ...props }) => {
+  const { colors } = useContext(ColorContext);
 
   const [filterArray, set_filterArray] = useState(undefined);
   const [recName, set_recName] = useState(undefined);
@@ -259,11 +260,11 @@ const GatePassAckListUI = ({route, ...props }) => {
   >
     <Image
       source={filterImg}
-      style={{ height: 25, width: 25, tintColor: showFilteredList ? color.color2 : '#7F7F81', marginRight: 10 }}
+      style={{ height: 25, width: 25, tintColor: showFilteredList ? colors.color2 : '#7F7F81', marginRight: 10 }}
     />
     {
       filterCount ?
-      <Text style={{ color: '#7F7F81', fontSize: 14, backgroundColor:color.color2, borderRadius:30,color:'#fff', padding:5 }}>{filterCount}</Text> :
+      <Text style={{ color: '#7F7F81', fontSize: 14, backgroundColor:colors.color2, borderRadius:30,color:'#fff', padding:5 }}>{filterCount}</Text> :
       <Text style={{ color: '#7F7F81', fontSize: 14 }}>{"Filter"}</Text> 
     }
     

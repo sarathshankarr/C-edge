@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useContext} from 'react';
 import {
   StyleSheet,
   Text,
@@ -12,17 +12,91 @@ import {
   FlatList,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import color from '../../utils/commonStyles/color';
 import * as APIServiceCall from './../../utils/apiCalls/apiCallsComponent';
 import { extractLocationIds } from '../../utils/constants/constant';
+import { ColorContext } from '../colorTheme/colorTheme';
+
+const colorsList=[
+  { 
+    label: "Jungle Green",
+    Colors:{
+      color2: '#26A69A',      
+      lightcolor:'#9DE4DC',
+      color3:'#DDD'  ,          
+      color4:"#007167"  ,          // dark green  
+      color5:'#DDD' ,          
+      color6:'#DDD' ,          
+    }
+ },
+ { 
+  label: "Cerulean Blue",
+  Colors:{
+    color2: '#1F74BA',      
+    lightcolor:'#9DE4DC',
+    color3:'#DDD'  ,          
+    color4:"#195c95"  ,        // Dark    
+    color5:'#DDD' ,          
+    color6:'#DDD' ,         
+  }
+},
+ { 
+  label: "Royal Blue",
+  Colors:{
+    color2: '#246EE9',      
+    lightcolor:'#9DE4DC',
+    color3:'#DDD'  ,          
+    color4:"#246EE9"  ,        // Dark    
+    color5:'#DDD' ,          
+    color6:'#DDD' ,         
+  }
+},
+ { 
+  label: "Scarlet Red",
+  Colors:{
+    color2: '#FF2400',      
+    lightcolor:'#9DE4DC',
+    color3:'#DDD'  ,          
+    color4:"#FF2400"  ,        // Dark    
+    color5:'#DDD' ,          
+    color6:'#DDD' ,         
+  }
+},
+ { 
+  label: "Mint green ",
+  Colors:{
+    color2: '#3EB489',      
+    lightcolor:'#9DE4DC',
+    color3:'#DDD'  ,          
+    color4:"#2E8968"  ,        // Dark    
+    color5:'#DDD' ,          
+    color6:'#DDD' ,         
+  }
+},
+ { 
+  label: "Bright Cyan ",
+  Colors:{
+    color2: '#009CDE',      
+    lightcolor:'#9DE4DC',
+    color3:'#DDD'  ,          
+    color4:'#1F74BA'  ,        // Dark    
+    color5:'#DDD' ,          
+    color6:'#DDD' ,         
+  }
+},
+]
 
 const SettingsSidebar = ({navigation}) => {
+
   const [userName, setUserName] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
   const [showCompanyList, setshowCompanyList] = useState(false);
+  const [showColorList, setshowColorList] = useState(false);
   const [companyList, setcompanyList] = useState({});
   const [selectedCompanyName, setselectedCompanyName] = useState('')
   const [selectedCompanyId, setselectedCompanyId] = useState(0);
+  const { colors, updateColor,updateAllColors } = useContext(ColorContext);
+
+  const styles = getStyles(colors);
 
   useEffect(() => {
     const fetchUserName = async () => {
@@ -33,20 +107,31 @@ const SettingsSidebar = ({navigation}) => {
     getCompaniesList();
   }, []);
 
+  
+  const SettingItem = ({title, icon, onPress}) => (
+    <TouchableOpacity style={styles.settingItem} onPress={onPress}>
+      <View style={styles.settingIconContainer}>
+        <Image source={icon} style={styles.settingIcon} />
+      </View>
+      <Text style={styles.settingText}>{title}</Text>
+    </TouchableOpacity>
+  );
+
 
   const getCompaniesList = async () => {
     try {
       let companiesList = await AsyncStorage.getItem('CompaniesList');
-      console.log('Companies list in CH ===> ', companiesList);
+      // console.log('Companies list in CH ===> ', companiesList);
 
       const parsedList = companiesList ? JSON.parse(companiesList) : {};
       setcompanyList(parsedList);
 
       if (Object.keys(parsedList).length > 0) {
-        const [[firstKey, firstValue]] = Object.entries(parsedList);
-        setselectedCompanyId(firstKey);
-        setselectedCompanyName(firstValue);
-        console.log('setselectedCompanyId  ', firstKey, firstValue);
+        let usercompanyId = await AsyncStorage.getItem('companyId');
+        // console.log("parsedList===> ", parsedList, usercompanyId, typeof usercompanyId);
+        setselectedCompanyId(parsedList[usercompanyId]);
+        setselectedCompanyName(parsedList[usercompanyId]);
+        // console.log('setselectedCompanyId  ', firstKey, firstValue);
       } else {
         console.log('No companies found');
       }
@@ -88,6 +173,12 @@ const SettingsSidebar = ({navigation}) => {
     await getCompanyObj(id);
   };
 
+  const handleSelectColor =  (item) => {
+    console.log("selected color :" ,  item.Colors)
+    updateAllColors(item.Colors);
+    setshowColorList(false);
+  };
+
   const handleDeleteUser = async () => {
     let userId = await AsyncStorage.getItem('userId');
 
@@ -118,6 +209,11 @@ const SettingsSidebar = ({navigation}) => {
 
   const handleSearch = () => {};
 
+  const handleColorChange = () => {
+    const updatingColor = colors.color2 === '#1f74ba' ? '#26A69A' : '#1f74ba';
+    updateColor('color2', updatingColor);
+    console.log("Chnage color", colors);
+  };
 
   const getCompanyObj = async (newCompanyID) => {
     
@@ -171,7 +267,7 @@ const SettingsSidebar = ({navigation}) => {
 
       {/* Settings List */}
       <ScrollView style={styles.settingsContainer}>
-       {selectedCompanyId ?  <SettingItem
+       {selectedCompanyId  ?  <SettingItem
           title={selectedCompanyName ? selectedCompanyName : "No Company Selected"}
           icon={require('./../../../assets/images/png/office.png')}
           onPress={() => console.log("Current company")}
@@ -191,11 +287,12 @@ const SettingsSidebar = ({navigation}) => {
           icon={require('./../../../assets/images/png/notification.png')}
           onPress={() => navigation.navigate('Notifications')}
         />
-        {/* <SettingItem
+        <SettingItem
           title="Appearance"
           icon={require('./../../../assets/images/png/color-palette.png')}
-          onPress={() => console.log('AppearanceSettings')}
-        /> */}
+          // onPress={() => console.log('AppearanceSettings')}
+          onPress={() => setshowColorList(!showColorList)}
+        />
         <SettingItem
           title="Logout"
           icon={require('./../../../assets/images/png/logOut.png')}
@@ -246,10 +343,10 @@ const SettingsSidebar = ({navigation}) => {
       <View/>
       <Text style={styles.companyModalHeaderText}>Company List</Text>
       <TouchableOpacity onPress={()=>setshowCompanyList(false)}>
-                  <Image
-                    source={require('./../../../assets/images/png/close.png')}
-                    style={{width: 30, height: 30, tintColor: color.color2}}
-                  />
+         <Image
+           source={require('./../../../assets/images/png/close.png')}
+           style={{width: 30, height: 30, tintColor: colors.color2}}
+         />
          </TouchableOpacity>
     </View>
 
@@ -298,24 +395,80 @@ const SettingsSidebar = ({navigation}) => {
       )}
     </View>
   </View>
-</Modal>
+     </Modal>
 
+     <Modal
+      animationType="slide"
+      transparent={true}
+      visible={showColorList}
+      onRequestClose={() => setshowColorList(false)}
+>
+  <TouchableWithoutFeedback onPress={() => setshowColorList(false)}>
+    <View style={styles.companyModalOverlay} />
+  </TouchableWithoutFeedback>
+  <View style={styles.colorModalContainer}>
+    {/* Heading */}
+    <View style={styles.companyModalHeader}>
+      <View/>
+      <Text style={styles.companyModalHeaderText}>Colours List</Text>
+      <TouchableOpacity onPress={()=>setshowColorList(false)}>
+         <Image
+           source={require('./../../../assets/images/png/close.png')}
+           style={{width: 30, height: 30, tintColor: colors.color2}}
+         />
+         </TouchableOpacity>
+    </View>
+
+  {/* Search Bar */}
+  <View style={styles.companyModalSearchBarContainer}>
+      <TextInput
+        style={styles.companyModalSearchBar}
+        placeholder="Search Colour."
+        placeholderTextColor="#aaa"
+        onChangeText={handleSearch}
+      />
+    </View>
+
+    {/* Color List */}
+    <View style={styles.companyModalListContainer}>
+         <FlatList
+          data={colorsList}
+          keyExtractor={(item) => item.label.toString()}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              style={styles.companyModalDropdownItem}
+              onPress={() => handleSelectColor(item)}
+              key={item.label}
+            >
+              <View style={styles.companyModalItemContent}>
+                <View style={[styles.colorModalCircle, {backgroundColor: item.Colors.color2}]}>
+                  <Text style={styles.companyModalCircleText}>
+                    {item.label.charAt(0).toUpperCase()}
+                  </Text>
+                </View>
+                <Text style={styles.companyModalDropdownItemText}>
+                  {item.label}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          )}
+          ItemSeparatorComponent={() => (
+            <View style={styles.companyModalSeparator} />
+          )}
+          contentContainerStyle={styles.companyModalFlatListContent}
+        />
+    </View>
+  </View>
+     </Modal>
 
     </View>
   );
 };
 
 // Reusable Setting Item Component
-const SettingItem = ({title, icon, onPress}) => (
-  <TouchableOpacity style={styles.settingItem} onPress={onPress}>
-    <View style={styles.settingIconContainer}>
-      <Image source={icon} style={styles.settingIcon} />
-    </View>
-    <Text style={styles.settingText}>{title}</Text>
-  </TouchableOpacity>
-);
 
-const styles = StyleSheet.create({
+
+const getStyles = (colors) => StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f8f9fa',
@@ -325,7 +478,7 @@ const styles = StyleSheet.create({
   profileContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: color.color2,
+    backgroundColor: colors.color2,
     padding: 20,
     borderRadius: 15,
     marginBottom: 20,
@@ -378,7 +531,7 @@ const styles = StyleSheet.create({
   settingIcon: {
     width: 20,
     height: 20,
-    tintColor: color.color2,
+    tintColor: colors.color2,
   },
   settingText: {
     fontSize: 16,
@@ -434,8 +587,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 
-
-
   companyModalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -446,6 +597,19 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 20,
     padding: 10,
     height: '70%',
+    // overflow: 'hidden',
+    paddingVertical: 8,
+    position: 'absolute',
+    bottom: 0,
+    width: '100%',
+
+  },
+  colorModalContainer: {
+    backgroundColor: 'white',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 10,
+    height: '60%',
     // overflow: 'hidden',
     paddingVertical: 8,
     position: 'absolute',
@@ -510,7 +674,15 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: color.color2,
+    backgroundColor: colors.color2,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 20,
+  },
+  colorModalCircle: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 20,

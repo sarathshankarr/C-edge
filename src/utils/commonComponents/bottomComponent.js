@@ -1,10 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import {StyleSheet,Text,TouchableOpacity, View,} from 'react-native';
 import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
 import fonts from './../commonStyles/fonts';
-import color from '../commonStyles/color';
+import { ColorContext } from '../../components/colorTheme/colorTheme';
 
 const BottomComponent = ({navigation, route,leftBtnTitle,rightBtnTitle,isLeftBtnEnable,isRightBtnEnable,rigthBtnState,...props }) => {
+
+
+    const { colors } = useContext(ColorContext);
+    const styles = getStyles(colors);
 
     const leftButtonAction = () => {
         props.leftButtonAction();
@@ -32,7 +36,7 @@ const BottomComponent = ({navigation, route,leftBtnTitle,rightBtnTitle,isLeftBtn
 
 export default BottomComponent;
 
-const styles = StyleSheet.create({
+const getStyles = (colors) => StyleSheet.create({
 
     mainComponentStyle : {
         width:wp('100%'),
@@ -45,7 +49,7 @@ const styles = StyleSheet.create({
     },
 
     rightButtonstyleEnable: {
-        backgroundColor: color.color2,
+        backgroundColor: colors.color2,
         flex:1,
         height: hp("7%"),
         borderRadius: hp("0.5%"),

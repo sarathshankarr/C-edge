@@ -338,7 +338,7 @@
 //   },
 // });
 
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useContext, useEffect, useRef, useState} from 'react';
 import {
   View,
   StyleSheet,
@@ -361,11 +361,12 @@ import LoaderComponent from './../../utils/commonComponents/loaderComponent';
 import AlertComponent from './../../utils/commonComponents/alertComponent';
 import {CONFIRM_OTP, REQUEST_OTP} from '../../utils/apiCalls/apiCallsComponent';
 import axios from 'axios';
-import color from '../../utils/commonStyles/color';
+import { ColorContext } from '../colorTheme/colorTheme';
 
 let Logo = require('./../../../assets/images/png/Logo.png');
 
 const EnterOtp = ({navigation, route, ...props}) => {
+
   const [loading, setLoading] = useState(false);
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [resendDisabled, setResendDisabled] = useState(false);
@@ -381,6 +382,11 @@ const EnterOtp = ({navigation, route, ...props}) => {
   const [popUpAlert, set_popUpAlert] = useState(undefined);
   const [popUpRBtnTitle, set_popUpRBtnTitle] = useState(undefined);
   const [isPopupLeft, set_isPopupLeft] = useState(false);
+
+
+  const { colors } = useContext(ColorContext);
+  const styles = getStyles(colors);
+
 
   useEffect(() => {
     if (route?.params) {
@@ -663,7 +669,7 @@ const EnterOtp = ({navigation, route, ...props}) => {
 
 export default EnterOtp;
 
-const styles = StyleSheet.create({
+const getStyles = (colors) => StyleSheet.create({
   mainComponentStyle: {
     flex: 1,
     alignItems: 'center',
@@ -687,7 +693,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: '500',
-    color:color.color2,
+    color:colors.color2,
     fontFamily: 'serif',
     marginBottom: 30,
     // textAlign: 'left',
@@ -713,7 +719,7 @@ const styles = StyleSheet.create({
   // Login Button
   loginBtnStyle: {
     width: '80%',
-    backgroundColor: color.color2,
+    backgroundColor: colors.color2,
     paddingVertical: 12,
     borderRadius: 25,
     justifyContent: 'center',
@@ -751,7 +757,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   resendText: {
-    color: color.color2,
+    color: colors.color2,
     fontSize: 16,
     fontWeight: 'bold',
   },

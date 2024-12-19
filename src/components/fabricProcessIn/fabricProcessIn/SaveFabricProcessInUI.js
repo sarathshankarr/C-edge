@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useContext} from 'react';
 import {
   View,
   Text,
@@ -22,10 +22,15 @@ import BottomComponent from '../../../utils/commonComponents/bottomComponent';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import {formatDateIntoDMY} from '../../../utils/constants/constant';
 import {RadioButton, TextInput} from 'react-native-paper';
-import color from '../../../utils/commonStyles/color';
+import { ColorContext } from '../../colorTheme/colorTheme';
 
 let downArrowImg = require('./../../../../assets/images/png/dropDownImg.png');
 const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
+
+  const { colors } = useContext(ColorContext);
+  const styles = getStyles(colors);
+
+
   useEffect(() => {
     if (props.itemsObj) {
       // console.log("Props from data =========> ", props.itemsObj.processMap);
@@ -653,7 +658,7 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
             <View style={{position: 'relative'}}>
               <Text
                 style={{
-                  backgroundColor: color.color2,
+                  backgroundColor: colors.color2,
                   color: 'white',
                   padding: 3,
                   paddingHorizontal: 10,
@@ -892,7 +897,7 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
             <View style={{position: 'relative'}}>
               <Text
                 style={{
-                  backgroundColor: color.color2,
+                  backgroundColor: colors.color2,
                   color: 'white',
                   padding: 3,
                   paddingHorizontal: 10,
@@ -919,7 +924,7 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
             <View style={{position: 'relative'}}>
               <Text
                 style={{
-                  backgroundColor: color.color2,
+                  backgroundColor: colors.color2,
                   color: 'white',
                   padding: 3,
                   paddingHorizontal: 10,
@@ -946,7 +951,7 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
             <View style={{position: 'relative'}}>
               <Text
                 style={{
-                  backgroundColor: color.color2,
+                  backgroundColor: colors.color2,
                   color: 'white',
                   padding: 3,
                   paddingHorizontal: 10,
@@ -973,7 +978,7 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
             <View style={{position: 'relative'}}>
               <Text
                 style={{
-                  backgroundColor: color.color2,
+                  backgroundColor: colors.color2,
                   color: 'white',
                   padding: 3,
                   paddingHorizontal: 10,
@@ -1000,7 +1005,7 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
             <View style={{position: 'relative'}}>
               <Text
                 style={{
-                  backgroundColor: color.color2,
+                  backgroundColor: colors.color2,
                   color: 'white',
                   padding: 3,
                   paddingHorizontal: 10,
@@ -1027,7 +1032,7 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
             <View style={{position: 'relative'}}>
               <Text
                 style={{
-                  backgroundColor: color.color2,
+                  backgroundColor: colors.color2,
                   color: 'white',
                   padding: 3,
                   paddingHorizontal: 10,
@@ -1097,7 +1102,7 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
                         />
                          <Text
                           style={{
-                            backgroundColor: color.color2,
+                            backgroundColor: colors.color2,
                             color: '#000',
                             padding: 2,
                             paddingHorizontal: 10,
@@ -1169,7 +1174,7 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
 
 export default SaveFabricProcessInUI;
 
-const styles = StyleSheet.create({
+const getStyles = (colors) => StyleSheet.create({
   popSearchViewStyle: {
     height: hp('40%'),
     width: wp('90%'),
@@ -1256,7 +1261,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderColor: '#ddd',
     padding: 7,
-    backgroundColor: color.color2,
+    backgroundColor: colors.color2,
     alignItems: 'center',
   },
   table_head_captions: {

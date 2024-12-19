@@ -317,7 +317,7 @@
 // });
 
 
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { View, StyleSheet, TouchableOpacity, Text, TextInput, Image, Alert, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native';
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
@@ -330,7 +330,7 @@ import axios from 'axios';
 import * as APIServiceCall from './../../utils/apiCalls/apiCallsComponent';
 import { setUrlInGlobal } from '../../config/environment/environmentConfig';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import color from '../../utils/commonStyles/color';
+import { ColorContext } from '../colorTheme/colorTheme';
 
 
 let hideImg = require('./../../../assets/images/png/hide-password.png');
@@ -338,6 +338,11 @@ let openImg = require('./../../../assets/images/png/show-password.png');
 let Logo = require('./../../../assets/images/png/Logo.png');
 
 const ConfirmPassword = ({ navigation, route, ...props }) => {
+
+  const { colors } = useContext(ColorContext);
+  const styles = getStyles(colors);
+
+
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -596,7 +601,7 @@ const ConfirmPassword = ({ navigation, route, ...props }) => {
 
 export default ConfirmPassword;
 
-const styles = StyleSheet.create({
+const getStyles = (colors) => StyleSheet.create({
   mainComponentStyle: {
     flex: 1,
     alignItems: 'center',
@@ -620,7 +625,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: '500',
-    color: color.color2,
+    color: colors.color2,
     fontFamily: 'serif',
     marginBottom: 30,
     marginTop: 60,
@@ -650,7 +655,7 @@ const styles = StyleSheet.create({
   inputIcon: {
     width: 20,
     height: 20,
-    tintColor: color.color2,
+    tintColor: colors.color2,
     // tintColor: '#000',
     resizeMode: 'contain',
   },
@@ -685,7 +690,7 @@ const styles = StyleSheet.create({
   // Login Button
   loginBtnStyle: {
     width: '80%',
-    backgroundColor: color.color2,
+    backgroundColor: colors.color2,
     paddingVertical: 12,
     borderRadius: 25,
     justifyContent: 'center',

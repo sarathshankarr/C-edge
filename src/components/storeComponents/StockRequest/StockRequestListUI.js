@@ -1,4 +1,4 @@
-import React, {useState, useRef} from 'react';
+import React, {useState, useRef, useContext} from 'react';
 import {
   View,
   StyleSheet,
@@ -19,9 +19,9 @@ import CommonStyles from './../../../utils/commonStyles/commonStyles';
 import HeaderComponent from '../../../utils/commonComponents/headerComponent';
 import LoaderComponent from './../../../utils/commonComponents/loaderComponent';
 import AlertComponent from './../../../utils/commonComponents/alertComponent';
-import color from '../../../utils/commonStyles/color';
 import FilterModal from '../../../utils/commonComponents/FilterModal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { ColorContext } from '../../colorTheme/colorTheme';
 // import { useNavigation } from '@react-navigation/native';
 
 let searchImg = require('./../../../../assets/images/png/searchIcon.png');
@@ -30,6 +30,8 @@ let addImg = require('./../../../../assets/images/png/addition.png');
 
 const StockRequestListUI = ({navigation, route, ...props}) => {
 
+  const { colors } = useContext(ColorContext);
+  const styles = getStyles(colors);
 
   const [isListOpen, set_ListOpen] = useState(false);
   const [filterArray, set_filterArray] = useState(undefined);
@@ -350,11 +352,11 @@ const StockRequestListUI = ({navigation, route, ...props}) => {
   >
     <Image
       source={filterImg}
-      style={{ height: 25, width: 25, tintColor: showFilteredList ? color.color2 : '#7F7F81', marginRight: 10 }}
+      style={{ height: 25, width: 25, tintColor: showFilteredList ? colors.color2 : '#7F7F81', marginRight: 10 }}
     />
     {
       filterCount ?
-      <Text style={{ color: '#7F7F81', fontSize: 14, backgroundColor:color.color2, borderRadius:30,color:'#fff', padding:5 }}>{filterCount}</Text> :
+      <Text style={{ color: '#7F7F81', fontSize: 14, backgroundColor:colors.color2, borderRadius:30,color:'#fff', padding:5 }}>{filterCount}</Text> :
       <Text style={{ color: '#7F7F81', fontSize: 14 }}>{"Filter"}</Text> 
     }
     
@@ -368,7 +370,7 @@ const StockRequestListUI = ({navigation, route, ...props}) => {
                 }}>
                 <Image
                   source={addImg}
-                  style={{height: 40, width: 40, marginLeft: 15, tintColor:color.color2}}
+                  style={{height: 40, width: 40, marginLeft: 15, tintColor:colors.color2}}
                 />
               </TouchableOpacity>
 </View>
@@ -489,7 +491,7 @@ const StockRequestListUI = ({navigation, route, ...props}) => {
 
 export default StockRequestListUI;
 
-const styles = StyleSheet.create({
+const getStyles = (colors) => StyleSheet.create({
   leftBtnTextStyle: {
     color: 'white',
     fontSize: fonts.fontMedium,
@@ -499,7 +501,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   leftButtonstyle: {
-    backgroundColor: color.color2,
+    backgroundColor: colors.color2,
     // flex:1,
     height: hp('6%'),
     borderRadius: hp('0.5%'),

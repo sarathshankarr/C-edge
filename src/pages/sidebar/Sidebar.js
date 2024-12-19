@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useRef} from 'react';
+import React, {useEffect, useState, useRef, useContext} from 'react';
 import {
   Animated,
   Image,
@@ -10,8 +10,8 @@ import {
   ScrollView,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import color from '../../utils/commonStyles/color';
 import {Easing} from 'react-native';
+import { ColorContext } from '../../components/colorTheme/colorTheme';
 
 const dropdownMenus = {
   style: {
@@ -139,7 +139,11 @@ const Sidebar = ({navigation}) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [openDropdown, setOpenDropdown] = React.useState(null);
   const [selectedDropdown, setSelectedDropdown] = useState(null);
-  const [tempBackgroundEffect, setTempBackgroundEffect] = useState({}); // Track effect per dropdown
+  const [tempBackgroundEffect, setTempBackgroundEffect] = useState({}); 
+  
+  const { colors } = useContext(ColorContext);
+  const styles = getStyles(colors);
+
 
   const toggleDropdown = key => {
     setOpenDropdown(prev => (prev === key ? null : key));
@@ -293,6 +297,15 @@ const Sidebar = ({navigation}) => {
     );
   };
 
+  const NavItem = ({ title, icon, onPress }) => (
+    <TouchableOpacity style={styles.navItem} onPress={onPress}>
+      <View style={styles.navIconContainer}>
+        <Image style={styles.navIcon} source={icon} />
+      </View>
+      <Text style={styles.navText}>{title}</Text>
+    </TouchableOpacity>
+  );
+
   return (
     <View style={styles.container}>
       {/* Header */}
@@ -379,19 +392,12 @@ const Sidebar = ({navigation}) => {
 
 
 
-const NavItem = ({ title, icon, onPress }) => (
-  <TouchableOpacity style={styles.navItem} onPress={onPress}>
-    <View style={styles.navIconContainer}>
-      <Image style={styles.navIcon} source={icon} />
-    </View>
-    <Text style={styles.navText}>{title}</Text>
-  </TouchableOpacity>
-);
+
 
 
 export default Sidebar;
 
-const styles = StyleSheet.create({
+const getStyles = (colors) => StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
@@ -400,7 +406,7 @@ const styles = StyleSheet.create({
   scrollContent: {paddingBottom:20},
   // Header styles
   headerContainer: {
-    backgroundColor: color.color2,
+    backgroundColor: colors.color2,
     paddingVertical: 20,
     paddingHorizontal: 15,
     borderBottomLeftRadius: 20,
@@ -469,14 +475,14 @@ const styles = StyleSheet.create({
       borderBottomWidth:1,
       borderColor:'#EAEAEA',
   },
-navIcon: {width: 20, height: 20, tintColor: color.color2},
+navIcon: {width: 20, height: 20, tintColor: colors.color2},
 navText: {fontSize: 16, color: '#333',flexDirection:'row',flexWrap: 'wrap',flex: 1,textAlign: 'left',},
 bottomSection: {flexDirection: 'row', justifyContent: 'space-around', marginTop: 'auto', padding: 20},
 logoutButton: {alignItems: 'center'},
-logoutIcon: {width: 30, height: 30, tintColor:color.color2},
+logoutIcon: {width: 30, height: 30, tintColor:colors.color2},
 logoutText: {color: '#333', marginTop: 5, fontSize: 14},
 deleteButton: {alignItems: 'center'},
-deleteIcon: {width: 30, height: 30, tintColor:color.color2},
+deleteIcon: {width: 30, height: 30, tintColor:colors.color2},
 deleteText: {color: '#f00', marginTop: 5, fontSize: 14},
   modalContainer: {
     flex: 1,
@@ -522,7 +528,7 @@ deleteText: {color: '#f00', marginTop: 5, fontSize: 14},
   },
   selectedDropdownHeader: {
     borderLeftWidth: 5,
-    borderColor: color.color2,
+    borderColor: colors.color2,
     elevation: 5,
     backgroundColor: '#fff',
   },
@@ -530,11 +536,11 @@ deleteText: {color: '#f00', marginTop: 5, fontSize: 14},
     backgroundColor: '#f7f7f7',
   },
   selectedIcon: {
-    tintColor: color.color2,
+    tintColor: colors.color2,
   },
 
   selectedText: {
-    color: color.color2,
+    color: colors.color2,
   },
   animatedDropdownContent: {
     overflow: 'hidden', // Ensures content is clipped during animation

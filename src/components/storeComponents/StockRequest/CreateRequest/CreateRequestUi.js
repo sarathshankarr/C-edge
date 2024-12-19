@@ -1,4 +1,4 @@
-import React, {useState, useRef, useEffect} from 'react';
+import React, {useState, useRef, useEffect, useContext} from 'react';
 import {
   View,
   FlatList,
@@ -26,13 +26,15 @@ import CustomCheckBox from '../../../../utils/commonComponents/CustomCheckBox';
 import {RadioButton} from 'react-native-paper';
 import * as APIServiceCall from '../../../../utils/apiCalls/apiCallsComponent';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import color from '../../../../utils/commonStyles/color';
+import { ColorContext } from '../../../colorTheme/colorTheme';
 
 let downArrowImg = require('./../../../../../assets/images/png/dropDownImg.png');
 let closeImg = require('./../../../../../assets/images/png/close1.png');
 
 const CreateRequestUi = ({route, ...props}) => {
   const [rows, setRows] = React.useState([]);
+  const { colors } = useContext(ColorContext);
+  const styles = getStyles(colors);
 
   const [data, setData] = useState([]);
   const [stockTable, set_stockTable] = useState([]);
@@ -1435,7 +1437,7 @@ const CreateRequestUi = ({route, ...props}) => {
               <TouchableOpacity
                 onPress={addRow}
                 style={{
-                  backgroundColor: color.color2,
+                  backgroundColor: colors.color2,
                   paddingVertical: 10,
                   paddingHorizontal: 20,
                   borderRadius: 5,
@@ -1751,7 +1753,7 @@ const CreateRequestUi = ({route, ...props}) => {
 
 export default CreateRequestUi;
 
-const styles = StyleSheet.create({
+const getStyles = (colors) => StyleSheet.create({
   popSearchViewStyle: {
     height: hp('40%'),
     width: wp('90%'),
@@ -1843,7 +1845,7 @@ const styles = StyleSheet.create({
     borderColor: '#ddd',
     paddingVertical: 10,
     paddingHorizontal: 5,
-    backgroundColor: color.color2,
+    backgroundColor: colors.color2,
     alignItems: 'center',
   },
 

@@ -1,11 +1,13 @@
-import React, { useEffect } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View, Keyboard, ScrollView } from 'react-native';
 import { heightPercentageToDP as hp, widthPercentageToDP as wp, } from "react-native-responsive-screen";
 import fonts from './../commonStyles/fonts'
 import CommonStyles from './../commonStyles/commonStyles';
-import color from '../commonStyles/color';
+import { ColorContext } from '../../components/colorTheme/colorTheme';
 
 const AlertComponent = ({ navigation, route, header, message, isLeftBtnEnable, isRightBtnEnable, leftBtnTilte, rightBtnTilte, ...props }) => {
+    const { colors } = useContext(ColorContext);
+    const styles = getStyles(colors);
 
     useEffect(() => {
         Keyboard.dismiss();
@@ -55,7 +57,7 @@ const AlertComponent = ({ navigation, route, header, message, isLeftBtnEnable, i
 
 export default AlertComponent;
 
-const styles = StyleSheet.create({
+const getStyles = (colors) => StyleSheet.create({
     
     componentStyle: {
         width: wp('100%'),
@@ -97,7 +99,7 @@ const styles = StyleSheet.create({
     btnRightStyle: {
         flex: 1,
         height: wp('10%'),
-        backgroundColor: color.color2,
+        backgroundColor: colors.color2,
         justifyContent: 'center',
         alignItems: "center",
         borderRadius: 5,
@@ -121,7 +123,7 @@ const styles = StyleSheet.create({
     singleBtnStyle: {
         width: wp('70%'),
         height: wp('10%'),
-        backgroundColor:color.color2,
+        backgroundColor:colors.color2,
         justifyContent: 'center',
         alignItems: "center",
         borderRadius: 5,

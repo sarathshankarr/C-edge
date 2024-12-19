@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useContext} from 'react';
 import {
   View,
   Text,
@@ -21,13 +21,16 @@ import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import BottomComponent from '../../../utils/commonComponents/bottomComponent';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import {RadioButton, TextInput} from 'react-native-paper';
-import color from '../../../utils/commonStyles/color';
 import { useNavigation } from '@react-navigation/native';
+import { ColorContext } from '../../colorTheme/colorTheme';
 
 let downArrowImg = require('./../../../../assets/images/png/dropDownImg.png');
 
 const GatePassAckEditUI = ({route, ...props}) => {
   const navigation = useNavigation();
+  const { colors } = useContext(ColorContext);
+
+  const styles = getStyles(colors);
 
 const [documentNo, set_documentNo] = useState('');
 const [invoiceChallanNo, set_invoiceChallanNo] = useState('');
@@ -997,7 +1000,7 @@ const [ackBtnEnable, set_ackBtnEnable]=useState(true);
 
 export default GatePassAckEditUI;
 
-const styles = StyleSheet.create({
+const getStyles = (colors) => StyleSheet.create({
   popSearchViewStyle: {
     height: hp('40%'),
     width: wp('90%'),
@@ -1164,7 +1167,7 @@ const styles = StyleSheet.create({
 },
 
 rightButtonstyleEnable: {
-    backgroundColor: color.color2,
+    backgroundColor: colors.color2,
     flex:1,
     height: hp("7%"),
     borderRadius: hp("0.5%"),
@@ -1183,7 +1186,7 @@ rightButtonstyleEnable: {
 
   leftButtonstyle : {
     // backgroundColor: "white",
-    backgroundColor: color.color2,
+    backgroundColor: colors.color2,
     flex:1,
     height: hp("7%"),
     borderRadius: hp("0.5%"),
@@ -1196,7 +1199,7 @@ rightButtonstyleEnable: {
 
   leftButtonstyle1 : {
     // backgroundColor: "white",
-    backgroundColor: color.color2,
+    backgroundColor: colors.color2,
     flex:1.3,
     height: hp("7%"),
     borderRadius: hp("0.5%"),

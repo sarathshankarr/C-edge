@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
 import { View, StyleSheet, TouchableOpacity, Text, FlatList, Image, TextInput, Button } from 'react-native';
 import { heightPercentageToDP as hp, widthPercentageToDP as wp, } from "react-native-responsive-screen";
 import CommonStyles from '../../utils/commonStyles/commonStyles';
@@ -7,7 +7,7 @@ import fonts from '../../utils/commonStyles/fonts';
 import LoaderComponent from '../../utils/commonComponents/loaderComponent';
 import * as Constant from '../../utils/constants/constant';
 import AlertComponent from '../../utils/commonComponents/alertComponent';
-import color from '../../utils/commonStyles/color';
+import { ColorContext } from '../colorTheme/colorTheme';
 
 // let searchImg = require('./../../../../assets/images/png/searchIcon.png');
 let searchImg = require('./../../../assets/images/png/searchIcon.png');
@@ -19,6 +19,7 @@ const NotificationsUI = ({ route, ...props }) => {
   // const [recName, set_recName] = useState(undefined);
   // let isKeyboard = useRef(false);
   const [filterArray, set_filterArray] = useState([]);
+  const { colors } = useContext(ColorContext);
 
 
   React.useEffect(() => {
@@ -92,7 +93,7 @@ const NotificationsUI = ({ route, ...props }) => {
     <View style={[CommonStyles.mainComponentViewStyle]}>
 
       <View style={[CommonStyles.headerView]}>
-        <View style={{ flex: 1, backgroundColor: color.color2 }}>
+        <View style={{ flex: 1, backgroundColor: colors.color2 }}>
           <View style={[styles.headerView]}>
             <View style={{ flexDirection: 'row', position: 'absolute' }}>
               <View style={{ justifyContent: 'center' }}>

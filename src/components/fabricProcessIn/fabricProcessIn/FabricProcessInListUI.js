@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, {useState, useEffect, useRef, useContext} from 'react';
 import {
   View,
   StyleSheet,
@@ -21,9 +21,9 @@ import HeaderComponent from '../../../utils/commonComponents/headerComponent';
 import LoaderComponent from '../../../utils/commonComponents/loaderComponent';
 import * as Constant from '../../../utils/constants/constant';
 import AlertComponent from '../../../utils/commonComponents/alertComponent';
-import color from '../../../utils/commonStyles/color';
 import FilterModal from '../../../utils/commonComponents/FilterModal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { ColorContext } from '../../colorTheme/colorTheme';
 let searchImg = require('./../../../../assets/images/png/searchIcon.png');
 let addImg = require('./../../../../assets/images/png/addition.png');
 let addImg1 = require('./../../../../assets/images/png/add.png');
@@ -41,6 +41,7 @@ const FabricProcessInListUI = ({route, navigation, ...props}) => {
   const [isFiltering, setIsFiltering] = useState(false); 
   const [filterReqBody, setfilterReqBody] = useState({}); 
 
+  const { colors } = useContext(ColorContext);
 
 
   const [categories, set_categories]=useState([
@@ -314,11 +315,11 @@ const FabricProcessInListUI = ({route, navigation, ...props}) => {
   >
     <Image
       source={filterImg}
-      style={{ height: 25, width: 25, tintColor: showFilteredList ? color.color2 : '#7F7F81', marginRight: 10 }}
+      style={{ height: 25, width: 25, tintColor: showFilteredList ? colors.color2 : '#7F7F81', marginRight: 10 }}
     />
     {
       filterCount ?
-      <Text style={{ color: '#7F7F81', fontSize: 14, backgroundColor:color.color2, borderRadius:30,color:'#fff', padding:5 }}>{filterCount}</Text> :
+      <Text style={{ color: '#7F7F81', fontSize: 14, backgroundColor:colors.color2, borderRadius:30,color:'#fff', padding:5 }}>{filterCount}</Text> :
       <Text style={{ color: '#7F7F81', fontSize: 14 }}>{"Filter"}</Text> 
     }
     
@@ -332,7 +333,7 @@ const FabricProcessInListUI = ({route, navigation, ...props}) => {
                 }}>
                 <Image
                   source={addImg}
-                  style={{height: 40, width: 40, marginLeft: 15, tintColor:color.color2}}
+                  style={{height: 40, width: 40, marginLeft: 15, tintColor:colors.color2}}
                 />
               </TouchableOpacity>
 </View>
@@ -458,7 +459,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   leftButtonstyle: {
-    // backgroundColor: color.color2,
+    // backgroundColor: colors.color2,
     // flex:1,
     height: hp('6%'),
     borderRadius: hp('0.5%'),

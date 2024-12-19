@@ -242,7 +242,7 @@
 //   },
 // });
 
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { View, StyleSheet, TouchableOpacity, Text, TextInput, Image, Alert, KeyboardAvoidingView, Platform } from 'react-native';
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
@@ -254,7 +254,7 @@ import { CUSTOMER_URL } from '../../config/environment/environmentConfig';
 import { REQUEST_OTP } from '../../utils/apiCalls/apiCallsComponent';
 import { isValidUrl } from '../../utils/helper/helper';
 import axios from 'axios';
-import color from '../../utils/commonStyles/color';
+import { ColorContext } from '../colorTheme/colorTheme';
 
 let lock = require('./../../../assets/images/png/padlock.png');
 let Logo = require('./../../../assets/images/png/Logo.png');
@@ -262,6 +262,7 @@ let emailImg = require('./../../../assets/images/png/email.png');
 
 
 const MailConfirmation = ({ navigation, route, }) => {
+
   const [email, setEmail] = useState('');
   const [code, setCode] = useState('');
   const [loading, setLoading] = useState(false);
@@ -272,6 +273,10 @@ const MailConfirmation = ({ navigation, route, }) => {
   const [popUpAlert, set_popUpAlert] = useState(undefined);
   const [popUpRBtnTitle, set_popUpRBtnTitle] = useState(undefined);
   const [isPopupLeft, set_isPopupLeft] = useState(false);
+
+  const { colors } = useContext(ColorContext);
+  const styles = getStyles(colors);
+
 
   // const signInAction = () => {
   //   // navigation.navigate('LoginComponent');
@@ -449,7 +454,7 @@ const MailConfirmation = ({ navigation, route, }) => {
 
 export default MailConfirmation;
 
-const styles = StyleSheet.create({
+const getStyles = (colors) => StyleSheet.create({
   mainComponentStyle: {
     flex: 1,
     alignItems: 'center',
@@ -473,7 +478,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: '500',
-    color: color.color2,
+    color: colors.color2,
     fontFamily: 'serif',
     marginBottom: 30,
     // textAlign: 'left',
@@ -503,7 +508,7 @@ const styles = StyleSheet.create({
   inputIcon: {
     width: 20,
     height: 20,
-    tintColor: color.color2,
+    tintColor: colors.color2,
     // tintColor: '#000',
     resizeMode: 'contain',
   },
@@ -538,7 +543,7 @@ const styles = StyleSheet.create({
   // Login Button
   loginBtnStyle: {
     width: '80%',
-    backgroundColor: color.color2,
+    backgroundColor: colors.color2,
     paddingVertical: 12,
     borderRadius: 25,
     justifyContent: 'center',

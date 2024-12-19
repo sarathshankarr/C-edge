@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {
   Modal,
   View,
@@ -11,10 +11,10 @@ import {
   Image,
   ActivityIndicator,
 } from 'react-native';
-import color from '../commonStyles/color';
 import CustomCheckBox from './CustomCheckBox';
 import  * as APIServiceCall from './../../utils/apiCalls/apiCallsComponent';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { ColorContext } from '../../components/colorTheme/colorTheme';
 
 const FilterModal = ({isVisible, onClose, categoriesList, selectedCategoryListAPI,applyFilterFxn,clearFilter,reqBody}) => {
 
@@ -29,6 +29,11 @@ const FilterModal = ({isVisible, onClose, categoriesList, selectedCategoryListAP
   const [prepoluateIndices, setPrepoluateIndices] = useState([]); 
   const [prepopulateFilterList, setprepopulateFilterList] = useState([]); 
   const [searchCacheResults, setSearchCacheResults] = useState({}); 
+
+  const { colors } = useContext(ColorContext);
+  const styles = getStyles(colors);
+
+
 
 
 useEffect(()=>{
@@ -198,7 +203,7 @@ const toggleSelection = (item) => {
           <TouchableOpacity onPress={onClose}>
             <Image
               source={require('./../../../assets/images/png/close.png')}
-              style={{width: 30, height: 30, tintColor: color.color2}}
+              style={{width: 30, height: 30, tintColor: colors.color2}}
             />
           </TouchableOpacity>
         </View>
@@ -255,7 +260,7 @@ const toggleSelection = (item) => {
             {/* Right-Side List */}
             {isLoading ? (
                 <View style={styles.loaderContainer}>
-                    <ActivityIndicator size="large" color={color.color2} />
+                    <ActivityIndicator size="large" color={colors.color2} />
                 </View>
             ) : (
             <FlatList
@@ -294,7 +299,7 @@ const toggleSelection = (item) => {
   );
 };
 
-const styles = StyleSheet.create({
+const getStyles = (colors) => StyleSheet.create({
   overlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -344,7 +349,7 @@ const styles = StyleSheet.create({
     // backgroundColor: '#ff6600',
     borderLeftWidth: 3,
     // borderLeftColor: '#ff6600',
-    borderLeftColor: color.color2,
+    borderLeftColor: colors.color2,
   },
   categoryText: {
     fontSize: 14,
@@ -352,7 +357,7 @@ const styles = StyleSheet.create({
   },
   selectedCategoryText: {
     // color: '#ff6600',
-    color: color.color2,
+    color: colors.color2,
     fontWeight: 'bold',
   },
   rightSide: {
@@ -425,7 +430,7 @@ const styles = StyleSheet.create({
     flex: 2,
     paddingVertical: 12,
     // backgroundColor: '#ff6600',
-    backgroundColor: color.color2,
+    backgroundColor: colors.color2,
     borderRadius: 8,
     alignItems: 'center',
   },

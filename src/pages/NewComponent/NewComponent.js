@@ -9,7 +9,6 @@
 // import Inventory from '../bottom/inventory/inventory';
 // import CommonHeader from '../../utils/commonComponents/CommonHeader';
 // import StoreManagement from '../bottom/StoreManagement/StoreManagement';
-// import color from '../../utils/commonStyles/color';
 
 // const BottomTab = createBottomTabNavigator();
 // const Stack = createNativeStackNavigator();
@@ -103,7 +102,7 @@
 
 // export default NewComponent;
 
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Image, View, Text, StyleSheet, useWindowDimensions } from 'react-native';
@@ -114,7 +113,7 @@ import StyleManagement from '../bottom/styleManagement/styleManagement';
 import Inventory from '../bottom/inventory/inventory';
 import CommonHeader from '../../utils/commonComponents/CommonHeader';
 import StoreManagement from '../bottom/StoreManagement/StoreManagement';
-import color from '../../utils/commonStyles/color';
+import { ColorContext } from '../../components/colorTheme/colorTheme';
 
 
 const BottomTab = createBottomTabNavigator();
@@ -130,6 +129,9 @@ const itemsArray = [
 const TabNavigator = () => {
   const { width, height } = useWindowDimensions();
   const landscape = width > height;
+  const { colors } = useContext(ColorContext);
+  const styles = getStyles(colors);
+
 
   return (
     <BottomTab.Navigator
@@ -141,7 +143,7 @@ const TabNavigator = () => {
               style={{
                 width: focused ? 35 : 25,
                 height: focused ? 35 : 25,
-                tintColor: focused ? color.color4 : color.color2,
+                tintColor: focused ? colors.color4 : colors.color2 ,
               }}
             />
           </View>
@@ -192,14 +194,14 @@ const NewComponent = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const getStyles = (colors) => StyleSheet.create({
   tabIconContainer: {
     alignItems: 'center',
     justifyContent: 'center',
   },
   selectedTab: {
     borderTopWidth: 4,
-    borderTopColor: color.color2,
+    borderTopColor: colors.color2,
     width: '65%',
   },
   tabLabel: {
@@ -209,7 +211,7 @@ const styles = StyleSheet.create({
     color: '#000',
   },
   selectedTabLabel: {
-    color: color.color2,
+    color: colors.color2,
     fontWeight: 'bold',
   },
 });
