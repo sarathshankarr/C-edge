@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Image, StyleSheet } from 'react-native';
-import color from '../../../utils/commonStyles/color';
+import { ColorContext } from '../../../components/colorTheme/colorTheme';
 
 const Production = ({ navigation }) => {
+  const { colors } = useContext(ColorContext);
+  const styles = getStyles(colors);
 
   const inwardProcess = [
     { id: 1, name: 'Cutting In', component: 'CuttingMainComponent', image: require('../../../../assets/images/png/scissors.png') },
@@ -59,7 +61,7 @@ const Production = ({ navigation }) => {
   );
 };
 
-const styles = StyleSheet.create({
+const getStyles = (colors) => StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
@@ -104,7 +106,7 @@ const styles = StyleSheet.create({
     width: 27,
     height: 27,
     resizeMode: 'contain',
-    tintColor: color.color2,
+    tintColor: colors.color2,
   },
   iconText: {
     textAlign: 'center',

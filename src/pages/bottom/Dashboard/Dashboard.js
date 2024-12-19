@@ -55,12 +55,15 @@
 // // });
 
 
-import React from 'react';
+import React, { useContext } from 'react';
 import { View, Text, Image, StyleSheet, SafeAreaView } from 'react-native';
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from "react-native-responsive-screen";
+// import { ColorContext } from '../../../components/colorTheme/colorTheme';
 // import CommonStyles from "./../../../utils/commonStyles/commonStyles";
 
 const DashboardComponent = ({ route, ...props }) => {
+  // const { colors } = useContext(ColorContext);
+  // const styles = getStyles(colors);
 
   return (
     <View style={styles.container}>

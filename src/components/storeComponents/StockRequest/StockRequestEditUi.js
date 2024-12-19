@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useContext } from 'react';
 import { View, FlatList, Text, StyleSheet, TouchableOpacity, ScrollView, Image, TextInput } from 'react-native';
 import { heightPercentageToDP as hp, widthPercentageToDP as wp, } from "react-native-responsive-screen";
 
@@ -11,7 +11,7 @@ import TextInputComponent from '../../../utils/commonComponents/textInputCompone
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import BottomComponent from '../../../utils/commonComponents/bottomComponent';
 import CustomCheckBox from '../../../utils/commonComponents/CustomCheckBox';
-import color from '../../../utils/commonStyles/color';
+import { ColorContext } from '../../colorTheme/colorTheme';
 
 let downArrowImg = require('./../../../../assets/images/png/dropDownImg.png');
 
@@ -23,6 +23,8 @@ const StockRequestEditUi = ({ route, ...props }) => {
   const [checkbox, set_checkbox] = useState(false);
   const [remarks, set_remarks] = useState('');
   const [flag, set_flag] = useState(true);
+  const { colors } = useContext(ColorContext);
+  const styles = getStyles(colors);
 
 
   useEffect(() => {
@@ -390,7 +392,7 @@ const StockRequestEditUi = ({ route, ...props }) => {
 
 export default StockRequestEditUi;
 
-const styles = StyleSheet.create({
+const getStyles = (colors) => StyleSheet.create({
 
   popSearchViewStyle: {
     height: hp("40%"),
@@ -471,7 +473,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderColor: '#ddd',
     padding: 7,
-    backgroundColor: color.color2,
+    backgroundColor: colors.color2,
     alignItems: 'center'
   },
   table_head_captions2: {

@@ -206,7 +206,7 @@
 //   },
 // });
 
-import React from 'react';
+import React, { useContext } from 'react';
 import {
   View,
   StyleSheet,
@@ -226,7 +226,7 @@ import CommonStyles from './../../utils/commonStyles/commonStyles';
 import LoaderComponent from './../../utils/commonComponents/loaderComponent';
 import AlertComponent from './../../utils/commonComponents/alertComponent';
 import CustomCheckBox from '../../utils/commonComponents/CustomCheckBox';
-import color from '../../utils/commonStyles/color';
+import { ColorContext } from '../colorTheme/colorTheme';
 
 let hideImg = require('./../../../assets/images/png/hide-password.png');
 let openImg = require('./../../../assets/images/png/show-password.png');
@@ -235,6 +235,10 @@ let Logo = require('./../../../assets/images/png/Logo.png');
 let email = require('./../../../assets/images/png/email.png');
 
 const LoginUI = ({route, ...props}) => {
+
+  const { colors } = useContext(ColorContext);
+  const styles = getStyles(colors);
+
   const validatePassword = psdValue => {
     props.validatePassword(psdValue);
   };
@@ -395,7 +399,7 @@ const LoginUI = ({route, ...props}) => {
 
 export default LoginUI;
 
-const styles = StyleSheet.create({
+const getStyles = (colors) => StyleSheet.create({
   mainComponentStyle: {
     flex: 1,
     alignItems: 'center',
@@ -420,7 +424,7 @@ const styles = StyleSheet.create({
     fontSize: 36,
     fontWeight: '500',
     // color: '#888888',
-    color: color.color2,
+    color: colors.color2,
     // color: 'purple',
     // color: '#000',
     marginBottom: 30,
@@ -431,7 +435,7 @@ const styles = StyleSheet.create({
   titleHighlight: {
     color: '#3BC3FF',
     // color: 'purple',
-    // color: color.color2,
+    // color: colors.color2,
     // color: '#000',
 
     fontWeight: '600',
@@ -461,7 +465,7 @@ const styles = StyleSheet.create({
   inputIcon: {
     width: 20,
     height: 20,
-    tintColor: color.color2,
+    tintColor: colors.color2,
     resizeMode: 'contain',
   },
   input: {
@@ -495,7 +499,7 @@ const styles = StyleSheet.create({
   // Login Button
   loginBtnStyle: {
     width: '80%',
-    backgroundColor: color.color2,
+    backgroundColor: colors.color2,
     paddingVertical: 12,
     borderRadius: 25,
     justifyContent: 'center',

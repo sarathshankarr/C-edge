@@ -1,10 +1,10 @@
 export default  color={
-
    color2: '#26A69A',      // GREEN  
    lightcolor:'#9DE4DC',
    color3:'#DDD'  ,          // GREEN BORDER
    color4:"#007167"  ,          // dark green  
-   color5:'#DDD'  ,          // GREEN BORDER
+   color5:'#DDD' ,          // GREEN BORDER
+   color6:'#DDD' ,          // GREEN BORDER
 }
 
    // //buttons color 

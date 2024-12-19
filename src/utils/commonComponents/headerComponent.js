@@ -1,17 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import {StyleSheet,Text,TouchableOpacity, View,Image} from 'react-native';
 import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
 import fonts from './../commonStyles/fonts';
-import color from '../commonStyles/color';
+import { ColorContext } from '../../components/colorTheme/colorTheme';
 
 const HeaderComponent = ({navigation, route,isChatEnable,isTImerEnable,isSettingsEnable,isBackBtnEnable,title,isTitleHeaderEnable,moduleName,headerColor,...props }) => {
+    const { colors } = useContext(ColorContext);
 
     const backBtnAction = () => {
         props.backBtnAction();
     };
     return (
 
-        <View style={{flex:1,backgroundColor:color.color2, paddingVertical: 17}}>
+        <View style={{flex:1,backgroundColor:colors.color2, paddingVertical: 17}}>
             <View style={[styles.headerView]}>
                 <View style={{flexDirection:'row', position:'absolute'}}>
 
