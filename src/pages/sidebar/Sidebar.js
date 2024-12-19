@@ -21,12 +21,12 @@ const dropdownMenus = {
       {
         label: 'Style',
         route: 'StyleManageComponent',
-        src: require('../../../assets/images/png/stylee.png'),
+        src: require('../../../assets/images/png/shirt.png'),
       },
       {
         label: 'Design Directory Approval',
         route: 'DDAList',
-        src: require('../../../assets/images/png/approve.png'),
+        src: require('../../../assets/images/png/website.png'),
       },
     ],
   },
@@ -37,7 +37,7 @@ const dropdownMenus = {
       {
         label: 'PO Approval',
         route: 'POApproveListComponent',
-        src: require('../../../assets/images/png/validation.png'),
+        src: require('../../../assets/images/png/stamp.png'),
       },
     ],
   },
@@ -226,7 +226,7 @@ const Sidebar = ({navigation}) => {
       setTempBackgroundEffect({[key]: true});
       setTimeout(() => setTempBackgroundEffect({[key]: false}), 2000);
 
-      console.log("slected dropdown ====> ", menu.style[0].label==="Location Wise Style Inventory");
+      // console.log("slected dropdown ====> ", menu.style[0].label==="Location Wise Style Inventory");
       // Animate dropdown height
       Animated.timing(animationValue, {
         toValue: isSelected ? 0 : menu.style[0].label==="Location Wise Style Inventory" ? menu.style.length * 80 : menu.style.length * 60, 

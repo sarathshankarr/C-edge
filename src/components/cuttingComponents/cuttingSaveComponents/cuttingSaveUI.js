@@ -217,7 +217,7 @@ const CuttingSaveUI = ({ route, ...props }) => {
 
   return (
 
-    <TouchableWithoutFeedback onPress={() => set_isBatchType(false)}>
+    // <TouchableWithoutFeedback onPress={() => set_isBatchType(false)}>
 
       <View style={[CommonStyles.mainComponentViewStyle]}>
 
@@ -233,61 +233,28 @@ const CuttingSaveUI = ({ route, ...props }) => {
           />
         </View>
 
-        <View style={{ marginTop: hp('3%') }}>
-
-          <View style={{ flexDirection: 'row', width: wp('90%') }}>
-            <Text style={[CommonStyles.tylesHeaderTextStyle, { textAlign: 'left' }]}>{'Style - '}</Text>
-            <Text style={[CommonStyles.tylesHeaderTextStyle, { textAlign: 'left' }]}>{props.itemsObj ? props.itemsObj.styleName : null}</Text>
-          </View>
+        <View style={{ marginTop: hp('3%'), width: wp('90%'), }}>
+          <View style={{flexDirection :'row', justifyContent:'space-between'}}>
+          <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:1,textAlign:'left'}]}>{'Style'}</Text>
+          <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:0.3}]}>{' :  '}</Text>
+          <Text style={[CommonStyles.tylesTextStyle,{flex:3,textAlign:'left'}]}>{props.itemsObj ? props.itemsObj.styleName : null}</Text>
+        </View> 
 
         </View>
 
         <View style={{ marginTop: hp('3%'), width: wp('90%'), marginBottom: hp('2%') }}>
-
-          <View style={{ flexDirection: 'row', width: wp('70%') }}>
-            <Text style={[CommonStyles.tylesHeaderTextStyle, { textAlign: 'left' }]}>{'Main Fabric - '}</Text>
-            <Text style={[CommonStyles.tylesHeaderTextStyle, { textAlign: 'left' }]}>{props.itemsObj ? props.itemsObj.fabricName : null}</Text>
-          </View>
+          <View style={{flexDirection :'row', justifyContent:'space-between'}}>
+          <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:1,textAlign:'left'}]}>{'Main Fabric'}</Text>
+          <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:0.3}]}>{' :  '}</Text>
+          <Text style={[CommonStyles.tylesTextStyle,{flex:3,textAlign:'left'}]}>{props.itemsObj ? props.itemsObj.fabricName : null}</Text>
+        </View> 
 
         </View>
 
 
         <View style={{ marginBottom: hp('5%') }}>
           <KeyboardAwareScrollView enableOnAndroid={true} extraHeight={130} extraScrollHeight={130} showsVerticalScrollIndicator={false}>
-
-            {/* <TouchableOpacity style={{ flexDirection: 'row', borderWidth: 0.5, borderColor: "#D8D8D8", borderRadius: hp("0.5%"), width: wp("90%"), }} onPress={() => { set_isBatchType(!isBatchType) }} >
-
-              <View>
-                <View style={[styles.SectionStyle1, {}]}>
-
-                  <View style={{ flexDirection: 'column', }}>
-                    <Text style={batchText ? [styles.dropTextLightStyle] : [styles.dropTextInputStyle]}>{'Select Batch '}</Text>
-                    {batchText ? <Text style={[styles.dropTextInputStyle]}>{batchText}</Text> : null}
-                  </View>
-                </View>
-              </View>
-
-              <View style={{ justifyContent: 'center' }}>
-                <Image source={downArrowImg} style={styles.imageStyle} />
-              </View>
-
-            </TouchableOpacity>
-
-            {isBatchType ? (
-              <View style={styles.popSearchViewStyle}>
-                <ScrollView nestedScrollEnabled={true}>
-                {Object.keys(batchMapArr).map((item, index) => (
-                    <TouchableOpacity key={item} onPress={() => actionOnBatchtype(item, batchMapArr[item])}>
-                      <View style={styles.flatview}>
-                        <Text style={styles.dropTextInputStyle}>{batchMapArr[item]}</Text>
-                      </View>
-                    </TouchableOpacity>
-                  ))}
-                </ScrollView>
-              </View>
-            ) : null} */}
-
-
+           
             <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: hp('2%'), backgroundColor: '#f8f8f8' }}>
               <TouchableOpacity
                 style={{ flexDirection: 'row', borderWidth: 0.5, borderColor: "#D8D8D8", borderRadius: hp("0.5%"), width: wp("90%") }}
@@ -448,6 +415,7 @@ const CuttingSaveUI = ({ route, ...props }) => {
                 autoCapitalize={"none"}
                 keyboardType={'numeric'}
                 setValue={(textAnswer) => { }}
+                
               />
 
             </View>
@@ -458,6 +426,7 @@ const CuttingSaveUI = ({ route, ...props }) => {
                 inputText={actualConsumption?.toString()}
                 labelText={'Actual Consumption'}
                 isEditable={false}
+                
                 maxLengthVal={10}
                 autoCapitalize={"none"}
                 keyboardType={'numeric'}
@@ -476,6 +445,7 @@ const CuttingSaveUI = ({ route, ...props }) => {
                 autoCapitalize={"none"}
                 keyboardType={'numeric'}
                 setValue={(textAnswer) => { }}
+                
               />
 
             </View>
@@ -511,7 +481,7 @@ const CuttingSaveUI = ({ route, ...props }) => {
               <TextInputComponent
                 inputText={fabricReturn.toString()}
                 labelText={'Fabric Returned'}
-                isEditable={false}
+                isEditable={false}              
                 maxLengthVal={10}
                 autoCapitalize={"none"}
                 keyboardType={'numeric'}
@@ -523,7 +493,7 @@ const CuttingSaveUI = ({ route, ...props }) => {
               <TextInputComponent
                 inputText={dailyConsumption.toString()}
                 labelText={' Total Daily Consumption'}
-                isEditable={true}
+                isEditable={false}
                 maxLengthVal={10}
                 autoCapitalize={"none"}
                 keyboardType={'numeric'}
@@ -594,7 +564,7 @@ const CuttingSaveUI = ({ route, ...props }) => {
         {props.isLoading === true ? <LoaderComponent isLoader={true} loaderText={Constant.LOADER_MESSAGE} isButtonEnable={false} /> : null}
 
       </View>
-    </TouchableWithoutFeedback>
+    // </TouchableWithoutFeedback>
   );
 }
 
