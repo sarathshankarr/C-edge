@@ -103,13 +103,21 @@ const CommonStyles = StyleSheet.create({
         color : 'white',
     },
 
-    mainComponentViewStyle : {
-        flex:1,
-        backgroundColor:'white',
-        alignItems :'center',
-        backgroundColor: '#f0f0f0'
-    },
-  
+    // mainComponentViewStyle : {
+    //     flex:1,
+    //     backgroundColor:'white',
+    //     alignItems :'center',
+    //     backgroundColor: '#f0f0f0',
+    //     width:'full'
+    // },
+    mainComponentViewStyle: {
+        flex: 1,
+        backgroundColor: '#f0f0f0',
+        alignItems: 'center',
+        width: '100%',  // Make sure it takes the full width of the screen
+        justifyContent: 'flex-start',  // Ensure it starts from the top if needed
+      },
+      
     headerStyle : {
         flex:1,
         minHeight:hp('10%'),

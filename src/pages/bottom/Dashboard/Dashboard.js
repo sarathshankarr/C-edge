@@ -99,24 +99,24 @@ const styles = StyleSheet.create({
   contentWrapper: {
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: wp(5),
+    paddingHorizontal: wp('5%'),
   },
   image: {
-    width: wp(50),
-    height: hp(25),
-    marginBottom: hp(2),
+    width: wp('50%'),
+    height: hp('25%'),
+    marginBottom: hp('2%'),
   },
   title: {
-    fontSize: wp(6),
+    fontSize: wp('6%'),
     fontWeight: 'bold',
     color: '#333',
-    marginBottom: hp(1),
+    marginBottom: hp('1%'),
   },
   subtitle: {
-    fontSize: wp(4),
+    fontSize: wp('4%'),
     textAlign: 'center',
     color: '#666',
-    lineHeight: wp(5.5),
+    lineHeight: wp('5.5%'),
   },
 });
 
