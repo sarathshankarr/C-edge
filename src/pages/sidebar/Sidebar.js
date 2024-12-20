@@ -369,9 +369,9 @@ const Sidebar = ({navigation}) => {
             onPress={() => navigation.navigate('Settings')}
           />
         </View>
+       <View style={{marginBottom: 150}} />
       </ScrollView>
 
-     
 
 
 
