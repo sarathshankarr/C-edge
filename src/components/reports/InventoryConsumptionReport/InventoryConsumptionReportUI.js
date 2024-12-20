@@ -41,10 +41,11 @@ const InventoryConsumptionReportUI = ({route, ...props}) => {
   const [displayStyleRadio, set_displayStyleRadio] = useState('No');
 
   const [general, set_general] = useState('Yes');
-  const [customFormat, setCustomFormat] = useState('Yes');
+  const [customFormat, setCustomFormat] = useState('No');
   const [fabric, setFabric] = useState('Yes');
-  const [style, setStyle] = useState('Yes');
-  const [rm, setRm] = useState('Yes');
+  const [style, setStyle] = useState('No');
+  const [rm, setRm] = useState('No');
+  const [rollWise, setrollWise] = useState('Yes');
 
   const [rawMaterialTypeList, setRawMaterialTypeList] = useState([]);
   const [filteredRawMaterialType, set_filteredRawMaterialType] = useState([]);
@@ -66,18 +67,16 @@ const InventoryConsumptionReportUI = ({route, ...props}) => {
   const [locationId, set_locationId] = useState('');
 
   const [styleList, setStyleList] = useState([]);
-const [filteredStyle, set_filteredStyle] = useState([]);
-const [showStyleList, set_showStyleList] = useState(false);
-const [styleName, set_styleName] = useState('');
-const [styleId, set_styleId] = useState('');
+  const [filteredStyle, set_filteredStyle] = useState([]);
+  const [showStyleList, set_showStyleList] = useState(false);
+  const [styleName, set_styleName] = useState('');
+  const [styleId, set_styleId] = useState('');
 
-
-const [fabricList, setFabricList] = useState([]);
-const [filteredFabric, set_filteredFabric] = useState([]);
-const [showFabricList, set_showFabricList] = useState(false);
-const [fabricName, set_fabricName] = useState('');
-const [fabricId, set_fabricId] = useState('');
-
+  const [fabricList, setFabricList] = useState([]);
+  const [filteredFabric, set_filteredFabric] = useState([]);
+  const [showFabricList, set_showFabricList] = useState(false);
+  const [fabricName, set_fabricName] = useState('');
+  const [fabricId, set_fabricId] = useState('');
 
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [startDate, set_startDate] = useState('');
@@ -160,6 +159,16 @@ const [fabricId, set_fabricId] = useState('');
     set_locationName(name);
     set_showLocationList(false);
   };
+  const actionOnStyle = (id, name) => {
+    set_styleId(id);
+    set_styleName(name);
+    set_showStyleList(false);
+  };
+  const actionOnFabric = (id, name) => {
+    set_fabricId(id);
+    set_fabricName(name);
+    set_showFabricList(false);
+  };
 
   const handleSearchRawMaterialType = text => {
     if (text.trim().length > 0) {
@@ -182,6 +191,26 @@ const [fabricId, set_fabricId] = useState('');
     }
   };
   const handleSearchLocation = text => {
+    if (text.trim().length > 0) {
+      const filtered = props.lists.getStockFabrics.filter(fabric =>
+        fabric.name.toLowerCase().includes(text.toLowerCase()),
+      );
+      set_filteredLocation(filtered);
+    } else {
+      set_filteredLocation(props.lists.getStockFabrics);
+    }
+  };
+  const handleSearchStyle = text => {
+    if (text.trim().length > 0) {
+      const filtered = props.lists.getStockFabrics.filter(fabric =>
+        fabric.name.toLowerCase().includes(text.toLowerCase()),
+      );
+      set_filteredLocation(filtered);
+    } else {
+      set_filteredLocation(props.lists.getStockFabrics);
+    }
+  };
+  const handleSearchFabric = text => {
     if (text.trim().length > 0) {
       const filtered = props.lists.getStockFabrics.filter(fabric =>
         fabric.name.toLowerCase().includes(text.toLowerCase()),
@@ -254,7 +283,7 @@ const [fabricId, set_fabricId] = useState('');
               justifyContent: 'space-evenly',
               marginTop: hp('2%'),
             }}>
-            <View style={{flexDirection: 'row', alignItems: 'center', flex:1}}>
+            <View style={{flexDirection: 'row', alignItems: 'center', flex: 1}}>
               <RadioButton
                 value="Yes"
                 status={general === 'Yes' ? 'checked' : 'unchecked'}
@@ -266,7 +295,7 @@ const [fabricId, set_fabricId] = useState('');
               <Text style={{fontWeight: 'bold', color: '#000'}}>General</Text>
             </View>
 
-            <View style={{flexDirection: 'row', alignItems: 'center', flex:1}}>
+            <View style={{flexDirection: 'row', alignItems: 'center', flex: 1}}>
               <RadioButton
                 value="No"
                 status={customFormat === 'Yes' ? 'checked' : 'unchecked'}
@@ -289,7 +318,7 @@ const [fabricId, set_fabricId] = useState('');
               justifyContent: 'space-evenly',
               marginTop: hp('2%'),
             }}>
-            <View style={{flexDirection: 'row', alignItems: 'center', flex:1}}>
+            <View style={{flexDirection: 'row', alignItems: 'center', flex: 1}}>
               <RadioButton
                 value="Yes"
                 status={fabric === 'Yes' ? 'checked' : 'unchecked'}
@@ -302,7 +331,7 @@ const [fabricId, set_fabricId] = useState('');
 
               <Text style={{fontWeight: 'bold', color: '#000'}}>Fabric</Text>
             </View>
-            <View style={{flexDirection: 'row', alignItems: 'center', flex:1}}>
+            <View style={{flexDirection: 'row', alignItems: 'center', flex: 1}}>
               <RadioButton
                 value="Yes"
                 status={rm === 'Yes' ? 'checked' : 'unchecked'}
@@ -312,10 +341,11 @@ const [fabricId, set_fabricId] = useState('');
                   setStyle('No');
                 }}
               />
-              <Text style={{fontWeight: 'bold', color: '#000'}}>{"RM"}</Text>
+              <Text style={{fontWeight: 'bold', color: '#000'}}>{'RM'}</Text>
             </View>
             {general === 'Yes' && (
-              <View style={{flexDirection: 'row', alignItems: 'center', flex:1}}>
+              <View
+                style={{flexDirection: 'row', alignItems: 'center', flex: 1}}>
                 <RadioButton
                   value="Yes"
                   status={style === 'Yes' ? 'checked' : 'unchecked'}
@@ -394,151 +424,306 @@ const [fabricId, set_fabricId] = useState('');
           </View>
 
           {/* drop down lists */}
-          <View
-            style={{
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: '#fff',
-              marginTop: hp('2%'),
-            }}>
-            <TouchableOpacity
+
+          {rm === 'Yes' && (
+            <View
               style={{
-                flexDirection: 'row',
-                borderWidth: 0.5,
-                borderColor: '#D8D8D8',
-                borderRadius: hp('0.5%'),
-                width: wp('90%'),
-              }}
-              onPress={() => {
-                set_showRawMaterialTypeList(!showRawMaterialTypeList);
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: '#fff',
+                marginTop: hp('2%'),
               }}>
-              <View>
-                <View style={[styles.SectionStyle1, {}]}>
-                  <View style={{flexDirection: 'column'}}>
-                    <Text
-                      style={
-                        rawMaterialTypeId
-                          ? [styles.dropTextLightStyle]
-                          : [styles.dropTextInputStyle]
-                      }>
-                      {'Raw Material Type    '}
-                    </Text>
-                    {rawMaterialTypeId ? (
-                      <Text style={[styles.dropTextInputStyle]}>
-                        {rawMaterialTypeName}
+              <TouchableOpacity
+                style={{
+                  flexDirection: 'row',
+                  borderWidth: 0.5,
+                  borderColor: '#D8D8D8',
+                  borderRadius: hp('0.5%'),
+                  width: wp('90%'),
+                }}
+                onPress={() => {
+                  set_showRawMaterialTypeList(!showRawMaterialTypeList);
+                }}>
+                <View>
+                  <View style={[styles.SectionStyle1, {}]}>
+                    <View style={{flexDirection: 'column'}}>
+                      <Text
+                        style={
+                          rawMaterialTypeId
+                            ? [styles.dropTextLightStyle]
+                            : [styles.dropTextInputStyle]
+                        }>
+                        {'Raw Material Type    '}
                       </Text>
-                    ) : null}
+                      {rawMaterialTypeId ? (
+                        <Text style={[styles.dropTextInputStyle]}>
+                          {rawMaterialTypeName}
+                        </Text>
+                      ) : null}
+                    </View>
                   </View>
                 </View>
-              </View>
 
-              <View style={{justifyContent: 'center'}}>
-                <Image source={downArrowImg} style={styles.imageStyle} />
-              </View>
-            </TouchableOpacity>
+                <View style={{justifyContent: 'center'}}>
+                  <Image source={downArrowImg} style={styles.imageStyle} />
+                </View>
+              </TouchableOpacity>
 
-            {showRawMaterialTypeList && (
-              <View style={styles.dropdownContent1}>
-                <TextInput
-                  style={styles.searchInput}
-                  placeholder="Search "
-                  onChangeText={handleSearchRawMaterialType}
-                  placeholderTextColor="#000"
-                />
-                <ScrollView
-                  style={styles.scrollView}
-                  nestedScrollEnabled={true}>
-                  {filteredRawMaterialType.length === 0 ? (
-                    <Text style={styles.noCategoriesText}>
-                      Sorry, no results found!
-                    </Text>
-                  ) : (
-                    filteredRawMaterialType.map((item, index) => (
-                      <TouchableOpacity
-                        key={index}
-                        style={styles.dropdownOption}
-                        onPress={() => actionOnRawMaterialType(item)}>
-                        <Text style={{color: '#000'}}>{item.name}</Text>
-                      </TouchableOpacity>
-                    ))
-                  )}
-                </ScrollView>
-              </View>
-            )}
-          </View>
-
-          <View
-            style={{
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: '#fff',
-              marginTop: hp('2%'),
-            }}>
-            <TouchableOpacity
-              style={{
-                flexDirection: 'row',
-                borderWidth: 0.5,
-                borderColor: '#D8D8D8',
-                borderRadius: hp('0.5%'),
-                width: wp('90%'),
-              }}
-              onPress={() => {
-                set_showRawMaterialList(!showRawMaterialList);
-              }}>
-              <View>
-                <View style={[styles.SectionStyle1, {}]}>
-                  <View style={{flexDirection: 'column'}}>
-                    <Text
-                      style={
-                        rawMaterialId
-                          ? [styles.dropTextLightStyle]
-                          : [styles.dropTextInputStyle]
-                      }>
-                      {'* Raw Material'}
-                    </Text>
-                    {rawMaterialId ? (
-                      <Text style={[styles.dropTextInputStyle]}>
-                        {rawMaterialName}
+              {showRawMaterialTypeList && (
+                <View style={styles.dropdownContent1}>
+                  <TextInput
+                    style={styles.searchInput}
+                    placeholder="Search "
+                    onChangeText={handleSearchRawMaterialType}
+                    placeholderTextColor="#000"
+                  />
+                  <ScrollView
+                    style={styles.scrollView}
+                    nestedScrollEnabled={true}>
+                    {filteredRawMaterialType.length === 0 ? (
+                      <Text style={styles.noCategoriesText}>
+                        Sorry, no results found!
                       </Text>
-                    ) : null}
+                    ) : (
+                      filteredRawMaterialType.map((item, index) => (
+                        <TouchableOpacity
+                          key={index}
+                          style={styles.dropdownOption}
+                          onPress={() => actionOnRawMaterialType(item)}>
+                          <Text style={{color: '#000'}}>{item.name}</Text>
+                        </TouchableOpacity>
+                      ))
+                    )}
+                  </ScrollView>
+                </View>
+              )}
+            </View>
+          )}
+
+          {rm === 'Yes' && (
+            <View
+              style={{
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: '#fff',
+                marginTop: hp('2%'),
+              }}>
+              <TouchableOpacity
+                style={{
+                  flexDirection: 'row',
+                  borderWidth: 0.5,
+                  borderColor: '#D8D8D8',
+                  borderRadius: hp('0.5%'),
+                  width: wp('90%'),
+                }}
+                onPress={() => {
+                  set_showRawMaterialList(!showRawMaterialList);
+                }}>
+                <View>
+                  <View style={[styles.SectionStyle1, {}]}>
+                    <View style={{flexDirection: 'column'}}>
+                      <Text
+                        style={
+                          rawMaterialId
+                            ? [styles.dropTextLightStyle]
+                            : [styles.dropTextInputStyle]
+                        }>
+                        {'* Raw Material'}
+                      </Text>
+                      {rawMaterialId ? (
+                        <Text style={[styles.dropTextInputStyle]}>
+                          {rawMaterialName}
+                        </Text>
+                      ) : null}
+                    </View>
                   </View>
                 </View>
-              </View>
 
-              <View style={{justifyContent: 'center'}}>
-                <Image source={downArrowImg} style={styles.imageStyle} />
-              </View>
-            </TouchableOpacity>
+                <View style={{justifyContent: 'center'}}>
+                  <Image source={downArrowImg} style={styles.imageStyle} />
+                </View>
+              </TouchableOpacity>
 
-            {showRawMaterialList && (
-              <View style={styles.dropdownContent1}>
-                <TextInput
-                  style={styles.searchInput}
-                  placeholder="Search "
-                  onChangeText={handleSearchRawMaterial}
-                  placeholderTextColor="#000"
-                />
-                <ScrollView
-                  style={styles.scrollView}
-                  nestedScrollEnabled={true}>
-                  {filteredRawMaterial.length === 0 ? (
-                    <Text style={styles.noCategoriesText}>
-                      Sorry, no results found!
-                    </Text>
-                  ) : (
-                    filteredRawMaterial.map((item, index) => (
-                      <TouchableOpacity
-                        key={index}
-                        style={styles.dropdownOption}
-                        onPress={() => actionOnRawMaterial(item)}>
-                        <Text style={{color: '#000'}}>{item.name}</Text>
-                      </TouchableOpacity>
-                    ))
-                  )}
-                </ScrollView>
-              </View>
-            )}
-          </View>
+              {showRawMaterialList && (
+                <View style={styles.dropdownContent1}>
+                  <TextInput
+                    style={styles.searchInput}
+                    placeholder="Search "
+                    onChangeText={handleSearchRawMaterial}
+                    placeholderTextColor="#000"
+                  />
+                  <ScrollView
+                    style={styles.scrollView}
+                    nestedScrollEnabled={true}>
+                    {filteredRawMaterial.length === 0 ? (
+                      <Text style={styles.noCategoriesText}>
+                        Sorry, no results found!
+                      </Text>
+                    ) : (
+                      filteredRawMaterial.map((item, index) => (
+                        <TouchableOpacity
+                          key={index}
+                          style={styles.dropdownOption}
+                          onPress={() => actionOnRawMaterial(item)}>
+                          <Text style={{color: '#000'}}>{item.name}</Text>
+                        </TouchableOpacity>
+                      ))
+                    )}
+                  </ScrollView>
+                </View>
+              )}
+            </View>
+          )}
+
+          {style === 'Yes' && (
+            <View
+              style={{
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: '#fff',
+                marginTop: hp('2%'),
+              }}>
+              <TouchableOpacity
+                style={{
+                  flexDirection: 'row',
+                  borderWidth: 0.5,
+                  borderColor: '#D8D8D8',
+                  borderRadius: hp('0.5%'),
+                  width: wp('90%'),
+                }}
+                onPress={() => {
+                  set_showStyleList(!showStyleList);
+                }}>
+                <View>
+                  <View style={[styles.SectionStyle1, {}]}>
+                    <View style={{flexDirection: 'column'}}>
+                      <Text
+                        style={
+                          styleId
+                            ? [styles.dropTextLightStyle]
+                            : [styles.dropTextInputStyle]
+                        }>
+                        {'Style *'}
+                      </Text>
+                      {styleId ? (
+                        <Text style={[styles.dropTextInputStyle]}>
+                          {styleName}
+                        </Text>
+                      ) : null}
+                    </View>
+                  </View>
+                </View>
+
+                <View style={{justifyContent: 'center'}}>
+                  <Image source={downArrowImg} style={styles.imageStyle} />
+                </View>
+              </TouchableOpacity>
+
+              {showStyleList && (
+                <View style={styles.dropdownContent1}>
+                  <TextInput
+                    style={styles.searchInput}
+                    placeholder="Search "
+                    onChangeText={handleSearchStyle}
+                    placeholderTextColor="#000"
+                  />
+                  <ScrollView
+                    style={styles.scrollView}
+                    nestedScrollEnabled={true}>
+                    {filteredStyle.length === 0 ? (
+                      <Text style={styles.noCategoriesText}>
+                        Sorry, no results found!
+                      </Text>
+                    ) : (
+                      filteredStyle.map((item, index) => (
+                        <TouchableOpacity
+                          key={index}
+                          style={styles.dropdownOption}
+                          onPress={() => actionOnStyle(item)}>
+                          <Text style={{color: '#000'}}>{item.name}</Text>
+                        </TouchableOpacity>
+                      ))
+                    )}
+                  </ScrollView>
+                </View>
+              )}
+            </View>
+          )}
+
+          {fabric === 'Yes' && (
+            <View
+              style={{
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: '#fff',
+                marginTop: hp('2%'),
+              }}>
+              <TouchableOpacity
+                style={{
+                  flexDirection: 'row',
+                  borderWidth: 0.5,
+                  borderColor: '#D8D8D8',
+                  borderRadius: hp('0.5%'),
+                  width: wp('90%'),
+                }}
+                onPress={() => {
+                  set_showFabricList(!showFabricList);
+                }}>
+                <View>
+                  <View style={[styles.SectionStyle1, {}]}>
+                    <View style={{flexDirection: 'column'}}>
+                      <Text
+                        style={
+                          fabricId
+                            ? [styles.dropTextLightStyle]
+                            : [styles.dropTextInputStyle]
+                        }>
+                        {'Fabric *'}
+                      </Text>
+                      {fabricId ? (
+                        <Text style={[styles.dropTextInputStyle]}>
+                          {fabricName}
+                        </Text>
+                      ) : null}
+                    </View>
+                  </View>
+                </View>
+
+                <View style={{justifyContent: 'center'}}>
+                  <Image source={downArrowImg} style={styles.imageStyle} />
+                </View>
+              </TouchableOpacity>
+
+              {showFabricList && (
+                <View style={styles.dropdownContent1}>
+                  <TextInput
+                    style={styles.searchInput}
+                    placeholder="Search "
+                    onChangeText={handleSearchFabric}
+                    placeholderTextColor="#000"
+                  />
+                  <ScrollView
+                    style={styles.scrollView}
+                    nestedScrollEnabled={true}>
+                    {filteredFabric.length === 0 ? (
+                      <Text style={styles.noCategoriesText}>
+                        Sorry, no results found!
+                      </Text>
+                    ) : (
+                      filteredFabric.map((item, index) => (
+                        <TouchableOpacity
+                          key={index}
+                          style={styles.dropdownOption}
+                          onPress={() => actionOnFabric(item)}>
+                          <Text style={{color: '#000'}}>{item.name}</Text>
+                        </TouchableOpacity>
+                      ))
+                    )}
+                  </ScrollView>
+                </View>
+              )}
+            </View>
+          )}
 
           <View
             style={{
@@ -603,7 +788,7 @@ const [fabricId, set_fabricId] = useState('');
                       <TouchableOpacity
                         key={index}
                         style={styles.dropdownOption}
-                        onPress={() => actiononloca(item)}>
+                        onPress={() => actionOnLocation(item)}>
                         <Text style={{color: '#000'}}>{item.name}</Text>
                       </TouchableOpacity>
                     ))
@@ -613,15 +798,50 @@ const [fabricId, set_fabricId] = useState('');
             )}
           </View>
 
+         {fabric === 'Yes' &&  <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              marginBottom: hp('1%'),
+              justifyContent: 'space-evenly',
+              marginTop: hp('2%'),
+            }}>
+            <Text style={{width: '50%', fontWeight: 'bold', color: '#000'}}>
+              Roll Wise
+            </Text>
+            <Text style={{marginRight: wp('2%'), color: '#000'}}>Yes</Text>
+            <RadioButton
+              value="Yes"
+              status={rollWise === 'Yes' ? 'checked' : 'unchecked'}
+              onPress={() => {
+                setrollWise('Yes');
+              }}
+            />
+
+            <Text
+              style={{
+                marginRight: wp('2%'),
+                marginLeft: wp('4%'),
+                color: '#000',
+              }}>
+              No
+            </Text>
+            <RadioButton
+              value="No"
+              status={rollWise === 'No' ? 'checked' : 'unchecked'}
+              onPress={() => setrollWise('No')}
+            />
+          </View>}
+
           <View style={{marginBottom: 150}} />
         </View>
       </KeyboardAwareScrollView>
 
       <View style={CommonStyles.bottomViewComponentStyle}>
         <BottomComponent
-          rightBtnTitle={'Save'}
+          rightBtnTitle={'Search'}
           leftBtnTitle={'Back'}
-          isLeftBtnEnable={true}
+          isLeftBtnEnable={false}
           rigthBtnState={true}
           isRightBtnEnable={true}
           leftButtonAction={() => backBtnAction()}
