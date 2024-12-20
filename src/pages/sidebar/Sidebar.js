@@ -130,6 +130,17 @@ const dropdownMenus = {
       },
     ],
   },
+  reports: {
+    label: 'Reports',
+    icon: require('../../../assets/images/png/sales.png'),
+    style: [
+      {
+        label: 'Inventory Consumption Report',
+        route: 'InventoryConsumptionReport',
+        src: require('../../../assets/images/png/report.png'),
+      },
+    ],
+  },
 };
 
 const Sidebar = ({navigation}) => {

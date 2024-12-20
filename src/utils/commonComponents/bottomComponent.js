@@ -55,6 +55,7 @@ const getStyles = (colors) => StyleSheet.create({
         borderRadius: hp("0.5%"),
         justifyContent: "center",
         alignItems:'center',
+
       },
 
       rightButtonstyleDisable: {
@@ -85,7 +86,8 @@ const getStyles = (colors) => StyleSheet.create({
         fontWeight : '700',
         marginLeft: wp("1%"),
         marginRight: wp("1%"),
-        textAlign:'center'
+        textAlign:'center',
+
       },
 
       leftBtnTextStyle: {

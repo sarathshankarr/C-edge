@@ -58,6 +58,9 @@ import EnterOtp from '../components/forgetPassword/EnterOtp';
 import ConfirmPassword from '../components/forgetPassword/ConfirmPassword';
 import GatePassAckList from '../components/gatePassAcknowledgement/Listpage/GatePassAckList';
 import GatePassAckEdit from '../components/gatePassAcknowledgement/EditPage/GatePassAckEdit';
+import InventoryConsumptionReport from '../components/reports/InventoryConsumptionReport/InventoryConsumptionReport';
+
+
 import Splash from '../pages/splash/splash';
 import Settings from '../components/settings/Settings';
 
@@ -125,6 +128,7 @@ const AppStack = () => {
       <Stack.Screen name="GatePassAckList" component={GatePassAckList} options={{ headerShown: false }} /> 
       <Stack.Screen name="GatePassAckEdit" component={GatePassAckEdit} options={{ headerShown: false }} /> 
       <Stack.Screen name="Settings" component={Settings} options={{ headerShown: true }} /> 
+      <Stack.Screen name="InventoryConsumptionReport" component={InventoryConsumptionReport} options={{ headerShown: false }} /> 
     </Stack.Navigator>
   );
 };

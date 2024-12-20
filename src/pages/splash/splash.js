@@ -10,13 +10,12 @@ import Animated, {
   withSequence,
   Easing,
 } from 'react-native-reanimated';
-import { ColorContext } from '../../components/colorTheme/colorTheme';
+
 
 const Splash = () => {
   const navigation = useNavigation();
   const Logo = require('./../../../assets/images/png/Logo.png');
-  const { colors } = useContext(ColorContext);
-  const styles = getStyles(colors);
+
 
   // Shared values for animations
   const translateX = useSharedValue(-300);
@@ -79,7 +78,7 @@ const Splash = () => {
   );
 };
 
-const getStyles = (colors) => StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
@@ -99,7 +98,8 @@ const getStyles = (colors) => StyleSheet.create({
     width: 12,
     height: 12,
     borderRadius: 6,
-    backgroundColor: colors.color2,
+    // backgroundColor: colors.color2,
+    backgroundColor: '#1F74BA',
     marginHorizontal: 8,
   },
 });

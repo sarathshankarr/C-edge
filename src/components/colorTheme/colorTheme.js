@@ -1,8 +1,10 @@
-import React, { createContext, useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { createContext, useEffect, useState } from 'react';
 
 const ColorContext = createContext();
 
 const ColorProvider = ({ children }) => {
+  const [isLoading, setIsLoading] = useState(true);
 
   const [colors, setColors] = useState({
     color2: '#26A69A', 
@@ -11,6 +13,24 @@ const ColorProvider = ({ children }) => {
     color4: '#007167', 
     color5: '#DDD', 
   });
+
+useEffect(() => {
+  const getColorfromStorage = async () => {
+    try {
+      const ThemeColor = await AsyncStorage.getItem('ThemeColor');
+      if (ThemeColor) {
+        const parsedColors = JSON.parse(ThemeColor);
+        setColors(parsedColors.Colors);
+      }
+    } catch (error) {
+      console.error("Failed to load theme color from AsyncStorage", error);
+    } finally {
+      setIsLoading(false); 
+    }
+  };
+
+  getColorfromStorage();
+}, []);
 
   const updateColor = (key, value) => {
     setColors((prevColors) => ({
