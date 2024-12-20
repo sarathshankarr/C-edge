@@ -45,7 +45,7 @@ export async function loginUserAPIService(jsonValue) {
         }
 
         const data = await response.json();
-        console.log('loginUserAPIService Response ', data);
+        // console.log('loginUserAPIService Response ', data);
 
         if (data && data.passwordStatus) {
             statusData = data.passwordStatus;
@@ -3053,7 +3053,7 @@ export async function requestOtp1(jsonValue) {
         }
 
         const data = await response.json();
-        console.log('loginUserAPIService Response ', data);
+        // console.log('loginUserAPIService Response ', data);
 
         if (data && data.passwordStatus) {
             statusData = data.passwordStatus;
@@ -3107,7 +3107,7 @@ export async function validateOtp1(jsonValue) {
         }
 
         const data = await response.json();
-        console.log('loginUserAPIService Response ', data);
+        // console.log('loginUserAPIService Response ', data);
 
         if (data && data.passwordStatus) {
             statusData = data.passwordStatus;
@@ -3161,7 +3161,7 @@ export async function resetPassword1(jsonValue) {
         }
 
         const data = await response.json();
-        console.log('loginUserAPIService Response ', data);
+        // console.log('loginUserAPIService Response ', data);
 
         if (data && data.passwordStatus) {
             statusData = data.passwordStatus;

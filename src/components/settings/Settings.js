@@ -95,6 +95,7 @@ const SettingsSidebar = ({navigation}) => {
   const [selectedCompanyName, setselectedCompanyName] = useState('')
   const [selectedCompanyId, setselectedCompanyId] = useState(0);
   const { colors, updateColor,updateAllColors } = useContext(ColorContext);
+  const [query, setquery] = useState('');
 
   const styles = getStyles(colors);
 
@@ -173,10 +174,11 @@ const SettingsSidebar = ({navigation}) => {
     await getCompanyObj(id);
   };
 
-  const handleSelectColor =  (item) => {
+  const handleSelectColor =  async(item) => {
     console.log("selected color :" ,  item.Colors)
     updateAllColors(item.Colors);
     setshowColorList(false);
+    await AsyncStorage.setItem('ThemeColor', JSON.stringify(item));
   };
 
   const handleDeleteUser = async () => {
@@ -207,13 +209,14 @@ const SettingsSidebar = ({navigation}) => {
     handleLogout();
   };
 
-  const handleSearch = () => {};
 
-  const handleColorChange = () => {
-    const updatingColor = colors.color2 === '#1f74ba' ? '#26A69A' : '#1f74ba';
-    updateColor('color2', updatingColor);
-    console.log("Chnage color", colors);
-  };
+  const filteredCompanyList = Object.keys(companyList).filter(item =>
+    companyList[item].toLowerCase().includes(query.toLowerCase())
+  );
+  
+  const filteredColorList = colorsList.filter(item =>
+    item.label.toLowerCase().includes(query.toLowerCase())
+  );
 
   const getCompanyObj = async (newCompanyID) => {
     
@@ -342,7 +345,10 @@ const SettingsSidebar = ({navigation}) => {
     <View style={styles.companyModalHeader}>
       <View/>
       <Text style={styles.companyModalHeaderText}>Company List</Text>
-      <TouchableOpacity onPress={()=>setshowCompanyList(false)}>
+      <TouchableOpacity onPress={()=>{
+        setshowCompanyList(false);
+        setquery('');
+        }}>
          <Image
            source={require('./../../../assets/images/png/close.png')}
            style={{width: 30, height: 30, tintColor: colors.color2}}
@@ -356,19 +362,19 @@ const SettingsSidebar = ({navigation}) => {
         style={styles.companyModalSearchBar}
         placeholder="Search companies..."
         placeholderTextColor="#aaa"
-        onChangeText={handleSearch}
+        onChangeText={(text)=>setquery(text)}
       />
     </View>
 
     {/* Company List */}
     <View style={styles.companyModalListContainer}>
-      {Object.keys(companyList).length === 0 ? (
+      {filteredCompanyList.length === 0 ? (
         <Text style={styles.companyModalNoResultsText}>
           No results found
         </Text>
       ) : (
         <FlatList
-          data={Object.keys(companyList)}
+          data={filteredCompanyList}
           keyExtractor={(item) => item.toString()}
           renderItem={({ item }) => (
             <TouchableOpacity
@@ -411,7 +417,10 @@ const SettingsSidebar = ({navigation}) => {
     <View style={styles.companyModalHeader}>
       <View/>
       <Text style={styles.companyModalHeaderText}>Colours List</Text>
-      <TouchableOpacity onPress={()=>setshowColorList(false)}>
+      <TouchableOpacity onPress={()=>{
+        setshowColorList(false);
+        setquery('');
+        }}>
          <Image
            source={require('./../../../assets/images/png/close.png')}
            style={{width: 30, height: 30, tintColor: colors.color2}}
@@ -425,14 +434,19 @@ const SettingsSidebar = ({navigation}) => {
         style={styles.companyModalSearchBar}
         placeholder="Search Colour."
         placeholderTextColor="#aaa"
-        onChangeText={handleSearch}
+        onChangeText={(text)=>setquery(text)}
       />
     </View>
 
     {/* Color List */}
-    <View style={styles.companyModalListContainer}>
+      <View style={styles.companyModalListContainer}>
+      {filteredColorList.length === 0 ? (
+        <Text style={styles.companyModalNoResultsText}>
+          No results found
+        </Text>
+      ) : (
          <FlatList
-          data={colorsList}
+          data={filteredColorList}
           keyExtractor={(item) => item.label.toString()}
           renderItem={({ item }) => (
             <TouchableOpacity
@@ -457,6 +471,7 @@ const SettingsSidebar = ({navigation}) => {
           )}
           contentContainerStyle={styles.companyModalFlatListContent}
         />
+      )}
     </View>
   </View>
      </Modal>
