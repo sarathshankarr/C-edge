@@ -215,6 +215,7 @@ import {
   Image,
   Alert,
   TextInput,
+  Platform,
 } from 'react-native';
 import {
   heightPercentageToDP as hp,
@@ -430,7 +431,11 @@ const getStyles = (colors) => StyleSheet.create({
     marginBottom: 30,
     textAlign: 'center',
     marginTop: 60,
-    fontFamily:'serif'
+    // fontFamily:'serif'
+    fontFamily: Platform.select({
+      ios: 'Georgia',
+      android: 'serif',
+    }),
   },
   titleHighlight: {
     color: '#3BC3FF',
@@ -439,7 +444,10 @@ const getStyles = (colors) => StyleSheet.create({
     // color: '#000',
 
     fontWeight: '600',
-    fontFamily: 'serif',
+    fontFamily: Platform.select({
+      ios: 'Georgia',
+      android: 'serif',
+    }),
   },
 
   inputContainer: {

@@ -1,4 +1,4 @@
-import React, {useState, useRef, useEffect, useContext} from 'react';
+import React, {useState, useRef, useEffect, useContext, useMemo} from 'react';
 import {
   View,
   FlatList,
@@ -25,6 +25,7 @@ import BottomComponent from '../../../utils/commonComponents/bottomComponent';
 import {RadioButton} from 'react-native-paper';
 import {ColorContext} from '../../colorTheme/colorTheme';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import {RadioGroup} from 'react-native-radio-buttons-group';
 
 let downArrowImg = require('./../../../../assets/images/png/dropDownImg.png');
 let closeImg = require('./../../../../assets/images/png/close1.png');
@@ -250,6 +251,111 @@ const InventoryConsumptionReportUI = ({route, ...props}) => {
     return ans;
   }
 
+  const generalRadioButtons = useMemo(
+    () => [
+      {
+        id: '1',
+        label: 'General',
+        value: 'General',
+        selected: general === 'Yes',
+      },
+      {
+        id: '2',
+        label: 'Custom Format',
+        value: 'Custom Format',
+        selected: customFormat === 'Yes',
+      },
+    ],
+    [general, customFormat],
+  );
+
+  // Define radio buttons for Fabric, RM, and Style
+  const categoryRadioButtons = useMemo(
+    () => [
+      {
+        id: '1',
+        label: 'Fabric',
+        value: 'Fabric',
+        selected: fabric === 'Yes',
+      },
+      {
+        id: '2',
+        label: 'RM',
+        value: 'RM',
+        selected: rm === 'Yes',
+      },
+      ...(general === 'Yes'
+        ? [
+            {
+              id: '3',
+              label: 'Style',
+              value: 'Style',
+              selected: style === 'Yes',
+            },
+          ]
+        : []),
+    ],
+    [fabric, rm, style, general],
+  );
+
+  // Define radio buttons for Roll Wise
+  const rollWiseRadioButtons = useMemo(
+    () => [
+      {
+        id: '1',
+        label: 'Yes',
+        value: 'Yes',
+        selected: rollWise === 'Yes',
+      },
+      {
+        id: '2',
+        label: 'No',
+        value: 'No',
+        selected: rollWise === 'No',
+      },
+    ],
+    [rollWise],
+  );
+
+  const handleGeneralChange = selectedId => {
+    const selectedOption = generalRadioButtons.find(
+      button => button.id === selectedId,
+    );
+    if (selectedOption.value === 'General') {
+      set_general('Yes');
+      setCustomFormat('No');
+    } else {
+      set_general('No');
+      setCustomFormat('Yes');
+    }
+  };
+
+  const handleCategoryChange = selectedId => {
+    const selectedOption = categoryRadioButtons.find(
+      button => button.id === selectedId,
+    );
+    if (selectedOption.value === 'Fabric') {
+      setFabric('Yes');
+      setRm('No');
+      setStyle('No');
+    } else if (selectedOption.value === 'RM') {
+      setFabric('No');
+      setRm('Yes');
+      setStyle('No');
+    } else if (selectedOption.value === 'Style') {
+      setFabric('No');
+      setRm('No');
+      setStyle('Yes');
+    }
+  };
+
+  const handleRollWiseChange = selectedId => {
+    const selectedOption = rollWiseRadioButtons.find(
+      button => button.id === selectedId,
+    );
+    setrollWise(selectedOption.value);
+  };
+
   return (
     <View style={[CommonStyles.mainComponentViewStyle]}>
       <View style={[CommonStyles.headerView]}>
@@ -360,121 +466,25 @@ const InventoryConsumptionReportUI = ({route, ...props}) => {
             )}
           </View> */}
 
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              marginBottom: hp('1%'),
-              justifyContent: 'space-between',
-              marginTop: hp('2%'),
-            }}>
-            <RadioButton.Group
-              onValueChange={newValue => {
-                if (newValue === 'General') {
-                  set_general('Yes');
-                  setCustomFormat('No');
-                } else {
-                  set_general('No');
-                  setCustomFormat('Yes');
-                }
-              }}
-              value={general === 'Yes' ? 'General' : 'Custom Format'}>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  flex: 1,
-                }}>
-                <View style={{flexDirection: 'row', alignItems: 'center',width:'50%'}}>
-                  <RadioButton value="General" />
-                  <Text style={{fontWeight: 'bold', color: '#000'}}>
-                    General
-                  </Text>
-                </View>
-                <View style={{flexDirection: 'row', alignItems: 'center',width:'50%'}}>
-                  <RadioButton value="Custom Format" />
-                  <Text style={{fontWeight: 'bold', color: '#000'}}>
-                    Custom Format
-                  </Text>
-                </View>
-              </View>
-            </RadioButton.Group>
-          </View>
+     
+          
+        <RadioGroup
+        style={{ flexDirection: 'row' }}
+        radioButtons={generalRadioButtons}
+        onPress={handleGeneralChange}
+        layout="column"
+        selectedId={generalRadioButtons.find((item) => item.value === (general === 'Yes' ? 'General' : 'Custom Format'))?.id}
+      />
 
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              marginTop: hp('2%'),
-            }}>
-            <RadioButton.Group
-              onValueChange={newValue => {
-                if (newValue === 'Fabric') {
-                  setFabric('Yes');
-                  setRm('No');
-                  setStyle('No');
-                } else if (newValue === 'RM') {
-                  setFabric('No');
-                  setRm('Yes');
-                  setStyle('No');
-                } else if (newValue === 'Style') {
-                  setFabric('No');
-                  setRm('No');
-                  setStyle('Yes');
-                }
-              }}
-              value={
-                fabric === 'Yes' ? 'Fabric' : rm === 'Yes' ? 'RM' : 'Style'
-              }
-              >
-               <View
-                style={{
-                  flexDirection: 'row',
-                  // justifyContent: 'space-between',
-                  // alignItems: 'center',
-                  // flex: 1,
-                }}> 
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    width:'33%'                  }}>
-                  <RadioButton value="Fabric" />
-                  <Text style={{fontWeight: 'bold', color: '#000'}}>
-                    Fabric
-                  </Text>
-                </View>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                   width:'33%'
-                  }}>
-                  <RadioButton value="RM" />
-                  <Text style={{fontWeight: 'bold', color: '#000'}}>RM</Text>
-                </View>
-                {general === 'Yes' && (
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      width:'33%'
-                    }}>
-                    <RadioButton value="Style" />
-                    <Text style={{fontWeight: 'bold', color: '#000'}}>
-                      Style
-                    </Text>
-                  </View>
-                )}
-              </View>
-            </RadioButton.Group>
-          </View>
+      <RadioGroup
+        style={{ flexDirection: 'row' }}
+        radioButtons={categoryRadioButtons}
+        onPress={handleCategoryChange}
+        layout="column"
+        selectedId={categoryRadioButtons.find((item) => item.value === (fabric === 'Yes' ? 'Fabric' : rm === 'Yes' ? 'RM' : style === 'Yes' ? 'Style' : ''))?.id}
+      />
 
-
-
-
+      
           {/* dates */}
           <DateTimePickerModal
             isVisible={isDatePickerVisible}
@@ -949,22 +959,28 @@ const InventoryConsumptionReportUI = ({route, ...props}) => {
               />
             </View>
           )} */}
-         {fabric === 'Yes' && (   <View style={{ flexDirection: 'row', alignItems: 'center',justifyContent: 'space-between', marginTop: hp('2%') }}>
-            <Text style={{ width: '50%', fontWeight: 'bold', color: '#000' }}>Roll Wise</Text>
-            <RadioButton.Group
-              onValueChange={(newValue) => setrollWise(newValue)}
-              value={rollWise}>
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Text style={{ marginRight: wp('2%'), color: '#000' }}>Yes</Text>
-                <RadioButton value="Yes" />
-                <Text style={{ marginRight: wp('2%'), marginLeft: wp('4%'), color: '#000' }}>No</Text>
-                <RadioButton value="No" />
-              </View>
-            </RadioButton.Group>
-          </View>
-          )}
 
-          <View style={{marginBottom: 150}} />
+
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginTop: hp('2%'),
+            }}>
+            <Text style={{width: '50%', fontWeight: 'bold', color: '#000'}}>
+              Roll Wise
+            </Text>
+            <RadioGroup
+        style={{ flexDirection: 'row' }}
+        radioButtons={rollWiseRadioButtons}
+        onPress={handleRollWiseChange}
+        layout="row"
+        selectedId={rollWiseRadioButtons.find((item) => item.value === rollWise)?.id}
+      />
+          </View>
+
+          {/* <View style={{marginBottom: 150}} /> */}
         </View>
       </KeyboardAwareScrollView>
 
@@ -1193,5 +1209,11 @@ const getStyles = colors =>
       fontSize: 16,
       fontWeight: '600',
       color: '#000000',
+    },
+    sectionTitle: {
+      fontSize: 16,
+      fontWeight: 'bold',
+      color: '#000',
+      marginVertical: 8,
     },
   });
