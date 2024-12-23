@@ -1,5 +1,5 @@
 import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
-import { View, TouchableOpacity, Image, Text, StyleSheet, Modal, ScrollView, TextInput, ActivityIndicator, Alert, FlatList, TouchableWithoutFeedback } from 'react-native';
+import { View, TouchableOpacity, Image, Text, StyleSheet, Modal, ScrollView, TextInput, ActivityIndicator, Alert, FlatList, TouchableWithoutFeedback, Platform } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as APIServiceCall from './../apiCalls/apiCallsComponent'
@@ -459,7 +459,10 @@ const CommonHeader = ({ title, showDrawerButton }) => {
            fontWeight: 'bold', 
            marginLeft: 20, 
            fontSize: 24, 
-           fontFamily: 'serif', 
+            fontFamily: Platform.select({
+                 ios: 'Georgia',
+                 android: 'serif',
+               }),
            letterSpacing: 1, 
            textTransform: 'uppercase', 
            alignSelf: 'center'

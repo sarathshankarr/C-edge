@@ -447,7 +447,7 @@ export async function allCuttingStyles(jsonValue) {
         obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
         return obj;
     }
-    console.log('allCuttingStyles ', jsonValue, Environment.uri + "cutting/loadAllCuttingStyles")
+    // console.log('allCuttingStyles ', jsonValue, Environment.uri + "cutting/loadAllCuttingStyles")
     await fetch(Environment.uri + "cutting/loadAllCuttingStyles",
         {
             method: "POST",
@@ -542,7 +542,7 @@ export async function getFabricDetails(jsonValue) {
             body: JSON.stringify(jsonValue),
         }
     ).then((response) => response.json()).then(async (data) => {
-        console.log('getFabricDetails1- ', data)
+        // console.log('getFabricDetails1- ', data)
 
         if (data) {
             statusData = true;

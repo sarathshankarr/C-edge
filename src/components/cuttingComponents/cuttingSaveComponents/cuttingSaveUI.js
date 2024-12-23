@@ -116,7 +116,7 @@ const CuttingSaveUI = ({ route, ...props }) => {
       } else {
         enterSizesArray[i].enterQty = 0;
       }
-      console.log(enterSizesArray[i].enterQty);
+      // console.log(enterSizesArray[i].enterQty);
     }
 
 
@@ -126,7 +126,7 @@ const CuttingSaveUI = ({ route, ...props }) => {
     }
 
 
-    console.log('props.itemsObj ', props.itemsObj)
+    // console.log('props.itemsObj ', props.itemsObj)
 
     let obj = {
       "menuId": props.itemsObj.menuId,
@@ -149,7 +149,7 @@ const CuttingSaveUI = ({ route, ...props }) => {
       "unitprice": unitPrice ? unitPrice : 0,
       "companyLocation": locationId ? locationId : 0,
     }
-    console.log('Submit details ', obj);
+    // console.log('Submit details ', obj);
     props.submitAction(obj);
   }
 

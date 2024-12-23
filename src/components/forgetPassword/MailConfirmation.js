@@ -479,7 +479,10 @@ const getStyles = (colors) => StyleSheet.create({
     fontSize: 20,
     fontWeight: '500',
     color: colors.color2,
-    fontFamily: 'serif',
+    fontFamily: Platform.select({
+      ios: 'Georgia',
+      android: 'serif',
+    }),
     marginBottom: 30,
     // textAlign: 'left',
     marginTop: 60,
@@ -487,7 +490,10 @@ const getStyles = (colors) => StyleSheet.create({
   titleHighlight: {
     color: '#3BC3FF',
     fontWeight: '600',
-    fontFamily: 'serif',
+    fontFamily: Platform.select({
+      ios: 'Georgia',
+      android: 'serif',
+    }),
   },
 
   inputContainer: {

@@ -31,7 +31,7 @@ const StichingOutUI = ({route, ...props }) => {
   const [categories, set_categories]=useState([
     { id: "stylesName", fid: "styleno", value: "Style No" , idxId:"styleId"},
     { id: "colorsNames",fid: "color", value: " Color" , idxId:"colorid"},
-    { id: "workordernumber",fid: "wono", value: " W.O No" , idxId:"wono"},
+    // { id: "workordernumber",fid: "wono", value: " W.O No" , idxId:"wono"},
   ]);
 
   React.useEffect(() => {

@@ -54,7 +54,7 @@ const CuttingSaveComponent = ({ navigation, route, ...props }) => {
 
     let addCuttingAPIObj = await APIServiceCall.addCuttingDetails(obj1);
     set_isLoading(false);
-    console.log('addCuttingDetails Class ', addCuttingAPIObj)
+    // console.log('addCuttingDetails Class ', addCuttingAPIObj)
     if(addCuttingAPIObj && addCuttingAPIObj.statusData){
 
       if(addCuttingAPIObj.responseData && addCuttingAPIObj.responseData.status !== 'False'){
@@ -77,14 +77,16 @@ const CuttingSaveComponent = ({ navigation, route, ...props }) => {
   const saveCuttingDetails = async (obj) => {
 
     set_isLoading(true);
+    console.log('saveCuttingAPIObj before giving to api ==> ', obj)
 
     let saveCuttingAPIObj = await APIServiceCall.saveCuttingDetails(obj);
     set_isLoading(false);
-    console.log('saveCuttingAPIObj ', saveCuttingAPIObj)
+    // console.log('saveCuttingAPIObj before giving to api ==> ', saveCuttingAPIObj)
     if(saveCuttingAPIObj && saveCuttingAPIObj.statusData){
 
-      if(saveCuttingAPIObj.responseData && saveCuttingAPIObj.responseData.status !== 'False'){
+      if(saveCuttingAPIObj.responseData && saveCuttingAPIObj.responseData.status === 'True'){
         // popUpAction(Constant.Fail_Save_Dtls_MSG,Constant.DefaultAlert_MSG,'OK', true,false);
+        console.log("sucess");
         backBtnAction();
 
       } else {

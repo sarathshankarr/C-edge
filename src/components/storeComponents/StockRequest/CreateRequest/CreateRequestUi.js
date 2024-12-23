@@ -1,4 +1,4 @@
-import React, {useState, useRef, useEffect, useContext} from 'react';
+import React, {useState, useRef, useEffect, useContext, useMemo} from 'react';
 import {
   View,
   FlatList,
@@ -27,6 +27,7 @@ import {RadioButton} from 'react-native-paper';
 import * as APIServiceCall from '../../../../utils/apiCalls/apiCallsComponent';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ColorContext } from '../../../colorTheme/colorTheme';
+import { RadioGroup } from 'react-native-radio-buttons-group';
 
 let downArrowImg = require('./../../../../../assets/images/png/dropDownImg.png');
 let closeImg = require('./../../../../../assets/images/png/close1.png');
@@ -120,6 +121,50 @@ const CreateRequestUi = ({route, ...props}) => {
         editStock: true,
       },
     ]);
+  };
+
+  const generalRadioButtons = useMemo(
+    () => [
+      { id: 'yes', label: 'Yes', value: 'Yes' },
+      { id: 'no', label: 'No', value: 'No' },
+    ],
+    []
+  );
+
+  const buyerRadioButtons = useMemo(
+    () => [
+      { id: 'buyerYes', label: 'Yes', value: 'Yes' },
+      { id: 'buyerNo', label: 'No', value: 'No' },
+    ],
+    []
+  );
+
+  const displayStyleRadioButtons = useMemo(
+    () => [
+      { id: 'displayYes', label: 'Yes', value: 'Yes' },
+      { id: 'displayNo', label: 'No', value: 'No' },
+    ],
+    []
+  );
+
+  const handleGeneralRadioChange = (selectedId) => {
+    const selectedValue = generalRadioButtons.find((item) => item.id === selectedId)?.value;
+    set_generalRadio(selectedValue);
+
+    if (selectedValue === 'Yes') {
+      set_buyerRadio('No');
+      set_displayStyleRadio('No');
+    }
+  };
+
+  const handleBuyerRadioChange = (selectedId) => {
+    const selectedValue = buyerRadioButtons.find((item) => item.id === selectedId)?.value;
+    set_buyerRadio(selectedValue);
+  };
+
+  const handleDisplayStyleRadioChange = (selectedId) => {
+    const selectedValue = displayStyleRadioButtons.find((item) => item.id === selectedId)?.value;
+    set_displayStyleRadio(selectedValue);
   };
 
   useEffect(() => {
@@ -978,7 +1023,7 @@ const CreateRequestUi = ({route, ...props}) => {
               )}
             </View>
           </View> */}
-          <View
+          {/* <View
         style={{
         alignItems: 'center',
         justifyContent: 'center',
@@ -1037,7 +1082,113 @@ const CreateRequestUi = ({route, ...props}) => {
           </View>
         )}
       </View>
+          </View> */}
+
+          {/* <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: 20 }}>
+         <View style={{ marginTop: 10 }}>
+          <View style={{ marginBottom: 10, flexDirection:'row',justifyContent: 'space-between'}}>
+          <Text style={{ width: '50%', fontWeight: 'bold', color: '#000' }}>General</Text>
+          <RadioGroup
+            style={{ flexDirection: 'row' }}
+            radioButtons={generalRadioButtons}
+            onPress={handleGeneralRadioChange}
+            selectedId={generalRadioButtons.find((item) => item.value === generalRadio)?.id}
+          />
           </View>
+
+        {generalRadio === 'No' && (
+          <View style={{ marginBottom: 10 }}>
+            <Text style={{ width: '50%', fontWeight: 'bold', color: '#000' }}>Buyer PO Wise</Text>
+            <RadioGroup
+            style={{ flexDirection: 'row' }}
+              radioButtons={buyerRadioButtons}
+              onPress={handleBuyerRadioChange}
+              selectedId={buyerRadioButtons.find((item) => item.value === buyerRadio)?.id}
+            />
+          </View>
+        )}
+
+        {generalRadio === 'No' && (
+          <View style={{ marginBottom: 10 }}>
+            <Text style={{ width: '50%', fontWeight: 'bold', color: '#000' }}>Display Style Wise</Text>
+            <RadioGroup
+              style={{ flexDirection: 'row' }}
+              radioButtons={displayStyleRadioButtons}
+              onPress={handleDisplayStyleRadioChange}
+              selectedId={displayStyleRadioButtons.find((item) => item.value === displayStyleRadio)?.id}
+            />
+          </View>
+        )}
+      </View>
+          </View> */}
+
+<View style={{ alignItems: 'center', justifyContent: 'center', marginTop: 20 }}>
+  <View style={{ marginTop: 10 }}>
+    <View style={{  flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between' }}>
+      <Text style={{ width: '50%', fontWeight: 'bold', color: '#000' }}>General</Text>
+      <RadioGroup
+        style={{ flexDirection: 'row' }}  
+        radioButtons={generalRadioButtons}
+        onPress={handleGeneralRadioChange}
+        layout="row"
+        selectedId={generalRadioButtons.find((item) => item.value === generalRadio)?.id}
+      />
+    </View>
+
+    {generalRadio === 'No' && (
+      <View style={{  flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between'}}>
+        <Text style={{ width: '50%', fontWeight: 'bold', color: '#000' }}>Buyer PO Wise</Text>
+        <RadioGroup
+          style={{ flexDirection: 'row' }}  
+          radioButtons={buyerRadioButtons}
+          onPress={handleBuyerRadioChange}
+          layout="row"
+          selectedId={buyerRadioButtons.find((item) => item.value === buyerRadio)?.id}
+        />
+      </View>
+    )}
+
+    {generalRadio === 'No' && (
+      <View style={{  flexDirection: 'row',alignItems: 'center',justifyContent: 'space-between'}}>
+        <Text style={{ width: '50%', fontWeight: 'bold', color: '#000' }}>Display Style Wise</Text>
+        <RadioGroup
+                style={{ flexDirection: 'row' }}
+                radioButtons={displayStyleRadioButtons}
+                onPress={handleDisplayStyleRadioChange}
+                layout="row"
+                selectedId={displayStyleRadioButtons.find((item) => item.value === displayStyleRadio)?.id}
+                />
+      </View>
+    )}
+{/* 
+     <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  marginTop: hp('2%'),
+                }}>
+                <Text style={{width: '50%', fontWeight: 'bold', color: '#000'}}>
+                  Roll Wise
+                </Text>
+                <RadioGroup
+            style={{ flexDirection: 'row' }}
+            radioButtons={rollWiseRadioButtons}
+            onPress={handleRollWiseChange}
+            layout="row"
+            selectedId={rollWiseRadioButtons.find((item) => item.value === rollWise)?.id}
+          />
+              </View> */}
+  </View>
+</View>
+
+
+
+
           {generalRadio === 'No' && (
             <View
               style={{
