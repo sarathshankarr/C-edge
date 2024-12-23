@@ -275,7 +275,7 @@ const InventoryConsumptionReportUI = ({route, ...props}) => {
             width: '90%',
             marginHorizontal: wp('5%'),
           }}>
-          <View
+          {/* <View
             style={{
               flexDirection: 'row',
               alignItems: 'center',
@@ -358,7 +358,122 @@ const InventoryConsumptionReportUI = ({route, ...props}) => {
                 <Text style={{fontWeight: 'bold', color: '#000'}}>Style</Text>
               </View>
             )}
+          </View> */}
+
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              marginBottom: hp('1%'),
+              justifyContent: 'space-between',
+              marginTop: hp('2%'),
+            }}>
+            <RadioButton.Group
+              onValueChange={newValue => {
+                if (newValue === 'General') {
+                  set_general('Yes');
+                  setCustomFormat('No');
+                } else {
+                  set_general('No');
+                  setCustomFormat('Yes');
+                }
+              }}
+              value={general === 'Yes' ? 'General' : 'Custom Format'}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  flex: 1,
+                }}>
+                <View style={{flexDirection: 'row', alignItems: 'center',width:'50%'}}>
+                  <RadioButton value="General" />
+                  <Text style={{fontWeight: 'bold', color: '#000'}}>
+                    General
+                  </Text>
+                </View>
+                <View style={{flexDirection: 'row', alignItems: 'center',width:'50%'}}>
+                  <RadioButton value="Custom Format" />
+                  <Text style={{fontWeight: 'bold', color: '#000'}}>
+                    Custom Format
+                  </Text>
+                </View>
+              </View>
+            </RadioButton.Group>
           </View>
+
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginTop: hp('2%'),
+            }}>
+            <RadioButton.Group
+              onValueChange={newValue => {
+                if (newValue === 'Fabric') {
+                  setFabric('Yes');
+                  setRm('No');
+                  setStyle('No');
+                } else if (newValue === 'RM') {
+                  setFabric('No');
+                  setRm('Yes');
+                  setStyle('No');
+                } else if (newValue === 'Style') {
+                  setFabric('No');
+                  setRm('No');
+                  setStyle('Yes');
+                }
+              }}
+              value={
+                fabric === 'Yes' ? 'Fabric' : rm === 'Yes' ? 'RM' : 'Style'
+              }
+              >
+               <View
+                style={{
+                  flexDirection: 'row',
+                  // justifyContent: 'space-between',
+                  // alignItems: 'center',
+                  // flex: 1,
+                }}> 
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    width:'33%'                  }}>
+                  <RadioButton value="Fabric" />
+                  <Text style={{fontWeight: 'bold', color: '#000'}}>
+                    Fabric
+                  </Text>
+                </View>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                   width:'33%'
+                  }}>
+                  <RadioButton value="RM" />
+                  <Text style={{fontWeight: 'bold', color: '#000'}}>RM</Text>
+                </View>
+                {general === 'Yes' && (
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      width:'33%'
+                    }}>
+                    <RadioButton value="Style" />
+                    <Text style={{fontWeight: 'bold', color: '#000'}}>
+                      Style
+                    </Text>
+                  </View>
+                )}
+              </View>
+            </RadioButton.Group>
+          </View>
+
+
+
 
           {/* dates */}
           <DateTimePickerModal
@@ -798,40 +913,56 @@ const InventoryConsumptionReportUI = ({route, ...props}) => {
             )}
           </View>
 
-         {fabric === 'Yes' &&  <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              marginBottom: hp('1%'),
-              justifyContent: 'space-evenly',
-              marginTop: hp('2%'),
-            }}>
-            <Text style={{width: '50%', fontWeight: 'bold', color: '#000'}}>
-              Roll Wise
-            </Text>
-            <Text style={{marginRight: wp('2%'), color: '#000'}}>Yes</Text>
-            <RadioButton
-              value="Yes"
-              status={rollWise === 'Yes' ? 'checked' : 'unchecked'}
-              onPress={() => {
-                setrollWise('Yes');
-              }}
-            />
-
-            <Text
+          {/* {fabric === 'Yes' && (
+            <View
               style={{
-                marginRight: wp('2%'),
-                marginLeft: wp('4%'),
-                color: '#000',
+                flexDirection: 'row',
+                alignItems: 'center',
+                marginBottom: hp('1%'),
+                justifyContent: 'space-evenly',
+                marginTop: hp('2%'),
               }}>
-              No
-            </Text>
-            <RadioButton
-              value="No"
-              status={rollWise === 'No' ? 'checked' : 'unchecked'}
-              onPress={() => setrollWise('No')}
-            />
-          </View>}
+              <Text style={{width: '50%', fontWeight: 'bold', color: '#000'}}>
+                Roll Wise
+              </Text>
+              <Text style={{marginRight: wp('2%'), color: '#000'}}>Yes</Text>
+              <RadioButton
+                value="Yes"
+                status={rollWise === 'Yes' ? 'checked' : 'unchecked'}
+                onPress={() => {
+                  setrollWise('Yes');
+                }}
+              />
+
+              <Text
+                style={{
+                  marginRight: wp('2%'),
+                  marginLeft: wp('4%'),
+                  color: '#000',
+                }}>
+                No
+              </Text>
+              <RadioButton
+                value="No"
+                status={rollWise === 'No' ? 'checked' : 'unchecked'}
+                onPress={() => setrollWise('No')}
+              />
+            </View>
+          )} */}
+         {fabric === 'Yes' && (   <View style={{ flexDirection: 'row', alignItems: 'center',justifyContent: 'space-between', marginTop: hp('2%') }}>
+            <Text style={{ width: '50%', fontWeight: 'bold', color: '#000' }}>Roll Wise</Text>
+            <RadioButton.Group
+              onValueChange={(newValue) => setrollWise(newValue)}
+              value={rollWise}>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Text style={{ marginRight: wp('2%'), color: '#000' }}>Yes</Text>
+                <RadioButton value="Yes" />
+                <Text style={{ marginRight: wp('2%'), marginLeft: wp('4%'), color: '#000' }}>No</Text>
+                <RadioButton value="No" />
+              </View>
+            </RadioButton.Group>
+          </View>
+          )}
 
           <View style={{marginBottom: 150}} />
         </View>

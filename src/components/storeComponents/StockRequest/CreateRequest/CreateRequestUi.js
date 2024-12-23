@@ -833,6 +833,8 @@ const CreateRequestUi = ({route, ...props}) => {
     );
   };
 
+  console.log("radio button values==> ", generalRadio, buyerRadio, displayStyleRadio)
+
   return (
     <View style={[CommonStyles.mainComponentViewStyle]}>
       <View style={[CommonStyles.headerView]}>
@@ -853,7 +855,7 @@ const CreateRequestUi = ({route, ...props}) => {
         extraScrollHeight={130}
         showsVerticalScrollIndicator={false}>
         <View style={{marginBottom: hp('5%')}}>
-          <View
+          {/* <View
             style={{
               alignItems: 'center',
               justifyContent: 'center',
@@ -975,15 +977,74 @@ const CreateRequestUi = ({route, ...props}) => {
                 </View>
               )}
             </View>
-          </View>
+          </View> */}
+          <View
+        style={{
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginTop: hp('3%'),
+      }}>
+      <View style={{ flexDirection: 'column', marginTop: hp('1%') }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: hp('1%') }}>
+          <Text style={{ width: '50%', fontWeight: 'bold', color: '#000' }}>General</Text>
+          <RadioButton.Group
+            onValueChange={(newValue) => {
+              set_generalRadio(newValue);
+              if (newValue === 'Yes') {
+                set_buyerRadio('No');
+                set_displayStyleRadio('No');
+              }
+            }}
+            value={generalRadio}>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Text style={{ marginRight: wp('2%'), color: '#000' }}>Yes</Text>
+              <RadioButton value="Yes" />
+              <Text style={{ marginRight: wp('2%'), marginLeft: wp('4%'), color: '#000' }}>No</Text>
+              <RadioButton value="No" />
+            </View>
+          </RadioButton.Group>
+        </View>
 
+        {generalRadio === 'No' && (
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: hp('1%') }}>
+            <Text style={{ width: '50%', fontWeight: 'bold', color: '#000' }}>Buyer PO Wise</Text>
+            <RadioButton.Group
+              onValueChange={(newValue) => set_buyerRadio(newValue)}
+              value={buyerRadio}>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Text style={{ marginRight: wp('2%'), color: '#000' }}>Yes</Text>
+                <RadioButton value="Yes" />
+                <Text style={{ marginRight: wp('2%'), marginLeft: wp('4%'), color: '#000' }}>No</Text>
+                <RadioButton value="No" />
+              </View>
+            </RadioButton.Group>
+          </View>
+        )}
+
+        {generalRadio === 'No' && (
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: hp('1%') }}>
+            <Text style={{ width: '50%', fontWeight: 'bold', color: '#000' }}>Display Style Wise</Text>
+            <RadioButton.Group
+              onValueChange={(newValue) => set_displayStyleRadio(newValue)}
+              value={displayStyleRadio}>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Text style={{ marginRight: wp('2%'), color: '#000' }}>Yes</Text>
+                <RadioButton value="Yes" />
+                <Text style={{ marginRight: wp('2%'), marginLeft: wp('4%'), color: '#000' }}>No</Text>
+                <RadioButton value="No" />
+              </View>
+            </RadioButton.Group>
+          </View>
+        )}
+      </View>
+          </View>
           {generalRadio === 'No' && (
             <View
               style={{
                 alignItems: 'center',
                 justifyContent: 'center',
-                marginTop: hp('3%'),
-                backgroundColor: '#ffffff',
+                marginTop: hp('2%'),
+                // backgroundColor: '#f8f8f8',
               }}>
               <TouchableOpacity
                 style={{
@@ -992,6 +1053,7 @@ const CreateRequestUi = ({route, ...props}) => {
                   borderColor: '#D8D8D8',
                   borderRadius: hp('0.5%'),
                   width: wp('90%'),
+                  backgroundColor: '#fff',
                 }}
                 onPress={() => {
                   set_showStylesList(!showStylesList);
@@ -1076,7 +1138,7 @@ const CreateRequestUi = ({route, ...props}) => {
                 borderColor: '#D8D8D8',
                 borderRadius: hp('0.5%'),
                 width: wp('90%'),
-                              backgroundColor: '#fff',
+                backgroundColor: '#fff',
 
               }}
               onPress={() => {
