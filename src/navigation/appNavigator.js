@@ -63,13 +63,17 @@ import InventoryConsumptionReport from '../components/reports/InventoryConsumpti
 
 import Splash from '../pages/splash/splash';
 import Settings from '../components/settings/Settings';
+import SalesOrderReport from '../components/reports/SalesOrderReport copy/SalesOrderReport';
+import ProductionProcessReport from '../components/reports/Production process report/ProductionProcessReport';
+import StyleBomReport from '../components/reports/Style BOM report/StyleBomReport';
+import WorkerWagesReport from '../components/reports/Worker wages report/WorkerWagesReport';
 
 
 const Stack = createNativeStackNavigator();
 
 const AppStack = () => {
   return (
-    <Stack.Navigator initialRouteName="SplashComponent" screenOptions={{ gestureEnabled: false }}>
+    <Stack.Navigator initialRouteName="SplashComponent" screenOptions={{ animationEnabled: true, gestureEnabled: true }}>
       <Stack.Screen name="LoginComponent" component={LoginComponent} options={{ headerShown: false }} />
       <Stack.Screen name="SplashComponent" component={Splash} options={{ headerShown: false }} />
       <Stack.Screen name="HomeScreenComponent" component={HomeScreenComponent} options={{ headerShown: false }} />
@@ -129,6 +133,10 @@ const AppStack = () => {
       <Stack.Screen name="GatePassAckEdit" component={GatePassAckEdit} options={{ headerShown: false }} /> 
       <Stack.Screen name="Settings" component={Settings} options={{ headerShown: false }} /> 
       <Stack.Screen name="InventoryConsumptionReport" component={InventoryConsumptionReport} options={{ headerShown: false }} /> 
+      <Stack.Screen name="SalesOrderReport" component={SalesOrderReport} options={{ headerShown: false }} /> 
+      <Stack.Screen name="ProductionProcessReport" component={ProductionProcessReport} options={{ headerShown: false }} /> 
+      <Stack.Screen name="StyleBomReport" component={StyleBomReport} options={{ headerShown: false }} /> 
+      <Stack.Screen name="WorkerWagesReport" component={WorkerWagesReport} options={{ headerShown: false }} /> 
     </Stack.Navigator>
   );
 };

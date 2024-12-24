@@ -21,7 +21,7 @@ const App = () => {
   }
 
 
-console.log("entered app.js file ", colors)
+// console.log("entered app.js file ", colors)
   return (
       <View style={{
         flex:1,

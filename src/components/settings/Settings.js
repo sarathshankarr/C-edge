@@ -170,6 +170,8 @@ const SettingsSidebar = ({navigation}) => {
     setselectedCompanyName(name);
     setshowCompanyList(false);
     await getCompanyObj(id);
+    navigation.navigate('Main');
+    
   };
 
   const handleSelectColor = async item => {

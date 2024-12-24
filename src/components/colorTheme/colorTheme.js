@@ -14,6 +14,8 @@ const ColorProvider = ({ children }) => {
     color5: '#DDD', 
   });
 
+  
+
 useEffect(() => {
   const getColorfromStorage = async () => {
     try {
