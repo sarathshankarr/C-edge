@@ -466,25 +466,40 @@ const InventoryConsumptionReportUI = ({route, ...props}) => {
             )}
           </View> */}
 
-     
-          
-        <RadioGroup
-        style={{ flexDirection: 'row' }}
-        radioButtons={generalRadioButtons}
-        onPress={handleGeneralChange}
-        layout="column"
-        selectedId={generalRadioButtons.find((item) => item.value === (general === 'Yes' ? 'General' : 'Custom Format'))?.id}
-      />
+          <RadioGroup
+            style={{flexDirection: 'row'}}
+            radioButtons={generalRadioButtons}
+            onPress={handleGeneralChange}
+            layout="row"
+            selectedId={
+              generalRadioButtons.find(
+                item =>
+                  item.value ===
+                  (general === 'Yes' ? 'General' : 'Custom Format'),
+              )?.id
+            }
+          />
 
-      <RadioGroup
-        style={{ flexDirection: 'row' }}
-        radioButtons={categoryRadioButtons}
-        onPress={handleCategoryChange}
-        layout="column"
-        selectedId={categoryRadioButtons.find((item) => item.value === (fabric === 'Yes' ? 'Fabric' : rm === 'Yes' ? 'RM' : style === 'Yes' ? 'Style' : ''))?.id}
-      />
+          <RadioGroup
+            style={{flexDirection: 'row'}}
+            radioButtons={categoryRadioButtons}
+            onPress={handleCategoryChange}
+            layout="row"
+            selectedId={
+              categoryRadioButtons.find(
+                item =>
+                  item.value ===
+                  (fabric === 'Yes'
+                    ? 'Fabric'
+                    : rm === 'Yes'
+                    ? 'RM'
+                    : style === 'Yes'
+                    ? 'Style'
+                    : ''),
+              )?.id
+            }
+          />
 
-      
           {/* dates */}
           <DateTimePickerModal
             isVisible={isDatePickerVisible}
@@ -959,26 +974,28 @@ const InventoryConsumptionReportUI = ({route, ...props}) => {
               />
             </View>
           )} */}
-
-
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              marginTop: hp('2%'),
-            }}>
-            <Text style={{width: '50%', fontWeight: 'bold', color: '#000'}}>
-              Roll Wise
-            </Text>
-            <RadioGroup
-        style={{ flexDirection: 'row' }}
-        radioButtons={rollWiseRadioButtons}
-        onPress={handleRollWiseChange}
-        layout="row"
-        selectedId={rollWiseRadioButtons.find((item) => item.value === rollWise)?.id}
-      />
-          </View>
+          {fabric === 'Yes' && (
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginTop: hp('2%'),
+              }}>
+              <Text style={{width: '50%', fontWeight: 'bold', color: '#000'}}>
+                Roll Wise
+              </Text>
+              <RadioGroup
+                style={{flexDirection: 'row'}}
+                radioButtons={rollWiseRadioButtons}
+                onPress={handleRollWiseChange}
+                layout="row"
+                selectedId={
+                  rollWiseRadioButtons.find(item => item.value === rollWise)?.id
+                }
+              />
+            </View>
+          )}
 
           {/* <View style={{marginBottom: 150}} /> */}
         </View>
