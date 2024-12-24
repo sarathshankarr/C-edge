@@ -254,6 +254,7 @@ const handleSearchGst = text => {
                 label="Start Date *"
                 value={startDate ? startDate : ''}
                 placeholder="Start Date"
+                placeholderTextColor="#000"
                 mode="outlined"
               />
             </View>
@@ -281,6 +282,7 @@ const handleSearchGst = text => {
               <TextInput
                 label="End Date *"
                 value={endDate ? endDate : ''}
+                placeholderTextColor="#000"
                 placeholder="End Date"
                 mode="outlined"
               />

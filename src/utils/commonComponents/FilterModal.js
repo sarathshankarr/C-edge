@@ -253,6 +253,7 @@ const toggleSelection = (item) => {
             <TextInput
               style={styles.searchBar}
               placeholder={`Search`}
+              placeholderTextColor='black'
               value={searchText}
               onChangeText={handleFilterList}
             />

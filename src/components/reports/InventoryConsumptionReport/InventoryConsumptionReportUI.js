@@ -258,12 +258,16 @@ const InventoryConsumptionReportUI = ({route, ...props}) => {
         label: 'General',
         value: 'General',
         selected: general === 'Yes',
+        labelStyle: {color: '#000'},
+
       },
       {
         id: '2',
         label: 'Custom Format',
         value: 'Custom Format',
         selected: customFormat === 'Yes',
+        labelStyle: {color: '#000'},
+
       },
     ],
     [general, customFormat],
@@ -277,12 +281,16 @@ const InventoryConsumptionReportUI = ({route, ...props}) => {
         label: 'Fabric',
         value: 'Fabric',
         selected: fabric === 'Yes',
+        labelStyle: {color: '#000'},
+
       },
       {
         id: '2',
         label: 'RM',
         value: 'RM',
         selected: rm === 'Yes',
+        labelStyle: {color: '#000'},
+
       },
       ...(general === 'Yes'
         ? [
@@ -291,6 +299,8 @@ const InventoryConsumptionReportUI = ({route, ...props}) => {
               label: 'Style',
               value: 'Style',
               selected: style === 'Yes',
+              labelStyle: {color: '#000'},
+
             },
           ]
         : []),
@@ -306,12 +316,16 @@ const InventoryConsumptionReportUI = ({route, ...props}) => {
         label: 'Yes',
         value: 'Yes',
         selected: rollWise === 'Yes',
+        labelStyle: {color: '#000'},
+
       },
       {
         id: '2',
         label: 'No',
         value: 'No',
         selected: rollWise === 'No',
+        labelStyle: {color: '#000'},
+
       },
     ],
     [rollWise],
@@ -481,7 +495,7 @@ const InventoryConsumptionReportUI = ({route, ...props}) => {
           />
 
           <RadioGroup
-            style={{flexDirection: 'row'}}
+            style={{flexDirection: 'row', color:'#000'}}
             radioButtons={categoryRadioButtons}
             onPress={handleCategoryChange}
             layout="row"
@@ -520,6 +534,7 @@ const InventoryConsumptionReportUI = ({route, ...props}) => {
                 label="Start Date"
                 value={startDate ? startDate : ''}
                 placeholder="Start Date"
+                placeholderTextColor="#000"
                 mode="outlined"
               />
             </View>
@@ -547,6 +562,7 @@ const InventoryConsumptionReportUI = ({route, ...props}) => {
               <TextInput
                 label="End Date"
                 value={endDate ? endDate : ''}
+                placeholderTextColor="#000"
                 placeholder="End Date"
                 mode="outlined"
               />

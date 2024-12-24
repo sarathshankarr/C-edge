@@ -233,6 +233,7 @@ const handleSearchEmployee = text => {
                 label="Start Date"
                 value={startDate ? startDate : ''}
                 placeholder="Start Date *"
+                placeholderTextColor="#000"
                 mode="outlined"
               />
             </View>
@@ -261,6 +262,7 @@ const handleSearchEmployee = text => {
                 label="End Date"
                 value={endDate ? endDate : ''}
                 placeholder="End Date *"
+                placeholderTextColor="#000"
                 mode="outlined"
               />
             </View>
