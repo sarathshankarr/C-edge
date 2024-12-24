@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useRef, useContext} from 'react';
+import React, {useEffect, useState, useRef, useContext, useCallback} from 'react';
 import {
   Animated,
   Image,
@@ -12,6 +12,7 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Easing} from 'react-native';
 import { ColorContext } from '../../components/colorTheme/colorTheme';
+import { useFocusEffect } from '@react-navigation/native';
 
 const dropdownMenus = {
   style: {
@@ -139,6 +140,26 @@ const dropdownMenus = {
         route: 'InventoryConsumptionReport',
         src: require('../../../assets/images/png/report.png'),
       },
+      {
+        label: 'Sales Order Report',
+        route: 'SalesOrderReport',
+        src: require('../../../assets/images/png/report.png'),
+      },
+      {
+        label: 'Production Process Report',
+        route: 'ProductionProcessReport',
+        src: require('../../../assets/images/png/report.png'),
+      },
+      {
+        label: 'Style Bom Report',
+        route: 'StyleBomReport',
+        src: require('../../../assets/images/png/report.png'),
+      },
+      {
+        label: 'Worker Wages Report',
+        route: 'WorkerWagesReport',
+        src: require('../../../assets/images/png/report.png'),
+      },
     ],
   },
 };
@@ -146,6 +167,7 @@ const dropdownMenus = {
 const Sidebar = ({navigation}) => {
   const [userName, set_userName] = useState('');
   const [admin, set_admin] = useState('');
+  const [companyName, set_companyName] = useState('');
 
   const [modalVisible, setModalVisible] = useState(false);
   const [openDropdown, setOpenDropdown] = React.useState(null);
@@ -160,12 +182,20 @@ const Sidebar = ({navigation}) => {
     setOpenDropdown(prev => (prev === key ? null : key));
   };
 
-  useEffect(() => {
-    getUserName();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      getUserName();
+    }, [])
+  );
 
   const getUserName = async () => {
     let userName = await AsyncStorage.getItem('userDisplayName');
+    let companyObj = await AsyncStorage.getItem('companyObj');
+    let cpyObj = JSON.parse(companyObj);
+
+    // console.log("compnay Name", cpyObj.company_name)
+
+
     let admin = await AsyncStorage.getItem('admin');
     // console.log('UserName', userName, admin);
     if (userName) {
@@ -173,6 +203,10 @@ const Sidebar = ({navigation}) => {
     }
     if (admin) {
       set_admin(admin);
+    }
+    if (companyObj) {
+      set_companyName(cpyObj.company_name);
+      console.log("inside setting company name")
     }
   };
 
@@ -320,7 +354,7 @@ const Sidebar = ({navigation}) => {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <View style={styles.headerContainer}>
+      {/* <View style={styles.headerContainer}>
         <View style={styles.header}>
           <TouchableOpacity>
             <Image
@@ -329,14 +363,41 @@ const Sidebar = ({navigation}) => {
             />
           </TouchableOpacity>
           <View>
-            {/* <Text style={styles.headerTitle}>Hi,  {userName}</Text>
-                <Text style={styles.headerSubtitle}>{admin ? admin : "Profile"}</Text> */}
-
             <Text style={styles.headerTitle}>Profile</Text>
             <Text style={styles.headerSubtitle}>{userName}</Text>
           </View>
         </View>
-      </View>
+        <View style={{flexDirection:'row', alignItems:'center'}}>
+         <Image
+              style={[styles.img1, {borderRadius: 30, tintColor: '#fff'}]}
+              source={require('../../../assets/images/png/office.png')}
+            />
+          <Text style={styles.headerSubtitle}>{companyName}</Text>
+        </View>
+      </View> */}
+
+      <View style={styles.headerContainer}>
+     <View style={styles.header}>
+    <TouchableOpacity>
+      <Image
+        style={[styles.img, { tintColor: '#fff' }]}
+        source={require('../../../assets/images/png/profile.png')}
+      />
+    </TouchableOpacity>
+    <View>
+      <Text style={styles.headerTitle}>Profile</Text>
+      <Text style={styles.headerSubtitle}>{userName}</Text>
+    </View>
+  </View>
+
+  {companyName && <View style={styles.companyInfo}>
+    <Image
+      style={[styles.img1, { tintColor: '#fff'}]}
+      source={require('../../../assets/images/png/building.png')}
+    />
+    <Text style={styles.headerSubtitle}>{companyName}</Text>
+  </View>}
+</View>
 
       {/* Navigation */}
       <ScrollView
@@ -369,7 +430,7 @@ const Sidebar = ({navigation}) => {
             onPress={() => navigation.navigate('Settings')}
           />
         </View>
-       <View style={{marginBottom: 150}} />
+       <View style={{marginBottom: 50}} />
       </ScrollView>
 
 
@@ -416,9 +477,46 @@ const getStyles = (colors) => StyleSheet.create({
   scrollContainer: {flex: 1},
   scrollContent: {paddingBottom:20},
   // Header styles
+  // headerContainer: {
+  //   backgroundColor: colors.color2,
+  //   paddingVertical: 20,
+  //   paddingHorizontal: 15,
+  //   borderBottomLeftRadius: 20,
+  //   borderBottomRightRadius: 20,
+  //   margin: 15,
+  //   // borderRadius:5,
+  // },
+  // header: {
+  //   flexDirection: 'row',
+  //   alignItems: 'center',
+  // },
+  // img: {
+  //   height: 50,
+  //   width: 50,
+  //   borderRadius: 25,
+  //   marginRight: 15,
+  //   backgroundColor: '#ffffff50',
+  // },
+  // img1: {
+  //   height: 25,
+  //   width: 25,
+  //   borderRadius: 25,
+  //   marginRight: 15,
+  //   backgroundColor: '#ffffff50',
+  // },
+  // headerTitle: {
+  //   color: '#fff',
+  //   fontSize: 18,
+  //   fontWeight: 'bold',
+  // },
+  // headerSubtitle: {
+  //   color: '#fff',
+  //   fontSize: 14,
+  //   marginTop: 5,
+  // },
   headerContainer: {
-    backgroundColor: colors.color2,
-    paddingVertical: 20,
+      backgroundColor: colors.color2,
+    paddingVertical: 5,
     paddingHorizontal: 15,
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
@@ -428,6 +526,7 @@ const getStyles = (colors) => StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginBottom: 7,
   },
   img: {
     height: 50,
@@ -435,16 +534,38 @@ const getStyles = (colors) => StyleSheet.create({
     borderRadius: 25,
     marginRight: 15,
     backgroundColor: '#ffffff50',
+    borderWidth: 1,
+    borderColor: '#fff',
+  },
+  img1: {
+    height: 30,
+    width: 30,
+    // borderRadius: 30,
+    marginRight: 15,
+    // backgroundColor: '#ffffff',
+    // borderWidth: 1,
+    // borderColor: '#fff',
   },
   headerTitle: {
     color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
+    fontSize: 20,
+    fontWeight: '600',
   },
   headerSubtitle: {
-    color: '#fff',
+    color: '#ffffffcc',
     fontSize: 14,
-    marginTop: 5,
+    marginTop: 2,
+  },
+  companyInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingTop: 5,
+    paddingBottom: 2,
+    borderTopWidth: 1,
+    justifyContent:'center',
+    borderTopColor: '#ffffff50',
+    marginTop: 2,
+    paddingHorizontal: 15,
   },
 
   dropdownTitle: {flexDirection: 'row', alignItems: 'center'},
