@@ -218,12 +218,16 @@ const ProductionProcessReportUI = ({route, ...props}) => {
         label: 'Total',
         value: 'Total',
         selected: total === 'Yes',
+        labelStyle: {color: '#000'},
+
       },
       {
         id: '2',
         label: 'Daywise',
         value: 'Daywise',
         selected: dayWise === 'Yes',
+        labelStyle: {color: '#000'},
+
       },
 
       {
@@ -231,6 +235,8 @@ const ProductionProcessReportUI = ({route, ...props}) => {
         label: ' Pending Quantity  ',
         value: 'pendingQuantity',
         selected: pendingQuantity === 'Yes',
+        labelStyle: {color: '#000'},
+
       },
     ],
     [total, dayWise, pendingQuantity],
@@ -277,10 +283,10 @@ const ProductionProcessReportUI = ({route, ...props}) => {
         <View
           style={{
             marginBottom: hp('5%'),
-            marginTop: hp('5%'),
             width: '90%',
             marginHorizontal: wp('5%'),
           }}>
+            <View style={{marginTop:20}}/>
           <RadioGroup
             style={{flexDirection: 'row'}}
             radioButtons={categoryRadioButtons}
@@ -321,6 +327,7 @@ const ProductionProcessReportUI = ({route, ...props}) => {
                 label="Start Date"
                 value={startDate ? startDate : ''}
                 placeholder="Start Date *"
+                placeholderTextColor="#000"
                 mode="outlined"
               />
             </View>
@@ -349,6 +356,7 @@ const ProductionProcessReportUI = ({route, ...props}) => {
                 label="End Date"
                 value={endDate ? endDate : ''}
                 placeholder="End Date *"
+                placeholderTextColor="#000"
                 mode="outlined"
               />
             </View>
