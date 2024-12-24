@@ -125,24 +125,24 @@ const CreateRequestUi = ({route, ...props}) => {
 
   const generalRadioButtons = useMemo(
     () => [
-      { id: 'yes', label: 'Yes', value: 'Yes' },
-      { id: 'no', label: 'No', value: 'No' },
+      { id: 'yes', label: 'Yes', value: 'Yes' ,labelStyle: {color: '#000'}},
+      { id: 'no', label: 'No', value: 'No',labelStyle: {color: '#000'}, },
     ],
     []
   );
 
   const buyerRadioButtons = useMemo(
     () => [
-      { id: 'buyerYes', label: 'Yes', value: 'Yes' },
-      { id: 'buyerNo', label: 'No', value: 'No' },
+      { id: 'buyerYes', label: 'Yes', value: 'Yes',labelStyle: {color: '#000'}, },
+      { id: 'buyerNo', label: 'No', value: 'No',labelStyle: {color: '#000'}, },
     ],
     []
   );
 
   const displayStyleRadioButtons = useMemo(
     () => [
-      { id: 'displayYes', label: 'Yes', value: 'Yes' },
-      { id: 'displayNo', label: 'No', value: 'No' },
+      { id: 'displayYes', label: 'Yes', value: 'Yes' ,labelStyle: {color: '#000'},},
+      { id: 'displayNo', label: 'No', value: 'No' ,labelStyle: {color: '#000'},},
     ],
     []
   );
