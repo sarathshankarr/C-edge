@@ -93,7 +93,7 @@ const GatePassAckListUI = ({route, ...props }) => {
    setIsFiltering(true); 
 
       let nestedFilter = props.itemsArray;
-      const styleArray = nestedFilter.filter(style => (style?.docno.toUpperCase().includes(name.toUpperCase()) || style?.vendorname.toUpperCase().includes(name.toUpperCase()) ));
+      const styleArray = nestedFilter.filter(style => (style?.docno.toUpperCase().includes(name.toUpperCase()) || style?.vendorname.toUpperCase().includes(name.toUpperCase()) || style?.docdatestr.toUpperCase().includes(name.toUpperCase()) || (style?.isAcknowledgement===1 ? "delivered".toUpperCase().includes(name.toUpperCase()) : "open".toUpperCase().includes(name.toUpperCase()))));
 
       if(styleArray && styleArray.length > 0) {
         set_filterArray(styleArray);

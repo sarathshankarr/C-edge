@@ -132,7 +132,9 @@ const [ackBtnEnable, set_ackBtnEnable]=useState(true);
       }
 
       if(props.itemsObj.docdatestr){
-        set_documentDate(props.itemsObj.docdatestr)
+        const dd= props.itemsObj.docdatestr.split(' ');
+        console.log("setting doc date ", dd[0]);
+        set_documentDate(dd[0])
       }
       if(props.itemsObj.docketdatestr){
         set_docketDate(props.itemsObj.docketdatestr)
@@ -190,11 +192,19 @@ const [ackBtnEnable, set_ackBtnEnable]=useState(true);
     props.popOkBtnAction();
   };
 
-  const formatDate=(date)=>{
+  const formatDateForSave=(date)=>{
     const [d,m, y]=date.split('/');
     const ans=[y,m,d].join('-')
+    console.log("date ==> ", date, ans);
     return ans;
   }
+
+function formatDateIntoDMY(inp) {
+  const[y, m, d]=inp.split('-');
+  let ans=[d, m, y];
+  ans=ans.join('/');
+  return ans;
+}
 
   const submitAction = async (acknowledgementValue) => {
  
@@ -210,9 +220,9 @@ const [ackBtnEnable, set_ackBtnEnable]=useState(true);
       "gpUserIdandRoleId" : userId,
       "gatePassLocationId" : locationId,
       "remarks" : remarks,
-      "docdatestr" :documentDate ? formatDate(documentDate) : "",
-      "invdatestr" : invoiceChallanDate ? formatDate(invoiceChallanDate) : "",
-      "docketdatestr" :docketDate ? formatDate(docketDate) : "",
+      "docdatestr" :documentDate ? formatDateForSave(documentDate) : "",
+      "invdatestr" : invoiceChallanDate ? formatDateForSave(invoiceChallanDate) : "",
+      "docketdatestr" :docketDate ? formatDateForSave(docketDate) : "",
       "transportname" : transporterId,
       "vendorid" : vendorId,
       "uom" : uom,
@@ -294,14 +304,13 @@ const [ackBtnEnable, set_ackBtnEnable]=useState(true);
      set_inputBarCode('');
    }
 
-
   }
 
   
-
   const handleConfirm = (date) => {
     const extractedDate = date.toISOString().split('T')[0];
-    const formattedDate =  formatDateIntoDMY(extractedDate)
+    const formattedDate =  formatDateIntoDMY(extractedDate);
+    console.log("extracted date===> ",date,  extractedDate,formattedDate,"end")
 
     if (activeField === 'documentDate') {
       set_documentDate(formattedDate);
@@ -363,19 +372,6 @@ const [ackBtnEnable, set_ackBtnEnable]=useState(true);
     });
   }
 
-
-  function formatDateForSave(inp) {
-    const[d, m, y]=inp.split('/');
-    let ans=[y, m, d];
-    ans=ans.join('-');
-    return ans;
-}
-  function formatDateIntoDMY(inp) {
-    const[y, m, d]=inp.split('-');
-    let ans=[d, m, y];
-    ans=ans.join('-');
-    return ans;
-}
 
   return (
     <View style={[CommonStyles.mainComponentViewStyle]}>

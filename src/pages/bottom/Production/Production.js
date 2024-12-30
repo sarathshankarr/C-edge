@@ -11,12 +11,12 @@ const Production = ({ navigation }) => {
     { id: 2, name: 'Stitching In', component: 'StichingInComponent', image: require('../../../../assets/images/png/sewing.png') },
     { id: 3, name: 'Finishing In', component: 'FinishingStyleComponent', image: require('../../../../assets/images/png/success.png') },
     { id: 4, name: 'Fabric Process In', component: 'FabricProcessInList', image: require('../../../../assets/images/png/fabricProce.png') },
-    { id: 5, name: 'Gate Pass Acknowledgement', component: 'GatePassAckList', image: require('../../../../assets/images/png/acknowledge.png') },
   ];
-
+  
   const outwardProcess = [   
     { id: 1, name: 'Stitching Out', component: 'StichingOutComponent', image: require('../../../../assets/images/png/sewing.png') },
     { id: 2, name: 'Finishing Out', component: 'FinishingOutListComponent', image: require('../../../../assets/images/png/success.png') },
+    { id: 3, name: 'Gate Pass Acknowledgement', component: 'GatePassAckList', image: require('../../../../assets/images/png/acknowledge.png') },
   ];
 
   const handleDemoClick = (component) => {

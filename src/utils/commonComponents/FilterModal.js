@@ -39,6 +39,8 @@ const FilterModal = ({isVisible, onClose, categoriesList, selectedCategoryListAP
 useEffect(()=>{
   if(prepopulateSelectedCategory){
     setSelectedCategory(prepopulateSelectedCategory)
+  }else{
+    setSelectedCategory('')
   }
   if(prepoluateIndices){
     setSelectedIndices(prepoluateIndices)
@@ -62,8 +64,8 @@ useEffect(()=>{
         ? value.toUpperCase().includes(searchValue)
         : value.toString().includes(searchValue);
     });
-        
-    set_selectedCategoryFilteredItems(filtered);
+    const fil=filtered.reverse();
+    set_selectedCategoryFilteredItems(fil);
     setSearchText(text);
   }
 
@@ -115,11 +117,13 @@ const toggleSelection = (item) => {
       if(categoreisListAPIOBJ && categoreisListAPIOBJ.statusData){
   
         if(categoreisListAPIOBJ && categoreisListAPIOBJ.responseData){
-          set_selectedCategoryItems(categoreisListAPIOBJ.responseData);
-          set_selectedCategoryFilteredItems(categoreisListAPIOBJ.responseData);
+          const filtered=categoreisListAPIOBJ.responseData;
+          const fil=filtered.reverse();
+          set_selectedCategoryItems(fil);
+          set_selectedCategoryFilteredItems(fil);
           setSearchCacheResults(prevLists => ({
             ...prevLists,
-            [id] : categoreisListAPIOBJ.responseData
+            [id] : fil
           }))
         } 
   

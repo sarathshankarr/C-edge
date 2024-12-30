@@ -67,56 +67,10 @@ const StyleDetailsUI = ({ route, ...props }) => {
           </View>
         </View>
 
-        {/* <View style={{marginTop:hp('5%'),}}>
-
-          <View style={{width:('90%'), height:hp('5%'),flexDirection:'row'}}>
-            <Text style={[CommonStyles.tylesHeaderTextStyle,{ width: '40%', textAlign: 'left' }]}>{'Style'}</Text>
-            <Text style={[CommonStyles.tylesHeaderTextStyle,{ flex: 1, marginLeft: hp('2%') }]}>{':   '}{props.itemObj && props.itemObj.styleName ? props.itemObj.styleName : 'N/A'}</Text>
-          </View>
-
-          <View style={{width:('90%'), height:hp('5%'),flexDirection:'row'}}>
-            <Text style={[CommonStyles.tylesHeaderTextStyle,{ width: '40%', textAlign: 'left' }]}>{'Fabric'}</Text>
-            <Text style={[CommonStyles.tylesHeaderTextStyle,{ flex: 1, marginLeft: hp('2%') }]}>{':  '}{props.itemObj && props.itemObj.fabricName ? props.itemObj.fabricName : 'N/A'}</Text>
-          </View>
-
-          <View style={{width:('90%'), height:hp('5%'),flexDirection:'row'}}>
-            <Text style={[CommonStyles.tylesHeaderTextStyle,{textAlign:'left'},{width:'40%'}]}>{'Customer Style'}</Text>
-            <Text style={[CommonStyles.tylesHeaderTextStyle,{ flex: 1, marginLeft: hp('2%') }]}>{':  '}{props.itemObj && props.itemObj.customerStyle ? props.itemObj.customerStyle : 'N/A'}</Text>
-          </View>
-
-          <View style={{width:('90%'), height:hp('5%'),flexDirection:'row'}}>
-            <Text style={[CommonStyles.tylesHeaderTextStyle,{ width: '40%', textAlign: 'left' }]}>{'Shipping Date'}</Text>
-            <Text style={[CommonStyles.tylesHeaderTextStyle,{ flex: 1, marginLeft: hp('2%') }]}>{':   '}{props.itemObj && props.itemObj.shippingDate ? props.itemObj.shippingDate : 'N/A'}</Text>
-          </View>
-
-          <View style={{width:('90%'), height:hp('5%'),flexDirection:'row'}}>
-            <Text style={[CommonStyles.tylesHeaderTextStyle,{ width: '40%', textAlign: 'left' }]}>{'Season'}</Text>
-            <Text style={[CommonStyles.tylesHeaderTextStyle,{ flex: 1,  marginLeft: hp('2%') }]}>{':'}{props.itemObj && props.itemObj.season ? props.itemObj.season : 'N/A'}</Text>
-          </View>
-
-          <View style={{width:('90%'), height:hp('5%'),flexDirection:'row'}}>
-            <Text style={[CommonStyles.tylesHeaderTextStyle,{ width: '40%', textAlign: 'left' }]}>{'FOB Price :'}</Text>
-            <Text style={[CommonStyles.tylesHeaderTextStyle,{ flex: 1, marginLeft: hp('2%') }]}>{':'}{props.itemObj && props.itemObj.fob ? props.itemObj.fob : 'N/A'}</Text>
-          </View>
-
-          <View style={{width:('100%'), height:hp('5%'),flexDirection:'row',justifyContent:'space-between',alignItems:'center'}}>
-            <View style = {{flexDirection:'row'}}>
-              <Text style={[CommonStyles.tylesHeaderTextStyle,{ width: '38%', textAlign: 'left' }]}>{'Total Qty :'}</Text>
-              <Text style={[CommonStyles.tylesHeaderTextStyle,{ flex: 1, marginLeft: hp('1%') }]}>{':   '}{props.itemObj && props.itemObj.totalQty ? props.itemObj.totalQty : 'N/A'}</Text>
-            </View>
-            <View style = {{flex:1,alignItems:'flex-end'}}>
-              <TouchableOpacity onPress={() => sizeDetailsAction()} style={styles.buttonStyle}>
-                <Image source={arrowImg} style={styles.arrowIconStyle}/>
-              </TouchableOpacity>
-            </View>
-          </View>
-
-        </View> */}
-
         <View style={{ marginTop: hp('5%') }}>
           <View style={{ width: '100%', flexDirection: 'row', marginVertical: hp('1%') }}>
             <View style={{ width: '40%', flexDirection: 'row', justifyContent: 'space-between' }}>
-              <Text style={[CommonStyles.tylesHeaderTextStyle, {}]}>{'Style'}</Text>
+              <Text style={[CommonStyles.tylesHeaderTextStyle, {}]}>{'Style No'}</Text>
               <Text style={[CommonStyles.tylesHeaderTextStyle, { marginLeft: hp('1%') }]}>{':'}</Text>
             </View>
             <View style={{ width: '60%', paddingLeft: hp('1%') }}>
@@ -136,7 +90,7 @@ const StyleDetailsUI = ({ route, ...props }) => {
 
           <View style={{ width: '100%', flexDirection: 'row', marginVertical: hp('1%') }}>
             <View style={{ width: '40%', flexDirection: 'row', justifyContent: 'space-between' }}>
-              <Text style={[CommonStyles.tylesHeaderTextStyle, {}]}>{'Customer Style'}</Text>
+              <Text style={[CommonStyles.tylesHeaderTextStyle, {}]}>{'Customer Style No *'}</Text>
               <Text style={[CommonStyles.tylesHeaderTextStyle, { marginLeft: hp('1%') }]}>{':'}</Text>
             </View>
             <View style={{ width: '60%', paddingLeft: hp('1%') }}>
