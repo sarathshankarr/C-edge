@@ -103,7 +103,7 @@ const GatePassAckEdit = ({ navigation, route, ...props }) => {
     tempObj.company=JSON.parse(companyObj);
     
 
-    console.log(" edit saving Obj ===> ", tempObj);
+    console.log(" edit saving Obj before saving ===> ", tempObj);
 
     set_isLoading(true);   
     let saveGPAEditObj = await APIServiceCall.saveGatePassAckEditSave(tempObj);

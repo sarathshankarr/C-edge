@@ -108,11 +108,6 @@ const dropdownMenus = {
         route: 'FabricProcessInList',
         src: require('../../../assets/images/png/fabricProce.png'),
       },
-      {
-        label: 'Gate Pass Acknowledgement',
-        route: 'GatePassAckList',
-        src: require('../../../assets/images/png/acknowledge.png'),
-      },
     ],
   },
   outwardProcess: {
@@ -128,6 +123,11 @@ const dropdownMenus = {
         label: 'Finishing Out',
         route: 'FinishingOutListComponent',
         src: require('../../../assets/images/png/success.png'),
+      },
+      {
+        label: 'Gate Pass Acknowledgement',
+        route: 'GatePassAckList',
+        src: require('../../../assets/images/png/acknowledge.png'),
       },
     ],
   },
