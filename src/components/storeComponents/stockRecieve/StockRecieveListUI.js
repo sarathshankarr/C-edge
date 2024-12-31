@@ -187,7 +187,7 @@ const StockRecieveListUI = ({ route, ...props }) => {
           isChatEnable={false}
           isTImerEnable={false}
           isTitleHeaderEnable={true}
-          title={'Stock Recieve List'}
+          title={'Stock Receive List'}
           backBtnAction={() => backBtnAction()}
         />
       </View>

@@ -143,7 +143,7 @@ const CuttingSaveUI = ({ route, ...props }) => {
       "userId": userId,
       "compIds": usercompanyId,
       "company":JSON.parse(companyObj),
-     "sizeDetails": enterSizesArray,
+      "sizeDetails": enterSizesArray,
       "actualcon": actualConsumption,
       "batchId": batchId ? batchId : 0,
       "unitprice": unitPrice ? unitPrice : 0,

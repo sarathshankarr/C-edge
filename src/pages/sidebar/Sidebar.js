@@ -57,7 +57,7 @@ const dropdownMenus = {
         src: require('../../../assets/images/png/stockApproval.png'),
       },
       {
-        label: 'Store Recieve',
+        label: 'Store Receive',
         route: 'StockRecieveList',
         src: require('../../../assets/images/png/stockRecieve.png'),
       },
