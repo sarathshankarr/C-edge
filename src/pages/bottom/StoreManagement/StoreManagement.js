@@ -11,7 +11,7 @@ const StoreManagement = ({ navigation }) => {
   const inwardProcess = [
     { id: 1, name: 'Stock Request ', component: 'StockRequestList', image: require('../../../../assets/images/png/stockRequest.png') },
     { id: 2, name: 'Stock Approval', component: 'StoreApproveListComponent', image: require('../../../../assets/images/png/stockApproval.png') },
-    { id: 3, name: 'Stock Recieve ', component: 'StockRecieveList', image: require('../../../../assets/images/png/stockRecieve.png') },
+    { id: 3, name: 'Stock Receive ', component: 'StockRecieveList', image: require('../../../../assets/images/png/stockRecieve.png') },
   ];
 
 //   const outwardProcess = [

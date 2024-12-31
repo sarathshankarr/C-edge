@@ -55,6 +55,9 @@ const [itemsArray, set_itemsArray] = useState([]);
         "compIds": usercompanyId,
         "company":JSON.parse(companyObj),
     }
+    console.log( "styleId ",id,"soId ",  sid,)
+    console.log( "re body before getting fab details ==> ","start", obj, "end");
+
 
     let fabricAPIObj = await APIServiceCall.getFabricDetails(obj);
     set_isLoading(false);
@@ -82,6 +85,8 @@ const [itemsArray, set_itemsArray] = useState([]);
   };
 
   const actionOnRow = (item,index) => {
+    item.styleId=route.params?.styleId;
+    item.soId=route.params?.soId;
     navigation.navigate('CuttingSaveComponent',{item:item})
   };
 

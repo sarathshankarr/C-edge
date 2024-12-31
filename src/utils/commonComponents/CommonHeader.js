@@ -142,11 +142,11 @@ const CommonHeader = ({ title, showDrawerButton }) => {
           k: key,
           name: value,
         }));
+        const fil=filtered.reverse();
+        set_filterStyleList2(fil);
+        set_styleList2(fil);
 
-        set_filterStyleList2(filtered);
-        set_styleList2(filtered);
-
-        console.log("filtered===> ", filtered[0]);
+        // console.log("filtered===> ", filtered[0]);
       }
     } else {
       // popUpAction(Constant.SERVICE_FAIL_MSG, Constant.DefaultAlert_MSG, 'OK', true, false);

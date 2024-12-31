@@ -531,7 +531,7 @@ export async function getFabricDetails(jsonValue) {
         obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
         return obj;
     }
-    console.log('getFabricDetails ', jsonValue, Environment.uri + "cutting/getFabricDetails")
+    console.log('getFabricDetails ', Environment.uri + "cutting/getFabricDetails")
     await fetch(Environment.uri + "cutting/getFabricDetails",
         {
             method: "POST",
@@ -542,8 +542,6 @@ export async function getFabricDetails(jsonValue) {
             body: JSON.stringify(jsonValue),
         }
     ).then((response) => response.json()).then(async (data) => {
-        // console.log('getFabricDetails1- ', data)
-
         if (data) {
             statusData = true;
             responseData = data
@@ -869,7 +867,7 @@ export async function addCuttingDetails(jsonValue) {
         obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
         return obj;
     }
-    console.log('addCuttingDetails ', jsonValue, Environment.uri + "cutting/addCuttingDetails")
+    console.log('addCuttingDetails ', Environment.uri + "cutting/addCuttingDetails")
     await fetch(Environment.uri + "cutting/addCuttingDetails",
         {
             method: "POST",
@@ -1503,7 +1501,7 @@ export async function saveDDA(jsonValue) {
         obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
         return obj;
     }
-    console.log('saveStitchingInDetails ', jsonValue, Environment.uri + "designdirectory/designDirectoryApprove")
+    console.log('saveDDA  ', Environment.uri + "designdirectory/designDirectoryApprove")
     await fetch(Environment.uri + "designdirectory/designDirectoryApprove",
         {
             method: "POST",

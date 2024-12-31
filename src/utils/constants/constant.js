@@ -31,7 +31,7 @@ export const validate_Fields_ = 'Please fill atleast one size field before submi
 export const validate_location_ = 'Please select the location before submitting !';
 export const validate_EnterQty =(check)=> `Please enter the quantity of ${check} less than remaining quantity`;
 export const Wrong_Code_Msg="Invalid Code', 'Please enter a valid customer code."
-export const PO_Rejected_MSG_WITHOUT_REMARKS = 'Please fill the remarks before Rejecting ';
+export const PO_Rejected_MSG_WITHOUT_REMARKS = 'Please enter the remarks before Rejecting ';
 export const SELECT_STATUS = 'Please Select the Status to Proceed';
 export const ONLINE_STATUS = 'Please check your internet connection !!';
 export const ALL_FIELDS = 'Please fill all the fields';

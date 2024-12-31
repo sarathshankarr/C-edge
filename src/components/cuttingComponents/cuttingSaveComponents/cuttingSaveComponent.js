@@ -19,7 +19,8 @@ const CuttingSaveComponent = ({ navigation, route, ...props }) => {
     React.useEffect(() => {  
     
       if(route.params?.item) {        
-        addCuttingDetails(route.params?.item)
+        addCuttingDetails(route.params?.item);
+        console.log("route.params?.item====> ", route.params?.item)
       }
       
     }, [route.params?.item]);

@@ -20,7 +20,7 @@ const DDAEdit = ({ navigation, route, ...props }) => {
 
     if (route.params?.item) {
       getInitialData(route.params?.item);
-      // console.log("route.params?.item===========> ", route.params?.item);
+      console.log("route.params?.item===========> ", route.params?.item.designId);
     }
 
   }, [route.params]);
@@ -54,7 +54,7 @@ const DDAEdit = ({ navigation, route, ...props }) => {
       "company":JSON.parse(companyObj),
 
     }
-    // console.log('Fini Out Add--->,',obj)
+    // console.log(' DDA edit request body --->,',obj);
     let EditDDAAPIObj = await APIServiceCall.EditDDA(obj);
     set_isLoading(false);
 
@@ -87,7 +87,7 @@ const DDAEdit = ({ navigation, route, ...props }) => {
   };
 
 
-  const submitAction = async (designId, statusId, remarks) => {
+  const submitAction = async (designId,remarks1, statusId, remarks) => {
 
     if(statusId===0){
       popUpAction(Constant.SELECT_STATUS, Constant.DefaultAlert_MSG, 'OK', true, false);
@@ -110,6 +110,7 @@ const DDAEdit = ({ navigation, route, ...props }) => {
       "menuId": 728,
       "approvedStatus": statusId,
       "remarks": remarks,
+      "note": remarks1,
       "userName": userName,
       "userPwd": userPsd,
       "compIds": usercompanyId,
@@ -121,14 +122,15 @@ const DDAEdit = ({ navigation, route, ...props }) => {
   };
 
   const saveEditObj = async (tempObj) => {
-
+ 
     set_isLoading(true);
     let saveEditObj = await APIServiceCall.saveDDA(tempObj);
-    console.log('save DDA,', saveEditObj);
     set_isLoading(false);
+    console.log("response after approving", saveEditObj?.responseData)
 
-    if (saveEditObj && saveEditObj.statusData && saveEditObj.responseData && saveEditObj.responseData.status !== 'False') {
+    if (saveEditObj && saveEditObj.statusData && saveEditObj.responseData && saveEditObj.responseData.status !== 'false') {
       saveBack();
+      console.log("sucess");
     } else {
       popUpAction(Constant.Fail_Save_Dtls_MSG, Constant.DefaultAlert_MSG, 'OK', true, false);
     }
