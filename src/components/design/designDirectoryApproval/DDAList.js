@@ -21,9 +21,6 @@ const DDAList = ({ navigation, route, ...props }) => {
   const [hasMore, setHasMore] = useState(true); 
   
   
-  
-  
-  
   useFocusEffect(
     React.useCallback(() => {
        getInitialData(0, true);
@@ -100,28 +97,20 @@ const backBtnAction = () => {
     let companyObj = await AsyncStorage.getItem('companyObj');
     let obj =   {
       "menuId": 40,
-      "searchKeyValue": "",
-      "styleSearchDropdown": "-1",
-      "dataFilter": "60Days",
-      "locIds": 0,
-      "brandIds": 0,
-      "compIds": 0,
-      "fromRecord": 0,
-      "toRecord": 25,
-     "username": userName,
-      "password" : userPsd,
+      "designId": 24,
+      "menuId": 728,
+      "userName": userName,
+      "userPwd" : userPsd,
       "compIds": usercompanyId,
       "company":JSON.parse(companyObj),
       "categoryType" : types,
       "categoryIds" : Ids,
+      "approvedStatus": 1,
+
   }
-
-
-
-
     //  console.log("requested filtered body ==> ", obj);
   
-    let stichingOutAPIObj = await APIServiceCall.getFiltered_finishingIn(obj);
+    let stichingOutAPIObj = await APIServiceCall.getFiltered_DDA(obj);
     set_MainLoading(false);
     
     if(stichingOutAPIObj && stichingOutAPIObj.statusData){

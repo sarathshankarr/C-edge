@@ -130,8 +130,6 @@ const POApprovalUI = ({ route, ...props }) => {
               </TouchableOpacity>
             ))}
           </ScrollView>
-          {console.log("gstName jsx  ==>", props?.gstName, props?.totalGstAmount, props?.totalFare)
-          }
           {/* <View style={{}}>
             <Text style={[CommonStyles.tylesHeaderTextStyle, { textAlign: 'right', marginTop:15}]}>{props?.gstName ? "GST    -  ": "Tax Amount   -  " + props?.totalGstAmount}</Text> 
              <Text style={[CommonStyles.tylesHeaderTextStyle, { textAlign: 'right', marginTop:20}]}>{'Total    -  ' + (Number(props?.totalFare)+Number(props?.totalGstAmount)).toFixed(2)}</Text>

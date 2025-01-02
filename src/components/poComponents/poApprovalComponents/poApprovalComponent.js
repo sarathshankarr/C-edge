@@ -38,7 +38,7 @@ const POApprovalComponent = ({ navigation, route, ...props }) => {
 
   const getGSTorTaxAmount=(tax)=>{
     const gt=formatPrice(tax);
-    console.log("formated price",gt)
+    // console.log("formated price",gt)
     if(gt[0]!='₹'){
       set_gstName(false);
     }
@@ -49,7 +49,7 @@ const POApprovalComponent = ({ navigation, route, ...props }) => {
     if (itemsArray && itemsArray?.length > 0) {
       let totalGstAmount = itemsArray.reduce((sum, item) => sum + item?.gstAmount, 0);
       set_gstAmount(totalGstAmount);
-      console.log("totalGst====> ", totalGstAmount);
+      // console.log("totalGst====> ", totalGstAmount);
     }
   }, [itemsArray]);
 
@@ -68,9 +68,9 @@ const POApprovalComponent = ({ navigation, route, ...props }) => {
       "compIds": usercompanyId,
       "company":JSON.parse(companyObj),
     }
-
+    console.log("req body for edit", obj);
     let poEditAPIObj = await APIServiceCall.poApproveEditAPIService(obj);
-    console.log('poNumber edit details', poEditAPIObj)
+    // console.log('poNumber edit details', poEditAPIObj)
     set_isLoading(false);
 
     if (poEditAPIObj && poEditAPIObj.statusData) {
@@ -99,7 +99,7 @@ const POApprovalComponent = ({ navigation, route, ...props }) => {
 
   const getTotalFare = (recordArray) => {
 
-    console.log('child list ==> ', recordArray?.poChildResponseList[0])
+    // console.log('child list ==> ', recordArray?.poChildResponseList[0])
     set_totalFare(recordArray.totalAmount);
 
   };
@@ -144,7 +144,7 @@ const POApprovalComponent = ({ navigation, route, ...props }) => {
     }
 
     let poApproveAPIObj = await APIServiceCall.poApproveAPIService(obj);
-    console.log('poNumber Approve API----> ', poApproveAPIObj)
+    // console.log('poNumber Approve API----> ', poApproveAPIObj)
     set_isLoading(false);
 
     if (poApproveAPIObj && poApproveAPIObj.statusData) {

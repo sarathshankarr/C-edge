@@ -38,7 +38,7 @@ const StockRequestEditUi = ({route, ...props}) => {
 
   useEffect(() => {
     if (props?.itemsObj) {
-      console.log('props from api==> ', props?.itemsObj);
+      // console.log('props from api==> ', props?.itemsObj);
       set_stockTable(props?.itemsObj);
     }
   }, [props?.itemsObj]);
@@ -89,7 +89,7 @@ const StockRequestEditUi = ({route, ...props}) => {
           showsVerticalScrollIndicator={false}>
           {stockTable?.length > 0 &&
             stockTable.map((table, tableIndex) => (
-              <>
+              <View key={tableIndex}>
                 <View
                   style={{
                     alignItems: 'center',
@@ -98,8 +98,8 @@ const StockRequestEditUi = ({route, ...props}) => {
                   }}>
                   <TextInputComponent
                     inputText={
-                      props?.itemsObj[0] && props?.itemsObj[0][0]?.styleName
-                        ? props?.itemsObj[0][0]?.styleName
+                      props?.itemsObj[tableIndex] && props?.itemsObj[tableIndex][0]?.styleName
+                        ? props?.itemsObj[tableIndex][0]?.styleName
                         : ''
                     }
                     labelText={'Style Name'}
@@ -118,8 +118,8 @@ const StockRequestEditUi = ({route, ...props}) => {
                   }}>
                   <TextInputComponent
                     inputText={
-                      props?.itemsObj[0] && props?.itemsObj[0][0]?.styledesc
-                        ? props?.itemsObj[0][0]?.styledesc
+                      props?.itemsObj[tableIndex] && props?.itemsObj[tableIndex][0]?.styledesc
+                        ? props?.itemsObj[tableIndex][0]?.styledesc
                         : ''
                     }
                     labelText={'Style Desc'}
@@ -138,8 +138,8 @@ const StockRequestEditUi = ({route, ...props}) => {
                   }}>
                   <TextInputComponent
                     inputText={
-                      props?.itemsObj[0] && props?.itemsObj[0][0]?.shipqty
-                        ? props?.itemsObj[0][0]?.shipqty
+                      props?.itemsObj[tableIndex] && props?.itemsObj[tableIndex][0]?.shipqty
+                        ? props?.itemsObj[tableIndex][0]?.shipqty
                         : ''
                     }
                     labelText={'Ship Qty'}
@@ -158,8 +158,8 @@ const StockRequestEditUi = ({route, ...props}) => {
                   }}>
                   <TextInputComponent
                     inputText={
-                      props?.itemsObj[0] && props?.itemsObj[0][0]?.username
-                        ? props?.itemsObj[0][0]?.username
+                      props?.itemsObj[tableIndex] && props?.itemsObj[tableIndex][0]?.username
+                        ? props?.itemsObj[tableIndex][0]?.username
                         : ''
                     }
                     labelText={'User Name'}
@@ -170,7 +170,6 @@ const StockRequestEditUi = ({route, ...props}) => {
                     // setValue={(textAnswer) => { untiPriceValue(textAnswer) }}
                   />
                 </View>
-
                 <View
                   style={{
                     alignItems: 'center',
@@ -179,8 +178,8 @@ const StockRequestEditUi = ({route, ...props}) => {
                   }}>
                   <TextInputComponent
                     inputText={
-                      props?.itemsObj[0] && props?.itemsObj[0][0]?.woNo
-                        ? props?.itemsObj[0][0]?.woNo
+                      props?.itemsObj[tableIndex] && props?.itemsObj[tableIndex][0]?.woNo
+                        ? props?.itemsObj[tableIndex][0]?.woNo
                         : ''
                     }
                     labelText={'Work Order No'}
@@ -268,7 +267,7 @@ const StockRequestEditUi = ({route, ...props}) => {
                     ))}
                   </View>
                 </View>
-              </>
+              </View>
             ))}
 
           <View style={{marginBottom: 150}} />
