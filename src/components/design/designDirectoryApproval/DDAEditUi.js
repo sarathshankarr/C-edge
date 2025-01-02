@@ -71,23 +71,60 @@ const DDAEditUi = ({ route, ...props }) => {
   useEffect(() => {
     if (props.itemsObj) {
       set_dataObj(props?.itemsObj);
+
+
       if (props?.itemsObj?.color) {
-        set_colorId(props?.itemsObj?.color);
-        set_colorName(props?.itemsObj?.colormap[props.itemsObj.color])
+        const colorNum=Number(props?.itemsObj?.color)
+        set_colorId(colorNum);
+        set_colorName(props?.itemsObj?.colorsMap[colorNum])
       }
 
       if (props?.itemsObj?.uom) {
         set_uomId(props?.itemsObj?.uom);
         set_uomName(props?.itemsObj?.uomMap[props.itemsObj.uom]);
-        // console.log("props?.itemsObj?.uomMap[props.itemsObj.uom]", props?.itemsObj?.uom, props?.itemsObj?.uomMap[props.itemsObj.uom]);
       }
-      // console.log("props?.itemsObj?.fabric", props?.itemsObj?.fabric);
 
-      if (props?.itemsObj?.fabric) {
-        // set_fabricId(props?.itemsObj?.fabricId);
-        // set_fabricName(props?.itemsObj?.fabricsMap[props.itemsObj.fabricId]);
-        set_fabricName(props?.itemsObj?.fabric);
+      if (props?.itemsObj?.fabricId) {
+        set_fabricId(props?.itemsObj?.fabricId);
+        set_fabricName(props?.itemsObj?.loadFabricStyles[props.itemsObj.fabricId]);
+        // set_fabricName(props?.itemsObj?.fabric);
       }
+
+      if (props?.itemsObj?.locationId) {
+        set_locationId(props?.itemsObj?.locationId);
+        set_locationName(props?.itemsObj?.locationsMap[props.itemsObj.locationId]);
+      }
+
+      if (props?.itemsObj?.design_farma_id) {
+        set_farmaId(props?.itemsObj?.design_farma_id);
+        set_farmaName(props?.itemsObj?.farmaMap[props.itemsObj.design_farma_id]);
+      }
+
+      if (props?.itemsObj?.design_Dey_No) {
+        set_dyeNoId(props?.itemsObj?.design_Dey_No);
+        set_dyeNoName(props?.itemsObj?.dyenoMap[props.itemsObj.design_Dey_No]);
+      }
+
+      if (props?.itemsObj?.cap_category_id) {
+        set_capCategoryId(props?.itemsObj?.cap_category_id);
+        set_capCategoryName(props?.itemsObj?.capcategoryMap[props.itemsObj.cap_category_id]);
+      }
+
+      if (props?.itemsObj?.closure_id) {
+        set_closureId(props?.itemsObj?.closure_id);
+        set_closureName(props?.itemsObj?.closureMap[props.itemsObj.closure_id]);
+      }
+
+      if (props?.itemsObj?.sizegroupId) {
+        set_seasonId(props?.itemsObj?.sizegroupId);
+        set_seasonName(props?.itemsObj?.sizeGroupsMap[props.itemsObj.sizegroupId]);
+      }
+
+      if (props?.itemsObj?.sizeRangeId) {
+        set_scaleId(props?.itemsObj?.sizeRangeId);
+        set_scaleName(props?.itemsObj?.sizeRangesMap[props.itemsObj.sizeRangeId]);
+      }
+
 
       if (props?.itemsObj?.note) {
         set_remarks1(props?.itemsObj?.note)
@@ -246,7 +283,7 @@ const DDAEditUi = ({ route, ...props }) => {
                 <View style={[styles.SectionStyle1, {}]}>
                   <View style={{ flexDirection: 'column', }}>
                     <Text style={props.itemsObj?.designType ? [styles.dropTextLightStyle] : [styles.dropTextInputStyle]}>{'Design Type * '}</Text>
-                    <Text style={[styles.dropTextInputStyle]}>{props?.itemsObj?.designType ? props?.itemsObj?.designType : 'N/A'}</Text>
+                    <Text style={[styles.dropTextInputStyle]}>{props?.itemsObj?.designType ? props?.itemsObj?.designType : 'select'}</Text>
                   </View>
 
                 </View>
@@ -621,7 +658,7 @@ const DDAEditUi = ({ route, ...props }) => {
 
                   <View style={{ flexDirection: 'column', }}>
                     <Text style={scaleId ? [styles.dropTextLightStyle] : [styles.dropTextInputStyle]}>{'Scale '}</Text>
-                    <Text style={[styles.dropTextInputStyle]}>{scaleName ? scaleName : ''}</Text>
+                    <Text style={[styles.dropTextInputStyle]}>{scaleName ? scaleName : 'select'}</Text>
                   </View>
 
                 </View>
@@ -661,19 +698,7 @@ const DDAEditUi = ({ route, ...props }) => {
               setValue={(textAnswer) => { untiPriceValue(textAnswer) }}
             />
           </View>
-           <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: hp('1%') }} >
-            <TextInputComponent
-              inputText={props.itemsObj ? props?.itemsObj?.artwork : ''}
-              labelText={'NS'}
-              isEditable={false}
-              maxLengthVal={200}
-              multiline={true} // Allow multiline input
-              autoCapitalize={"none"}
-              isBackground={'#dedede'}
-              setValue={(textAnswer) => { untiPriceValue(textAnswer) }}
-            />
-          </View>
-
+          
            <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: hp('1%') }} >
             <TextInputComponent
               inputText={props.itemsObj ? props?.itemsObj?.artwork : ''}
@@ -960,7 +985,7 @@ const DDAEditUi = ({ route, ...props }) => {
 
                   <View style={{ flexDirection: 'column', }}>
                     <Text style={statusArrayName ? [styles.dropTextLightStyle] : [styles.dropTextInputStyle]}>{'Approved Status:'}</Text>
-                    <Text style={[styles.dropTextInputStyle]}>{statusArrayName ? statusArrayName : ''}</Text>
+                    <Text style={[styles.dropTextInputStyle]}>{statusArrayName ? statusArrayName : 'Select Status'}</Text>
                   </View>
 
                 </View>
@@ -973,17 +998,27 @@ const DDAEditUi = ({ route, ...props }) => {
             </TouchableOpacity>
 
             {showStatusArrayList && editStatus ? (
-              <View style={styles.popSearchViewStyle}>
-                <ScrollView nestedScrollEnabled={true}>
-                  {statusArray?.map((item) => (
-                    <TouchableOpacity key={item.id} onPress={() => actionOnStatus(item)}>
-                      <View style={styles.flatview}>
-                        <Text style={styles.dropTextInputStyle}>{item.value}</Text>
-                      </View>
-                    </TouchableOpacity>
-                  ))}
-                </ScrollView>
-              </View>
+              // <View style={styles.popSearchViewStyle}>
+              //   <ScrollView nestedScrollEnabled={true}>
+              //     {statusArray?.map((item) => (
+              //       <TouchableOpacity key={item.id} onPress={() => actionOnStatus(item)}>
+              //         <View style={styles.flatview}>
+              //           <Text style={styles.dropTextInputStyle}>{item.value}</Text>
+              //         </View>
+              //       </TouchableOpacity>
+              //     ))}
+                 <View style={styles.dropdownContent1}>
+                      {statusArray.map((item) => (
+                        <TouchableOpacity
+                          key={item.id}
+                          style={styles.dropdownOption}
+                          onPress={() => actionOnStatus(item)}>
+                          <Text style={{color: '#000'}}>{item.value}</Text>
+                        </TouchableOpacity>
+                      ))}
+                  </View> 
+              //   </ScrollView>
+              // </View>
             ) : null}
 
 
@@ -1155,6 +1190,24 @@ const getStyles = (colors) => StyleSheet.create({
     alignItems: 'center',
     elevation: 1,
     backgroundColor: '#fff',
+  },
+  dropdownContent1: {
+    elevation: 5,
+    // height: 220,
+    maxHeight: 220,
+    alignSelf: 'center',
+    width: '98%',
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    borderColor: 'lightgray', // Optional: Adds subtle border (for effect)
+    borderWidth: 1,
+    marginTop:3
+  },
+  dropdownOption: {
+    paddingHorizontal: 10,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
   },
 
 })

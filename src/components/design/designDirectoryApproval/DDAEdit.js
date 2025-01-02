@@ -58,6 +58,7 @@ const DDAEdit = ({ navigation, route, ...props }) => {
     let EditDDAAPIObj = await APIServiceCall.EditDDA(obj);
     set_isLoading(false);
 
+    console.log("edit get data ==> ", EditDDAAPIObj.statusData);
     if (EditDDAAPIObj && EditDDAAPIObj.statusData) {
       set_itemsObj(EditDDAAPIObj.responseData);
     } else {

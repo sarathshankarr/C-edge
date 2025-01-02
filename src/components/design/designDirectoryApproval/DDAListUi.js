@@ -31,8 +31,7 @@ const DDAListUi = ({ route, ...props }) => {
 
 
   const [categories, set_categories]=useState([
-    { id: "styleNames", fid: "styleno", value: "Style No" , idxId:"styleId"},
-    { id: "colorNames",fid: "color", value: "Color" , idxId:"colorid"},
+    { id: "designType", fid: "designType", value: "Design Type" , idxId:"designTypeId"},
   ]);
 
 
@@ -52,16 +51,11 @@ const getRequestBody = async() => {
   let usercompanyId = await AsyncStorage.getItem('companyId');
   let companyObj = await AsyncStorage.getItem('companyObj');
   let Obj=  {
-    "menuId": 40,
-    "searchKeyValue": "",
-    "styleSearchDropdown": "-1",
-    "dataFilter": "60Days",
-    "locIds": 0,
-    "brandIds": 0,
-    "fromRecord": 0,
-    "toRecord": 25,
-    "username": userName,
-    "password": userPsd,
+    "approvedStatus": 1,
+    "menuId": 728,
+    "designId": 24,
+    "userName": userName,
+    "userPwd": userPsd,
     "compIds": usercompanyId,
     "company":JSON.parse(companyObj),
     "categoryIds": "",
@@ -307,7 +301,7 @@ setfilterReqBody(Obj)
       <FilterModal
         isVisible={isFilterVisible}
         categoriesList={categories}
-        selectedCategoryListAPI={'getSelectedCategoryList_finishingIn'}
+        selectedCategoryListAPI={'getSelectedCategoryList_DDA'}
         onClose={() => setFilterVisible(false)}
         applyFilterFxn={applyFilterFxn}
         clearFilter={clearFilter}

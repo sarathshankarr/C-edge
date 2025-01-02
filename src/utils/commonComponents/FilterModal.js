@@ -94,7 +94,7 @@ const toggleSelection = (item) => {
 
 
 
-    const getSelectedCategoryListFBI = async (functionName, id) => {
+    const getSelectedCategoryListFBI = async (functionName, id, fid) => {
 
       // let userName = await AsyncStorage.getItem('userName');
       // let userPsd = await AsyncStorage.getItem('userPsd');
@@ -119,11 +119,18 @@ const toggleSelection = (item) => {
         if(categoreisListAPIOBJ && categoreisListAPIOBJ.responseData){
           const filtered=categoreisListAPIOBJ.responseData;
           const fil=filtered.reverse();
-          set_selectedCategoryItems(fil);
-          set_selectedCategoryFilteredItems(fil);
+          const fil2=fil.filter(item=>{
+            const selcat= fid;
+            return item[selcat]!=="";
+          });
+          // console.log("setting  f1==> ",fid,  fil);
+          // console.log("setting f2 ==> ",fid, fil2);
+      
+          set_selectedCategoryItems(fil2);
+          set_selectedCategoryFilteredItems(fil2);
           setSearchCacheResults(prevLists => ({
             ...prevLists,
-            [id] : fil
+            [id] : fil2
           }))
         } 
   
@@ -152,7 +159,7 @@ const toggleSelection = (item) => {
         set_selectedCategoryFilteredItems(searchCacheResults[ide]);
         console.log("Caching ......");
       }else{
-        getSelectedCategoryListFBI(selectedCategoryListAPI, item.id);
+        getSelectedCategoryListFBI(selectedCategoryListAPI, item.id, item.fid);
       }
       setSelectedIndices([]);
     }
