@@ -54,7 +54,7 @@ const DDAEdit = ({ navigation, route, ...props }) => {
       "company":JSON.parse(companyObj),
 
     }
-    // console.log(' DDA edit request body --->,',obj);
+    console.log(' DDA edit request body --->,',obj);
     let EditDDAAPIObj = await APIServiceCall.EditDDA(obj);
     set_isLoading(false);
 
@@ -130,8 +130,8 @@ const DDAEdit = ({ navigation, route, ...props }) => {
     console.log("response after approving", saveEditObj?.responseData)
 
     if (saveEditObj && saveEditObj.statusData && saveEditObj.responseData && saveEditObj.responseData.status !== 'false') {
-      saveBack();
       console.log("sucess");
+      saveBack();
     } else {
       popUpAction(Constant.Fail_Save_Dtls_MSG, Constant.DefaultAlert_MSG, 'OK', true, false);
     }
