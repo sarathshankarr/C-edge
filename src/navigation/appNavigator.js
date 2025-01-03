@@ -67,6 +67,8 @@ import SalesOrderReport from '../components/reports/SalesOrderReport copy/SalesO
 import ProductionProcessReport from '../components/reports/Production process report/ProductionProcessReport';
 import StyleBomReport from '../components/reports/Style BOM report/StyleBomReport';
 import WorkerWagesReport from '../components/reports/Worker wages report/WorkerWagesReport';
+import FabricList from '../components/masters/Fabric/FabricList';
+import FabricEdit from '../components/masters/Fabric/FabricEdit';
 
 
 const Stack = createNativeStackNavigator();
@@ -137,6 +139,8 @@ const AppStack = () => {
       <Stack.Screen name="ProductionProcessReport" component={ProductionProcessReport} options={{ headerShown: false }} /> 
       <Stack.Screen name="StyleBomReport" component={StyleBomReport} options={{ headerShown: false }} /> 
       <Stack.Screen name="WorkerWagesReport" component={WorkerWagesReport} options={{ headerShown: false }} /> 
+      <Stack.Screen name="masterFabricList" component={FabricList} options={{ headerShown: false }} /> 
+      <Stack.Screen name="masterFabricEdit" component={FabricEdit} options={{ headerShown: false }} /> 
     </Stack.Navigator>
   );
 };

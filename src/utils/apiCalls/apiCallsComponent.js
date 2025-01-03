@@ -136,7 +136,7 @@ export async function poApproveEditAPIService(jsonValue) {
         obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
         return obj;
     }
-    console.log('Po Approval Code ', jsonValue, Environment.uri + "po/poedit")
+    console.log('Po Approval Code ', Environment.uri + "po/poedit")
     await fetch(Environment.uri + "po/poedit",
         {
             method: "POST",
@@ -147,7 +147,7 @@ export async function poApproveEditAPIService(jsonValue) {
             body: JSON.stringify(jsonValue),
         }
     ).then((response) => response.json()).then(async (data) => {
-        console.log('Po Approval Code1 ', data)
+        // console.log('Po Approval Code1 ', data)
 
         if (data && data.status) {
             statusData = data.status;

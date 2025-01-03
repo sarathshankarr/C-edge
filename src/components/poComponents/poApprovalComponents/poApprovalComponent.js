@@ -22,15 +22,22 @@ const POApprovalComponent = ({ navigation, route, ...props }) => {
   const [pId, set_pId] = useState(1);
   const [remarks, set_remarks] = useState("");
   const [gstAmount, set_gstAmount]=useState(0);
+
+
   const [gstName, set_gstName]=useState(true);
 
+  const [itemDetails, setItemDetails]=useState({
+    "totalAmountIncludingGST":'0',
+    "tcs": '0',
+    "priceFromList": '0',
+  })
 
 
   React.useEffect(() => {
 
     if (route.params?.item) {
       getInitialData(route.params?.item.poNumber);
-      console.log('route params from list page==> ', route.params?.item)
+      console.log('route params from list page==> ', route.params?.item);
       getGSTorTaxAmount(route.params?.item?.price);
     }
 
@@ -68,9 +75,9 @@ const POApprovalComponent = ({ navigation, route, ...props }) => {
       "compIds": usercompanyId,
       "company":JSON.parse(companyObj),
     }
-    console.log("req body for edit", obj);
+    // console.log("req body for edit", obj);
     let poEditAPIObj = await APIServiceCall.poApproveEditAPIService(obj);
-    // console.log('poNumber edit details', poEditAPIObj)
+    console.log('poNumber edit details', poEditAPIObj, poEditAPIObj?.responseData?.poChildResponseList);
     set_isLoading(false);
 
     if (poEditAPIObj && poEditAPIObj.statusData) {
@@ -80,9 +87,15 @@ const POApprovalComponent = ({ navigation, route, ...props }) => {
         set_itemsArray(poEditAPIObj.responseData.poChildResponseList);
         set_sdeliveryDate(poEditAPIObj.responseData.deliveryDateStr);
         set_startDate(poEditAPIObj.responseData.issueDateStr);
-        set_poNumber(poEditAPIObj.responseData.poNumber)
+        set_poNumber(poEditAPIObj.responseData.poNumber);
+        setItemDetails({
+          ...itemDetails,
+          totalAmountIncludingGST: poEditAPIObj.responseData.totalgst || '0',
+          tcs: poEditAPIObj.responseData.tcs || '0',
+          priceFromList: poEditAPIObj.responseData.totalAmount || '0',
+        });
+        
       }
-
     } else {
       popUpAction(Constant.SERVICE_FAIL_MSG, Constant.DefaultAlert_MSG, 'OK', true, false, 1);
     }
@@ -90,10 +103,6 @@ const POApprovalComponent = ({ navigation, route, ...props }) => {
     if (poEditAPIObj && poEditAPIObj.error) {
       popUpAction(Constant.SERVICE_FAIL_MSG, Constant.DefaultAlert_MSG, 'OK', true, false, 1)
     }
-
-    // if()
-    
-
 
   };
 
@@ -200,6 +209,7 @@ const POApprovalComponent = ({ navigation, route, ...props }) => {
       popUpRBtnTitle={popUpRBtnTitle}
       isPopupLeft={isPopupLeft}
       isPopUp={isPopUp}
+      itemDetails={itemDetails}
       backBtnAction={backBtnAction}
       approveAction={approveAction}
       popOkBtnAction={popOkBtnAction}

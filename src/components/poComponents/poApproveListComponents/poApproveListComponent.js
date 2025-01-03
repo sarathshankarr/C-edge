@@ -202,7 +202,6 @@ const POApproveListComponent = ({ navigation, route, ...props }) => {
       fetchMore={fetchMore}
       MainLoading = {MainLoading}
       applyFilterFxn={getFilteredList}
-
     />
 
   );
