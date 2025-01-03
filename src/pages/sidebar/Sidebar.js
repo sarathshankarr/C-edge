@@ -42,6 +42,17 @@ const dropdownMenus = {
       },
     ],
   },
+  masters: {
+    label: 'Master',
+    icon: require('../../../assets/images/png/mentor.png'),
+    style: [
+      {
+        label: 'Fabric',
+        route: 'masterFabricList',
+        src: require('../../../assets/images/png/mentor.png'),
+      },
+    ],
+  },
   store: {
     label: 'Store Management',
     icon: require('../../../assets/images/png/store.png'),
