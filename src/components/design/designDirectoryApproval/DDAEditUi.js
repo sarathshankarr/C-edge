@@ -57,6 +57,7 @@ const DDAEditUi = ({ route, ...props }) => {
   const [remarks2, set_remarks2] = useState("");
 
   const [rmTable, setRmTable] = useState([]);
+  const [sizesTable, setSizesTable] = useState([]);
 
 
   const imageArray = [
@@ -135,6 +136,9 @@ const DDAEditUi = ({ route, ...props }) => {
 
       if (props?.itemsObj?.rmItems) {
         setRmTable(props?.itemsObj?.rmItems)
+      }
+      if (props?.itemsObj?.sizesGSCodesList) {
+        setSizesTable(props?.itemsObj?.sizesGSCodesList)
       }
 
       if (props?.itemsObj?.approveStatus) {
@@ -699,10 +703,11 @@ const DDAEditUi = ({ route, ...props }) => {
             />
           </View>
           
-           <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: hp('1%') }} >
+          {sizesTable?.length > 0 && sizesTable.map((item, index)=> (
+            <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: hp('1%') }} key={index} >
             <TextInputComponent
-              inputText={props.itemsObj ? props?.itemsObj?.artwork : ''}
-              labelText={'NM'}
+              inputText={item ?  item?.design_gs_quantity.toString() : ""}
+              labelText={item?.sizeCode}
               isEditable={false}
               maxLengthVal={200}
               multiline={true} 
@@ -711,6 +716,8 @@ const DDAEditUi = ({ route, ...props }) => {
               setValue={(textAnswer) => { untiPriceValue(textAnswer) }}
             />
           </View>
+          ))
+          }
 
            <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: hp('1%') }} >
             <TextInputComponent
