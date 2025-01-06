@@ -51,7 +51,7 @@ const CuttingSaveComponent = ({ navigation, route, ...props }) => {
       "company":JSON.parse(companyObj),
    }
 
-    console.log("req body of add cutting ", obj1)
+    // console.log("req body of add cutting ", obj1)
 
     let addCuttingAPIObj = await APIServiceCall.addCuttingDetails(obj1);
     set_isLoading(false);
@@ -78,7 +78,7 @@ const CuttingSaveComponent = ({ navigation, route, ...props }) => {
   const saveCuttingDetails = async (obj) => {
 
     set_isLoading(true);
-    console.log('saveCuttingAPIObj before giving to api ==> ', obj)
+    // console.log('saveCuttingAPIObj before giving to api ==> ', obj)
 
     let saveCuttingAPIObj = await APIServiceCall.saveCuttingDetails(obj);
     set_isLoading(false);

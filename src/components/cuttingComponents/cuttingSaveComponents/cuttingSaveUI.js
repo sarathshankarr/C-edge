@@ -125,8 +125,14 @@ const CuttingSaveUI = ({ route, ...props }) => {
       return
     }
 
+    if ( props.itemsObj.fabricIssued && Number(props.itemsObj.fabricIssued)>0) {
+      if(dailyConsumption >  Number(props.itemsObj.fabricIssued)){
+        props.popUpAction(Constant.validate_total_consump_, Constant.DefaultAlert_MSG, 'OK', true, false)
+        return;
+      }
+    }
 
-    // console.log('props.itemsObj ', props.itemsObj)
+
 
     let obj = {
       "menuId": props.itemsObj.menuId,
@@ -426,7 +432,6 @@ const CuttingSaveUI = ({ route, ...props }) => {
                 inputText={actualConsumption?.toString()}
                 labelText={'Actual Consumption'}
                 isEditable={false}
-                
                 maxLengthVal={10}
                 autoCapitalize={"none"}
                 keyboardType={'numeric'}
@@ -436,16 +441,14 @@ const CuttingSaveUI = ({ route, ...props }) => {
             </View>
 
             <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: hp('1%') }} >
-
               <TextInputComponent
-                inputText={props.itemsObj ? props.itemsObj.fabricIssued : undefined}
+                inputText={props.itemsObj ? props.itemsObj.fabricIssued : ''}
                 labelText={'Fabric Issued'}
                 isEditable={false}
                 maxLengthVal={10}
                 autoCapitalize={"none"}
                 keyboardType={'numeric'}
-                setValue={(textAnswer) => { }}
-                
+                setValue={(textAnswer) => { }}     
               />
 
             </View>
