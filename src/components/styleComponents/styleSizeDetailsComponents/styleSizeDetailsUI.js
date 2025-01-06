@@ -53,7 +53,7 @@ console.log('Item ',item)
           isChatEnable={false}
           isTImerEnable={false}
           isTitleHeaderEnable={true}
-          title={'Style Details'}
+          title={'Style Detailsss'}
           backBtnAction = {() => backBtnAction()}
         />
       </View>  

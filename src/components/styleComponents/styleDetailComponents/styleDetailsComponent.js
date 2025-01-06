@@ -16,6 +16,7 @@ const StyleDetailsComponent = ({ navigation, route, ...props }) => {
   const [isPopupLeft, set_isPopupLeft] = useState(false);
   const [styleId, set_styleId] = useState(undefined);
   const [img, set_img]=useState('');
+  const [styleDetailsList, set_styleDetailsList]=useState('');
 
   React.useEffect(() => {
 
@@ -23,6 +24,7 @@ const StyleDetailsComponent = ({ navigation, route, ...props }) => {
       set_styleId(route.params?.sId);
       set_img(route.params?.image);
       getInitialData(route.params?.sId);
+      getInitialDataList(route.params?.sId);
     }
     
   }, [route.params?.sId]);
@@ -39,7 +41,7 @@ const StyleDetailsComponent = ({ navigation, route, ...props }) => {
       "username": userName,
       "password" : userPsd
     }
-  console.log('Style ',obj)
+    console.log('Style ',obj)
     let styleDetailsAPIObj = await APIServiceCall.stylesDetailsAPIByRecord(obj);
     set_isLoading(false);
     
@@ -54,6 +56,36 @@ const StyleDetailsComponent = ({ navigation, route, ...props }) => {
     }
 
     if(styleDetailsAPIObj && styleDetailsAPIObj.error) {
+      popUpAction(Constant.SERVICE_FAIL_MSG,Constant.DefaultAlert_MSG,'OK', true,false)
+    }
+
+  };
+
+  const getInitialDataList = async (id) => {
+
+    set_isLoading(true);
+    let userName = await AsyncStorage.getItem('userName');
+    let userPsd = await AsyncStorage.getItem('userPsd');
+    let obj = {
+      "styleId":id,
+      "username": userName,
+      "password" : userPsd
+    }
+
+    let styleSDdetailsAPIObj = await APIServiceCall.styleSizeDetails(obj);
+    set_isLoading(false);
+    
+    if(styleSDdetailsAPIObj && styleSDdetailsAPIObj.statusData){
+
+      if(styleSDdetailsAPIObj && styleSDdetailsAPIObj.responseData){
+        set_styleDetailsList(styleSDdetailsAPIObj.responseData)
+      } 
+
+    } else {
+      popUpAction(Constant.SERVICE_FAIL_MSG,Constant.DefaultAlert_MSG,'OK', true,false);
+    }
+
+    if(styleSDdetailsAPIObj && styleSDdetailsAPIObj.error) {
       popUpAction(Constant.SERVICE_FAIL_MSG,Constant.DefaultAlert_MSG,'OK', true,false)
     }
 
@@ -107,6 +139,7 @@ const StyleDetailsComponent = ({ navigation, route, ...props }) => {
       popOkBtnAction = {popOkBtnAction}
       sizeDetailsAction = {sizeDetailsAction}
       viewProcessFlowAction = {viewProcessFlowAction}
+      styleDetailsList = {styleDetailsList}
     />
 
   );

@@ -146,8 +146,14 @@ const CommonStyles = StyleSheet.create({
         maxHeight:hp('40%'),
         backgroundColor:'white',
         marginTop: hp("2%"),
-        marginBottom: hp("5%"),
-         
+        marginBottom: hp("5%"), 
+    },
+    listStyle2 : {
+        width:wp('90%'),
+        maxHeight:hp('50%'),
+        backgroundColor:'white',
+        marginTop: hp("2%"),
+        marginBottom: hp("5%"), 
     },
   
     cellBackViewStyle : {
