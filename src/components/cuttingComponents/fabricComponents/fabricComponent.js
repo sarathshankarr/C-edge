@@ -17,10 +17,16 @@ const [itemsArray, set_itemsArray] = useState([]);
   const [isPopupLeft, set_isPopupLeft] = useState(false);
   const [trimFabric, set_trimFabric]=useState([]);
 
+  const [styleId, set_styleId]=useState('');
+  const [soId, set_soId]=useState('');
+
 
   React.useEffect(() => {  
     
     if(route.params?.styleId && route.params?.soId) {
+      console.log("params ==> ", route.params?.styleId , route.params?.soId, typeof route.params?.soId);
+      set_styleId(route.params?.styleId);
+      set_soId(route.params?.soId);
         getInitialData(route.params?.styleId,route.params?.soId);
     }
     
@@ -66,11 +72,9 @@ const [itemsArray, set_itemsArray] = useState([]);
 
       if(fabricAPIObj && fabricAPIObj.responseData){
         set_itemsArray([fabricAPIObj.responseData])
-        // console.log('Fabric----> ',fabricAPIObj.responseData)
       } 
       if(fabricAPIObj && fabricAPIObj.responseData && fabricAPIObj.responseData.cuttingFabricDetailsList){
         set_trimFabric(fabricAPIObj.responseData.cuttingFabricDetailsList)
-        // console.log('trimFabric----> ',fabricAPIObj.responseData.cuttingFabricDetailsList)
       } 
       
 
@@ -85,8 +89,9 @@ const [itemsArray, set_itemsArray] = useState([]);
   };
 
   const actionOnRow = (item,index) => {
-    item.styleId=route.params?.styleId;
-    item.soId=route.params?.soId;
+    item.styleId=styleId;
+    item.soId=soId;
+    // console.log("item selecetd ==> ", item);
     navigation.navigate('CuttingSaveComponent',{item:item})
   };
 

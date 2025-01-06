@@ -40,13 +40,10 @@ const StyleSizeDetailsComponent = ({ navigation, route, ...props }) => {
     let styleSDdetailsAPIObj = await APIServiceCall.styleSizeDetails(obj);
     set_isLoading(false);
     
-    console.log('StyleDetailsComponent--------------> ', JSON.stringify(styleSDdetailsAPIObj.responseData))
     if(styleSDdetailsAPIObj && styleSDdetailsAPIObj.statusData){
 
       if(styleSDdetailsAPIObj && styleSDdetailsAPIObj.responseData){
-        console.log('StyleDetailsComponent-------------->11111 ', JSON.stringify(styleSDdetailsAPIObj))
         set_itemObj(styleSDdetailsAPIObj.responseData)
-        console.log('StyleDetailsComponent-------------->222 ', JSON.stringify(styleSDdetailsAPIObj))
       } 
 
     } else {

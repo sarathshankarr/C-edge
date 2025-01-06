@@ -13,6 +13,7 @@ const CuttingSaveComponent = ({ navigation, route, ...props }) => {
     const [popUpAlert, set_popUpAlert] = useState(undefined);
     const [popUpRBtnTitle, set_popUpRBtnTitle] = useState(undefined);
     const [isPopupLeft, set_isPopupLeft] = useState(false);
+    const [routeParams, set_routeParams] = useState({});
 
     let itemsObjRef = useRef();
 
@@ -20,7 +21,8 @@ const CuttingSaveComponent = ({ navigation, route, ...props }) => {
     
       if(route.params?.item) {        
         addCuttingDetails(route.params?.item);
-        console.log("route.params?.item====> ", route.params?.item)
+        console.log("route.params?.item====> ", route.params?.item);
+        set_routeParams(route.params?.item);
       }
       
     }, [route.params?.item]);
@@ -78,7 +80,8 @@ const CuttingSaveComponent = ({ navigation, route, ...props }) => {
   const saveCuttingDetails = async (obj) => {
 
     set_isLoading(true);
-    // console.log('saveCuttingAPIObj before giving to api ==> ', obj)
+
+    console.log('saveCuttingAPIObj before giving to api ==> ', obj);
 
     let saveCuttingAPIObj = await APIServiceCall.saveCuttingDetails(obj);
     set_isLoading(false);
@@ -139,6 +142,7 @@ const CuttingSaveComponent = ({ navigation, route, ...props }) => {
       popOkBtnAction = {popOkBtnAction}
       popUpAction = {popUpAction}
       submitAction = {submitAction}
+      routeParams = {routeParams}
     />
 
   );

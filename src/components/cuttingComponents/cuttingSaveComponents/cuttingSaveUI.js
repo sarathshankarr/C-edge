@@ -139,10 +139,10 @@ const CuttingSaveUI = ({ route, ...props }) => {
       "styleId": props.itemsObj.styleId,
       "soId": props.itemsObj.soId,
       "fabricId": props.itemsObj.fabricId,
-      "fabricType": 'Main Fabric',//batchText,
-      "fabricWastage": fabricWaste,//fabricWaste,
-      "damageQty": damageQty,//damageQty,
-      "rejectQty": rejectQty,//rejectQty,
+      "fabricType":  props.routeParams.fabricType,
+      "fabricWastage": fabricWaste,
+      "damageQty": damageQty,
+      "rejectQty": rejectQty,
       "fabricConsumption": dailyConsumption,
       "username": userName,
       "password": userPsd,
@@ -163,7 +163,7 @@ const CuttingSaveUI = ({ route, ...props }) => {
     let tempArray = enterSizesArray;
     tempArray[index].enterQty = value;
     set_enterSizesArray(tempArray);
-    console.log('-------->', tempArray);
+    // console.log('-------->', tempArray);
 
     let tempDaily = 0;
     let totalSum = 0;
@@ -174,7 +174,7 @@ const CuttingSaveUI = ({ route, ...props }) => {
     set_dailyConsumption(tempDaily);
     let v = tempDaily / totalSum;
     set_actualConsumption(v);
-    console.log("actual Consumption  ", tempDaily, totalSum, actualConsumption);
+    // console.log("actual Consumption  ", tempDaily, totalSum, actualConsumption);
   };
 
   // const actionOnBatchtype = (id, name) => {
@@ -250,9 +250,9 @@ const CuttingSaveUI = ({ route, ...props }) => {
 
         <View style={{ marginTop: hp('3%'), width: wp('90%'), marginBottom: hp('2%') }}>
           <View style={{flexDirection :'row', justifyContent:'space-between'}}>
-          <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:1,textAlign:'left'}]}>{'Main Fabric'}</Text>
+          <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:1,textAlign:'left'}]}>{props.routeParams.fabricName == "Main Fabric" ? 'Main Fabric' : 'Trim Fabric'}</Text>
           <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:0.3}]}>{' :  '}</Text>
-          <Text style={[CommonStyles.tylesTextStyle,{flex:3,textAlign:'left'}]}>{props.itemsObj ? props.itemsObj.fabricName : null}</Text>
+          <Text style={[CommonStyles.tylesTextStyle,{flex:3,textAlign:'left'}]}>{props.routeParams ? props.routeParams.fabricName : null}</Text>
         </View> 
 
         </View>
@@ -414,7 +414,7 @@ const CuttingSaveUI = ({ route, ...props }) => {
             <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: hp('1%') }} >
 
               <TextInputComponent
-                inputText={approvedConsumption?.toString()}
+                inputText={props.routeParams.fabricName == "Main Fabric" ? approvedConsumption?.toString() : props?.itemsObj?.trimApprovedconsumption?.toString()}
                 labelText={'Approved Consumption'}
                 isEditable={false}
                 maxLengthVal={10}
@@ -429,7 +429,8 @@ const CuttingSaveUI = ({ route, ...props }) => {
             <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: hp('1%') }} >
 
               <TextInputComponent
-                inputText={actualConsumption?.toString()}
+                // inputText={actualConsumption?.toString()}
+                inputText={props.routeParams.fabricName == "Main Fabric" ? actualConsumption?.toString() : props.itemsObj?.actualConsumtionTrim?.toString()}
                 labelText={'Actual Consumption'}
                 isEditable={false}
                 maxLengthVal={10}
@@ -496,6 +497,17 @@ const CuttingSaveUI = ({ route, ...props }) => {
               <TextInputComponent
                 inputText={dailyConsumption.toString()}
                 labelText={' Total Daily Consumption'}
+                isEditable={false}
+                maxLengthVal={10}
+                autoCapitalize={"none"}
+                keyboardType={'numeric'}
+                setValue={(textAnswer) => { set_dailyConsumption(textAnswer.toString()) }}
+              />
+            </View>
+            <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: hp('1%') }} >
+              <TextInputComponent
+                inputText={fabricUsed.toString()}
+                labelText={' Total  Consumption'}
                 isEditable={false}
                 maxLengthVal={10}
                 autoCapitalize={"none"}

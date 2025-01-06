@@ -72,7 +72,7 @@ const StyleManageComponent = ({ navigation, route, ...props }) => {
       "company":JSON.parse(companyObj),
     }
 
-    console.log('req obj for list ===> ', obj);
+    // console.log('req obj for list ===> ', obj);
 
 
     let poEditAPIObj = await APIServiceCall.loadAllStylesAPI(obj);
