@@ -71,25 +71,7 @@ const CuttingSaveUI = ({ route, ...props }) => {
     }
   }, [props.itemsObj]);
 
-  // const parseBatchRecords = (batchMap) => {
-
-  //   let tempArr = [];
-  //   if (batchMap) {
-  //     for (let [key, value] of Object.entries(batchMap)) {
-  //       console.log(key, value);
-  //       if (value !== "") {
-  //         let obj = {
-  //           key: value
-  //         }
-  //         tempArr.push(obj)
-  //       }
-
-  //     }
-  //     console.log('temp ', tempArr)
-  //     set_batchMapArr(tempArr);
-  //   }
-
-  // }
+ 
 
   const backBtnAction = () => {
     props.backBtnAction();
@@ -167,8 +149,9 @@ const CuttingSaveUI = ({ route, ...props }) => {
 
     let tempDaily = 0;
     let totalSum = 0;
+    const approvedQty=props.routeParams.fabricType == "Main Fabric" ? approvedConsumption?.toString() : props?.itemsObj?.trimApprovedconsumption?.toString();
     for (let i = 0; i < enterSizesArray.length; i++) {
-      tempDaily += (Number(enterSizesArray[i].enterQty) * Number(approvedConsumption));
+      tempDaily += (Number(enterSizesArray[i].enterQty) * Number(approvedQty));
       totalSum += (Number(enterSizesArray[i].enterQty));
     }
     set_dailyConsumption(tempDaily);
@@ -250,7 +233,7 @@ const CuttingSaveUI = ({ route, ...props }) => {
 
         <View style={{ marginTop: hp('3%'), width: wp('90%'), marginBottom: hp('2%') }}>
           <View style={{flexDirection :'row', justifyContent:'space-between'}}>
-          <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:1,textAlign:'left'}]}>{props.routeParams.fabricName == "Main Fabric" ? 'Main Fabric' : 'Trim Fabric'}</Text>
+          <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:1,textAlign:'left'}]}>{props.routeParams.fabricType == "Main Fabric" ? 'Main Fabric' : 'Trim Fabric'}</Text>
           <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:0.3}]}>{' :  '}</Text>
           <Text style={[CommonStyles.tylesTextStyle,{flex:3,textAlign:'left'}]}>{props.routeParams ? props.routeParams.fabricName : null}</Text>
         </View> 
@@ -414,7 +397,7 @@ const CuttingSaveUI = ({ route, ...props }) => {
             <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: hp('1%') }} >
 
               <TextInputComponent
-                inputText={props.routeParams.fabricName == "Main Fabric" ? approvedConsumption?.toString() : props?.itemsObj?.trimApprovedconsumption?.toString()}
+                inputText={props.routeParams.fabricType == "Main Fabric" ? approvedConsumption?.toString() : props?.itemsObj?.trimApprovedconsumption?.toString()}
                 labelText={'Approved Consumption'}
                 isEditable={false}
                 maxLengthVal={10}
@@ -430,7 +413,7 @@ const CuttingSaveUI = ({ route, ...props }) => {
 
               <TextInputComponent
                 // inputText={actualConsumption?.toString()}
-                inputText={props.routeParams.fabricName == "Main Fabric" ? actualConsumption?.toString() : props.itemsObj?.actualConsumtionTrim?.toString()}
+                inputText={props.routeParams.fabricType == "Main Fabric" ? actualConsumption?.toString() : props.itemsObj?.actualConsumtionTrim?.toString()}
                 labelText={'Actual Consumption'}
                 isEditable={false}
                 maxLengthVal={10}
@@ -497,7 +480,7 @@ const CuttingSaveUI = ({ route, ...props }) => {
               <TextInputComponent
                 inputText={dailyConsumption.toString()}
                 labelText={' Total Daily Consumption'}
-                isEditable={false}
+                isEditable={true}
                 maxLengthVal={10}
                 autoCapitalize={"none"}
                 keyboardType={'numeric'}
@@ -649,6 +632,7 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
     marginTop: hp("1%"),
     marginLeft: wp('4%'),
+    color: 'black',
   },
   dropdownContent: {
     elevation: 5,

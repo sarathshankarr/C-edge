@@ -50,8 +50,8 @@ const StockRequestList = ({ navigation, route, ...props }) => {
     let obj = {
       "searchKeyValue": "",
       "styleSearchDropdown": "-1",    
-      "fromRecord": 0,
-      "toRecord": 999,
+      "fromRecord": fromRecord,
+      "toRecord": toRecord,
       "username": userName,
       "password" : userPsd,
       "compIds": usercompanyId,
@@ -59,7 +59,7 @@ const StockRequestList = ({ navigation, route, ...props }) => {
 
   }
 
-    let stockStylesAPIObj = await APIServiceCall.stockApproveListDetails(obj);
+    let stockStylesAPIObj = await APIServiceCall.stockRequestListDetails(obj);
     set_isLoading(false);
     
     if(stockStylesAPIObj && stockStylesAPIObj.statusData){

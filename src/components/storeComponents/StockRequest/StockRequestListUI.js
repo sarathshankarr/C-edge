@@ -385,7 +385,7 @@ const StockRequestListUI = ({navigation, route, ...props}) => {
                 CommonStyles.tylesHeaderTextStyle,
                 {flex: 0.5, textAlign: 'left'},
               ]}>
-              {'SId'}
+              {'SoId'}
             </Text>
             <Text
               style={[
