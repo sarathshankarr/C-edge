@@ -30,11 +30,11 @@ const StyleProcessWorkFlow = ({ navigation, route, ...props }) => {
   };
 
   const getInitialData = async (process, style) => {
+    set_isLoading(true);
 
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
     let companyObj = await AsyncStorage.getItem('companyObj');
-    set_isLoading(true);
     let obj = {
       "username": userName,
       "password": userPsd,
@@ -42,12 +42,10 @@ const StyleProcessWorkFlow = ({ navigation, route, ...props }) => {
       "process": process,
       "company": JSON.parse(companyObj),
     }
-
-    console.log("before calling API ==> ");
+    console.log("red body ==> ", obj);
 
     let STOREDETAILSAPIObj = await APIServiceCall.GetStyleStatusFlow(obj);
 
-    console.log("After  calling API ==> ");
 
     set_isLoading(false);
 

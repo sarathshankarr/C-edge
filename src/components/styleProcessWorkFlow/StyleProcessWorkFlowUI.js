@@ -230,15 +230,35 @@ const StockRequestEditUi = ({route, ...props}) => {
                         style={[
                           styles.table_body_single_row,
 
-                          item.processTotQty <= item.totQty &&
-                            item.damagedqty === 0 &&
-                            item.totQty !== 0 && {
-                              backgroundColor: 'lightgreen',
-                            },
-                          item.processTotQty > item.totQty &&
-                            item.damagedqty === 0 &&
-                            item.totQty !== 0 && {backgroundColor: 'yellow'},
-                          item.damagedqty !== 0 && {backgroundColor: 'orange'},
+                          // processQty >= totQty and dmged =0  ; GREEN 
+
+// processQty < totQty and dmged =0 ; YELLOW
+// damaged =1  ORANGE
+
+                          item.processTotQty >= item.totQty && 
+                          item.damagedqty === 0 && {
+                            backgroundColor: 'lightgreen',
+                          },
+                          
+                          item.processTotQty < item.totQty && 
+                          item.damagedqty === 0 && {
+                            backgroundColor: 'yellow',
+                          },
+                          
+                          item.damagedqty === 1 && {
+                            backgroundColor: 'orange',
+                          },
+
+                          // item.processTotQty <= item.totQty &&
+                          //   item.damagedqty === 0 &&
+                          //   item.totQty !== 0 && {
+                          //     backgroundColor: 'lightgreen',
+                          //   },
+                          // item.processTotQty > item.totQty &&
+                          //   item.damagedqty === 0 &&
+                          //   item.totQty !== 0 && {backgroundColor: 'yellow'},
+                          // item.damagedqty !== 0 && {backgroundColor: 'orange'},
+                         
                         ]}>
                         <View style={{width: '35%'}}>
                           <Text style={styles.table_data}>{item.menuName}</Text>

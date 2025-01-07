@@ -16,7 +16,12 @@ const StyleDetailsComponent = ({ navigation, route, ...props }) => {
   const [isPopupLeft, set_isPopupLeft] = useState(false);
   const [styleId, set_styleId] = useState(undefined);
   const [img, set_img]=useState('');
-  const [styleDetailsList, set_styleDetailsList]=useState('');
+  const [listItems, set_listItems]=useState({
+    productionSummary:[],
+    timeAndAction:[],
+    styleDetailsList:[]
+  });
+
 
   React.useEffect(() => {
 
@@ -25,11 +30,13 @@ const StyleDetailsComponent = ({ navigation, route, ...props }) => {
       set_img(route.params?.image);
       getInitialData(route.params?.sId);
       getInitialDataList(route.params?.sId);
+      getProductionSummary(route.params?.sId);
+      getTimeandAction(route.params?.sId);
     }
     
   }, [route.params?.sId]);
 
-  console.log("image===>",img)
+  // console.log("image===>",img)
 
   const getInitialData = async (id) => {
 
@@ -41,7 +48,7 @@ const StyleDetailsComponent = ({ navigation, route, ...props }) => {
       "username": userName,
       "password" : userPsd
     }
-    console.log('Style ',obj)
+    // console.log('Style ',obj)
     let styleDetailsAPIObj = await APIServiceCall.stylesDetailsAPIByRecord(obj);
     set_isLoading(false);
     
@@ -78,7 +85,11 @@ const StyleDetailsComponent = ({ navigation, route, ...props }) => {
     if(styleSDdetailsAPIObj && styleSDdetailsAPIObj.statusData){
 
       if(styleSDdetailsAPIObj && styleSDdetailsAPIObj.responseData){
-        set_styleDetailsList(styleSDdetailsAPIObj.responseData)
+        // set_styleDetailsList(styleSDdetailsAPIObj.responseData);
+        set_listItems(prevState => ({
+          ...prevState,
+          styleDetailsList: styleSDdetailsAPIObj.responseData
+        }));
       } 
 
     } else {
@@ -86,6 +97,77 @@ const StyleDetailsComponent = ({ navigation, route, ...props }) => {
     }
 
     if(styleSDdetailsAPIObj && styleSDdetailsAPIObj.error) {
+      popUpAction(Constant.SERVICE_FAIL_MSG,Constant.DefaultAlert_MSG,'OK', true,false)
+    }
+
+  };
+
+  const getProductionSummary = async (id) => {
+
+    set_isLoading(true);
+
+    let userName = await AsyncStorage.getItem('userName');
+    let userPsd = await AsyncStorage.getItem('userPsd');
+
+    let obj = {
+      "styleId" : id,
+      "process" :"singlestyle",
+      "username": userName,
+      "password" : userPsd,
+    }
+
+    let poEditAPIObj = await APIServiceCall.viewProcessFlow(obj);
+    set_isLoading(false);
+    if(poEditAPIObj && poEditAPIObj.statusData){
+
+      if(poEditAPIObj && poEditAPIObj.responseData){
+        // set_itemsArray(poEditAPIObj.responseData)
+        set_listItems(prevState => ({
+          ...prevState,
+          productionSummary: poEditAPIObj.responseData
+        }));
+      } 
+
+    } else {
+      popUpAction(Constant.SERVICE_FAIL_MSG,Constant.DefaultAlert_MSG,'OK', true,false);
+    }
+
+    if(poEditAPIObj && poEditAPIObj.error) {
+      popUpAction(Constant.SERVICE_FAIL_MSG,Constant.DefaultAlert_MSG,'OK', true,false)
+    }
+
+  };
+
+  const getTimeandAction = async (id) => {
+
+    set_isLoading(true);
+    let userName = await AsyncStorage.getItem('userName');
+    let userPsd = await AsyncStorage.getItem('userPsd');
+    let obj = {
+      "styleId":id,
+      "oldOrNewProcess":0,
+      "username": userName,
+      "password" : userPsd,
+    }
+
+    let vTimeActionAPIObj = await APIServiceCall.vieTimeAction(obj);
+    set_isLoading(false);
+    // console.log('ViewTimeAction ',vTimeActionAPIObj)
+    if(vTimeActionAPIObj && vTimeActionAPIObj.statusData){
+
+      if(vTimeActionAPIObj && vTimeActionAPIObj.responseData){
+        // set_listItems(vTimeActionAPIObj.responseData.styletimeandactionlist);
+        set_listItems(prevState => ({
+          ...prevState,
+          getTimeandAction:vTimeActionAPIObj.responseData.styletimeandactionlist
+        }));
+      } 
+
+    } else {
+      popUpAction(Constant.SERVICE_FAIL_MSG,Constant.DefaultAlert_MSG,'OK', true,false);
+    }
+
+    if(vTimeActionAPIObj && vTimeActionAPIObj.error) {
       popUpAction(Constant.SERVICE_FAIL_MSG,Constant.DefaultAlert_MSG,'OK', true,false)
     }
 
@@ -115,7 +197,6 @@ const StyleDetailsComponent = ({ navigation, route, ...props }) => {
   };
 
   const sizeDetailsAction = () => {
-    console.log('Hello ', )
     navigation.navigate('styleSizeDetailsComponents',{sId:styleId})
   };
 
@@ -139,7 +220,7 @@ const StyleDetailsComponent = ({ navigation, route, ...props }) => {
       popOkBtnAction = {popOkBtnAction}
       sizeDetailsAction = {sizeDetailsAction}
       viewProcessFlowAction = {viewProcessFlowAction}
-      styleDetailsList = {styleDetailsList}
+      listItems = {listItems}
     />
 
   );
