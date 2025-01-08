@@ -104,11 +104,12 @@ const StockRequestList = ({ navigation, route, ...props }) => {
       "categoryIds" : Ids,
       "compIds": usercompanyId,
       "company":JSON.parse(companyObj),
+      "styleSearchDropdown":"-1",
 
   }
-    //  console.log("requested filtered body ==> ", obj);
+     console.log("requested filtered body ==> ", obj);
   
-    let stichingOutAPIObj = await APIServiceCall.getFiltered_StockApproveRequest(obj);
+    let stichingOutAPIObj = await APIServiceCall.getFiltered_StockRequest(obj);
     set_MainLoading(false);
     
     if(stichingOutAPIObj && stichingOutAPIObj.statusData){

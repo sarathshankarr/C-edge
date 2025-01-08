@@ -105,7 +105,7 @@ const toggleSelection = (item) => {
       let obj = reqBody;
       obj.categoryType=id;
 
-      // console.log("rightside  req body", functionName, id);
+      // console.log("rightside  req body", obj);
   
       // let categoreisListAPIOBJ = await APIServiceCall.getSelectedCategoryListFBI(obj);
       // if (typeof APIServiceCall[functionName] === 'function') {
