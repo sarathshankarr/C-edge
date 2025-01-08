@@ -240,30 +240,54 @@ const StockRequestEditUi = ({route, ...props}) => {
                           // processQty < totQty and dmged =0 ; YELLOW
                           // damaged =1  ORANGE
 
+                          item.totQty !== 0  &&
+                            item.processTotQty !== 0 &&
+                            item.processTotQty <= item.totQty &&
+                            item.damagedqty === 0 && {
+                              backgroundColor: '#26A69A',
+                            },
+
+                            item.totQty === 0 &&  item.processTotQty !== 0 && (item.spcmenudid===31 || item.spcmenudid===32) && {
+                              backgroundColor: '#26A69A',
+                            },
+
+                          item.processTotQty !== 0 &&
+                          item.totQty !== 0  &&
+                            item.processTotQty > item.totQty &&
+                            item.damagedqty === 0 && {
+                              backgroundColor: '#FFF59D',
+                            },
+
                           item.processTotQty !== 0 &&
                             item.totQty !== 0 &&
-                            (item.processTotQty >= item.totQty &&
-                              item.damagedqty === 0 && {
-                                backgroundColor: 'lightgreen',
-                              },
-                            item.processTotQty < item.totQty &&
-                              item.damagedqty === 0 && {
-                                backgroundColor: 'yellow',
-                              },
                             item.damagedqty === 1 && {
-                              backgroundColor: 'orange',
-                            }),
+                              backgroundColor: '#FF7F00',
+                            },
 
-                          // item.processTotQty <= item.totQty &&
-                          //   item.damagedqty === 0 &&
-                          //   item.totQty !== 0 && {
-                          //     backgroundColor: 'lightgreen',
-                          //   },
-                          // item.processTotQty > item.totQty &&
-                          //   item.damagedqty === 0 &&
-                          //   item.totQty !== 0 && {backgroundColor: 'yellow'},
-                          // item.damagedqty !== 0 && {backgroundColor: 'orange'},
                         ]}>
+                        {console.log(
+                          'types ===> ',
+                          index === 0 && '  start ==>  ',
+                          item.processTotQty,
+                          item.totQty,
+                          item.damagedqty,
+                          item.spcmenudid,
+                          item.menuName,
+                          item.processTotQty <= item.totQty
+                          // item.processTotQty !== 0 &&
+                          //   item.totQty !== 0 &&
+                          //   item.processTotQty <= item.totQty &&
+                          //   item.damagedqty === 0,
+
+                          // item.processTotQty !== 0 &&
+                          //   item.totQty !== 0 &&
+                          //   item.processTotQty > item.totQty &&
+                          //   item.damagedqty === 0,
+
+                          // item.processTotQty !== 0 &&
+                          //   item.totQty !== 0 &&
+                          //   item.damagedqty === 1,
+                        )}
                         <View style={{width: '35%'}}>
                           <Text style={styles.table_data}>{item.menuName}</Text>
                         </View>

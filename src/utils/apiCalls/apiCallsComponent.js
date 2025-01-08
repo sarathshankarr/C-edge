@@ -332,7 +332,7 @@ export async function stylesDetailsAPIByRecord(jsonValue) {
             body: JSON.stringify(jsonValue),
         }
     ).then((response) => response.json()).then(async (data) => {
-        console.log('listStylesAPIByRec ', data)
+        // console.log('listStylesAPIByRec ', data)
 
         if (data) {
             statusData = true;
@@ -363,7 +363,7 @@ export async function viewProcessFlow(jsonValue) {
         obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
         return obj;
     }
-    console.log('viewProcessFlow ', jsonValue, Environment.uri + "styleapi/viewProcessFlowByStyle")
+    console.log('viewProcessFlow ', Environment.uri + "styleapi/viewProcessFlowByStyle")
     await fetch(Environment.uri + "styleapi/viewProcessFlowByStyle",
         {
             method: "POST",
@@ -374,7 +374,7 @@ export async function viewProcessFlow(jsonValue) {
             body: JSON.stringify(jsonValue),
         }
     ).then((response) => response.json()).then(async (data) => {
-        console.log('viewProcessFlow1 ', data)
+        // console.log('viewProcessFlow1 ', data)
 
         if (data) {
             statusData = true;
@@ -405,7 +405,7 @@ export async function vieTimeAction(jsonValue) {
         obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
         return obj;
     }
-    console.log('viewTimeAndAction ', jsonValue, Environment.uri + "styleapi/viewTimeAndAction")
+    console.log('viewTimeAndAction ', Environment.uri + "styleapi/viewTimeAndAction")
     await fetch(Environment.uri + "styleapi/viewTimeAndAction",
         {
             method: "POST",
@@ -416,7 +416,7 @@ export async function vieTimeAction(jsonValue) {
             body: JSON.stringify(jsonValue),
         }
     ).then((response) => response.json()).then(async (data) => {
-        console.log('viewTimeAndAction ', data)
+        // console.log('viewTimeAndAction ', data)
 
         if (data) {
             statusData = true;
@@ -489,7 +489,7 @@ export async function styleSizeDetails(jsonValue) {
         obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
         return obj;
     }
-    console.log('styleSizeDetails ', jsonValue, Environment.uri + "styleapi/styleSizeDetails")
+    console.log('styleSizeDetails ', Environment.uri + "styleapi/styleSizeDetails")
     await fetch(Environment.uri + "styleapi/styleSizeDetails",
         {
             method: "POST",
@@ -500,7 +500,7 @@ export async function styleSizeDetails(jsonValue) {
             body: JSON.stringify(jsonValue),
         }
     ).then((response) => response.json()).then(async (data) => {
-        console.log('styleSizeDetails1---> ', data)
+        // console.log('styleSizeDetails1---> ', data)
 
         if (data) {
             statusData = true;

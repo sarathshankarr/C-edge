@@ -156,10 +156,10 @@ const StyleDetailsComponent = ({ navigation, route, ...props }) => {
     if(vTimeActionAPIObj && vTimeActionAPIObj.statusData){
 
       if(vTimeActionAPIObj && vTimeActionAPIObj.responseData){
-        // set_listItems(vTimeActionAPIObj.responseData.styletimeandactionlist);
+        // console.log("response of Time & Action", vTimeActionAPIObj.responseData);
         set_listItems(prevState => ({
           ...prevState,
-          getTimeandAction:vTimeActionAPIObj.responseData.styletimeandactionlist
+          timeAndAction:vTimeActionAPIObj.responseData.styletimeandactionlist
         }));
       } 
 
