@@ -22,6 +22,7 @@ import AlertComponent from './../../../utils/commonComponents/alertComponent';
 import FilterModal from '../../../utils/commonComponents/FilterModal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ColorContext } from '../../colorTheme/colorTheme';
+import AddNewItem from '../../../utils/commonComponents/AddNewItem';
 // import { useNavigation } from '@react-navigation/native';
 
 let searchImg = require('./../../../../assets/images/png/searchIcon.png');
@@ -362,7 +363,7 @@ const StockRequestListUI = ({navigation, route, ...props}) => {
     
   </TouchableOpacity>
 
-              <TouchableOpacity
+              {/* <TouchableOpacity
                 style={styles.leftButtonstyle1}
                 onPress={() => {
                   createPage();
@@ -371,7 +372,7 @@ const StockRequestListUI = ({navigation, route, ...props}) => {
                   source={addImg}
                   style={{height: 40, width: 40, marginLeft: 15, tintColor:colors.color2}}
                 />
-              </TouchableOpacity>
+              </TouchableOpacity> */}
 </View>
 
 
@@ -461,6 +462,8 @@ const StockRequestListUI = ({navigation, route, ...props}) => {
         reqBody={filterReqBody}
 
       />
+
+      <AddNewItem navItem='CreateStockRequest'/>
 
       {props.isPopUp ? (
         <View style={CommonStyles.customPopUpStyle}>

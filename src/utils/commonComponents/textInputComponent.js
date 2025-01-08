@@ -26,6 +26,7 @@ const TextInputComponent = ({
   const [backgroundColor, set_backgroundColor] = useState('transparent');
   const [autoCapitalizeValue, set_autoCapitalizeValue] = useState('none');
 
+  const styles = getStyles(isEditable);
   useEffect(() => {
     if (widthValue) {
       set_widthTextInput(widthValue);
@@ -54,7 +55,7 @@ const TextInputComponent = ({
           underlineColor={'transparent'}
           style={[
             styles.textInputStyle,
-            {backgroundColor: isEditable ? 'transparent' : '#dedede'},
+            // {backgroundColor: isEditable ? 'transparent' : '#dedede'},
           ]}
           activeUnderlineColor={'#7F7F81'}
           selectionColor={'transparent'}
@@ -74,7 +75,7 @@ const TextInputComponent = ({
 
 export default TextInputComponent;
 
-const styles = StyleSheet.create({
+const getStyles = (isEditable) => StyleSheet.create({
   textInputStyle: {
     fontWeight: 'normal',
     fontSize: 20,
@@ -90,7 +91,7 @@ const styles = StyleSheet.create({
     borderRadius: wp('1%'),
     borderWidth: 1,
     borderColor: '#dedede',
-    backgroundColor: 'white',
+    backgroundColor:  isEditable ? '#fff' : '#dedede',
     alignItems: 'center',
     justifyContent: 'center',
   },

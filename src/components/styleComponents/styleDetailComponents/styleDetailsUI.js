@@ -203,7 +203,7 @@ const StyleDetailsUI = ({route, ...props}) => {
                   justifyContent: 'space-between',
                 }}>
                 <Text style={[CommonStyles.tylesHeaderTextStyle, {}]}>
-                  {'Customer Style No *'}
+                  {'Customer Style No '}
                 </Text>
                 <Text
                   style={[
