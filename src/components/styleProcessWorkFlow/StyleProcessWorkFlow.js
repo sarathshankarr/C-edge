@@ -42,7 +42,7 @@ const StyleProcessWorkFlow = ({ navigation, route, ...props }) => {
       "process": process,
       "company": JSON.parse(companyObj),
     }
-    console.log("red body ==> ", obj);
+    // console.log("red body ==> ", obj);
 
     let STOREDETAILSAPIObj = await APIServiceCall.GetStyleStatusFlow(obj);
 

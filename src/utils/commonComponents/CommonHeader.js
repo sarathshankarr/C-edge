@@ -142,7 +142,8 @@ const CommonHeader = ({ title, showDrawerButton }) => {
           k: key,
           name: value,
         }));
-        const fil=filtered.reverse();
+        const filteringEmpty=filtered.filter((item)=>item.name!=="")
+        const fil=filteringEmpty.reverse();
         set_filterStyleList2(fil);
         set_styleList2(fil);
 

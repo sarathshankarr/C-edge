@@ -30,8 +30,8 @@ let arrowImg = require('./../../../../assets/images/png/arrowImg.png');
 
 
 const HeadingItemsList = [
-  {id: 1, title: 'View Time and Action' },
-  {id: 2, title: 'Production Summary' },
+  {id: 1, title: 'Production Summary' },
+  {id: 2, title: 'View Time and Action' },
   {id: 3, title: 'RM Allocation(BOM)'},
   // {id: 4, title: 'Thread'},
 ];
@@ -62,10 +62,10 @@ const StyleDetailsUI = ({route, ...props}) => {
   const sizeDetailsAction = () => {
     props.sizeDetailsAction();
   };
-
+  
   // console.log("styleDetailsList  style1==>",  props.listItems.styleDetailsList.styleSizeDataResponseList )
   // console.log("productionSummary  style2==>",  props.listItems.productionSummary.styleresponselist );
-  // console.log("timeAndAction  style3==>",  props.listItems.timeAndAction )
+  console.log("timeAndAction  style3==>",  props.listItems.timeAndAction )
   
   
   const renderItem = ({item, index}) => {
