@@ -154,7 +154,7 @@ const CreateRequest = ({ navigation, route, ...props }) => {
       "company":JSON.parse(companyObj),
 
     }
-    console.log("geeeeeeeeeeeeee==> ", obj);
+    // console.log("geeeeeeeeeeeeee==> ", obj);
 
     let STOREDETAILSAPIObj = await APIServiceCall.getBatches(obj);
     set_isLoading(false);
