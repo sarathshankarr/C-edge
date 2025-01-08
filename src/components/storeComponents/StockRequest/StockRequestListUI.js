@@ -48,9 +48,8 @@ const StockRequestListUI = ({navigation, route, ...props}) => {
 
 
   const [categories, set_categories]=useState([
-    { id: "stylename", fid: "styleName", value: "Style" , idxId:"styleId"},
-    { id: "id",fid: "stockId", value: "#SO" , idxId:"stockId"},
-    { id: "username",fid: "userName", value: "Requested By" , idxId:"userId"},
+    { id: "Requested_by", fid: "requestedBy", value: "Requested By" , idxId:"userId"},
+    { id: "STYLE_NO",fid: "styleName", value: "Style By" , idxId:"styleId"},
   ]);
 
 
@@ -76,7 +75,7 @@ const StockRequestListUI = ({navigation, route, ...props}) => {
       "categoryIds" : "",
       "compIds": usercompanyId,
       "company":JSON.parse(companyObj),
-
+      "styleSearchDropdown":"-1",
   }
   setfilterReqBody(Obj)
   };
@@ -236,7 +235,7 @@ const StockRequestListUI = ({navigation, route, ...props}) => {
           isChatEnable={false}
           isTImerEnable={false}
           isTitleHeaderEnable={true}
-          title={'Stock Request List'}
+          title={'Stock Request '}
           backBtnAction={() => backBtnAction()}
         />
       </View>
@@ -455,7 +454,7 @@ const StockRequestListUI = ({navigation, route, ...props}) => {
       <FilterModal
         isVisible={isFilterVisible}
         categoriesList={categories}
-        selectedCategoryListAPI={'getSelectedCategoryList_StockApproveRequest'}
+        selectedCategoryListAPI={'getSelectedCategoryList_StockRequest'}
         onClose={() => setFilterVisible(false)}
         applyFilterFxn={applyFilterFxn}
         clearFilter={clearFilter}

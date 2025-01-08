@@ -98,7 +98,8 @@ const StockRequestEditUi = ({route, ...props}) => {
                   }}>
                   <TextInputComponent
                     inputText={
-                      props?.itemsObj[tableIndex] && props?.itemsObj[tableIndex][0]?.styleName
+                      props?.itemsObj[tableIndex] &&
+                      props?.itemsObj[tableIndex][0]?.styleName
                         ? props?.itemsObj[tableIndex][0]?.styleName
                         : ''
                     }
@@ -118,7 +119,8 @@ const StockRequestEditUi = ({route, ...props}) => {
                   }}>
                   <TextInputComponent
                     inputText={
-                      props?.itemsObj[tableIndex] && props?.itemsObj[tableIndex][0]?.styledesc
+                      props?.itemsObj[tableIndex] &&
+                      props?.itemsObj[tableIndex][0]?.styledesc
                         ? props?.itemsObj[tableIndex][0]?.styledesc
                         : ''
                     }
@@ -138,7 +140,8 @@ const StockRequestEditUi = ({route, ...props}) => {
                   }}>
                   <TextInputComponent
                     inputText={
-                      props?.itemsObj[tableIndex] && props?.itemsObj[tableIndex][0]?.shipqty
+                      props?.itemsObj[tableIndex] &&
+                      props?.itemsObj[tableIndex][0]?.shipqty
                         ? props?.itemsObj[tableIndex][0]?.shipqty
                         : ''
                     }
@@ -158,7 +161,8 @@ const StockRequestEditUi = ({route, ...props}) => {
                   }}>
                   <TextInputComponent
                     inputText={
-                      props?.itemsObj[tableIndex] && props?.itemsObj[tableIndex][0]?.username
+                      props?.itemsObj[tableIndex] &&
+                      props?.itemsObj[tableIndex][0]?.username
                         ? props?.itemsObj[tableIndex][0]?.username
                         : ''
                     }
@@ -178,7 +182,8 @@ const StockRequestEditUi = ({route, ...props}) => {
                   }}>
                   <TextInputComponent
                     inputText={
-                      props?.itemsObj[tableIndex] && props?.itemsObj[tableIndex][0]?.woNo
+                      props?.itemsObj[tableIndex] &&
+                      props?.itemsObj[tableIndex][0]?.woNo
                         ? props?.itemsObj[tableIndex][0]?.woNo
                         : ''
                     }
@@ -230,24 +235,24 @@ const StockRequestEditUi = ({route, ...props}) => {
                         style={[
                           styles.table_body_single_row,
 
-                          // processQty >= totQty and dmged =0  ; GREEN 
+                          // processQty >= totQty and dmged =0  ; GREEN
 
-// processQty < totQty and dmged =0 ; YELLOW
-// damaged =1  ORANGE
+                          // processQty < totQty and dmged =0 ; YELLOW
+                          // damaged =1  ORANGE
 
-                          item.processTotQty >= item.totQty && 
-                          item.damagedqty === 0 && {
-                            backgroundColor: 'lightgreen',
-                          },
-                          
-                          item.processTotQty < item.totQty && 
-                          item.damagedqty === 0 && {
-                            backgroundColor: 'yellow',
-                          },
-                          
-                          item.damagedqty === 1 && {
-                            backgroundColor: 'orange',
-                          },
+                          item.processTotQty !== 0 &&
+                            item.totQty !== 0 &&
+                            (item.processTotQty >= item.totQty &&
+                              item.damagedqty === 0 && {
+                                backgroundColor: 'lightgreen',
+                              },
+                            item.processTotQty < item.totQty &&
+                              item.damagedqty === 0 && {
+                                backgroundColor: 'yellow',
+                              },
+                            item.damagedqty === 1 && {
+                              backgroundColor: 'orange',
+                            }),
 
                           // item.processTotQty <= item.totQty &&
                           //   item.damagedqty === 0 &&
@@ -258,7 +263,6 @@ const StockRequestEditUi = ({route, ...props}) => {
                           //   item.damagedqty === 0 &&
                           //   item.totQty !== 0 && {backgroundColor: 'yellow'},
                           // item.damagedqty !== 0 && {backgroundColor: 'orange'},
-                         
                         ]}>
                         <View style={{width: '35%'}}>
                           <Text style={styles.table_data}>{item.menuName}</Text>

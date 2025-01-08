@@ -26,15 +26,15 @@ import CustomCheckBox from '../../../../utils/commonComponents/CustomCheckBox';
 import {RadioButton} from 'react-native-paper';
 import * as APIServiceCall from '../../../../utils/apiCalls/apiCallsComponent';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { ColorContext } from '../../../colorTheme/colorTheme';
-import { RadioGroup } from 'react-native-radio-buttons-group';
+import {ColorContext} from '../../../colorTheme/colorTheme';
+import {RadioGroup} from 'react-native-radio-buttons-group';
 
 let downArrowImg = require('./../../../../../assets/images/png/dropDownImg.png');
 let closeImg = require('./../../../../../assets/images/png/close1.png');
 
 const CreateRequestUi = ({route, ...props}) => {
   const [rows, setRows] = React.useState([]);
-  const { colors } = useContext(ColorContext);
+  const {colors} = useContext(ColorContext);
   const styles = getStyles(colors);
 
   const [data, setData] = useState([]);
@@ -125,30 +125,37 @@ const CreateRequestUi = ({route, ...props}) => {
 
   const generalRadioButtons = useMemo(
     () => [
-      { id: 'yes', label: 'Yes', value: 'Yes' ,labelStyle: {color: '#000'}},
-      { id: 'no', label: 'No', value: 'No',labelStyle: {color: '#000'}, },
+      {id: 'yes', label: 'Yes', value: 'Yes', labelStyle: {color: '#000'}},
+      {id: 'no', label: 'No', value: 'No', labelStyle: {color: '#000'}},
     ],
-    []
+    [],
   );
 
   const buyerRadioButtons = useMemo(
     () => [
-      { id: 'buyerYes', label: 'Yes', value: 'Yes',labelStyle: {color: '#000'}, },
-      { id: 'buyerNo', label: 'No', value: 'No',labelStyle: {color: '#000'}, },
+      {id: 'buyerYes', label: 'Yes', value: 'Yes', labelStyle: {color: '#000'}},
+      {id: 'buyerNo', label: 'No', value: 'No', labelStyle: {color: '#000'}},
     ],
-    []
+    [],
   );
 
   const displayStyleRadioButtons = useMemo(
     () => [
-      { id: 'displayYes', label: 'Yes', value: 'Yes' ,labelStyle: {color: '#000'},},
-      { id: 'displayNo', label: 'No', value: 'No' ,labelStyle: {color: '#000'},},
+      {
+        id: 'displayYes',
+        label: 'Yes',
+        value: 'Yes',
+        labelStyle: {color: '#000'},
+      },
+      {id: 'displayNo', label: 'No', value: 'No', labelStyle: {color: '#000'}},
     ],
-    []
+    [],
   );
 
-  const handleGeneralRadioChange = (selectedId) => {
-    const selectedValue = generalRadioButtons.find((item) => item.id === selectedId)?.value;
+  const handleGeneralRadioChange = selectedId => {
+    const selectedValue = generalRadioButtons.find(
+      item => item.id === selectedId,
+    )?.value;
     set_generalRadio(selectedValue);
 
     if (selectedValue === 'Yes') {
@@ -157,13 +164,17 @@ const CreateRequestUi = ({route, ...props}) => {
     }
   };
 
-  const handleBuyerRadioChange = (selectedId) => {
-    const selectedValue = buyerRadioButtons.find((item) => item.id === selectedId)?.value;
+  const handleBuyerRadioChange = selectedId => {
+    const selectedValue = buyerRadioButtons.find(
+      item => item.id === selectedId,
+    )?.value;
     set_buyerRadio(selectedValue);
   };
 
-  const handleDisplayStyleRadioChange = (selectedId) => {
-    const selectedValue = displayStyleRadioButtons.find((item) => item.id === selectedId)?.value;
+  const handleDisplayStyleRadioChange = selectedId => {
+    const selectedValue = displayStyleRadioButtons.find(
+      item => item.id === selectedId,
+    )?.value;
     set_displayStyleRadio(selectedValue);
   };
 
@@ -254,12 +265,12 @@ const CreateRequestUi = ({route, ...props}) => {
     let companyObj = await AsyncStorage.getItem('companyObj');
     props.setLoad(true);
     let obj = {
-      "username": userName,
-      "password": userPsd,
-      "compIds": usercompanyId,
-      "company":JSON.parse(companyObj),
-      "processId": 0,
-      "woStyleId": stylesId,
+      username: userName,
+      password: userPsd,
+      compIds: usercompanyId,
+      company: JSON.parse(companyObj),
+      processId: 0,
+      woStyleId: stylesId,
     };
     let STOREDETAILSAPIObj = await APIServiceCall.getFabricByStyleId(obj);
     props.setLoad(false);
@@ -368,12 +379,12 @@ const CreateRequestUi = ({route, ...props}) => {
     props.setLoad(true);
 
     let obj = {
-      "username": userName,
-      "password": userPsd,
-      "processId": 0,
-      "woStyleId": fabricId,
-      "compIds": usercompanyId,
-      "company":JSON.parse(companyObj),
+      username: userName,
+      password: userPsd,
+      processId: 0,
+      woStyleId: fabricId,
+      compIds: usercompanyId,
+      company: JSON.parse(companyObj),
     };
 
     let STOREDETAILSAPIObj = await APIServiceCall.getFabricByfabricId(obj);
@@ -436,13 +447,12 @@ const CreateRequestUi = ({route, ...props}) => {
     props.setLoad(true);
 
     let obj = {
-      "username": userName,
-      "password": userPsd,
-      "processId": 0,
-      "trimTypeId": stockTId,
-      "compIds": usercompanyId,
-      "company":JSON.parse(companyObj),
-
+      username: userName,
+      password: userPsd,
+      processId: 0,
+      trimTypeId: stockTId,
+      compIds: usercompanyId,
+      company: JSON.parse(companyObj),
     };
 
     let STOREDETAILSAPIObj = await APIServiceCall.getTrimsByTypeId(obj);
@@ -493,12 +503,11 @@ const CreateRequestUi = ({route, ...props}) => {
     props.setLoad(true);
 
     let obj = {
-      "username": userName,
-      "password": userPsd,
-      "trimId": trimId,
-      "compIds": usercompanyId,
-      "company":JSON.parse(companyObj),
-
+      username: userName,
+      password: userPsd,
+      trimId: trimId,
+      compIds: usercompanyId,
+      company: JSON.parse(companyObj),
     };
 
     let STOREDETAILSAPIObj = await APIServiceCall.getStockQty(obj);
@@ -542,16 +551,16 @@ const CreateRequestUi = ({route, ...props}) => {
     props.setLoad(true);
 
     let obj = {
-      "username": userName,
-      "password": userPsd,
-      "compIds": usercompanyId,
-      "company":JSON.parse(companyObj),
-      "processId": 0,
-      "woStyleId": 0,
-      "trimId": 175,
-      "locationId": 1,
-      "lotId": 1,
-      "sizeId": 0,
+      username: userName,
+      password: userPsd,
+      compIds: usercompanyId,
+      company: JSON.parse(companyObj),
+      processId: 0,
+      woStyleId: 0,
+      trimId: 175,
+      locationId: 1,
+      lotId: 1,
+      sizeId: 0,
     };
 
     let STOREDETAILSAPIObj = await APIServiceCall.getRmQtyByLot(obj);
@@ -596,16 +605,16 @@ const CreateRequestUi = ({route, ...props}) => {
     props.setLoad(true);
 
     let obj = {
-      "username": userName,
-      "password": userPsd,
-      "compIds": usercompanyId,
-      "company":JSON.parse(companyObj),
+      username: userName,
+      password: userPsd,
+      compIds: usercompanyId,
+      company: JSON.parse(companyObj),
 
-      "processId": 0,
-      "woStyleId": 0,
-      "trimId": 175,
-      "locationId": 1,
-      "lotId": 1,
+      processId: 0,
+      woStyleId: 0,
+      trimId: 175,
+      locationId: 1,
+      lotId: 1,
     };
 
     let STOREDETAILSAPIObj = await APIServiceCall.getRmQtyByLocation(obj);
@@ -650,16 +659,16 @@ const CreateRequestUi = ({route, ...props}) => {
     props.setLoad(true);
 
     let obj = {
-      "username": userName,
-      "password": userPsd,
-      "compIds": usercompanyId,
-      "company":JSON.parse(companyObj),
+      username: userName,
+      password: userPsd,
+      compIds: usercompanyId,
+      company: JSON.parse(companyObj),
 
-      "processId": 0,
-      "woStyleId": 0,
-      "trimId": 266,
-      "locationId": 1,
-      "lotId": 0,
+      processId: 0,
+      woStyleId: 0,
+      trimId: 266,
+      locationId: 1,
+      lotId: 0,
     };
 
     let STOREDETAILSAPIObj = await APIServiceCall.getFabQtyByLocation(obj);
@@ -878,7 +887,12 @@ const CreateRequestUi = ({route, ...props}) => {
     );
   };
 
-  console.log("radio button values==> ", generalRadio, buyerRadio, displayStyleRadio)
+  console.log(
+    'radio button values==> ',
+    generalRadio,
+    buyerRadio,
+    displayStyleRadio,
+  );
 
   return (
     <View style={[CommonStyles.mainComponentViewStyle]}>
@@ -1122,49 +1136,84 @@ const CreateRequestUi = ({route, ...props}) => {
       </View>
           </View> */}
 
-<View style={{ alignItems: 'center', justifyContent: 'center', marginTop: 20 }}>
-  <View style={{ marginTop: 10 }}>
-    <View style={{  flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between' }}>
-      <Text style={{ width: '50%', fontWeight: 'bold', color: '#000' }}>General</Text>
-      <RadioGroup
-        style={{ flexDirection: 'row' }}  
-        radioButtons={generalRadioButtons}
-        onPress={handleGeneralRadioChange}
-        layout="row"
-        selectedId={generalRadioButtons.find((item) => item.value === generalRadio)?.id}
-      />
-    </View>
-
-    {generalRadio === 'No' && (
-      <View style={{  flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between'}}>
-        <Text style={{ width: '50%', fontWeight: 'bold', color: '#000' }}>Buyer PO Wise</Text>
-        <RadioGroup
-          style={{ flexDirection: 'row' }}  
-          radioButtons={buyerRadioButtons}
-          onPress={handleBuyerRadioChange}
-          layout="row"
-          selectedId={buyerRadioButtons.find((item) => item.value === buyerRadio)?.id}
-        />
-      </View>
-    )}
-
-    {generalRadio === 'No' && (
-      <View style={{  flexDirection: 'row',alignItems: 'center',justifyContent: 'space-between'}}>
-        <Text style={{ width: '50%', fontWeight: 'bold', color: '#000' }}>Display Style Wise</Text>
-        <RadioGroup
-                style={{ flexDirection: 'row' }}
-                radioButtons={displayStyleRadioButtons}
-                onPress={handleDisplayStyleRadioChange}
-                layout="row"
-                selectedId={displayStyleRadioButtons.find((item) => item.value === displayStyleRadio)?.id}
+          <View
+            style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginTop: 20,
+            }}>
+            <View style={{marginTop: 10}}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                }}>
+                <Text style={{width: '50%', fontWeight: 'bold', color: '#000'}}>
+                  General
+                </Text>
+                <RadioGroup
+                  style={{flexDirection: 'row'}}
+                  radioButtons={generalRadioButtons}
+                  onPress={handleGeneralRadioChange}
+                  layout="row"
+                  selectedId={
+                    generalRadioButtons.find(
+                      item => item.value === generalRadio,
+                    )?.id
+                  }
                 />
-      </View>
-    )}
-{/* 
+              </View>
+
+              {generalRadio === 'No' && (
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                  }}>
+                  <Text
+                    style={{width: '50%', fontWeight: 'bold', color: '#000'}}>
+                    Buyer PO Wise
+                  </Text>
+                  <RadioGroup
+                    style={{flexDirection: 'row'}}
+                    radioButtons={buyerRadioButtons}
+                    onPress={handleBuyerRadioChange}
+                    layout="row"
+                    selectedId={
+                      buyerRadioButtons.find(item => item.value === buyerRadio)
+                        ?.id
+                    }
+                  />
+                </View>
+              )}
+
+              {generalRadio === 'No' && (
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                  }}>
+                  <Text
+                    style={{width: '50%', fontWeight: 'bold', color: '#000'}}>
+                    Display Style Wise
+                  </Text>
+                  <RadioGroup
+                    style={{flexDirection: 'row'}}
+                    radioButtons={displayStyleRadioButtons}
+                    onPress={handleDisplayStyleRadioChange}
+                    layout="row"
+                    selectedId={
+                      displayStyleRadioButtons.find(
+                        item => item.value === displayStyleRadio,
+                      )?.id
+                    }
+                  />
+                </View>
+              )}
+              {/* 
      <View
                 style={{
                   flexDirection: 'row',
@@ -1183,11 +1232,8 @@ const CreateRequestUi = ({route, ...props}) => {
             selectedId={rollWiseRadioButtons.find((item) => item.value === rollWise)?.id}
           />
               </View> */}
-  </View>
-</View>
-
-
-
+            </View>
+          </View>
 
           {generalRadio === 'No' && (
             <View
@@ -1290,7 +1336,6 @@ const CreateRequestUi = ({route, ...props}) => {
                 borderRadius: hp('0.5%'),
                 width: wp('90%'),
                 backgroundColor: '#fff',
-
               }}
               onPress={() => {
                 set_showFabricList(!showFabricList);
@@ -1481,7 +1526,7 @@ const CreateRequestUi = ({route, ...props}) => {
                 borderColor: '#D8D8D8',
                 borderRadius: hp('0.5%'),
                 width: wp('90%'),
-                backgroundColor: '#ffffff'
+                backgroundColor: '#ffffff',
               }}
               onPress={() => {
                 set_showProcessList(!showProcessList);
@@ -1508,16 +1553,14 @@ const CreateRequestUi = ({route, ...props}) => {
             </TouchableOpacity>
 
             {showProcessList ? (
-              <View style={styles.popSearchViewStyle}>
+              <View style={styles.dropdownContent1}>
                 <ScrollView nestedScrollEnabled={true}>
                   {props?.lists?.getMenus?.map(item => (
                     <TouchableOpacity
                       key={item?.id}
                       onPress={() => actionOnProcess(item.id, item.name)}>
-                      <View style={styles.flatview}>
-                        <Text style={styles.dropTextInputStyle}>
-                          {item?.name}
-                        </Text>
+                      <View style={styles.dropdownOption}>
+                        <Text style={{color: '#000'}}>{item?.name}</Text>
                       </View>
                     </TouchableOpacity>
                   ))}
@@ -1540,7 +1583,7 @@ const CreateRequestUi = ({route, ...props}) => {
                 borderColor: '#D8D8D8',
                 borderRadius: hp('0.5%'),
                 width: wp('90%'),
-                backgroundColor: '#ffffff'
+                backgroundColor: '#ffffff',
               }}
               onPress={() => {
                 set_showUnitMasterList(!showUnitMasterList);
@@ -1595,7 +1638,7 @@ const CreateRequestUi = ({route, ...props}) => {
             )}
           </View>
 
-          {/* //==========Remarks========= */}
+          {/* //========== Comments ========= */}
 
           <View
             style={{
@@ -1701,7 +1744,7 @@ const CreateRequestUi = ({route, ...props}) => {
                   <View key={row.id} style={styles.table_body_single_row}>
                     <View style={{width: 60}}>
                       <TouchableOpacity
-                        style={{alignItems: 'center'}}
+                        style={{alignItems: '', justifyContent: ''}}
                         onPress={() => RemoveRow(row.id)}>
                         <Image source={closeImg} style={styles.imageStyle1} />
                       </TouchableOpacity>
@@ -1735,8 +1778,9 @@ const CreateRequestUi = ({route, ...props}) => {
                                       ...r,
                                       showStockTypesList: !r.showStockTypesList,
                                       showStocksList: false,
+                                      filteredStockTypes : props.lists.getStockTypes
                                     }
-                                  : {...r, showStockTypesList: false},
+                                  : {...r, showStockTypesList: false, filteredStockTypes:props.lists.getStockTypes},
                               ),
                             );
                           }}>
@@ -1760,13 +1804,13 @@ const CreateRequestUi = ({route, ...props}) => {
                           <View style={{justifyContent: 'center'}}>
                             <Image
                               source={downArrowImg}
-                              style={{height: 40, width: 40}}
+                              style={styles.imageStyle}
                             />
                           </View>
                         </TouchableOpacity>
 
                         {row.showStockTypesList && row.editStockType && (
-                          <View style={styles.popSearchViewStyle}>
+                          <View style={styles.dropdownContent2}>
                             <TextInput
                               style={styles.searchInput}
                               placeholder="Search Stock Type"
@@ -1787,8 +1831,8 @@ const CreateRequestUi = ({route, ...props}) => {
                                     onPress={() =>
                                       actionOnStockTypes(item, row.id)
                                     }>
-                                    <View style={styles.flatview}>
-                                      <Text style={styles.dropTextInputStyle}>
+                                    <View style={styles.dropdownOption}>
+                                      <Text style={{color: '#000'}}>
                                         {item?.name}
                                       </Text>
                                     </View>
@@ -1801,13 +1845,15 @@ const CreateRequestUi = ({route, ...props}) => {
                       </View>
                     </View>
 
+                    <View style={{width: 5}}></View>
+
                     {/* Stock Dropdown */}
                     <View style={{width: 200}}>
                       <View
                         style={{
                           alignItems: 'center',
                           justifyContent: 'center',
-                          marginTop: hp('2%'),
+                          marginTop: hp('1%'),
                           backgroundColor: row.editStock
                             ? '#ffffff'
                             : '#dedede',
@@ -1845,20 +1891,27 @@ const CreateRequestUi = ({route, ...props}) => {
                                 {'Stock '}
                               </Text>
                               <Text style={styles.dropTextInputStyle}>
-                                {row.stockId ? row.stock : 'Select Stock'}
+                                {row.stockId ? row.stock : 'Select '}
                               </Text>
                             </View>
                           </View>
                           <View style={{justifyContent: 'center'}}>
                             <Image
                               source={downArrowImg}
-                              style={styles.imageStyle}
+                              style={{
+                                height: 20,
+                                width: 20,
+                                tintColor:'red',
+                                aspectRatio: 1,
+                                marginRight: 20,
+                                resizeMode: 'contain',
+                              }}
                             />
                           </View>
                         </TouchableOpacity>
 
                         {row.showStocksList && row.editStock && (
-                          <View style={styles.popSearchViewStyle}>
+                          <View style={styles.dropdownContent2}>
                             <TextInput
                               style={styles.searchInput}
                               placeholder="Search Stock"
@@ -1879,8 +1932,8 @@ const CreateRequestUi = ({route, ...props}) => {
                                     onPress={() =>
                                       actionOnStocks(item, row.id)
                                     }>
-                                    <View style={styles.flatview}>
-                                      <Text style={styles.dropTextInputStyle}>
+                                    <View style={styles.dropdownOption}>
+                                      <Text style={{color: '#000'}}>
                                         {item?.name}
                                       </Text>
                                     </View>
@@ -1966,189 +2019,211 @@ const CreateRequestUi = ({route, ...props}) => {
 
 export default CreateRequestUi;
 
-const getStyles = (colors) => StyleSheet.create({
-  popSearchViewStyle: {
-    height: hp('40%'),
-    width: wp('90%'),
-    backgroundColor: '#fff',
-    alignSelf: 'center',
-    alignItems: 'center',
-    borderColor: 'lightgray', // Optional: Adds subtle border (for effect)
-    borderWidth: 1,
-    marginTop: 3,
-  },
+const getStyles = colors =>
+  StyleSheet.create({
+    popSearchViewStyle: {
+      height: hp('40%'),
+      width: wp('90%'),
+      backgroundColor: '#fff',
+      alignSelf: 'center',
+      alignItems: 'center',
+      borderColor: 'lightgray', // Optional: Adds subtle border (for effect)
+      borderWidth: 1,
+      marginTop: 3,
+    },
+    popSearchViewStyleTable: {
+      height: hp('40%'),
+      width: 200,
+      backgroundColor: '#fff',
+      alignSelf: 'center',
+      alignItems: 'center',
+      borderColor: 'lightgray', // Optional: Adds subtle border (for effect)
+      borderWidth: 1,
+      marginTop: 3,
+    },
 
-  flatcontainer: {
-    flex: 1,
-  },
+    flatcontainer: {
+      flex: 1,
+    },
 
-  flatview: {
-    height: hp('8%'),
-    marginBottom: hp('0.3%'),
-    alignContent: 'center',
-    justifyContent: 'center',
-    borderBottomColor: 'black',
-    borderBottomWidth: wp('0.1%'),
-    width: wp('80%'),
-    alignItems: 'center',
-  },
+    flatview: {
+      height: hp('8%'),
+      marginBottom: hp('0.3%'),
+      alignContent: 'center',
+      justifyContent: 'center',
+      borderBottomColor: 'black',
+      borderBottomWidth: wp('0.1%'),
+      width: wp('80%'),
+      alignItems: 'center',
+    },
 
-  SectionStyle1: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    height: hp('7%'),
-    width: wp('75%'),
-    borderRadius: hp('0.5%'),
-  },
+    SectionStyle1: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      height: hp('7%'),
+      width: wp('75%'),
+      borderRadius: hp('0.5%'),
+    },
 
-  // Adjust the image style to make it smaller and visible
-  // imageStyle: {
-  //     height: wp("6%"),
-  //     aspectRatio: 1,
-  //     marginRight: wp('4%'),
-  //     resizeMode: 'contain',
-  // },
+    // Adjust the image style to make it smaller and visible
+    // imageStyle: {
+    //     height: wp("6%"),
+    //     aspectRatio: 1,
+    //     marginRight: wp('4%'),
+    //     resizeMode: 'contain',
+    // },
 
-  imageStyle: {
-    height: 50,
-    width: 50,
-    aspectRatio: 1,
-    marginRight: 20,
-    resizeMode: 'contain',
-  },
-  imageStyle1: {
-    height: 30,
-    aspectRatio: 1,
-    resizeMode: 'contain',
-    tintColor: 'red',
-    alignSelf: 'center',
-  },
+    imageStyle: {
+      height: 50,
+      width: 50,
+      aspectRatio: 1,
+      marginRight: 20,
+      resizeMode: 'contain',
+    },
+    imageStyle1: {
+      height: 30,
+      aspectRatio: 1,
+      resizeMode: 'contain',
+      tintColor: 'red',
+      alignSelf: 'center',
+    },
 
-  dropTextInputStyle: {
-    fontWeight: 'normal',
-    fontSize: 18,
-    marginLeft: wp('4%'),
-    color: 'black',
-    width: wp('80%'),
-  },
+    dropTextInputStyle: {
+      fontWeight: 'normal',
+      fontSize: 18,
+      marginLeft: wp('4%'),
+      color: 'black',
+      width: wp('80%'),
+    },
 
-  dropTextLightStyle: {
-    fontWeight: '300',
-    fontSize: 12,
-    width: wp('60%'),
-    alignSelf: 'flex-start',
-    marginTop: hp('1%'),
-    marginLeft: wp('4%'),
-    color: '#000',
-  },
+    dropTextLightStyle: {
+      fontWeight: '300',
+      fontSize: 12,
+      width: wp('60%'),
+      alignSelf: 'flex-start',
+      marginTop: hp('1%'),
+      marginLeft: wp('4%'),
+      color: '#000',
+    },
 
-  wrapper: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    flex: 1,
-    marginTop: hp('2%'),
-    width: '95%',
-    marginBottom: 10,
-    marginHorizontal: 10,
-  },
+    wrapper: {
+      justifyContent: 'center',
+      alignItems: 'center',
+      flex: 1,
+      marginTop: hp('2%'),
+      width: '95%',
+      marginBottom: 10,
+      marginHorizontal: 10,
+    },
 
-  table_head: {
-    flexDirection: 'row',
-    borderBottomWidth: 1,
-    borderColor: '#ddd',
-    paddingVertical: 10,
-    paddingHorizontal: 5,
-    backgroundColor: colors.color2,
-    alignItems: 'center',
-  },
+    table_head: {
+      flexDirection: 'row',
+      borderBottomWidth: 1,
+      borderColor: '#ddd',
+      paddingVertical: 10,
+      paddingHorizontal: 5,
+      backgroundColor: colors.color2,
+      alignItems: 'center',
+    },
 
-  table_head_captions: {
-    fontSize: 15,
-    color: 'white',
-    alignItems: 'center',
-    textAlign: 'center',
-    paddingHorizontal: 5,
-  },
+    table_head_captions: {
+      fontSize: 15,
+      color: 'white',
+      alignItems: 'center',
+      textAlign: 'center',
+      paddingHorizontal: 5,
+    },
 
-  table_body_single_row: {
-    backgroundColor: '#fff',
-    flexDirection: 'row',
-    borderBottomWidth: 1,
-    borderColor: '#ddd',
-    paddingVertical: 10, // Adjust vertical padding for rows
-    paddingHorizontal: 5, // Add horizontal padding
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+    table_body_single_row: {
+      backgroundColor: '#fff',
+      flexDirection: 'row',
+      borderBottomWidth: 1,
+      borderColor: '#ddd',
+      paddingVertical: 10, // Adjust vertical padding for rows
+      paddingHorizontal: 5, // Add horizontal padding
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
 
-  table_data: {
-    fontSize: 11,
-    color: '#000',
-    textAlign: 'center',
-    alignSelf: 'center',
-    paddingHorizontal: 5, // Add padding for data cells
-  },
+    table_data: {
+      fontSize: 11,
+      color: '#000',
+      textAlign: 'center',
+      alignSelf: 'center',
+      paddingHorizontal: 5, // Add padding for data cells
+    },
 
-  table: {
-    margin: 15,
-    justifyContent: 'center',
-    alignItems: 'center',
-    elevation: 1,
-    backgroundColor: '#fff',
-  },
+    table: {
+      margin: 15,
+      justifyContent: 'center',
+      alignItems: 'center',
+      elevation: 1,
+      backgroundColor: '#fff',
+    },
 
-  checkbox_container: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+    checkbox_container: {
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
 
-  table_data_input: {
-    fontSize: 16,
-    color: '#000',
-    borderBottomWidth: 1,
-    borderColor: '#ccc',
-    paddingHorizontal: 5,
-    textAlign: 'center',
-  },
-  searchInput: {
-    marginTop: 10,
-    borderRadius: 10,
-    height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
-    marginHorizontal: 10,
-    paddingLeft: 10,
-    marginBottom: 10,
-    color: '#000000',
-  },
-  scrollView: {
-    maxHeight: 150,
-  },
-  dropdownOption: {
-    paddingHorizontal: 10,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-  },
-  input: {
-    color: '#000',
-  },
-  dropdownContent1: {
-    elevation: 5,
-    height: 220,
-    alignSelf: 'center',
-    width: '90%',
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    borderColor: 'lightgray', // Optional: Adds subtle border (for effect)
-    borderWidth: 1,
-    marginTop: 3,
-  },
-  noCategoriesText: {
-    textAlign: 'center',
-    marginTop: 20,
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#000000',
-  },
-});
+    table_data_input: {
+      fontSize: 16,
+      color: '#000',
+      borderBottomWidth: 1,
+      borderColor: '#ccc',
+      paddingHorizontal: 5,
+      textAlign: 'center',
+    },
+    searchInput: {
+      marginTop: 10,
+      borderRadius: 10,
+      height: 40,
+      borderColor: 'gray',
+      borderWidth: 1,
+      marginHorizontal: 10,
+      paddingLeft: 10,
+      marginBottom: 10,
+      color: '#000000',
+    },
+    scrollView: {
+      maxHeight: 150,
+    },
+    dropdownOption: {
+      paddingHorizontal: 10,
+      paddingVertical: 12,
+      borderBottomWidth: 1,
+      borderBottomColor: '#ccc',
+    },
+    input: {
+      color: '#000',
+    },
+    dropdownContent1: {
+      elevation: 5,
+      height: 220,
+      alignSelf: 'center',
+      width: '90%',
+      backgroundColor: '#fff',
+      borderRadius: 10,
+      borderColor: 'lightgray', // Optional: Adds subtle border (for effect)
+      borderWidth: 1,
+      marginTop: 3,
+    },
+    dropdownContent2: {
+      elevation: 5,
+      height: 220,
+      alignSelf: 'center',
+      width: '90%',
+      backgroundColor: '#fff',
+      borderRadius: 10,
+      borderColor: 'lightgray', // Optional: Adds subtle border (for effect)
+      borderWidth: 1,
+      marginTop: 3,
+    },
+    noCategoriesText: {
+      textAlign: 'center',
+      marginTop: 20,
+      fontSize: 16,
+      fontWeight: '600',
+      color: '#000000',
+    },
+  });
