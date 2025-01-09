@@ -28,7 +28,8 @@ import * as APIServiceCall from '../../../../utils/apiCalls/apiCallsComponent';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {ColorContext} from '../../../colorTheme/colorTheme';
 import {RadioGroup} from 'react-native-radio-buttons-group';
-
+import DateTimePickerModal from "react-native-modal-datetime-picker";
+import { formatDateIntoDMY } from '../../../../utils/constants/constant';
 let downArrowImg = require('./../../../../../assets/images/png/dropDownImg.png');
 let closeImg = require('./../../../../../assets/images/png/close1.png');
 
@@ -96,6 +97,10 @@ const CreateRequestUi = ({route, ...props}) => {
     uomfabric: '',
     fabricqty: '',
   });
+
+    const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+    const [date, setDate] = useState('');
+  
 
   // const [stocksList, set_stocksList] = useState([]);
 
@@ -191,6 +196,11 @@ const CreateRequestUi = ({route, ...props}) => {
       }
     }
   }, [props]);
+
+  useEffect(()=>{
+        handleConfirm(new Date());
+
+  }, [])
 
   const RemoveRow = id => {
     console.log('ROW ID ===> ', id);
@@ -739,9 +749,10 @@ const CreateRequestUi = ({route, ...props}) => {
       fabricQty: enteredFabQty,
       uom: itemsObj?.uomfabric,
       rmDetails: requestDetails,
+      ts_create:date
     };
 
-    // console.log("SAVING OBJ=====>   ", tempObj);
+    // console.log("SAVING OBJ=====>   ", tempObj.ts_create);
     props.submitAction(tempObj);
   };
 
@@ -887,12 +898,21 @@ const CreateRequestUi = ({route, ...props}) => {
     );
   };
 
-  console.log(
-    'radio button values==> ',
-    generalRadio,
-    buyerRadio,
-    displayStyleRadio,
-  );
+  const handleConfirm = (d) => {
+    const formattedDate = d.toISOString().split('T')[0];
+    setDate(formattedDate);
+    hideDatePicker();
+  };
+
+  const showDatePicker = () => {
+    setDatePickerVisibility(true);
+  };
+
+  const hideDatePicker = () => {
+    setDatePickerVisibility(false);
+  };
+
+
 
   return (
     <View style={[CommonStyles.mainComponentViewStyle]}>
@@ -1213,6 +1233,38 @@ const CreateRequestUi = ({route, ...props}) => {
                   />
                 </View>
               )}
+
+              <View
+                style={{
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: '#fff',
+                  marginTop: hp('2%'),
+                  flexDirection: 'row',
+                  width: '90%',
+                }}>
+                <View style={{width: '85%', paddingHorizontal: 10}}>
+                  <TextInput
+                    label="Date"
+                    value={date ? formatDateIntoDMY(date) : ''}
+                    mode="outlined"
+                    color="#000"
+                  />
+                </View>
+                <TouchableOpacity onPress={showDatePicker} style={{padding: 5}}>
+                  <Image
+                    source={require('./../../../../../assets/images/png/calendar11.png')}
+                    style={{width: 40, height: 40}}
+                  />
+                </TouchableOpacity>
+              </View>
+
+                <DateTimePickerModal
+                  isVisible={isDatePickerVisible}
+                  mode="date"
+                  onConfirm={handleConfirm}
+                  onCancel={hideDatePicker}
+                  />
               {/* 
      <View
                 style={{

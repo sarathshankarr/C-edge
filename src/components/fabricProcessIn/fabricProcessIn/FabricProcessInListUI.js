@@ -24,6 +24,7 @@ import AlertComponent from '../../../utils/commonComponents/alertComponent';
 import FilterModal from '../../../utils/commonComponents/FilterModal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ColorContext } from '../../colorTheme/colorTheme';
+import AddNewItem from '../../../utils/commonComponents/AddNewItem';
 let searchImg = require('./../../../../assets/images/png/searchIcon.png');
 let addImg = require('./../../../../assets/images/png/addition.png');
 let addImg1 = require('./../../../../assets/images/png/add.png');
@@ -325,7 +326,7 @@ const FabricProcessInListUI = ({route, navigation, ...props}) => {
     
     
   </TouchableOpacity>
-
+{/* 
               <TouchableOpacity
                 style={styles.leftButtonstyle1}
                 onPress={() => {
@@ -335,7 +336,7 @@ const FabricProcessInListUI = ({route, navigation, ...props}) => {
                   source={addImg}
                   style={{height: 40, width: 40, marginLeft: 15, tintColor:colors.color2}}
                 />
-              </TouchableOpacity>
+              </TouchableOpacity> */}
 </View>
 
 
@@ -399,7 +400,7 @@ const FabricProcessInListUI = ({route, navigation, ...props}) => {
         </View>
       </View>
 
-      <View style={styles.container}>
+      {/* <View style={styles.container}> */}
       {/* <Button title="Open Filter"  /> */}
       <FilterModal
         isVisible={isFilterVisible}
@@ -410,7 +411,9 @@ const FabricProcessInListUI = ({route, navigation, ...props}) => {
         clearFilter={clearFilter}
         reqBody={filterReqBody}
       />
-    </View>
+    {/* </View> */}
+
+    <AddNewItem navItem={'CreateInProcess'}/>
 
       {props.isPopUp ? (
         <View style={CommonStyles.customPopUpStyle}>

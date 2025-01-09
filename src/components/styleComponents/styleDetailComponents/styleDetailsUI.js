@@ -65,7 +65,7 @@ const StyleDetailsUI = ({route, ...props}) => {
   
   // console.log("styleDetailsList  style1==>",  props.listItems.styleDetailsList.styleSizeDataResponseList )
   // console.log("productionSummary  style2==>",  props.listItems.productionSummary.styleresponselist );
-  console.log("timeAndAction  style3==>",  props.listItems.timeAndAction )
+  // console.log("timeAndAction  style3==>",  props.listItems.timeAndAction )
   
   
   const renderItem = ({item, index}) => {

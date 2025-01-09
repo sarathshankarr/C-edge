@@ -51,6 +51,11 @@ const dropdownMenus = {
   //       route: 'masterFabricList',
   //       src: require('../../../assets/images/png/mentor.png'),
   //     },
+  //     {
+  //       label: 'Raw Materials Master',
+  //       route: 'RawMaterialsMasterList',
+  //       src: require('../../../assets/images/png/mentor.png'),
+  //     },
   //   ],
   // },
   store: {
@@ -217,7 +222,7 @@ const Sidebar = ({navigation}) => {
     }
     if (companyObj) {
       set_companyName(cpyObj.company_name);
-      console.log("inside setting company name")
+      // console.log("inside setting company name")
     }
   };
 
