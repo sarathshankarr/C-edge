@@ -304,8 +304,12 @@ const CreateRequest = ({ navigation, route, ...props }) => {
       "fabricQty": tempObj.fabricQty,
       "uom": tempObj.uom,
       "rmDetails": tempObj.rmDetails,
+      "rmDetails": tempObj.rmDetails,
+      "ts_create": tempObj.ts_create,
     }
-    console.log("saving obj ==>", obj);
+    // console.log("saving obj  before giving to api==>", obj);
+    // return;
+    
 
     set_isLoading(true);
     let SAVEAPIObj = await APIServiceCall.saveStockRequest(obj);

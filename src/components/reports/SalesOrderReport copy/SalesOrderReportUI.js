@@ -249,13 +249,14 @@ const handleSearchGst = text => {
               marginTop: hp('2%'),
               flexDirection: 'row',
             }}>
-            <View style={{width: '85%'}}>
+            <View style={{width: '85%', paddingHorizontal:10}}>
               <TextInput
                 label="Start Date *"
                 value={startDate ? startDate : ''}
                 placeholder="Start Date"
                 placeholderTextColor="#000"
                 mode="outlined"
+                color="#000"
               />
             </View>
             <TouchableOpacity
@@ -278,13 +279,14 @@ const handleSearchGst = text => {
               marginTop: hp('2%'),
               flexDirection: 'row',
             }}>
-            <View style={{width: '85%'}}>
+            <View style={{width: '85%',paddingHorizontal:10}}>
               <TextInput
                 label="End Date *"
                 value={endDate ? endDate : ''}
                 placeholderTextColor="#000"
                 placeholder="End Date"
                 mode="outlined"
+                color="#000"
               />
             </View>
             <TouchableOpacity

@@ -69,6 +69,10 @@ import StyleBomReport from '../components/reports/Style BOM report/StyleBomRepor
 import WorkerWagesReport from '../components/reports/Worker wages report/WorkerWagesReport';
 import FabricList from '../components/masters/Fabric/FabricList';
 import FabricEdit from '../components/masters/Fabric/FabricEdit';
+import SaveRawMaterialsMaster from '../components/masters/RawMaterialsMaster/SaveRawMaterialsMaster';
+import RawMaterialsMasterList from '../components/masters/RawMaterialsMaster/RawMaterialsMasterList';
+import CreateRawMaterialsMasterComponent from '../components/masters/RawMaterialsMaster/CreateRawMaterialsMasterComponent';
+import CreateFabricComponent from '../components/masters/Fabric/CreateFabricComponent';
 
 
 const Stack = createNativeStackNavigator();
@@ -141,6 +145,10 @@ const AppStack = () => {
       <Stack.Screen name="WorkerWagesReport" component={WorkerWagesReport} options={{ headerShown: false }} /> 
       <Stack.Screen name="masterFabricList" component={FabricList} options={{ headerShown: false }} /> 
       <Stack.Screen name="masterFabricEdit" component={FabricEdit} options={{ headerShown: false }} /> 
+      <Stack.Screen name="CreateFabricComponent" component={CreateFabricComponent} options={{ headerShown: false }} /> 
+      <Stack.Screen name="CreateRawMaterialsMasterComponent" component={CreateRawMaterialsMasterComponent} options={{ headerShown: false }} /> 
+      <Stack.Screen name="RawMaterialsMasterList" component={RawMaterialsMasterList} options={{ headerShown: false }} /> 
+      <Stack.Screen name="SaveRawMaterialsMaster" component={SaveRawMaterialsMaster} options={{ headerShown: false }} /> 
     </Stack.Navigator>
   );
 };

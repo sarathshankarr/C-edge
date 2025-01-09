@@ -9,6 +9,7 @@ import * as Constant from "../../../utils/constants/constant";
 import FilterModal from '../../../utils/commonComponents/FilterModal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ColorContext } from '../../colorTheme/colorTheme';
+import AddNewItem from '../../../utils/commonComponents/AddNewItem';
 let searchImg = require('./../../../../assets/images/png/searchIcon.png');
 let exampleImage = require('./../../../../assets/images/png/img4.jpg');
 let filterImg = require('./../../../../assets/images/png/setting.png');
@@ -317,6 +318,8 @@ setfilterReqBody(Obj)
         clearFilter={clearFilter}
         reqBody={filterReqBody}
       />
+
+      <AddNewItem  navItem={'CreateFabricComponent'}/>
 
       {props.isPopUp ? <View style={CommonStyles.customPopUpStyle}>
         <AlertComponent
