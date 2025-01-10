@@ -4,7 +4,7 @@ import * as Constant from "../../../utils/constants/constant";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { useNavigation } from '@react-navigation/native';
-import CreateRawMaterialsMasterUI from './CreateUomMasterUI';
+import CreateUomMasterUI from './CreateUomMasterUI';
 
 const CreateUomMasterComponent = ({ route }) => {
   const navigation = useNavigation();
@@ -211,7 +211,7 @@ const CreateUomMasterComponent = ({ route }) => {
 
   return (
 
-    <CreateRawMaterialsMasterUI
+    <CreateUomMasterUI
       itemsArray={lists}
       isLoading={isLoading}
       popUpAction={popUpAction}

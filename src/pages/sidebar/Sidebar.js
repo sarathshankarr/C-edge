@@ -56,6 +56,11 @@ const dropdownMenus = {
         route: 'RawMaterialsMasterList',
         src: require('../../../assets/images/png/mentor.png'),
       },
+      {
+        label: 'UOM Master',
+        route: 'UomMasterList',
+        src: require('../../../assets/images/png/mentor.png'),
+      },
     ],
   },
   store: {
