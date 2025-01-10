@@ -4,9 +4,9 @@ import * as Constant from "./../../../utils/constants/constant";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { useFocusEffect } from '@react-navigation/native';
-import SaveRawMaterialsMasterUI from './SaveRawMaterialsMasterUI';
+import SaveUomMasterUI from './SaveUomMasterUI';
 
-const SaveRawMaterialsMaster = ({ navigation, route, ...props }) => {
+const SaveUomMaster = ({ navigation, route, ...props }) => {
 
     const [itemsObj, set_itemsObj] = useState([]);
     const [isLoading, set_isLoading] = useState(false);
@@ -126,7 +126,7 @@ const SaveRawMaterialsMaster = ({ navigation, route, ...props }) => {
   };
 
   return (
-    <SaveRawMaterialsMasterUI
+    <SaveUomMasterUI
       itemsObj = {itemsObj}
       isLoading = {isLoading}
       popUpAlert = {popUpAlert}
@@ -144,6 +144,6 @@ const SaveRawMaterialsMaster = ({ navigation, route, ...props }) => {
 
 }
 
-export default SaveRawMaterialsMaster;
+export default SaveUomMaster;
 
 

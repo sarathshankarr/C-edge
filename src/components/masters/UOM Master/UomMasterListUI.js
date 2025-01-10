@@ -31,7 +31,7 @@ let addImg1 = require('./../../../../assets/images/png/add.png');
 let filterImg = require('./../../../../assets/images/png/setting.png');
 let filterImg1 = require('./../../../../assets/images/png/filter.png');
 
-const RawMaterialsMasterListUI = ({route, navigation, ...props}) => {
+const UomMasterListUI = ({route, navigation, ...props}) => {
   const [isListOpen, set_ListOpen] = useState(false);
   const [refreshing, set_refreshing] = useState(false);
   const [filterArray, set_filterArray] = useState([]);
@@ -57,12 +57,8 @@ const RawMaterialsMasterListUI = ({route, navigation, ...props}) => {
   let isKeyboard = useRef(false);
 
   React.useEffect(() => {
-    set_filterArray(props?.itemsArray);
-    set_ItemsArray(props?.itemsArray);
-    if (props?.itemsArray) {
-      console.log('List ===> ', props?.itemsArray[2]);
-    }
-    getRequestBody();
+   
+    // getRequestBody();
   }, [props?.itemsArray]);
 
   const getRequestBody = async() => {
@@ -128,14 +124,6 @@ const RawMaterialsMasterListUI = ({route, navigation, ...props}) => {
     props.actionOnRow(item, index);
   };
 
-  const handleScan = async(item) => {
-    props.handleScan(item);
-  };
-
-
-  const handlePdf = async(item) => {
-    props.handlePdf(item);
-  };
 
   const fetchMore=()=>{
     if (!isFiltering) { 
@@ -158,9 +146,6 @@ const RawMaterialsMasterListUI = ({route, navigation, ...props}) => {
     setFilterVisible(false);
     setIsFiltering(false);
   };
-
-
-
 
   const createPage = () => {
     props.actionOnCreate();
@@ -233,7 +218,9 @@ const RawMaterialsMasterListUI = ({route, navigation, ...props}) => {
     );
   };
 
-
+  const handleNavigation=()=>{
+    props.handleNavigation();
+  }
 
   return (
     <View style={[CommonStyles.mainComponentViewStyle]}>
@@ -244,7 +231,7 @@ const RawMaterialsMasterListUI = ({route, navigation, ...props}) => {
           isChatEnable={false}
           isTImerEnable={false}
           isTitleHeaderEnable={true}
-          title={'Raw Materials Master List'}
+          title={'UOM Master List'}
           backBtnAction={() => backBtnAction()}
         />
       </View>
@@ -363,6 +350,13 @@ const RawMaterialsMasterListUI = ({route, navigation, ...props}) => {
         {!props.MainLoading ? <Text style={[CommonStyles.tylesHeaderTextStyle, {fontSize: 18}]}>{Constant.noRecFound}</Text> : null}
     </View>}
 
+                 <Button
+                 onPress={handleNavigation}
+                 title="UOM Master Edit"
+                 color="#841584"
+                  accessibilityLabel="Learn more about this purple button"
+                  />
+
         <View style={CommonStyles.listStyle}>
         {showFilteredList ?
         (<FlatList
@@ -401,7 +395,7 @@ const RawMaterialsMasterListUI = ({route, navigation, ...props}) => {
         reqBody={filterReqBody}
       />
 
-     <AddNewItem navItem={'CreateRawMaterialsMasterComponent'}/>
+     <AddNewItem navItem={'CreateUomMasterComponent'}/>
      
      
       {props.isPopUp ? (
@@ -430,7 +424,7 @@ const RawMaterialsMasterListUI = ({route, navigation, ...props}) => {
   );
 };
 
-export default RawMaterialsMasterListUI;
+export default UomMasterListUI;
 
 const styles = StyleSheet.create({
 

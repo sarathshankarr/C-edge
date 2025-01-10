@@ -73,6 +73,9 @@ import SaveRawMaterialsMaster from '../components/masters/RawMaterialsMaster/Sav
 import RawMaterialsMasterList from '../components/masters/RawMaterialsMaster/RawMaterialsMasterList';
 import CreateRawMaterialsMasterComponent from '../components/masters/RawMaterialsMaster/CreateRawMaterialsMasterComponent';
 import CreateFabricComponent from '../components/masters/Fabric/CreateFabricComponent';
+import CreateUomMasterComponent from '../components/masters/UOM Master/CreateUomMasterComponent';
+import UomMasterList from '../components/masters/UOM Master/UomMasterList';
+import SaveUomMaster from '../components/masters/UOM Master/SaveUomMaster';
 
 
 const Stack = createNativeStackNavigator();
@@ -143,12 +146,15 @@ const AppStack = () => {
       <Stack.Screen name="ProductionProcessReport" component={ProductionProcessReport} options={{ headerShown: false }} /> 
       <Stack.Screen name="StyleBomReport" component={StyleBomReport} options={{ headerShown: false }} /> 
       <Stack.Screen name="WorkerWagesReport" component={WorkerWagesReport} options={{ headerShown: false }} /> 
+      <Stack.Screen name="CreateFabricComponent" component={CreateFabricComponent} options={{ headerShown: false }} /> 
       <Stack.Screen name="masterFabricList" component={FabricList} options={{ headerShown: false }} /> 
       <Stack.Screen name="masterFabricEdit" component={FabricEdit} options={{ headerShown: false }} /> 
-      <Stack.Screen name="CreateFabricComponent" component={CreateFabricComponent} options={{ headerShown: false }} /> 
       <Stack.Screen name="CreateRawMaterialsMasterComponent" component={CreateRawMaterialsMasterComponent} options={{ headerShown: false }} /> 
       <Stack.Screen name="RawMaterialsMasterList" component={RawMaterialsMasterList} options={{ headerShown: false }} /> 
       <Stack.Screen name="SaveRawMaterialsMaster" component={SaveRawMaterialsMaster} options={{ headerShown: false }} /> 
+      <Stack.Screen name="CreateUomMasterComponent" component={CreateUomMasterComponent} options={{ headerShown: false }} /> 
+      <Stack.Screen name="UomMasterList" component={UomMasterList} options={{ headerShown: false }} /> 
+      <Stack.Screen name="SaveUomMaster" component={SaveUomMaster} options={{ headerShown: false }} /> 
     </Stack.Navigator>
   );
 };
