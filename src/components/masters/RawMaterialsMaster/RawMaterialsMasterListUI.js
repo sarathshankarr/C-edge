@@ -57,12 +57,12 @@ const RawMaterialsMasterListUI = ({route, navigation, ...props}) => {
   let isKeyboard = useRef(false);
 
   React.useEffect(() => {
-    set_filterArray(props?.itemsArray);
-    set_ItemsArray(props?.itemsArray);
-    if (props?.itemsArray) {
-      console.log('List ===> ', props?.itemsArray[2]);
-    }
-    getRequestBody();
+    // set_filterArray(props?.itemsArray);
+    // set_ItemsArray(props?.itemsArray);
+    // if (props?.itemsArray) {
+    //   console.log('List ===> ', props?.itemsArray[2]);
+    // }
+    // getRequestBody();
   }, [props?.itemsArray]);
 
   const getRequestBody = async() => {

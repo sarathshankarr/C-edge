@@ -11,10 +11,12 @@ const CreateRawMaterialsMasterComponent = ({ route }) => {
 
   const [isLoading, set_isLoading] = useState(false);
   const [isPopUp, set_isPopUp] = useState(false);
+  const [isPopupLeft, set_isPopupLeft] = useState(false);
   const [popUpMessage, set_popUpMessage] = useState(undefined);
   const [popUpAlert, set_popUpAlert] = useState(undefined);
   const [popUpRBtnTitle, set_popUpRBtnTitle] = useState(undefined);
-  const [isPopupLeft, set_isPopupLeft] = useState(false);
+
+  
   const [lists, set_lists] = useState({
     processMap: [],
     machineNosMap: [],
