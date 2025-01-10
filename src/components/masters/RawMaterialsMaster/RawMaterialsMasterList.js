@@ -177,7 +177,9 @@ const RawMaterialsMasterList = ({ route }) => {
     navigation.navigate('CreateInProcess');
   };
 
-  
+  const handleNavigation = () => {
+    navigation.navigate('SaveRawMaterialsMaster');
+  };
 
   return (
 
@@ -196,6 +198,8 @@ const RawMaterialsMasterList = ({ route }) => {
       popOkBtnAction = {popOkBtnAction}
       fetchMore={fetchMore}
       applyFilterFxn={getFilteredList}
+      handleNavigation={handleNavigation}
+
     />
 
   );

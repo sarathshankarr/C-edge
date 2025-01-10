@@ -1,15 +1,15 @@
 import React, { useState, useRef, useEffect, useContext } from 'react';
-import { View, FlatList, Text, StyleSheet, TouchableOpacity, Image, ScrollView, TextInput } from 'react-native';
+import { View, FlatList, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
 import { heightPercentageToDP as hp, widthPercentageToDP as wp, } from "react-native-responsive-screen";
 import * as Constant from "../../../utils/constants/constant";
 import CommonStyles from "../../../utils/commonStyles/commonStyles";
 import HeaderComponent from '../../../utils/commonComponents/headerComponent';
 import LoaderComponent from '../../../utils/commonComponents/loaderComponent';
 import AlertComponent from '../../../utils/commonComponents/alertComponent';
-import TextInputComponent from '../../../utils/commonComponents/textInputComponent';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import BottomComponent from '../../../utils/commonComponents/bottomComponent';
 import { ColorContext } from '../../colorTheme/colorTheme';
+import { TextInput } from 'react-native-paper';
 let downArrowImg = require('./../../../../assets/images/png/dropDownImg.png');
 
 const FabricEditUi = ({ route, ...props }) => {
@@ -17,168 +17,123 @@ const FabricEditUi = ({ route, ...props }) => {
   const { colors } = useContext(ColorContext);
   const styles = getStyles(colors);
 
-  const [enterSizesArray, set_enterSizesArray] = useState(undefined)
-  const [locationsList, set_locationsList] = useState([]);
-  const [showLocationList, set_showLocationList] = useState(false);
-  const [locationId, set_locationId] = useState(0);
-  const [locationName, set_locationName] = useState('');
-
-  const [colorId, set_colorId] = useState(0);
-  const [colorName, set_colorName] = useState('');
-
-  const [uomId, set_uomId] = useState(0);
-  const [uomName, set_uomName] = useState('');
-
-  const [fabricId, set_fabricId] = useState(0);
-  const [fabricName, set_fabricName] = useState('');
-
-  const [approvedStatus, set_approvedStatus] = useState('');
-
-  const [dataObj, set_dataObj] = useState([]);
-
-  const [disableButton, set_disableButton] = useState(true);
-
-
-  const [showStatusArrayList, set_showStatusArrayList] = useState(false);
-  const [statusArrayId, set_statusArrayId] = useState(0);
-  const [statusArrayName, set_statusArrayName] = useState("");
-
-  const [statusArray, setStatusArray] = useState([
-    { id: 0, value: "Select Status" },
-    { id: 1, value: "Approved" },
-    { id: 2, value: "Rejected" },
-  ])
-
-  const [unitPrice, set_unitPrice] = useState('0');
-  const [editLocation, set_editLocation] = useState(false);
-  const [editStatus, set_editStatus] = useState(true);
-
-  const [remarks1, set_remarks1] = useState("");
-  const [remarks2, set_remarks2] = useState("");
-
-  const [rmTable, setRmTable] = useState([]);
-  const [sizesTable, setSizesTable] = useState([]);
-
-
-  const imageArray = [
-    { id: 0, value: props.itemsObj.img1 },
-    { id: 0, value: props.itemsObj.img2 },
-    { id: 0, value: props.itemsObj.img3 },
-    { id: 0, value: props.itemsObj.img4 },
-
-  ];
-
-
-  useEffect(() => {
-    if (props.itemsObj) {
-      set_dataObj(props?.itemsObj);
-
-
-      if (props?.itemsObj?.color) {
-        const colorNum=Number(props?.itemsObj?.color)
-        set_colorId(colorNum);
-        set_colorName(props?.itemsObj?.colorsMap[colorNum])
-      }
-
-      if (props?.itemsObj?.uom) {
-        set_uomId(props?.itemsObj?.uom);
-        set_uomName(props?.itemsObj?.uomMap[props.itemsObj.uom]);
-      }
-
-      if (props?.itemsObj?.fabricId) {
-        set_fabricId(props?.itemsObj?.fabricId);
-        set_fabricName(props?.itemsObj?.loadFabricStyles[props.itemsObj.fabricId]);
-        // set_fabricName(props?.itemsObj?.fabric);
-      }
-
-      if (props?.itemsObj?.locationId) {
-        set_locationId(props?.itemsObj?.locationId);
-        set_locationName(props?.itemsObj?.locationsMap[props.itemsObj.locationId]);
-      }
-
-      if (props?.itemsObj?.design_farma_id) {
-        set_farmaId(props?.itemsObj?.design_farma_id);
-        set_farmaName(props?.itemsObj?.farmaMap[props.itemsObj.design_farma_id]);
-      }
-
-      if (props?.itemsObj?.design_Dey_No) {
-        set_dyeNoId(props?.itemsObj?.design_Dey_No);
-        set_dyeNoName(props?.itemsObj?.dyenoMap[props.itemsObj.design_Dey_No]);
-      }
-
-      if (props?.itemsObj?.cap_category_id) {
-        set_capCategoryId(props?.itemsObj?.cap_category_id);
-        set_capCategoryName(props?.itemsObj?.capcategoryMap[props.itemsObj.cap_category_id]);
-      }
-
-      if (props?.itemsObj?.closure_id) {
-        set_closureId(props?.itemsObj?.closure_id);
-        set_closureName(props?.itemsObj?.closureMap[props.itemsObj.closure_id]);
-      }
-
-      if (props?.itemsObj?.sizegroupId) {
-        set_seasonId(props?.itemsObj?.sizegroupId);
-        set_seasonName(props?.itemsObj?.sizeGroupsMap[props.itemsObj.sizegroupId]);
-      }
-
-      if (props?.itemsObj?.sizeRangeId) {
-        set_scaleId(props?.itemsObj?.sizeRangeId);
-        set_scaleName(props?.itemsObj?.sizeRangesMap[props.itemsObj.sizeRangeId]);
-      }
-
-
-      if (props?.itemsObj?.note) {
-        set_remarks1(props?.itemsObj?.note)
-      }
-      if (props?.itemsObj?.approveRemarks) {
-        set_remarks2(props?.itemsObj?.approveRemarks)
-      }
-
-      if (props?.itemsObj?.rmItems) {
-        setRmTable(props?.itemsObj?.rmItems)
-      }
-      if (props?.itemsObj?.sizesGSCodesList) {
-        setSizesTable(props?.itemsObj?.sizesGSCodesList)
-      }
-
-      if (props?.itemsObj?.approveStatus) {
-        set_statusArrayId(props?.itemsObj?.approveStatus);
-        set_approvedStatus(props?.itemsObj?.approveStatus);
-        // console.log("props?.itemsObj?.approveStatus==> ", props?.itemsObj?.approveStatus);
-
-        if (props?.itemsObj?.approveStatus === "1") {
-          set_statusArrayName(statusArray[1].value);
-          set_editStatus(false);
-          set_disableButton(false);
-        } else if (props?.itemsObj?.approveStatus === "2") {
-          set_statusArrayName(statusArray[2].value)
-          set_disableButton(false);
-          set_editStatus(false);
-        } else {
-          set_statusArrayName(statusArray[0].value)
-        }
-      }
-
+   useEffect(() => {
+      // if (props?.itemsArray) {
+      //   if (props.itemsArray.machineNosMap) {
+      //     set_filteredmachineNo(props.itemsArray.machineNosMap);
+      //     setMachineNoList(props.itemsArray.machineNosMap);
+      //   }
+      //   if (props.itemsArray.empMap) {
+      //     set_filteredattendedBy(props.itemsArray.empMap);
+      //     setAttendedByList(props.itemsArray.empMap);
+      //   }
+      //   if (props.itemsArray.shiftMap) {
+      //     set_shiftList(props.itemsArray.shiftMap);
+      //   }
+      // }
+    }, [props.itemsArray]);
+  
+    const [rawMaterialName, setRawMaterialName] = useState('');
+    const [hsn, setHsn] = useState('');
+    const [gstRate, setGstRate] = useState('');
+  
+  // Fabric No
+  const [fabricNoList, setFabricNoList] = useState([]);
+  const [filteredFabricNo, set_filteredFabricNo] = useState([]);
+  const [showFabricNoList, set_showFabricNoList] = useState(false);
+  const [fabricNoName, set_fabricNoName] = useState('');
+  const [fabricNoId, set_fabricNoId] = useState('');
+  const [showFabricNo, setShowFabricNo] = useState(false);
+  
+  const actionOnFabricNo = (item) => {
+    set_fabricNoId(item.id);
+    set_fabricNoName(item.name);
+    set_showFabricNoList(false);
+  };
+  
+  const handleSearchFabricNo = (text) => {
+    if (text.trim().length > 0) {
+      const filtered = fabricNoList.filter(user =>
+        user.name.toLowerCase().includes(text.toLowerCase()),
+      );
+      set_filteredFabricNo(filtered);
+    } else {
+      set_filteredFabricNo(fabricNoList);
     }
-  }, [props.itemsObj]);
+  };
   
-  const [farmaId, set_farmaId] = useState(0);
-  const [farmaName, set_farmaName] = useState('');
   
-  const [dyeNoId, set_dyeNoId] = useState(0);
-  const [dyeNoName, set_dyeNoName] = useState('');
-    
-  const [capCategoryId, set_capCategoryId] = useState(0);
-  const [capCategoryName, set_capCategoryName] = useState('');
+    // Location
+    const [locationList, setLocationList] = useState([]);
+    const [filteredLocation, set_filteredLocation] = useState([]);
+    const [showLocationList, set_showLocationList] = useState(false);
+    const [locationName, set_locationName] = useState('');
+    const [locationId, set_locationId] = useState('');
   
-  const [closureId, set_closureId] = useState(0);
-  const [closureName, set_closureName] = useState('');
+    const actionOnLocation = item => {
+      set_locationId(item.id);
+      set_locationName(item.name);
+      set_showLocationList(false);
+    };
   
-  const [seasonId, set_seasonId] = useState(0);
-  const [seasonName, set_seasonName] = useState('');
+    const handleSearchLocation = text => {
+      if (text.trim().length > 0) {
+        const filtered = locationList.filter(user =>
+          user.name.toLowerCase().includes(text.toLowerCase()),
+        );
+        set_filteredLocation(filtered);
+      } else {
+        set_filteredLocation(locationList);
+      }
+    };
   
-  const [scaleId, set_scaleId] = useState(0);
-  const [scaleName, set_scaleName] = useState('');
+    // Color
+    const [colorList, setColorList] = useState([]);
+    const [filteredColor, set_filteredColor] = useState([]);
+    const [showColorList, set_showColorList] = useState(false);
+    const [colorName, set_colorName] = useState('');
+    const [colorId, set_colorId] = useState('');
+  
+    const actionOnColor = item => {
+      set_colorId(item.id);
+      set_colorName(item.name);
+      set_showColorList(false);
+    };
+  
+    const handleSearchColor = text => {
+      if (text.trim().length > 0) {
+        const filtered = colorList.filter(user =>
+          user.name.toLowerCase().includes(text.toLowerCase()),
+        );
+        set_filteredColor(filtered);
+      } else {
+        set_filteredColor(colorList);
+      }
+    };
+  
+    // UOM (Unit of Measurement)
+    const [uomList, setUOMList] = useState([]);
+    const [filteredUOM, set_filteredUOM] = useState([]);
+    const [showUOMList, set_showUOMList] = useState(false);
+    const [uomName, set_uomName] = useState('');
+    const [uomId, set_uomId] = useState('');
+  
+    const actionOnUOM = item => {
+      set_uomId(item.id);
+      set_uomName(item.name);
+      set_showUOMList(false);
+    };
+  
+    const handleSearchUOM = text => {
+      if (text.trim().length > 0) {
+        const filtered = uomList.filter(user =>
+          user.name.toLowerCase().includes(text.toLowerCase()),
+        );
+        set_filteredUOM(filtered);
+      } else {
+        set_filteredUOM(uomList);
+      }
+    };
   
 
   const backBtnAction = () => {
@@ -193,24 +148,6 @@ const FabricEditUi = ({ route, ...props }) => {
     props.submitAction(props?.itemsObj?.designId, remarks1, statusArrayId, remarks2);
   };
 
-  const untiPriceValue = (value, index) => {
-    let tempArray = enterSizesArray;
-    tempArray[index].enterQty = value;
-    set_enterSizesArray(tempArray);
-    // console.log('--------', tempArray)
-  };
-
-  const actionOnLocation = (locationId, locationName) => {
-    set_locationName(locationName);
-    set_locationId(locationId);
-    set_showLocationList(false);
-  }
-
-  const actionOnStatus = (item) => {
-    set_statusArrayName(item?.value);
-    set_statusArrayId(item?.id);
-    set_showStatusArrayList(false);
-  }
 
 
   return (
@@ -230,827 +167,332 @@ const FabricEditUi = ({ route, ...props }) => {
       </View>
 
 
-      <KeyboardAwareScrollView enableOnAndroid={true} extraHeight={130} extraScrollHeight={130} showsVerticalScrollIndicator={false}>
-        <View style={{ marginBottom: hp('5%') }}>
-
-          <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: hp('1%') }} >
-            <TextInputComponent
-              inputText={dataObj ? dataObj?.designName : "N/A"}
-              labelText={'Design Name *'}
-              isEditable={false}
-              maxLengthVal={200}
-              multiline={true}
-              autoCapitalize={"none"}
-              isBackground={'#dedede'}
-              setValue={(textAnswer) => { untiPriceValue(textAnswer) }}
-            />
-          </View>
-
-          <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: hp('1%'), backgroundColor: editLocation ? '#ffffff' : '#dedede' }} >
-            <TouchableOpacity style={{ flexDirection: 'row', borderWidth: 0.5, borderColor: "#D8D8D8", borderRadius: hp("0.5%"), width: wp("90%"), }} onPress={() => { set_showLocationList(!showLocationList) }}>
-              <View>
-                <View style={[styles.SectionStyle1, {}]}>
-                  <View style={{ flexDirection: 'column', }}>
-                    <Text style={locationId ? [styles.dropTextLightStyle] : [styles.dropTextInputStyle]}>{'Location  * '}</Text>
-                    <Text style={[styles.dropTextInputStyle]}>{locationName ? locationName : 'select'}</Text>
-                  </View>
-
-                </View>
-              </View>
-
-              <View style={{ justifyContent: 'center' }}>
-                <Image source={downArrowImg} style={styles.imageStyle} />
-              </View>
-
-            </TouchableOpacity>
-
-            {showLocationList && editLocation ? (
-              <View style={styles.popSearchViewStyle}>
-                <ScrollView nestedScrollEnabled={true}>
-                  {Object.keys(locationsList).map((locationId) => (
-                    <TouchableOpacity key={locationId} onPress={() => actionOnLocation(locationId, locationsList[locationId])}>
-                      <View style={styles.flatview}>
-                        <Text style={styles.dropTextInputStyle}>{locationsList[locationId]}</Text>
-                      </View>
-                    </TouchableOpacity>
-                  ))}
-                </ScrollView>
-              </View>
-            ) : null}
-
-
-          </View>
-
-          <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: hp('1%'), backgroundColor: editLocation ? '#ffffff' : '#dedede' }} >
-            <TouchableOpacity style={{ flexDirection: 'row', borderWidth: 0.5, borderColor: "#D8D8D8", borderRadius: hp("0.5%"), width: wp("90%"), }} onPress={() => { set_showLocationList(!showLocationList) }}>
-              <View>
-                <View style={[styles.SectionStyle1, {}]}>
-                  <View style={{ flexDirection: 'column', }}>
-                    <Text style={props.itemsObj?.designType ? [styles.dropTextLightStyle] : [styles.dropTextInputStyle]}>{'Design Type * '}</Text>
-                    <Text style={[styles.dropTextInputStyle]}>{props?.itemsObj?.designType ? props?.itemsObj?.designType : 'select'}</Text>
-                  </View>
-
-                </View>
-              </View>
-
-              <View style={{ justifyContent: 'center' }}>
-                <Image source={downArrowImg} style={styles.imageStyle} />
-              </View>
-
-            </TouchableOpacity>
-
-            {showLocationList && editLocation ? (
-              <View style={styles.popSearchViewStyle}>
-                <ScrollView nestedScrollEnabled={true}>
-                  {Object.keys(locationsList).map((locationId) => (
-                    <TouchableOpacity key={locationId} onPress={() => actionOnLocation(locationId, locationsList[locationId])}>
-                      <View style={styles.flatview}>
-                        <Text style={styles.dropTextInputStyle}>{locationsList[locationId]}</Text>
-                      </View>
-                    </TouchableOpacity>
-                  ))}
-                </ScrollView>
-              </View>
-            ) : null}
-
-
-          </View>
-
-
-          <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: hp('1%'), backgroundColor: editLocation ? '#ffffff' : '#dedede' }} >
-
-            <TouchableOpacity style={{ flexDirection: 'row', borderWidth: 0.5, borderColor: "#D8D8D8", borderRadius: hp("0.5%"), width: wp("90%"), }} onPress={() => { set_showLocationList(!showLocationList) }}>
-
-              <View>
-                <View style={[styles.SectionStyle1, {}]}>
-
-                  <View style={{ flexDirection: 'column', }}>
-                    <Text style={colorName ? [styles.dropTextLightStyle] : [styles.dropTextInputStyle]}>{'Color '}</Text>
-                    <Text style={[styles.dropTextInputStyle]}>{colorName ? colorName : "select"}</Text>
-                  </View>
-
-                </View>
-              </View>
-
-              <View style={{ justifyContent: 'center' }}>
-                <Image source={downArrowImg} style={styles.imageStyle} />
-              </View>
-
-            </TouchableOpacity>
-
-            {showLocationList && editLocation ? (
-              <View style={styles.popSearchViewStyle}>
-                <ScrollView nestedScrollEnabled={true}>
-                  {Object.keys(locationsList).map((locationId) => (
-                    <TouchableOpacity key={locationId} onPress={() => actionOnLocation(locationId, locationsList[locationId])}>
-                      <View style={styles.flatview}>
-                        <Text style={styles.dropTextInputStyle}>{locationsList[locationId]}</Text>
-                      </View>
-                    </TouchableOpacity>
-                  ))}
-                </ScrollView>
-              </View>
-            ) : null}
-
-
-          </View>
-
-          <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: hp('1%'), backgroundColor: editLocation ? '#ffffff' : '#dedede' }} >
-
-            <TouchableOpacity style={{ flexDirection: 'row', borderWidth: 0.5, borderColor: "#D8D8D8", borderRadius: hp("0.5%"), width: wp("90%"), }} onPress={() => { set_showLocationList(!showLocationList) }}>
-
-              <View>
-                <View style={[styles.SectionStyle1, {}]}>
-
-                  <View style={{ flexDirection: 'column', }}>
-                    <Text style={uomName ? [styles.dropTextLightStyle] : [styles.dropTextInputStyle]}>{'UOM *'}</Text>
-                    <Text style={[styles.dropTextInputStyle]}>{uomName ? uomName : 'N/A'}</Text>
-                  </View>
-
-                </View>
-              </View>
-
-              <View style={{ justifyContent: 'center' }}>
-                <Image source={downArrowImg} style={styles.imageStyle} />
-              </View>
-
-            </TouchableOpacity>
-
-            {showLocationList && editLocation ? (
-              <View style={styles.popSearchViewStyle}>
-                <ScrollView nestedScrollEnabled={true}>
-                  {Object.keys(locationsList).map((locationId) => (
-                    <TouchableOpacity key={locationId} onPress={() => actionOnLocation(locationId, locationsList[locationId])}>
-                      <View style={styles.flatview}>
-                        <Text style={styles.dropTextInputStyle}>{locationsList[locationId]}</Text>
-                      </View>
-                    </TouchableOpacity>
-                  ))}
-                </ScrollView>
-              </View>
-            ) : null}
-
-          </View>
-
-          <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: hp('1%'), backgroundColor: editLocation ? '#ffffff' : '#dedede' }} >
-
-            <TouchableOpacity style={{ flexDirection: 'row', borderWidth: 0.5, borderColor: "#D8D8D8", borderRadius: hp("0.5%"), width: wp("90%"), }} onPress={() => { set_showLocationList(!showLocationList) }}>
-
-              <View>
-                <View style={[styles.SectionStyle1, {}]}>
-
-                  <View style={{ flexDirection: 'column', }}>
-                    <Text style={farmaId ? [styles.dropTextLightStyle] : [styles.dropTextInputStyle]}>{'Farma '}</Text>
-                    <Text style={[styles.dropTextInputStyle]}>{farmaId ? farmaName : 'select'}</Text>
-                  </View>
-
-                </View>
-              </View>
-
-              <View style={{ justifyContent: 'center' }}>
-                <Image source={downArrowImg} style={styles.imageStyle} />
-              </View>
-
-            </TouchableOpacity>
-
-            {showLocationList && editLocation ? (
-              <View style={styles.popSearchViewStyle}>
-                <ScrollView nestedScrollEnabled={true}>
-                  {Object.keys(locationsList).map((locationId) => (
-                    <TouchableOpacity key={locationId} onPress={() => actionOnLocation(locationId, locationsList[locationId])}>
-                      <View style={styles.flatview}>
-                        <Text style={styles.dropTextInputStyle}>{locationsList[locationId]}</Text>
-                      </View>
-                    </TouchableOpacity>
-                  ))}
-                </ScrollView>
-              </View>
-            ) : null}
-
-          </View>
-       
-          <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: hp('1%'), backgroundColor: editLocation ? '#ffffff' : '#dedede' }} >
-
-            <TouchableOpacity style={{ flexDirection: 'row', borderWidth: 0.5, borderColor: "#D8D8D8", borderRadius: hp("0.5%"), width: wp("90%"), }} onPress={() => { set_showLocationList(!showLocationList) }}>
-
-              <View>
-                <View style={[styles.SectionStyle1, {}]}>
-
-                  <View style={{ flexDirection: 'column', }}>
-                    <Text style={dyeNoId ? [styles.dropTextLightStyle] : [styles.dropTextInputStyle]}>{'Dye No '}</Text>
-                    <Text style={[styles.dropTextInputStyle]}>{dyeNoName ? dyeNoName : 'select'}</Text>
-                  </View>
-
-                </View>
-              </View>
-
-              <View style={{ justifyContent: 'center' }}>
-                <Image source={downArrowImg} style={styles.imageStyle} />
-              </View>
-
-            </TouchableOpacity>
-
-            {showLocationList && editLocation ? (
-              <View style={styles.popSearchViewStyle}>
-                <ScrollView nestedScrollEnabled={true}>
-                  {Object.keys(locationsList).map((locationId) => (
-                    <TouchableOpacity key={locationId} onPress={() => actionOnLocation(locationId, locationsList[locationId])}>
-                      <View style={styles.flatview}>
-                        <Text style={styles.dropTextInputStyle}>{locationsList[locationId]}</Text>
-                      </View>
-                    </TouchableOpacity>
-                  ))}
-                </ScrollView>
-              </View>
-            ) : null}
-
-          </View>
-
-          <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: hp('1%'), backgroundColor: editLocation ? '#ffffff' : '#dedede' }} >
-
-            <TouchableOpacity style={{ flexDirection: 'row', borderWidth: 0.5, borderColor: "#D8D8D8", borderRadius: hp("0.5%"), width: wp("90%"), }} onPress={() => { set_showLocationList(!showLocationList) }}>
-
-              <View>
-                <View style={[styles.SectionStyle1, {}]}>
-
-                  <View style={{ flexDirection: 'column', }}>
-                    <Text style={capCategoryId ? [styles.dropTextLightStyle] : [styles.dropTextInputStyle]}>{'Cap Category '}</Text>
-                    <Text style={[styles.dropTextInputStyle]}>{capCategoryName ? capCategoryName : 'select'}</Text>
-                  </View>
-
-                </View>
-              </View>
-
-              <View style={{ justifyContent: 'center' }}>
-                <Image source={downArrowImg} style={styles.imageStyle} />
-              </View>
-
-            </TouchableOpacity>
-
-            {showLocationList && editLocation ? (
-              <View style={styles.popSearchViewStyle}>
-                <ScrollView nestedScrollEnabled={true}>
-                  {Object.keys(locationsList).map((locationId) => (
-                    <TouchableOpacity key={locationId} onPress={() => actionOnLocation(locationId, locationsList[locationId])}>
-                      <View style={styles.flatview}>
-                        <Text style={styles.dropTextInputStyle}>{locationsList[locationId]}</Text>
-                      </View>
-                    </TouchableOpacity>
-                  ))}
-                </ScrollView>
-              </View>
-            ) : null}
-
-          </View>
-
-          <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: hp('1%'), backgroundColor: editLocation ? '#ffffff' : '#dedede' }} >
-
-            <TouchableOpacity style={{ flexDirection: 'row', borderWidth: 0.5, borderColor: "#D8D8D8", borderRadius: hp("0.5%"), width: wp("90%"), }} onPress={() => { set_showLocationList(!showLocationList) }}>
-
-              <View>
-                <View style={[styles.SectionStyle1, {}]}>
-
-                  <View style={{ flexDirection: 'column', }}>
-                    <Text style={closureId ? [styles.dropTextLightStyle] : [styles.dropTextInputStyle]}>{'Closure '}</Text>
-                    <Text style={[styles.dropTextInputStyle]}>{closureName ? closureName : 'select'}</Text>
-                  </View>
-
-                </View>
-              </View>
-
-              <View style={{ justifyContent: 'center' }}>
-                <Image source={downArrowImg} style={styles.imageStyle} />
-              </View>
-
-            </TouchableOpacity>
-
-            {showLocationList && editLocation ? (
-              <View style={styles.popSearchViewStyle}>
-                <ScrollView nestedScrollEnabled={true}>
-                  {Object.keys(locationsList).map((locationId) => (
-                    <TouchableOpacity key={locationId} onPress={() => actionOnLocation(locationId, locationsList[locationId])}>
-                      <View style={styles.flatview}>
-                        <Text style={styles.dropTextInputStyle}>{locationsList[locationId]}</Text>
-                      </View>
-                    </TouchableOpacity>
-                  ))}
-                </ScrollView>
-              </View>
-            ) : null}
-
-          </View>
-
-          <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: hp('1%') }} >
-            <TextInputComponent
-              inputText={props.itemsObj ? props.itemsObj.size : ""}
-              labelText={'Size'}
-              isEditable={false}
-              maxLengthVal={200}
-              multiline={true} // Allow multiline input
-              autoCapitalize={"none"}
-              isBackground={'#dedede'}
-              setValue={(textAnswer) => { untiPriceValue(textAnswer) }}
-            />
-          </View>
-          <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: hp('1%') }} >
-            <TextInputComponent
-              inputText={props.itemsObj ? props?.itemsObj?.artwork : 'N/A'}
-              labelText={'Artwork'}
-              isEditable={false}
-              maxLengthVal={200}
-              multiline={true} // Allow multiline input
-              autoCapitalize={"none"}
-              isBackground={'#dedede'}
-              setValue={(textAnswer) => { untiPriceValue(textAnswer) }}
-            />
-          </View>
-
-          <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: hp('1%') }} >
-            <TextInputComponent
-              inputText={props?.itemsObj ? props?.itemsObj?.desciption : 'N/A'}
-              labelText={'Description'}
-              isEditable={false}
-              maxLengthVal={200}
-              multiline={true} // Allow multiline input
-              autoCapitalize={"none"}
-              isBackground={'#dedede'}
-              setValue={(textAnswer) => { untiPriceValue(textAnswer) }}
-            />
-          </View>
-
-          <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: hp('1%'), backgroundColor: editLocation ? '#ffffff' : '#dedede' }} >
-
-            <TouchableOpacity style={{ flexDirection: 'row', borderWidth: 0.5, borderColor: "#D8D8D8", borderRadius: hp("0.5%"), width: wp("90%"), }} onPress={() => { set_showLocationList(!showLocationList) }}>
-
-              <View>
-                <View style={[styles.SectionStyle1, {}]}>
-
-                  <View style={{ flexDirection: 'column', }}>
-                    <Text style={fabricName ? [styles.dropTextLightStyle] : [styles.dropTextInputStyle]}>{'Fabric'}</Text>
-                    <Text style={[styles.dropTextInputStyle]}>{fabricName ? fabricName : 'select'}</Text>
-                  </View>
-
-                </View>
-              </View>
-
-              <View style={{ justifyContent: 'center' }}>
-                <Image source={downArrowImg} style={styles.imageStyle} />
-              </View>
-
-            </TouchableOpacity>
-
-            {showLocationList && editLocation ? (
-              <View style={styles.popSearchViewStyle}>
-                <ScrollView nestedScrollEnabled={true}>
-                  {Object.keys(locationsList).map((locationId) => (
-                    <TouchableOpacity key={locationId} onPress={() => actionOnLocation(locationId, locationsList[locationId])}>
-                      <View style={styles.flatview}>
-                        <Text style={styles.dropTextInputStyle}>{locationsList[locationId]}</Text>
-                      </View>
-                    </TouchableOpacity>
-                  ))}
-                </ScrollView>
-              </View>
-            ) : null}
-
-
-          </View>
-
-           <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: hp('1%'), backgroundColor: editLocation ? '#ffffff' : '#dedede' }} >
-
-            <TouchableOpacity style={{ flexDirection: 'row', borderWidth: 0.5, borderColor: "#D8D8D8", borderRadius: hp("0.5%"), width: wp("90%"), }} onPress={() => { set_showLocationList(!showLocationList) }}>
-
-              <View>
-                <View style={[styles.SectionStyle1, {}]}>
-
-                  <View style={{ flexDirection: 'column', }}>
-                    <Text style={seasonId ? [styles.dropTextLightStyle] : [styles.dropTextInputStyle]}>{'Season '}</Text>
-                    <Text style={[styles.dropTextInputStyle]}>{seasonName ? seasonName : 'select'}</Text>
-                  </View>
-
-                </View>
-              </View>
-
-              <View style={{ justifyContent: 'center' }}>
-                <Image source={downArrowImg} style={styles.imageStyle} />
-              </View>
-
-            </TouchableOpacity>
-
-            {showLocationList && editLocation ? (
-              <View style={styles.popSearchViewStyle}>
-                <ScrollView nestedScrollEnabled={true}>
-                  {Object.keys(locationsList).map((locationId) => (
-                    <TouchableOpacity key={locationId} onPress={() => actionOnLocation(locationId, locationsList[locationId])}>
-                      <View style={styles.flatview}>
-                        <Text style={styles.dropTextInputStyle}>{locationsList[locationId]}</Text>
-                      </View>
-                    </TouchableOpacity>
-                  ))}
-                </ScrollView>
-              </View>
-            ) : null}
-
-           </View>
-
-           <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: hp('1%'), backgroundColor: editLocation ? '#ffffff' : '#dedede' }} >
-
-            <TouchableOpacity style={{ flexDirection: 'row', borderWidth: 0.5, borderColor: "#D8D8D8", borderRadius: hp("0.5%"), width: wp("90%"), }} onPress={() => { set_showLocationList(!showLocationList) }}>
-
-              <View>
-                <View style={[styles.SectionStyle1, {}]}>
-
-                  <View style={{ flexDirection: 'column', }}>
-                    <Text style={scaleId ? [styles.dropTextLightStyle] : [styles.dropTextInputStyle]}>{'Scale '}</Text>
-                    <Text style={[styles.dropTextInputStyle]}>{scaleName ? scaleName : 'select'}</Text>
-                  </View>
-
-                </View>
-              </View>
-
-              <View style={{ justifyContent: 'center' }}>
-                <Image source={downArrowImg} style={styles.imageStyle} />
-              </View>
-
-            </TouchableOpacity>
-
-            {showLocationList && editLocation ? (
-              <View style={styles.popSearchViewStyle}>
-                <ScrollView nestedScrollEnabled={true}>
-                  {Object.keys(locationsList).map((locationId) => (
-                    <TouchableOpacity key={locationId} onPress={() => actionOnLocation(locationId, locationsList[locationId])}>
-                      <View style={styles.flatview}>
-                        <Text style={styles.dropTextInputStyle}>{locationsList[locationId]}</Text>
-                      </View>
-                    </TouchableOpacity>
-                  ))}
-                </ScrollView>
-              </View>
-            ) : null}
-
-           </View>
-
-           <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: hp('1%') }} >
-            <TextInputComponent
-              inputText={props.itemsObj ? props?.itemsObj?.size : ''}
-              labelText={'Size'}
-              isEditable={false}
-              maxLengthVal={200}
-              multiline={true} // Allow multiline input
-              autoCapitalize={"none"}
-              isBackground={'#dedede'}
-              setValue={(textAnswer) => { untiPriceValue(textAnswer) }}
-            />
-          </View>
-          
-          {sizesTable?.length > 0 && sizesTable.map((item, index)=> (
-            <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: hp('1%') }} key={index} >
-            <TextInputComponent
-              inputText={item ?  item?.design_gs_quantity.toString() : ""}
-              labelText={item?.sizeCode}
-              isEditable={false}
-              maxLengthVal={200}
-              multiline={true} 
-              autoCapitalize={"none"}
-              isBackground={'#dedede'}
-              setValue={(textAnswer) => { untiPriceValue(textAnswer) }}
-            />
-          </View>
-          ))
-          }
-
-           <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: hp('1%') }} >
-            <TextInputComponent
-              inputText={props.itemsObj ? props?.itemsObj?.front_logo_image : ''}
-              labelText={'Front logo image + Size'}
-              isEditable={false}
-              maxLengthVal={200}
-              multiline={true} 
-              autoCapitalize={"none"}
-              isBackground={'#dedede'}
-              setValue={(textAnswer) => { untiPriceValue(textAnswer) }}
-            />
-          </View>
-
-           <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: hp('1%') }} >
-            <TextInputComponent
-              inputText={props.itemsObj ? props?.itemsObj?.back_logo_image : ''}
-              labelText={'Back logo image + Size'}
-              isEditable={false}
-              maxLengthVal={200}
-              multiline={true} // Allow multiline input
-              autoCapitalize={"none"}
-              isBackground={'#dedede'}
-              setValue={(textAnswer) => { untiPriceValue(textAnswer) }}
-            />
-          </View>
-
-           <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: hp('1%') }} >
-            <TextInputComponent
-              inputText={props.itemsObj ? props?.itemsObj?.visor_logo_image : ''}
-              labelText={'Visor logo image + Size'}
-              isEditable={false}
-              maxLengthVal={200}
-              multiline={true} 
-              autoCapitalize={"none"}
-              isBackground={'#dedede'}
-              setValue={(textAnswer) => { untiPriceValue(textAnswer) }}
-            />
-          </View>
-
-           <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: hp('1%') }} >
-            <TextInputComponent
-              inputText={props.itemsObj ? props?.itemsObj?.brandWoven : ''}
-              labelText={'Brand woven label'}
-              isEditable={false}
-              maxLengthVal={200}
-              multiline={true} 
-              autoCapitalize={"none"}
-              isBackground={'#dedede'}
-              setValue={(textAnswer) => { untiPriceValue(textAnswer) }}
-            />
-          </View>
-
-           <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: hp('1%') }} >
-            <TextInputComponent
-              inputText={props.itemsObj ? props?.itemsObj?.tag : ''}
-              labelText={'Tag '}
-              isEditable={false}
-              maxLengthVal={200}
-              multiline={true} // Allow multiline input
-              autoCapitalize={"none"}
-              isBackground={'#dedede'}
-              setValue={(textAnswer) => { untiPriceValue(textAnswer) }}
-            />
-          </View>
-
-           <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: hp('1%') }} >
-            <TextInputComponent
-              inputText={props.itemsObj ? props?.itemsObj?.barcode_rfid : ''}
-              labelText={'Barcode or RFID'}
-              isEditable={false}
-              maxLengthVal={200}
-              multiline={true} // Allow multiline input
-              autoCapitalize={"none"}
-              isBackground={'#dedede'}
-              setValue={(textAnswer) => { untiPriceValue(textAnswer) }}
-            />
-          </View>
-
-
-
-          <View style={{ marginTop: 20, marginBottom: 30 }}>
-            <Text style={[CommonStyles.tylesHeaderTextStyle, { alignItems: 'center', marginLeft: 10, fontSize:18 }]}>{'Remarks  :'}</Text>
-            <View style={{ borderWidth: 1, borderColor: 'black', marginTop: 15, borderRadius: 10, backgroundColor: 'white' }}>
-              <TextInput
-                placeholder=""
-                autoCapitalize="none"
-                multiline
-                numberOfLines={3}
-                value={remarks1}
-                onChangeText={(text) => set_remarks1(text)}
-                style={{ color: 'black' }}
-              />
-            </View>
-          </View>
-
-          <View style={{
-            flexDirection: 'row', marginTop: hp('2%'), justifyContent: 'space-between', alignItems: 'center', paddingVertical: 10,
-            paddingHorizontal: 20,
+      <KeyboardAwareScrollView
+        enableOnAndroid={true}
+        extraHeight={130}
+        extraScrollHeight={130}
+        showsVerticalScrollIndicator={false}
+        style={{marginBottom: hp('15%')}}>
+        <View
+          style={{
+            marginBottom: hp('5%'),
+            width: '90%',
+            marginHorizontal: wp('5%'),
           }}>
-            <Text style={{ fontWeight: 'bold', color:'#000', fontSize: 20 }}>Design Image   </Text>
-
-            <Image source={{ uri: `data:image/png;base64,${props?.itemsObj?.designImg}` }} style={{ height: 120, width: 120 }} />
-          </View>
-
-          {/* <View style={{ width: '90%' }}>
-            <Text style={{ fontWeight: 'bold', fontSize: 17, color: '#000' }}>Images : </Text>
-            <View style={{
-              flexDirection: 'row',
-              marginTop: hp('2%'),
-              justifyContent: 'space-between',
+          <View
+            style={{
               alignItems: 'center',
-              paddingVertical: 10,
-              paddingHorizontal: 20,
-              flexWrap: 'wrap',
-            }}>
-              {imageArray.map((item, index) => (
-                <Image
-                  key={index}
-                  source={{ uri: `data:image/png;base64,${item.value}` }}
-                  style={{ height: 120, width: 120, padding: 5 }}
-                />
-              ))}
-            </View>
-
-          </View> */}
-          {/* <View style={{ width: '90%' }}>
-            <Text style={{ fontWeight: 'bold', fontSize: 17, color: '#000' }}>Images : </Text>
-            <View style={{
-              flexDirection: 'row',
+              justifyContent: 'center',
+              backgroundColor: '#fff',
               marginTop: hp('2%'),
-              justifyContent: 'space-between',
-              alignItems: 'flex-start', // Align items to the start of the container
-              paddingVertical: 10,
-              paddingHorizontal: 20,
-              flexWrap: 'wrap', // Wrap images to the next line
             }}>
-              {imageArray.map((item, index) => (
-                <Image
-                  key={index}
-                  source={{ uri: `data:image/png;base64,${item.value}` }}
-                  style={{
-                    height: 120,
-                    width: 120,
-                    margin: 5, // Add margin around the images
-                  }}
-                />
-              ))}
-            </View>
-          </View> */}
-
-          <View style={{ width: '90%' }}>
-            <Text style={{ fontWeight: 'bold', fontSize: 17, color: '#000', marginBottom: 10 }}>Images : </Text>
-            <View style={{
-              flexDirection: 'row',
-              justifyContent: 'flex-start',  // Align images to the start of the container
-              alignItems: 'flex-start',      // Align items to the start of the container
-              flexWrap: 'wrap',              // Wrap images to the next line
-            }}>
-              {imageArray.map((item, index) => (
-                <Image
-                  key={index}
-                  source={{ uri: `data:image/png;base64,${item.value}` }}
-                  style={{
-                    height: 120,
-                    width: '40%',
-                    margin: 5, 
-                  }}
-                />
-              ))}
-            </View>
-          </View>
-
-          <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: hp('1%') }} >
-            <TextInputComponent
-              inputText={props.itemsObj ? props?.itemsObj?.rightside_logo_image : 'N/A'}
-              labelText={'Right Side logo image + Size'}
-              isEditable={false}
-              maxLengthVal={200}
-              multiline={true} // Allow multiline input
-              autoCapitalize={"none"}
-              isBackground={'#dedede'}
-              setValue={(textAnswer) => { untiPriceValue(textAnswer) }}
-            />
-          </View>
-
-           <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: hp('1%') }} >
-            <TextInputComponent
-              inputText={props.itemsObj ? props?.itemsObj?.leftside_logo_image : ''}
-              labelText={'Left Side logo image + Size'}
-              isEditable={false}
-              maxLengthVal={200}
-              multiline={true} // Allow multiline input
-              autoCapitalize={"none"}
-              isBackground={'#dedede'}
-              setValue={(textAnswer) => { untiPriceValue(textAnswer) }}
-            />
-          </View>
-          
-           <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: hp('1%') }} >
-            <TextInputComponent
-              inputText={props.itemsObj ? props?.itemsObj?.washcare : ''}
-              labelText={'Wash care'}
-              isEditable={false}
-              maxLengthVal={200}
-              multiline={true} 
-              autoCapitalize={"none"}
-              isBackground={'#dedede'}
-              setValue={(textAnswer) => { untiPriceValue(textAnswer) }}
-            />
-          </View>
-
-           <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: hp('1%') }} >
-            <TextInputComponent
-              inputText={props.itemsObj ? props?.itemsObj?.inside_printing_tape : ''}
-              labelText={'Inside printing tape '}
-              isEditable={false}
-              maxLengthVal={200}
-              multiline={true} 
-              autoCapitalize={"none"}
-              isBackground={'#dedede'}
-              setValue={(textAnswer) => { untiPriceValue(textAnswer) }}
-            />
-          </View>
-
-           <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: hp('1%') }} >
-            <TextInputComponent
-              inputText={props.itemsObj ? props?.itemsObj?.j_hook : ''}
-              labelText={'J Hook'}
-              isEditable={false}
-              maxLengthVal={200}
-              multiline={true} 
-              autoCapitalize={"none"}
-              isBackground={'#dedede'}
-              setValue={(textAnswer) => { untiPriceValue(textAnswer) }}
-            />
-          </View>
-
-
-          {rmTable?.length > 0 && <View style={styles.wrapper}>
-            <View style={styles.table}>
-              {/* Table Head */}
-              <View style={styles.table_head}>
-                <View style={{ width: '50%' }}>
-                  <Text style={styles.table_head_captions}>RM Type</Text>
-                </View>
-                <View style={{ width: '50%' }}>
-                  <Text style={styles.table_head_captions}>RM Name</Text>
-                </View>
-              </View>
-
-              {rmTable?.map((item, index) => (
-                <View key={index} style={styles.table_body_single_row}>
-                  <View style={{ width: '50%' }}>
-                    <Text style={styles.table_data}>{item.rmType}</Text>
-                  </View>
-                  <View style={{ width: '50%' }}>
-                    <Text style={styles.table_data}>{item.rmname}</Text>
-                  </View>
-                </View>
-              ))}
-            </View>
-          </View>}
-
-
-          <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: hp('1%'), backgroundColor: editStatus ? '#ffffff' : '#dedede' }} >
-
-            <TouchableOpacity style={{ flexDirection: 'row', borderWidth: 0.5, borderColor: "#000", borderRadius: hp("0.5%"), width: wp("90%"), }} onPress={() => { set_showStatusArrayList(!showStatusArrayList) }}>
-
+            <TouchableOpacity
+              style={{
+                flexDirection: 'row',
+                borderWidth: 0.5,
+                borderColor: '#D8D8D8',
+                borderRadius: hp('0.5%'),
+                width: wp('90%'),
+              }}
+              onPress={() => {
+                set_showFabricNoList(!showFabricNoList);
+              }}>
               <View>
                 <View style={[styles.SectionStyle1, {}]}>
-
-                  <View style={{ flexDirection: 'column', }}>
-                    <Text style={statusArrayName ? [styles.dropTextLightStyle] : [styles.dropTextInputStyle]}>{'Approved Status:'}</Text>
-                    <Text style={[styles.dropTextInputStyle]}>{statusArrayName ? statusArrayName : 'Select Status'}</Text>
+                  <View style={{flexDirection: 'column'}}>
+                    <Text
+                      style={
+                        fabricNoId
+                          ? [styles.dropTextLightStyle]
+                          : [styles.dropTextInputStyle]
+                      }>
+                      {'Fabric No *  '}
+                    </Text>
+                    {fabricNoId ? (
+                      <Text style={[styles.dropTextInputStyle]}>
+                        {fabricNoName}
+                      </Text>
+                    ) : null}
                   </View>
-
                 </View>
               </View>
 
-              <View style={{ justifyContent: 'center' }}>
+              <View style={{justifyContent: 'center'}}>
                 <Image source={downArrowImg} style={styles.imageStyle} />
               </View>
-
             </TouchableOpacity>
 
-            {showStatusArrayList && editStatus ? (
-              // <View style={styles.popSearchViewStyle}>
-              //   <ScrollView nestedScrollEnabled={true}>
-              //     {statusArray?.map((item) => (
-              //       <TouchableOpacity key={item.id} onPress={() => actionOnStatus(item)}>
-              //         <View style={styles.flatview}>
-              //           <Text style={styles.dropTextInputStyle}>{item.value}</Text>
-              //         </View>
-              //       </TouchableOpacity>
-              //     ))}
-                 <View style={styles.dropdownContent1}>
-                      {statusArray.map((item) => (
-                        <TouchableOpacity
-                          key={item.id}
-                          style={styles.dropdownOption}
-                          onPress={() => actionOnStatus(item)}>
-                          <Text style={{color: '#000'}}>{item.value}</Text>
-                        </TouchableOpacity>
-                      ))}
-                  </View> 
-              //   </ScrollView>
-              // </View>
-            ) : null}
-
-
+            {showFabricNoList && (
+              <View style={styles.dropdownContent1}>
+                <TextInput
+                  style={styles.searchInput}
+                  placeholder="Search "
+                  onChangeText={handleSearchFabricNo}
+                  placeholderTextColor="#000"
+                />
+                <ScrollView
+                  style={styles.scrollView}
+                  nestedScrollEnabled={true}>
+                  {filteredFabricNo.length === 0 ? (
+                    <Text style={styles.noCategoriesText}>
+                      Sorry, no results found!
+                    </Text>
+                  ) : (
+                    filteredFabricNo.map((item, index) => (
+                      <TouchableOpacity
+                        key={index}
+                        style={styles.dropdownOption}
+                        onPress={() => actionOnFabricNo(item)}>
+                        <Text style={{color: '#000'}}>{item.name}</Text>
+                      </TouchableOpacity>
+                    ))
+                  )}
+                </ScrollView>
+              </View>
+            )}
           </View>
 
-          <View style={{ width: 'auto', marginTop: 30, marginBottom: 30 }}>
-            <Text style={[CommonStyles.tylesHeaderTextStyle, { alignItems: 'center', marginLeft: 10, fontSize:18 }]}>{'Remarks  :'}</Text>
-            <View style={{ borderWidth: 1, borderColor: 'black', marginTop: 15, borderRadius: 10, backgroundColor: 'white', width: '100%' }}>
-              {/* <View style={{ marginTop: 20, marginBottom: 30 }}>
-            <Text style={[CommonStyles.tylesHeaderTextStyle, { alignItems: 'center', marginLeft: 10, backgroundColor: 'white' }]}>{'Remarks  :'}</Text>
-            <View style={{ borderWidth: 1, borderColor: 'black',  marginTop: 15, borderRadius: 10, backgroundColor: 'white' }}> */}
-              <TextInput
-                placeholder=""
-                autoCapitalize="none"
-                multiline
-                numberOfLines={3}
-                value={remarks2}
-                editable={editStatus}
-                onChangeText={(text) => set_remarks2(text)}
-                style={{ color: 'black' }}
-              />
-            </View>
+          <View style={{marginTop: hp('2%')}}>
+            <TextInput
+              label="Raw Material Name *"
+              value={rawMaterialName}
+              mode="outlined"
+              onChangeText={text => setRawMaterialName(text)}
+            />
+          </View>
+          <View style={{marginTop: hp('2%')}}>
+            <TextInput
+              label="GST Rate(%) *"
+              value={gstRate}
+              mode="outlined"
+              onChangeText={text => setGstRate(text)}
+            />
+          </View>
+          <View style={{marginTop: hp('2%')}}>
+            <TextInput
+              label="HSN *"
+              value={hsn}
+              mode="outlined"
+              onChangeText={text => setHsn(text)}
+            />
           </View>
 
-          <View style={{ marginBottom: 100 }} />
+          <View
+            style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: '#fff',
+              marginTop: hp('2%'),
+            }}>
+            <TouchableOpacity
+              style={{
+                flexDirection: 'row',
+                borderWidth: 0.5,
+                borderColor: '#D8D8D8',
+                borderRadius: hp('0.5%'),
+                width: wp('90%'),
+              }}
+              onPress={() => {
+                set_showLocationList(!showLocationList);
+              }}>
+              <View>
+                <View style={[styles.SectionStyle1, {}]}>
+                  <View style={{flexDirection: 'column'}}>
+                    <Text
+                      style={
+                        locationId
+                          ? [styles.dropTextLightStyle]
+                          : [styles.dropTextInputStyle]
+                      }>
+                      {'Raw Material Type *  '}
+                    </Text>
+                    {locationName ? (
+                      <Text style={[styles.dropTextInputStyle]}>
+                        {locationName}
+                      </Text>
+                    ) : null}
+                  </View>
+                </View>
+              </View>
+
+              <View style={{justifyContent: 'center'}}>
+                <Image source={downArrowImg} style={styles.imageStyle} />
+              </View>
+            </TouchableOpacity>
+
+            {showLocationList && (
+              <View style={styles.dropdownContent1}>
+                <TextInput
+                  style={styles.searchInput}
+                  placeholder="Search "
+                  onChangeText={handleSearchLocation}
+                  placeholderTextColor="#000"
+                />
+                <ScrollView
+                  style={styles.scrollView}
+                  nestedScrollEnabled={true}>
+                  {filteredLocation.length === 0 ? (
+                    <Text style={styles.noCategoriesText}>
+                      Sorry, no results found!
+                    </Text>
+                  ) : (
+                    filteredLocation.map((item, index) => (
+                      <TouchableOpacity
+                        key={index}
+                        style={styles.dropdownOption}
+                        onPress={() => actionOnLocation(item)}>
+                        <Text style={{color: '#000'}}>{item.name}</Text>
+                      </TouchableOpacity>
+                    ))
+                  )}
+                </ScrollView>
+              </View>
+            )}
+          </View>
+
+          <View
+            style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: '#fff',
+              marginTop: hp('2%'),
+            }}>
+            <TouchableOpacity
+              style={{
+                flexDirection: 'row',
+                borderWidth: 0.5,
+                borderColor: '#D8D8D8',
+                borderRadius: hp('0.5%'),
+                width: wp('90%'),
+              }}
+              onPress={() => {
+                set_showColorList(!showColorList);
+              }}>
+              <View>
+                <View style={[styles.SectionStyle1, {}]}>
+                  <View style={{flexDirection: 'column'}}>
+                    <Text
+                      style={
+                        colorId
+                          ? [styles.dropTextLightStyle]
+                          : [styles.dropTextInputStyle]
+                      }>
+                      {'Color *  '}
+                    </Text>
+                    {colorId ? (
+                      <Text style={[styles.dropTextInputStyle]}>
+                        {colorName}
+                      </Text>
+                    ) : null}
+                  </View>
+                </View>
+              </View>
+
+              <View style={{justifyContent: 'center'}}>
+                <Image source={downArrowImg} style={styles.imageStyle} />
+              </View>
+            </TouchableOpacity>
+
+            {showColorList && (
+              <View style={styles.dropdownContent1}>
+                <TextInput
+                  style={styles.searchInput}
+                  placeholder="Search "
+                  onChangeText={handleSearchColor}
+                  placeholderTextColor="#000"
+                />
+                <ScrollView
+                  style={styles.scrollView}
+                  nestedScrollEnabled={true}>
+                  {filteredColor.length === 0 ? (
+                    <Text style={styles.noCategoriesText}>
+                      Sorry, no results found!
+                    </Text>
+                  ) : (
+                    filteredColor.map((item, index) => (
+                      <TouchableOpacity
+                        key={index}
+                        style={styles.dropdownOption}
+                        onPress={() => actionOnColor(item)}>
+                        <Text style={{color: '#000'}}>{item.name}</Text>
+                      </TouchableOpacity>
+                    ))
+                  )}
+                </ScrollView>
+              </View>
+            )}
+          </View>
+
+          <View
+            style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: '#fff',
+              marginTop: hp('2%'),
+            }}>
+            <TouchableOpacity
+              style={{
+                flexDirection: 'row',
+                borderWidth: 0.5,
+                borderColor: '#D8D8D8',
+                borderRadius: hp('0.5%'),
+                width: wp('90%'),
+              }}
+              onPress={() => {
+                set_showUOMList(!showUOMList);
+              }}>
+              <View>
+                <View style={[styles.SectionStyle1, {}]}>
+                  <View style={{flexDirection: 'column'}}>
+                    <Text
+                      style={
+                        uomId
+                          ? [styles.dropTextLightStyle]
+                          : [styles.dropTextInputStyle]
+                      }>
+                      {'UOM *  '}
+                    </Text>
+                    {uomId ? (
+                      <Text style={[styles.dropTextInputStyle]}>{uomName}</Text>
+                    ) : null}
+                  </View>
+                </View>
+              </View>
+
+              <View style={{justifyContent: 'center'}}>
+                <Image source={downArrowImg} style={styles.imageStyle} />
+              </View>
+            </TouchableOpacity>
+
+            {showUOMList && (
+              <View style={styles.dropdownContent1}>
+                <TextInput
+                  style={styles.searchInput}
+                  placeholder="Search "
+                  onChangeText={handleSearchUOM}
+                  placeholderTextColor="#000"
+                />
+                <ScrollView
+                  style={styles.scrollView}
+                  nestedScrollEnabled={true}>
+                  {filteredUOM.length === 0 ? (
+                    <Text style={styles.noCategoriesText}>
+                      Sorry, no results found!
+                    </Text>
+                  ) : (
+                    filteredUOM.map((item, index) => (
+                      <TouchableOpacity
+                        key={index}
+                        style={styles.dropdownOption}
+                        onPress={() => actionOnUOM(item)}>
+                        <Text style={{color: '#000'}}>{item.name}</Text>
+                      </TouchableOpacity>
+                    ))
+                  )}
+                </ScrollView>
+              </View>
+            )}
+          </View>
         </View>
       </KeyboardAwareScrollView>
 
@@ -1062,7 +504,7 @@ const FabricEditUi = ({ route, ...props }) => {
           leftBtnTitle={'Back'}
           isLeftBtnEnable={true}
           rigthBtnState={true}
-          isRightBtnEnable={disableButton}
+          isRightBtnEnable={true}
           leftButtonAction={() => backBtnAction()}
           rightButtonAction={async () => submitAction()}
         />
