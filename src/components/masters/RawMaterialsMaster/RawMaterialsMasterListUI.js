@@ -88,6 +88,10 @@ const RawMaterialsMasterListUI = ({route, navigation, ...props}) => {
     props.popOkBtnAction();
   };
 
+  const handleNavigation=()=>{
+    props.handleNavigation();
+  }
+
   const applyFilterFxn = (types, Ids, count) => {
     console.log("applyFilterFxn", types, Ids);
     props.applyFilterFxn(types, Ids);
@@ -331,6 +335,13 @@ const RawMaterialsMasterListUI = ({route, navigation, ...props}) => {
 
 
         {/* ) : null} */}
+
+              <Button
+                 onPress={handleNavigation}
+                 title="Raw Materials Master Edit"
+                 color="#841584"
+                  accessibilityLabel="Learn more about this purple button"
+                  />
 
 
         {filterArray && filterArray.length > 0 ? (

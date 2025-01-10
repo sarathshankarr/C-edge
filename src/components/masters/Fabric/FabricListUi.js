@@ -281,7 +281,7 @@ setfilterReqBody(Obj)
          title="Fabric Edit"
          color="#841584"
           accessibilityLabel="Learn more about this purple button"
-              />
+          />
 
         <View style={CommonStyles.listStyle}>
         {showFilteredList ?

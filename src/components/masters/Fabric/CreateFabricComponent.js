@@ -15,6 +15,7 @@ const CreateFabricComponent = ({ route }) => {
   const [popUpAlert, set_popUpAlert] = useState(undefined);
   const [popUpRBtnTitle, set_popUpRBtnTitle] = useState(undefined);
   const [isPopupLeft, set_isPopupLeft] = useState(false);
+  
   const [lists, set_lists] = useState({
     processMap: [],
     machineNosMap: [],
