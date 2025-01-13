@@ -49,17 +49,27 @@ const dropdownMenus = {
       {
         label: 'Fabric',
         route: 'masterFabricList',
-        src: require('../../../assets/images/png/mentor.png'),
+        src: require('../../../assets/images/png/textile.png'),
       },
       {
         label: 'Raw Materials Master',
         route: 'RawMaterialsMasterList',
-        src: require('../../../assets/images/png/mentor.png'),
+        src: require('../../../assets/images/png/metal.png'),
       },
       {
         label: 'UOM Master',
         route: 'UomMasterList',
-        src: require('../../../assets/images/png/mentor.png'),
+        src: require('../../../assets/images/png/measuring-tape.png'),
+      },
+      {
+        label: 'Location Master',
+        route: 'LocationMasterList',
+        src: require('../../../assets/images/png/measuring-tape.png'),
+      },
+      {
+        label: 'Raw Material Type',
+        route: 'RawMaterialTypeList',
+        src: require('../../../assets/images/png/measuring-tape.png'),
       },
     ],
   },
