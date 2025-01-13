@@ -76,6 +76,12 @@ import CreateFabricComponent from '../components/masters/Fabric/CreateFabricComp
 import CreateUomMasterComponent from '../components/masters/UOM Master/CreateUomMasterComponent';
 import UomMasterList from '../components/masters/UOM Master/UomMasterList';
 import SaveUomMaster from '../components/masters/UOM Master/SaveUomMaster';
+import CreateLocationMasterComponent from '../components/masters/LocationMaster/CreateLocationMasterComponent';
+import LocationMasterList from '../components/masters/LocationMaster/LocationMasterList';
+import LocationMasterEdit from '../components/masters/LocationMaster/LocationMasterEdit';
+import CreateRawMaterialTypeComponent from '../components/masters/Raw Material Type/CreateRawMaterialTypeComponent';
+import RawMaterialTypeList from '../components/masters/Raw Material Type/RawMaterialTypeList';
+import SaveRawMaterialType from '../components/masters/Raw Material Type/SaveRawMaterialType';
 
 
 const Stack = createNativeStackNavigator();
@@ -155,6 +161,12 @@ const AppStack = () => {
       <Stack.Screen name="CreateUomMasterComponent" component={CreateUomMasterComponent} options={{ headerShown: false }} /> 
       <Stack.Screen name="UomMasterList" component={UomMasterList} options={{ headerShown: false }} /> 
       <Stack.Screen name="SaveUomMaster" component={SaveUomMaster} options={{ headerShown: false }} /> 
+      <Stack.Screen name="CreateLocationMasterComponent" component={CreateLocationMasterComponent} options={{ headerShown: false }} /> 
+      <Stack.Screen name="LocationMasterList" component={LocationMasterList} options={{ headerShown: false }} /> 
+      <Stack.Screen name="LocationMasterEdit" component={LocationMasterEdit} options={{ headerShown: false }} /> 
+      <Stack.Screen name="CreateRawMaterialTypeComponent" component={CreateRawMaterialTypeComponent} options={{ headerShown: false }} /> 
+      <Stack.Screen name="RawMaterialTypeList" component={RawMaterialTypeList} options={{ headerShown: false }} /> 
+      <Stack.Screen name="SaveRawMaterialType" component={SaveRawMaterialType} options={{ headerShown: false }} /> 
     </Stack.Navigator>
   );
 };
