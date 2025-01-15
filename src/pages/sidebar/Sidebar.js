@@ -71,6 +71,21 @@ const dropdownMenus = {
         route: 'RawMaterialTypeList',
         src: require('../../../assets/images/png/measuring-tape.png'),
       },
+      {
+        label: 'Season Group Master',
+        route: 'SeasonMasterList',
+        src: require('../../../assets/images/png/measuring-tape.png'),
+      },
+      {
+        label: 'Size Master',
+        route: 'SizeMasterList',
+        src: require('../../../assets/images/png/measuring-tape.png'),
+      },
+      {
+        label: 'Scale/Size group Master',
+        route: 'ScaleOrSizeMasterList',
+        src: require('../../../assets/images/png/measuring-tape.png'),
+      },
     ],
   },
   store: {
@@ -223,17 +238,17 @@ const Sidebar = ({navigation}) => {
     let userName = await AsyncStorage.getItem('userDisplayName');
     let companyObj = await AsyncStorage.getItem('companyObj');
     let cpyObj = JSON.parse(companyObj);
+    let role_name = await AsyncStorage.getItem('role_name');
 
     // console.log("compnay Name", cpyObj.company_name)
 
 
-    let admin = await AsyncStorage.getItem('admin');
-    // console.log('UserName', userName, admin);
+    console.log('UserName', userName, admin);
     if (userName) {
       set_userName(userName);
     }
-    if (admin) {
-      set_admin(admin);
+    if (role_name) {
+      set_admin(role_name);
     }
     if (companyObj) {
       set_companyName(cpyObj.company_name);
@@ -416,8 +431,8 @@ const Sidebar = ({navigation}) => {
       />
     </TouchableOpacity>
     <View>
-      <Text style={styles.headerTitle}>Profile</Text>
       <Text style={styles.headerSubtitle}>{userName}</Text>
+      <Text style={styles.headerSubtitle}>{admin ? admin : "Profile"}</Text>
     </View>
   </View>
 

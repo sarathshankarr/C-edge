@@ -31,7 +31,7 @@ let addImg1 = require('./../../../../assets/images/png/add.png');
 let filterImg = require('./../../../../assets/images/png/setting.png');
 let filterImg1 = require('./../../../../assets/images/png/filter.png');
 
-const UomMasterListUI = ({route, navigation, ...props}) => {
+const ScaleOrSizeMasterListUI = ({route, navigation, ...props}) => {
   const [isListOpen, set_ListOpen] = useState(false);
   const [refreshing, set_refreshing] = useState(false);
   const [filterArray, set_filterArray] = useState([]);
@@ -231,7 +231,7 @@ const UomMasterListUI = ({route, navigation, ...props}) => {
           isChatEnable={false}
           isTImerEnable={false}
           isTitleHeaderEnable={true}
-          title={'UOM Master List'}
+          title={'Scale or Size Master List'}
           backBtnAction={() => backBtnAction()}
         />
       </View>
@@ -384,7 +384,12 @@ const UomMasterListUI = ({route, navigation, ...props}) => {
         </View>
       </View>
 
-      {/* <Button title="Open Filter"  /> */}
+      <Button
+                      onPress={handleNavigation}
+                      title="Scale or size Master Edit"
+                      color="#841584"
+                       accessibilityLabel="Learn more about this purple button"
+                       />
       <FilterModal
         isVisible={isFilterVisible}
         categoriesList={categories}
@@ -395,7 +400,7 @@ const UomMasterListUI = ({route, navigation, ...props}) => {
         reqBody={filterReqBody}
       />
 
-     <AddNewItem navItem={'CreateUomMasterComponent'}/>
+     <AddNewItem navItem={'CreateScaleOrSizeComponent'}/>
      
      
       {props.isPopUp ? (
@@ -424,7 +429,7 @@ const UomMasterListUI = ({route, navigation, ...props}) => {
   );
 };
 
-export default UomMasterListUI;
+export default ScaleOrSizeMasterListUI;
 
 const styles = StyleSheet.create({
 

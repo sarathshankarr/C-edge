@@ -82,6 +82,15 @@ import LocationMasterEdit from '../components/masters/LocationMaster/LocationMas
 import CreateRawMaterialTypeComponent from '../components/masters/Raw Material Type/CreateRawMaterialTypeComponent';
 import RawMaterialTypeList from '../components/masters/Raw Material Type/RawMaterialTypeList';
 import SaveRawMaterialType from '../components/masters/Raw Material Type/SaveRawMaterialType';
+import CreateSeasonMasterComponent from '../components/masters/SeasonGroupMaster/CreateSeasonMasterComponent';
+import SeasonMasterList from '../components/masters/SeasonGroupMaster/SeasonMasterList';
+import SaveSeasonMaster from '../components/masters/SeasonGroupMaster/SaveSeasonMaster';
+import CreateSizeMasterComponent from '../components/masters/SizeMaster/CreateSizeMasterComponent';
+import SizeMasterList from '../components/masters/SizeMaster/SizeMasterList';
+import SaveSizeMaster from '../components/masters/SizeMaster/SaveSizeMaster';
+import CreateScaleOrSizeComponent from '../components/masters/ScaleOrSizeGroupMaster/CreateScaleOrSizeComponent';
+import ScaleOrSizeMasterList from '../components/masters/ScaleOrSizeGroupMaster/ScaleOrSizeMasterList';
+import SaveScaleOrSizeMaster from '../components/masters/ScaleOrSizeGroupMaster/SaveScaleOrSizeMaster';
 
 
 const Stack = createNativeStackNavigator();
@@ -167,6 +176,15 @@ const AppStack = () => {
       <Stack.Screen name="CreateRawMaterialTypeComponent" component={CreateRawMaterialTypeComponent} options={{ headerShown: false }} /> 
       <Stack.Screen name="RawMaterialTypeList" component={RawMaterialTypeList} options={{ headerShown: false }} /> 
       <Stack.Screen name="SaveRawMaterialType" component={SaveRawMaterialType} options={{ headerShown: false }} /> 
+      <Stack.Screen name="CreateSeasonMasterComponent" component={CreateSeasonMasterComponent} options={{ headerShown: false }} /> 
+      <Stack.Screen name="SeasonMasterList" component={SeasonMasterList} options={{ headerShown: false }} /> 
+      <Stack.Screen name="SaveSeasonMaster" component={SaveSeasonMaster} options={{ headerShown: false }} /> 
+      <Stack.Screen name="CreateSizeMasterComponent" component={CreateSizeMasterComponent} options={{ headerShown: false }} /> 
+      <Stack.Screen name="SizeMasterList" component={SizeMasterList} options={{ headerShown: false }} /> 
+      <Stack.Screen name="SaveSizeMaster" component={SaveSizeMaster} options={{ headerShown: false }} /> 
+      <Stack.Screen name="CreateScaleOrSizeComponent" component={CreateScaleOrSizeComponent} options={{ headerShown: false }} /> 
+      <Stack.Screen name="ScaleOrSizeMasterList" component={ScaleOrSizeMasterList} options={{ headerShown: false }} /> 
+      <Stack.Screen name="SaveScaleOrSizeMaster" component={SaveScaleOrSizeMaster} options={{ headerShown: false }} /> 
     </Stack.Navigator>
   );
 };

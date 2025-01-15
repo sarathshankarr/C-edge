@@ -61,7 +61,6 @@ const StockRequestEditUi = ({ route, ...props }) => {
     props.submitAction(remarks,stockTable);
   };
   const RejectAction = (remarks) => {
-    // props.submitAction(remarks);
     console.log("Rejected");
 
   };

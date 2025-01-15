@@ -31,7 +31,7 @@ let addImg1 = require('./../../../../assets/images/png/add.png');
 let filterImg = require('./../../../../assets/images/png/setting.png');
 let filterImg1 = require('./../../../../assets/images/png/filter.png');
 
-const UomMasterListUI = ({route, navigation, ...props}) => {
+const SizeMasterListUI = ({route, navigation, ...props}) => {
   const [isListOpen, set_ListOpen] = useState(false);
   const [refreshing, set_refreshing] = useState(false);
   const [filterArray, set_filterArray] = useState([]);
@@ -231,7 +231,7 @@ const UomMasterListUI = ({route, navigation, ...props}) => {
           isChatEnable={false}
           isTImerEnable={false}
           isTitleHeaderEnable={true}
-          title={'UOM Master List'}
+          title={'Size Master List'}
           backBtnAction={() => backBtnAction()}
         />
       </View>
@@ -239,7 +239,7 @@ const UomMasterListUI = ({route, navigation, ...props}) => {
       <View style={CommonStyles.headerStyle}>
         {/* {filterArray ? ( */}
         <View style={{ flexDirection: 'row', width: '100%', marginBottom: 10, alignItems: 'center' }}>
-               {/* Search Bar */}
+  {/* Search Bar */}
   <View
     style={{
       flexDirection: 'row',
@@ -277,8 +277,8 @@ const UomMasterListUI = ({route, navigation, ...props}) => {
     />
   </View>
 
-                {/* Filter Button */}
-                <TouchableOpacity
+  {/* Filter Button */}
+  <TouchableOpacity
     style={{
       flexDirection: 'row',
       alignItems: 'center',
@@ -312,7 +312,7 @@ const UomMasterListUI = ({route, navigation, ...props}) => {
     }
     
     
-                </TouchableOpacity>
+  </TouchableOpacity>
 
         </View>
 
@@ -350,12 +350,12 @@ const UomMasterListUI = ({route, navigation, ...props}) => {
         {!props.MainLoading ? <Text style={[CommonStyles.tylesHeaderTextStyle, {fontSize: 18}]}>{Constant.noRecFound}</Text> : null}
     </View>}
 
-                 {/* <Button
+                 <Button
                  onPress={handleNavigation}
-                 title="UOM Master Edit"
+                 title="Size Master Edit"
                  color="#841584"
                   accessibilityLabel="Learn more about this purple button"
-                  /> */}
+                  />
 
         <View style={CommonStyles.listStyle}>
         {showFilteredList ?
@@ -395,7 +395,7 @@ const UomMasterListUI = ({route, navigation, ...props}) => {
         reqBody={filterReqBody}
       />
 
-     <AddNewItem navItem={'CreateUomMasterComponent'}/>
+     <AddNewItem navItem={'CreateSizeMasterComponent'}/>
      
      
       {props.isPopUp ? (
@@ -424,7 +424,7 @@ const UomMasterListUI = ({route, navigation, ...props}) => {
   );
 };
 
-export default UomMasterListUI;
+export default SizeMasterListUI;
 
 const styles = StyleSheet.create({
 

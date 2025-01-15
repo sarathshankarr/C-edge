@@ -143,7 +143,7 @@ const SettingsSidebar = ({navigation}) => {
   const handleLogout = async () => {
     try {
       await AsyncStorage.removeItem('userDisplayName');
-      await AsyncStorage.removeItem('admin');
+      await AsyncStorage.removeItem('role_name');
       await AsyncStorage.removeItem('userName');
       await AsyncStorage.removeItem('userPsd');
       await AsyncStorage.removeItem('userId');
