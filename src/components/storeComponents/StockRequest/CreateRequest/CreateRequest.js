@@ -261,22 +261,6 @@ const CreateRequest = ({ navigation, route, ...props }) => {
   const submitAction = (reqBody) => {
     // let tempObj = itemsObj;
     // tempObj.comments = remarks;
-
-    // let filteredRequestDetails = stockTable.map(detail => ({
-    //   "stockType": detail.stockType,
-    //   "stockTypeName": detail.stockTypeName,
-    //   "stock": detail.stock,
-    //   "stock_rm_lot": detail.stock_rm_lot,
-    //   "stockLocationId": detail.stockLocationId,
-    //   "styleRmSizeId": detail.styleRmSizeId,
-    //   "inputQty": detail.inputQty,
-    //   "uomstock": detail.uomstock
-    // }));
-
-    // tempObj.requestDetails = filteredRequestDetails;
-
-    // console.log("filteredRequestDetails==>", tempObj.requestDetails);
-
     saveStoreRequest(reqBody);
   };
 
@@ -304,12 +288,10 @@ const CreateRequest = ({ navigation, route, ...props }) => {
       "fabricQty": tempObj.fabricQty,
       "uom": tempObj.uom,
       "rmDetails": tempObj.rmDetails,
-      "rmDetails": tempObj.rmDetails,
       "ts_create": tempObj.ts_create,
-    }
-    // console.log("saving obj  before giving to api==>", obj);
-    // return;
+    };
     
+    console.log("req for save craete stock req ====>   ", obj)
 
     set_isLoading(true);
     let SAVEAPIObj = await APIServiceCall.saveStockRequest(obj);
