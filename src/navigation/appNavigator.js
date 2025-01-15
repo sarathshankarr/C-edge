@@ -63,7 +63,7 @@ import InventoryConsumptionReport from '../components/reports/InventoryConsumpti
 
 import Splash from '../pages/splash/splash';
 import Settings from '../components/settings/Settings';
-import SalesOrderReport from '../components/reports/SalesOrderReport copy/SalesOrderReport';
+import SalesOrderReport from '../components/reports/SalesOrderReport/SalesOrderReport';
 import ProductionProcessReport from '../components/reports/Production process report/ProductionProcessReport';
 import StyleBomReport from '../components/reports/Style BOM report/StyleBomReport';
 import WorkerWagesReport from '../components/reports/Worker wages report/WorkerWagesReport';
