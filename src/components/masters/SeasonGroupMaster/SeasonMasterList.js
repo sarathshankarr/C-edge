@@ -6,9 +6,9 @@ import ReactNativeBlobUtil from 'react-native-blob-util';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import { Alert, PermissionsAndroid, Platform } from 'react-native';
-import UomMasterListUI from './UomMasterListUI';
+import SeasonMasterListUI from './SeasonMasterListUI';
 
-const UomMasterList = ({ route }) => {
+const SeasonMasterList = ({ route }) => {
   const navigation=useNavigation();
   const ListSize=10;
 
@@ -26,9 +26,9 @@ const UomMasterList = ({ route }) => {
 
 
     
-  React.useEffect(() => {
-    getInitialData(0, true);
-  }, []);
+  // React.useEffect(() => {
+  //   getInitialData(0, true);
+  // }, []);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -84,7 +84,7 @@ const UomMasterList = ({ route }) => {
         "compIds": usercompanyId,
         "company":JSON.parse(companyObj),
     }
-      let LISTAPIOBJ = await APIServiceCall.loadAllUomMastersList(obj);
+      let LISTAPIOBJ = await APIServiceCall.loadAllFabricProcessInList(obj);
       set_isLoading(false);
       
       if(LISTAPIOBJ && LISTAPIOBJ.statusData){
@@ -179,13 +179,13 @@ const UomMasterList = ({ route }) => {
     navigation.navigate('CreateInProcess');
   };
   const handleNavigation = () => {
-    navigation.navigate('SaveUomMaster');
+    navigation.navigate('SaveSeasonMaster');
   };
   
 
   return (
 
-    <UomMasterListUI
+    <SeasonMasterListUI
       itemsArray = {itemsArray}
       isLoading = {isLoading}
       MainLoading = {MainLoading}
@@ -207,6 +207,6 @@ const UomMasterList = ({ route }) => {
   );
 
 }
-export default UomMasterList;
+export default SeasonMasterList;
 
 

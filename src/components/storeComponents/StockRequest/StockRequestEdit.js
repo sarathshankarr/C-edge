@@ -44,6 +44,7 @@ const StockRequestEdit = ({ navigation, route, ...props }) => {
       "company":JSON.parse(companyObj),
 
     }
+    // console.log("stock req edit req ", obj);
 
     let STOREDETAILSAPIObj = await APIServiceCall.GetEditStockRequestDetails(obj);
     // console.log('STOREDETAILSAPIObj,', STOREDETAILSAPIObj,'\nSTOREDETAILSAPIObj,',  STOREDETAILSAPIObj.responseData.sizeDetails)
@@ -80,23 +81,20 @@ const StockRequestEdit = ({ navigation, route, ...props }) => {
   const submitAction = (remarks,stockTable) => {
     let tempObj = itemsObj;
     tempObj.comments=remarks;
+    tempObj.requestDetails=stockTable;
+    console.log("temp obj ==>", tempObj);
 
-    let filteredRequestDetails = stockTable.map(detail => ({
-      "stockType": detail.stockType,    
-      "stockTypeName": detail.stockTypeName, 
-      "stock": detail.stock,  
-      "stock_rm_lot": detail.stock_rm_lot, 
-      "stockLocationId": detail.stockLocationId, 
-      "styleRmSizeId": detail.styleRmSizeId,   
-      "inputQty": detail.inputQty,      
-      "uomstock": detail.uomstock      
-  }));
-
-  tempObj.requestDetails=filteredRequestDetails;
-
-  console.log("filteredRequestDetails==>", tempObj.requestDetails );
-
-    saveStoreRequest(tempObj);
+    //   let filteredRequestDetails = stockTable.map(detail => ({
+      //     "stockType": detail.stockType,    
+      //     "stockTypeName": detail.stockTypeName, 
+      //     "stock": detail.stock,  
+      //     "stock_rm_lot": detail.stock_rm_lot, 
+      //     "stockLocationId": detail.stockLocationId, 
+      //     "styleRmSizeId": detail.styleRmSizeId,   
+      //     "inputQty": detail.inputQty,      
+      //     "uomstock": detail.uomstock      
+  // }));
+  saveStoreRequest(tempObj);
   };
 
   const saveStoreRequest = async (tempObj) => {
@@ -107,26 +105,33 @@ const StockRequestEdit = ({ navigation, route, ...props }) => {
     let companyObj = await AsyncStorage.getItem('companyObj');
 
     let obj = {
+      "id":tempObj.id,
       "username": userName,
       "password": userPsd,
       "compIds": usercompanyId,
       "company":JSON.parse(companyObj),
       "processId":0,
-      "woStyleId":tempObj.styleId,
-      "trimId":tempObj.fabricId,
-      "locationId":tempObj.fabricLocationId,
-      "unitMasterId":tempObj.unitmasterId,
-      "comments":tempObj.comments,
-      "general":0,
-      "styleWise":1,
-      "fabricQty":tempObj.fabricqty,
+      "woStyleId":tempObj?.styleId,
+      "trimId":tempObj?.fabricId,
+      "fabricid":tempObj?.fabricId,
+      "locationId":tempObj?.fabricLocationId,
+      "comments":tempObj?.comments,
+      "general":tempObj?.general,
+      "styleWise":tempObj?.styleWise,
+      "fabricQty":tempObj?.fabricqty,
       "uom":tempObj.uomfabric,
-      "rmDetails":tempObj.requestDetails,
+      "rmDetails":tempObj?.requestDetails,
+      "unitMasterId":tempObj?.unitmasterId,
+      "fablot":tempObj?.fablot,
+      "ts_create":tempObj?.ts_create,
+      "fabricWidthId":tempObj?.fabricWidthId,
     }
-    console.log("saving obj ==>", obj);
 
+
+    console.log("req edit save of stock req ", obj );
+    return;
     set_isLoading(true);
-    let SAVEAPIObj = await APIServiceCall.saveStockRequest(obj);
+    let SAVEAPIObj = await APIServiceCall.saveEditStockRequest(obj);
     set_isLoading(false);
 
     if (SAVEAPIObj && SAVEAPIObj.statusData && SAVEAPIObj.responseData !== "false") {

@@ -119,7 +119,7 @@ const LoginComponent = ({ navigation, route, ...props }) => {
       } else if (loginAPIObj.statusData) {
         console.log("Response data =====>", loginAPIObj.responseData.userName)
         await AsyncStorage.setItem('userDisplayName', loginAPIObj.responseData.userName);
-        await AsyncStorage.setItem('admin', loginAPIObj.responseData.admin);
+        await AsyncStorage.setItem('role_name', loginAPIObj?.responseData?.role_name ? loginAPIObj?.responseData?.role_name : "USER");
         await AsyncStorage.setItem('userName', userName);
         await AsyncStorage.setItem('userPsd', userPswd);
 
@@ -179,11 +179,14 @@ const LoginComponent = ({ navigation, route, ...props }) => {
   };
 
   const signInAction = () => {
+    console.log("online status ===> ", onlineStatus)
 
     if (onlineStatus === false) {
       popUpAction(Constant.ONLINE_STATUS, Constant.DefaultAlert_MSG, 'OK', true, false);
+      console.log("online status false ===> ", onlineStatus)
       return;
     } else {
+      console.log("online status true ===> ", onlineStatus)
       getCustomercode();
     }
   };
