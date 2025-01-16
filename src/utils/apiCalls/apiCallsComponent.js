@@ -3141,6 +3141,47 @@ export async function saveCreateProcessIn(jsonValue) {
     obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet }
     return obj;
 };
+export async function saveCreateUomMasters(jsonValue) {
+
+    let returnError = undefined;
+    let statusData = undefined;
+    let responseData = undefined;
+    let logoutData = false;
+    let obj = undefined;
+
+    let internet = await internetCheck();
+    if (!internet) {
+        obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
+        return obj;
+    }
+    // console.log('saveCreateProcessIn ', jsonValue, Environment.uri + "uomapi/saveUoms")
+    await fetch(Environment.uri + "uomapi/saveUoms",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            },
+            body: JSON.stringify(jsonValue),
+        }
+    ).then((response) => response.json()).then(async (data) => {
+        // console.log('apisaveFabricProcessIn ', data)
+
+        if (data) {
+            statusData = true;
+            responseData = data
+        } else {
+            statusData = undefined;
+        }
+
+    }).catch((error) => {
+        console.log('apisaveFabricProcessIn', error)
+        returnError = error;
+    });
+
+    obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet }
+    return obj;
+};
 export async function requestOtp1(jsonValue) {
     let returnError = undefined;
     let statusData = undefined;
@@ -3390,6 +3431,47 @@ export async function getEditDetailsOfFabricProcessIn(jsonValue) {
     obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet }
     return obj;
 };
+export async function getEditDetailsOfUomMasters(jsonValue) {
+
+    let returnError = undefined;
+    let statusData = undefined;
+    let responseData = undefined;
+    let logoutData = false;
+    let obj = undefined;
+
+    let internet = await internetCheck();
+    if (!internet) {
+        obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
+        return obj;
+    }
+    // console.log("url ==>", Environment.uri + "uomapi/EditUom", "JSON VALUE ==>", jsonValue)
+    await fetch(Environment.uri + "uomapi/EditUom",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            },
+            body: JSON.stringify(jsonValue),
+        }
+    ).then((response) => response.json()).then(async (data) => {
+        // console.log('apiFabricProcessOutAdd', '', data)
+
+        if (data) {
+            statusData = true;
+            responseData = data
+        } else {
+            statusData = undefined;
+        }
+
+    }).catch((error) => {
+        console.log('apiFabricProcessOutAdd error ', error)
+        returnError = error;
+    });
+
+    obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet }
+    return obj;
+};
 
 export async function SaveFabricProcessInDetails(jsonValue) {
 
@@ -3406,6 +3488,47 @@ export async function SaveFabricProcessInDetails(jsonValue) {
     }
     // console.log('saveCreateProcessIn ', jsonValue, Environment.uri + "fabricprocessinapi/apisaveFabricProcessOut")
     await fetch(Environment.uri + "fabricprocessinapi/apisaveFabricProcessOut",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            },
+            body: JSON.stringify(jsonValue),
+        }
+    ).then((response) => response.json()).then(async (data) => {
+        // console.log('apisaveFabricProcessIn ', data)
+
+        if (data) {
+            statusData = true;
+            responseData = data
+        } else {
+            statusData = undefined;
+        }
+
+    }).catch((error) => {
+        console.log('apisaveFabricProcessIn', error)
+        returnError = error;
+    });
+
+    obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet }
+    return obj;
+};
+export async function SaveUomMastersEdit(jsonValue) {
+
+    let returnError = undefined;
+    let statusData = undefined;
+    let responseData = undefined;
+    let logoutData = false;
+    let obj = undefined;
+
+    let internet = await internetCheck();
+    if (!internet) {
+        obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
+        return obj;
+    }
+    // console.log('saveCreateProcessIn ', jsonValue, Environment.uri + "uomapi/saveEditUoms")
+    await fetch(Environment.uri + "uomapi/saveEditUoms",
         {
             method: "POST",
             headers: {

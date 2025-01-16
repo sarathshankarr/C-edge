@@ -20,9 +20,8 @@ const SaveUomMaster = ({ navigation, route, ...props }) => {
   React.useEffect(() => {
     
     if(route.params) {
-      if(route.params?.id) {
-        getInitialData(route.params?.id);
-        set_fptid(route.params?.id);
+      if(route.params?.item) {
+        getInitialData(route.params?.item?.umoId);
       } 
     }
     console.log("Route Params ===> ", route?.params)
@@ -44,15 +43,14 @@ const SaveUomMaster = ({ navigation, route, ...props }) => {
     let companyObj = await AsyncStorage.getItem('companyObj');
     set_isLoading(true);
     let obj = {
-      "menuId": 588,
-      "fptid":id,
       "username": userName,
       "password" : userPsd,
+      "umoId": id,
       "compIds": usercompanyId,
       "company":JSON.parse(companyObj),
 
     }      
-    let EditFabricProcessInObj = await APIServiceCall.getEditDetailsOfFabricProcessIn(obj);
+    let EditFabricProcessInObj = await APIServiceCall.getEditDetailsOfUomMasters(obj);
     // console.log('Fabric process in edit  data ====> ,',JSON.stringify(EditFabricProcessInObj))
     set_isLoading(false);
     
@@ -87,33 +85,31 @@ const SaveUomMaster = ({ navigation, route, ...props }) => {
 
   const submitAction = (Obj) => {
 
-    saveFinishingOutData(Obj);
+    saveUomEdit(Obj);
 
   };
 
-  const saveFinishingOutData = async (tempObj) => {
+  const saveUomEdit = async (tempObj) => {
 
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
     let companyObj = await AsyncStorage.getItem('companyObj');
+    tempObj.menuid = 123;
     tempObj.username = userName;
     tempObj.password = userPsd;
     tempObj.compIds = usercompanyId;
     tempObj.company = JSON.parse(companyObj);
-    tempObj.menuId=588;
-    tempObj.fptid=fptid;
-    tempObj.fpt_id=fptid;
+
 
     console.log(" edit saving Obj ===> ", tempObj);
 
-    // return ;
-
     set_isLoading(true);   
-    let saveEditFPI = await APIServiceCall.SaveFabricProcessInDetails(tempObj);
+    let saveEditFPI = await APIServiceCall.SaveUomMastersEdit(tempObj);
     set_isLoading(false);
     
     if(saveEditFPI && saveEditFPI.statusData && saveEditFPI.responseData ){
+      console.log("Sucess");
       backBtnAction();
     } else {
       popUpAction(Constant.Fail_Save_Dtls_MSG,Constant.DefaultAlert_MSG,'OK', true,false);

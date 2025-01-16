@@ -79,21 +79,18 @@ const StockRequestEdit = ({ navigation, route, ...props }) => {
   };
 
   const submitAction = (remarks,stockTable) => {
+    console.log("itemsObj stock req ==============> ", itemsObj );
+
     let tempObj = itemsObj;
     tempObj.comments=remarks;
-    tempObj.requestDetails=stockTable;
-    console.log("temp obj ==>", tempObj);
+    const stockTableIds = stockTable.map(item => item?.id);
+    const filteredRequestDetails = tempObj.requestDetails.filter(detail =>
+      stockTableIds.includes(detail?.id)
+    );
+    tempObj.requestDetails=filteredRequestDetails;
 
-    //   let filteredRequestDetails = stockTable.map(detail => ({
-      //     "stockType": detail.stockType,    
-      //     "stockTypeName": detail.stockTypeName, 
-      //     "stock": detail.stock,  
-      //     "stock_rm_lot": detail.stock_rm_lot, 
-      //     "stockLocationId": detail.stockLocationId, 
-      //     "styleRmSizeId": detail.styleRmSizeId,   
-      //     "inputQty": detail.inputQty,      
-      //     "uomstock": detail.uomstock      
-  // }));
+    // console.log("temp obj  length ==>", tempObj?.requestDetails?.length, stockTable?.length, filteredRequestDetails?.length );
+  //  return;
   saveStoreRequest(tempObj);
   };
 
@@ -122,14 +119,14 @@ const StockRequestEdit = ({ navigation, route, ...props }) => {
       "uom":tempObj.uomfabric,
       "rmDetails":tempObj?.requestDetails,
       "unitMasterId":tempObj?.unitmasterId,
-      "fablot":tempObj?.fablot,
-      "ts_create":tempObj?.ts_create,
-      "fabricWidthId":tempObj?.fabricWidthId,
+      "fablot":tempObj?.stock_fab_lot,
+      "ts_create":tempObj?.requestedDateStr,
+      "fabricWidthId":tempObj?.stock_fab_width,
     }
 
+    console.log("req edit save of stock req  ================> ", obj );
+    // return;
 
-    console.log("req edit save of stock req ", obj );
-    return;
     set_isLoading(true);
     let SAVEAPIObj = await APIServiceCall.saveEditStockRequest(obj);
     set_isLoading(false);
