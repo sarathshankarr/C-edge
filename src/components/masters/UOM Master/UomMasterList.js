@@ -32,7 +32,7 @@ const UomMasterList = ({ route }) => {
 
   useFocusEffect(
     React.useCallback(() => {
-      // getInitialData(0, true);
+      getInitialData(0, true);
     }, [])
   );
   
@@ -94,7 +94,6 @@ const UomMasterList = ({ route }) => {
             ? LISTAPIOBJ.responseData 
             : [...prevItems, ...LISTAPIOBJ.responseData] 
           );
-    
           if(LISTAPIOBJ?.responseData?.length<ListSize-1){
             setHasMore(false);
           }
@@ -172,12 +171,9 @@ const UomMasterList = ({ route }) => {
   };
 
   const actionOnRow = (item,index) => {
-    // console.log("selected item ===>  ", item)
-    navigation.navigate('SaveFabricProcessIn', {id:item?.so_style_id});
+    navigation.navigate('SaveUomMaster', {item:item});
   };
-  const actionOnCreate= () => {
-    navigation.navigate('CreateInProcess');
-  };
+
   const handleNavigation = () => {
     navigation.navigate('SaveUomMaster');
   };
@@ -195,7 +191,6 @@ const UomMasterList = ({ route }) => {
       isPopupLeft = {isPopupLeft}
       isPopUp = {isPopUp}
       actionOnRow = {actionOnRow}
-      actionOnCreate = {actionOnCreate}
       backBtnAction = {backBtnAction}
       popOkBtnAction = {popOkBtnAction}
       fetchMore={fetchMore}

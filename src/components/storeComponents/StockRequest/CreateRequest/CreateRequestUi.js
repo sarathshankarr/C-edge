@@ -199,7 +199,6 @@ const CreateRequestUi = ({route, ...props}) => {
 
   useEffect(()=>{
         handleConfirm(new Date());
-
   }, [])
 
   const RemoveRow = id => {
@@ -417,14 +416,19 @@ const CreateRequestUi = ({route, ...props}) => {
       }));
       set_availableQty(STOREDETAILSAPIObj.responseData.availFabricQty);
 
+      // console.log(
+      //   'Values to Prepopulate',
+      //   STOREDETAILSAPIObj.responseData.approvedFabric,
+      //   STOREDETAILSAPIObj.responseData.approvedFabricConsumption,
+      //   STOREDETAILSAPIObj.responseData.allowanceFabric,
+      //   STOREDETAILSAPIObj.responseData.totalFabricApprovedWithAllowance,
+      //   STOREDETAILSAPIObj.responseData.availFabricQty,
+      //   STOREDETAILSAPIObj.responseData.uomType,
+      // );
       console.log(
         'Values to Prepopulate',
-        STOREDETAILSAPIObj.responseData.approvedFabric,
-        STOREDETAILSAPIObj.responseData.approvedFabricConsumption,
-        STOREDETAILSAPIObj.responseData.allowanceFabric,
-        STOREDETAILSAPIObj.responseData.totalFabricApprovedWithAllowance,
-        STOREDETAILSAPIObj.responseData.availFabricQty,
-        STOREDETAILSAPIObj.responseData.uomType,
+        STOREDETAILSAPIObj.responseData,
+
       );
       // set_itemsObj((prev) => ({ ...prev, fabricqty: STOREDETAILSAPIObj.responseData.fabricqty}));
     } else {
@@ -2278,4 +2282,4 @@ const getStyles = colors =>
       fontWeight: '600',
       color: '#000000',
     },
-  });
+});

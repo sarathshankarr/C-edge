@@ -26,17 +26,14 @@ import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import {formatDateIntoDMY} from '../../../utils/constants/constant';
 import {RadioButton, TextInput} from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import CustomCheckBox from '../../../utils/commonComponents/CustomCheckBox';
 
 let downArrowImg = require('./../../../../assets/images/png/dropDownImg.png');
 const CreateUomMasterUI = ({route, navigation, ...props}) => {
   const [uomType, setUomType] = useState('');
   const [uomDescription, setUomDescription] = useState('');
   const [workOrderUom, setWorkOrderUom] = useState('');
-
-  useEffect(() => {
-    if (props?.itemsArray) {
-    }
-  }, [props.itemsArray]);
+  const [fabricUom, seFabricUom] = useState(false);
 
   const backBtnAction = () => {
     props.backBtnAction();
@@ -47,128 +44,14 @@ const CreateUomMasterUI = ({route, navigation, ...props}) => {
   };
 
   const submitAction = async () => {
-    console.log({
-      date: date,
-      shiftId: shiftId,
-      inTime: inTime,
-      batchNoId: batchNoId,
-      batch: batch,
-      MachineNoId: MachineNoId,
-      attendedById: attendedById,
-      processId: processId,
-      OrderNoId: OrderNoId,
-      designNoId: designNoId,
-      matchingNoId: matchingNoId,
-    });
-
-    if (
-      !processId ||
-      !date ||
-      !Number(shiftId) ||
-      !inTime ||
-      !batchNoId ||
-      !batch ||
-      (!MachineNoId && !(showAddmcNO && addmachno)) ||
-      !attendedById
-    ) {
-      Alert.alert('Please fill all mandatory fields !');
-      return;
-    }
-
-    if (Number(processId) >= 591) {
-      // if (!OrderNoId || !designNoId || (Number(processId) !== 591 || !matchingNoId)) {
-      //   Alert.alert("Please fill all mandatory fields !");
-      //   return;
-      // }
-      if (
-        !OrderNoId ||
-        !designNoId ||
-        (Number(processId) !== 591 && !matchingNoId)
-      ) {
-        Alert.alert('Please fill all mandatory fields!');
-        return;
-      }
-    }
-
-    if (Number(processId) === 591) {
-      if (selectedIndex === null) {
-        Alert.alert('Please Select Atleast one Matching ');
-        return;
-      }
-    }
-    if (Number(fabricIssued) > Number(fabricIssuedLimit)) {
-      Alert.alert('Qty Should Not Be More than ', fabricIssuedLimit);
-      return;
-    }
-
-    const s = batchNoId.split('_');
-    const a = s[0];
-    const b = s[1];
-
-    let obj1;
-
-    table.map((item, index) => {
-      if (index === selectedIndex) {
-        obj1 = {
-          matchingName: item.matchingName,
-          orderMtr: item.ordermtr,
-          totMtr: item.totMtr,
-          img: item.Image,
-          matchId: item.matchId,
-          remainTot: item.remainTot,
-        };
-      }
-    });
-
-    const Obj = {
-      processid: processId ? Number(processId) : 0,
-      fabricId: fabricId ? fabricId : 0,
-      batchId: b ? Number(b) : 0,
-      creationDate: date ? date : '',
-      machineId: MachineNoId ? Number(MachineNoId) : 0,
-      shiftId: Number(shiftId),
-      attendedById: attendedById ? Number(attendedById) : 0,
-      intime: inTime,
-      batchNo: a ? Number(a) : '',
-      quality: quality,
-      lotNo: lotNo ? lotNo : '',
-      partyName: partyName,
-      rollTrolley: rollNo ? rollNo : '0',
-      fabricGreyWidth: fabricGreyWidth ? fabricGreyWidth : '',
-      noOfPieces: pieces ? pieces : '',
-      fabricIssued: fabricIssued ? Number(fabricIssued) : 0,
-      colorid: 0,
-      previousqty: previousQty ? Number(previousQty) : 0.0,
-      orderNo: OrderNoId ? Number(OrderNoId) : 0,
-      designId: designNoId ? Number(designNoId) : 0,
-      beforeProcessWidth: beforeProcessWidth ? beforeProcessWidth : '',
-      printingId: printingId ? Number(printingId) : 0,
-      addmachno: addmachno,
-      matchId: matchingNoId ? Number(matchingNoId) : 0,
-      matchimg: '',
-      orderId: OrderNoId ? Number(OrderNoId) : 0,
-      designNo: designNoId ? Number(designNoId) : 0,
-      newdesignNo: designNoId ? Number(designNoId) : 0,
-      matchingId: matchingNoId ? Number(matchingNoId) : 0,
-      fabricPrintingOrderFormDAO: [
-        {
-          poft_fpt_batchNo_id: a ? Number(a) : 0,
-          poft_order_id: OrderNoId ? Number(OrderNoId) : 0,
-          poft_design_id: designNoId ? Number(designNoId) : 0,
-          poft_matcing_id: obj1?.matchId ? Number(obj1?.matchId) : 0,
-          poft_design_img: obj1?.img ? obj1?.img : '',
-          poft_order_mtr: obj1?.orderMtr ? obj1?.orderMtr : 0,
-          poft_tot_printed_mtr: obj1?.totMtr ? obj1?.totMtr : 0,
-          poft_remaining_print: obj1?.remainTot ? obj1?.remainTot : 0,
-          poft_printingMenuId: processId ? Number(processId) : 0,
-        },
-      ],
+    let obj = {
+      umoType: uomType,
+      umoDescription: uomDescription,
+      fabuomvalue: fabricUom ? 1 : 0,
+      workorderuom: workOrderUom,
     };
 
-    // console.log("saving obj ", Obj)
-    // return;
-    props.submitAction(Obj);
-    // Alert.alert("Save Button Clicked");
+    props.submitAction(obj);
   };
 
   const backAction = async () => {
@@ -194,7 +77,7 @@ const CreateUomMasterUI = ({route, navigation, ...props}) => {
         extraHeight={130}
         extraScrollHeight={130}
         showsVerticalScrollIndicator={false}
-        style={{marginBottom: hp('15%'),width: '100%'}}>
+        style={{marginBottom: hp('15%'), width: '100%'}}>
         <View
           style={{
             marginBottom: hp('5%'),
@@ -226,9 +109,16 @@ const CreateUomMasterUI = ({route, navigation, ...props}) => {
               mode="outlined"
               multiline
               numberOfLines={3}
-              
               onChangeText={text => setWorkOrderUom(text)}
             />
+          </View>
+
+          <View style={[styles.checkboxItem, {marginTop: hp('2%')}]}>
+            <CustomCheckBox
+              isChecked={fabricUom}
+              onToggle={() => seFabricUom(!fabricUom)}
+            />
+            <Text style={styles.checkboxLabel}>{'Fabric UOM'}</Text>
           </View>
         </View>
       </KeyboardAwareScrollView>
@@ -426,5 +316,17 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: '#000000',
+  },
+  checkboxItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '45%', // Adjust width for better alignment
+    marginVertical: 5,
+    marginHorizontal: 5,
+  },
+  checkboxLabel: {
+    marginLeft: 8,
+    fontSize: 14,
+    color: '#000',
   },
 });

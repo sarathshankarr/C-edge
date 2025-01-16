@@ -23,17 +23,32 @@ import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import {formatDateIntoDMY} from '../../../utils/constants/constant';
 import {RadioButton, TextInput} from 'react-native-paper';
 import {ColorContext} from '../../colorTheme/colorTheme';
-
+import CustomCheckBox from '../../../utils/commonComponents/CustomCheckBox';
 let downArrowImg = require('./../../../../assets/images/png/dropDownImg.png');
 const SaveUomMasterUI = ({route, navigation, ...props}) => {
   const [uomType, setUomType] = useState('');
   const [uomDescription, setUomDescription] = useState('');
   const [workOrderUom, setWorkOrderUom] = useState('');
+  const [fabricUom, seFabricUom] = useState(false);
+
   const {colors} = useContext(ColorContext);
   const styles = getStyles(colors);
 
   useEffect(() => {
     if (props.itemsObj) {
+      console.log("props for edit save ", props.itemsObj);
+      if (props?.itemsObj?.umoType) {
+        setUomType(props?.itemsObj?.umoType);
+      }
+      if (props?.itemsObj?.umoDescription) {
+        setUomDescription(props?.itemsObj?.umoDescription);
+      }
+      if (props?.itemsObj?.workorderuom) {
+        setWorkOrderUom(props?.itemsObj?.workorderuom);
+      }
+      if (props?.itemsObj?.fabuomvalue) {
+        seFabricUom(props?.itemsObj?.fabuomvalue===1 ? true : false);
+      }
     }
   }, [props.itemsObj]);
 
@@ -42,103 +57,15 @@ const SaveUomMasterUI = ({route, navigation, ...props}) => {
   };
 
   const submitAction = async () => {
-    if (!outTime) {
-      Alert.alert('Please Enter outTime  !');
-      return;
-    }
-    if (props.itemsObj.fpt_menuOut_id === 608 && !fabricType) {
-      Alert.alert('Please Enter  Fabric type');
-      return;
-    }
 
-    let obj1 = {
-      printedMtr: table_ip,
-      printedmtrId: table[0]?.poft_id,
-      totalPrintedMtr:
-        Number(table[0]?.poft_tot_printed_mtr) +
-        Number(table_ip ? table_ip : '0'),
-      remainingPrint: table[0]?.poft_remaining_print,
-      matchingId: table[0]?.poft_matcing_id,
+    let obj = {
+      "umoType":uomType,
+      "umoDescription":uomDescription,
+      "fabuomvalue":fabricUom ? 1 : 0,
+      "workorderuom":workOrderUom,
+      "umoId": props?.itemsObj?.umoId
     };
-    const formatted_date = formatDateForSave(date);
-    // let Obj=props?.itemsObj;
-    // Obj.fpt_entry_date=formatted_date,
-    // Obj.fpt_intime=inTime,
-    // Obj.fpt_outtime=outTime,
-    // Obj.fpt_machine_id=MachineNoId,
-    // Obj.fpt_attendby_id=attendedById,
-    // Obj.fpt_roll_trolley=rollNo,
-    // Obj.fpt_fabricProcessed=fabricProcessed
-    // Obj.Fpt_temparature = props.itemsObj.fpt_temparature;
-    // Obj.previousqty =props?.itemsObj?.fpt_issued ;
-    // Obj.inmenuId = props?.itemsObj?.fpt_menuIn_id;
-    // Obj.fpt_printing_id =obj1?.printedmtrId;
-    // Obj.fpt_matching_id = obj1?.matchingId;
-    // Obj.fpt_order_id = props?.itemsObj?.fpt_order_id;
-    // Obj.fpt_desing_id = props?.itemsObj?.fpt_desing_id;
-    // Obj.sfpt_batchNo_id = props?.itemsObj?.fpt_batchNo_id;
-    // Obj.printedMtr = Number(obj1?.printedMtr);
-    // Obj.printedmtrId = obj1?.printedmtrId;
-    // Obj.totalPrintedMtr = obj1?.totalPrintedMtr;
-    // Obj.remainingPrint = obj1?.remainingPrint;
-    // Obj.matchingId = obj1?.matchingId;
-    // console.log("saving, table Obj ==> ", Obj.printedMtr,Obj.printedmtrId , Obj.remainingPrint,  Obj.totalPrintedMtr, Obj.matchingId);
-
-    // console.log("condn for proccc ================> ", props?.itemsObj?.fpt_menuIn_id,Number(obj1?.printedMtr), props?.itemsObj?.fpt_menuIn_id===591  )
-    let obj2 = {
-      fpt_entry_date: formatted_date,
-      fpt_machine_id: MachineNoId,
-      fpt_attendby_id: attendedById,
-      fpt_intime: inTime ? inTime : '',
-      fpt_outtime: outTime ? outTime : '',
-      Fpt_temparature: props.itemsObj.fpt_temparature,
-      fpt_mcspeed: props.itemsObj.fpt_mcspeed,
-      fpt_qty: props.itemsObj.fpt_qty,
-      fpt_afterprocessedwidth: props?.itemsObj?.fpt_afterprocessedwidth,
-      fpt_fabricProcessed:
-        props?.itemsObj?.fpt_menuIn_id === 591
-          ? Number(obj1?.printedMtr)
-          : fabricProcessed,
-      fpt_fabric_rejected: props?.itemsObj?.fpt_fabric_rejected,
-      fpt_ph: props?.itemsObj?.fpt_ph,
-      fpt_roll_trolley: props?.itemsObj?.fpt_roll_trolley,
-      fpt_partyno: props?.itemsObj?.fpt_partyno,
-      previousqty: props?.itemsObj?.fpt_issued,
-      inmenuId: props?.itemsObj?.fpt_menuIn_id,
-      fpt_menuOut_id: props?.itemsObj?.fpt_menuOut_id,
-      printingId: props?.itemsObj?.printingId,
-      fpt_printing_id: obj1?.printedmtrId,
-      fpt_matching_id: obj1?.matchingId,
-      fpt_order_id: props?.itemsObj?.fpt_order_id,
-      fpt_desing_id: props?.itemsObj?.fpt_desing_id,
-      fpt_batchNo_id: props?.itemsObj?.fpt_batchNo_id,
-      fpt_pound: props?.itemsObj?.fpt_pound,
-      fpt_shrinkage: props?.itemsObj?.fpt_shrinkage,
-      fabricType: fabricType,
-      fpt_freshPcs: Number(fresh),
-      fpt_twoPcs: Number(twoPieces),
-      fpt_printDamgePcs: Number(printDamagePieces),
-      fpt_bgradePcs: Number(bGradePieces),
-      fpt_fent: Number(fent),
-      fpt_chindi: Number(chindi),
-      fpt_steam: props?.itemsObj?.fpt_steam,
-      fpt_speed: props?.itemsObj?.fpt_speed,
-      fpt_weight: props?.itemsObj?.fpt_weight,
-      fpt_yard: props?.itemsObj?.fpt_yard,
-      fpt_glm: props?.itemsObj?.fpt_glm,
-      fpt_shift_id: props?.itemsObj?.fpt_shift_id,
-      printedMtr: Number(obj1?.printedMtr),
-      printedmtrId: obj1?.printedmtrId,
-      totalPrintedMtr: obj1?.totalPrintedMtr,
-      remainingPrint: obj1?.remainingPrint,
-      matchingId: obj1?.matchingId,
-      templist: props?.itemsObj?.templist,
-      applilist: props?.itemsObj?.applilist,
-      niplist: props?.itemsObj?.niplist,
-      stlist: props?.itemsObj?.stlist,
-    };
-    // console.log("REQ OBJ ========> ", obj2);
-    props.submitAction(obj2);
+    props.submitAction(obj);
   };
 
   const backAction = async () => {
@@ -176,7 +103,7 @@ const SaveUomMasterUI = ({route, navigation, ...props}) => {
               label="UOM Type *"
               value={uomType}
               mode="outlined"
-              editable={false}
+              editable={props?.itemsObj?.umoType ? false : true}
               onChangeText={text => setUomType(text)}
             />
           </View>
@@ -187,6 +114,7 @@ const SaveUomMasterUI = ({route, navigation, ...props}) => {
               mode="outlined"
               multiline
               numberOfLines={3}
+              editable={props?.itemsObj?.umoDescription ? false : true}
               onChangeText={text => setUomDescription(text)}
             />
           </View>
@@ -197,10 +125,19 @@ const SaveUomMasterUI = ({route, navigation, ...props}) => {
               mode="outlined"
               multiline
               numberOfLines={3}
-              editable={false}
+              editable={props?.itemsObj?.workorderuom ? false : true}
               onChangeText={text => setWorkOrderUom(text)}
             />
           </View>
+
+          <View  style={[styles.checkboxItem, {marginTop: hp('2%')}]}>
+                <CustomCheckBox
+                  isChecked={fabricUom}
+                  onToggle={() => seFabricUom(!fabricUom)}
+                />
+                <Text style={styles.checkboxLabel}>{"Fabric UOM"}</Text>
+          </View>
+
         </View>
       </KeyboardAwareScrollView>
 
@@ -403,5 +340,17 @@ const getStyles = colors =>
       fontSize: 16,
       fontWeight: '600',
       color: '#000000',
+    },
+    checkboxItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      width: '45%', // Adjust width for better alignment
+      marginVertical: 5,
+      marginHorizontal: 5,
+    },
+    checkboxLabel: {
+      marginLeft: 8,
+      fontSize: 14,
+      color: '#000',
     },
   });
