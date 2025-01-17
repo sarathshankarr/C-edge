@@ -26,13 +26,13 @@ const RawMaterialTypeList = ({ route }) => {
 
 
     
-  // React.useEffect(() => {
-  //   getInitialData(0, true);
-  // }, []);
+  React.useEffect(() => {
+    getInitialData(0, true);
+  }, []);
 
   useFocusEffect(
     React.useCallback(() => {
-      // getInitialData(0, true);
+      getInitialData(0, true);
     }, [])
   );
   
@@ -76,15 +76,17 @@ const RawMaterialTypeList = ({ route }) => {
       let obj = {  
         "username": userName,
         "password" : userPsd,
-        "menuId": 587,
+        "menuId": 82,
         "fromRecord": fromRecord,
         "toRecord": toRecord,
         "searchKeyValue": "",
         "styleSearchDropdown": "-1",
         "compIds": usercompanyId,
         "company":JSON.parse(companyObj),
+        "dataFilter": "60Days",
+        "flag": 1,
     }
-      let LISTAPIOBJ = await APIServiceCall.loadAllFabricProcessInList(obj);
+      let LISTAPIOBJ = await APIServiceCall.loadAllRawMaterialTypeMastersList(obj);
       set_isLoading(false);
       
       if(LISTAPIOBJ && LISTAPIOBJ.statusData){
@@ -94,7 +96,6 @@ const RawMaterialTypeList = ({ route }) => {
             ? LISTAPIOBJ.responseData 
             : [...prevItems, ...LISTAPIOBJ.responseData] 
           );
-    
           if(LISTAPIOBJ?.responseData?.length<ListSize-1){
             setHasMore(false);
           }
@@ -172,15 +173,10 @@ const RawMaterialTypeList = ({ route }) => {
   };
 
   const actionOnRow = (item,index) => {
-    // console.log("selected item ===>  ", item)
-    navigation.navigate('SaveFabricProcessIn', {id:item?.so_style_id});
+    navigation.navigate('SaveRawMaterialType', {item:item});
   };
-  const actionOnCreate= () => {
-    navigation.navigate('CreateInProcess');
-  };
-  const handleNavigation = () => {
-    navigation.navigate('SaveRawMaterialType');
-  };
+ 
+ 
   
 
   return (
@@ -195,13 +191,10 @@ const RawMaterialTypeList = ({ route }) => {
       isPopupLeft = {isPopupLeft}
       isPopUp = {isPopUp}
       actionOnRow = {actionOnRow}
-      actionOnCreate = {actionOnCreate}
       backBtnAction = {backBtnAction}
       popOkBtnAction = {popOkBtnAction}
       fetchMore={fetchMore}
       applyFilterFxn={getFilteredList}
-      handleNavigation={handleNavigation}
-
     />
 
   );

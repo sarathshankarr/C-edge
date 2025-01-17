@@ -8,6 +8,7 @@ import {
   ScrollView,
   Image,
   TextInput,
+  Alert,
 } from 'react-native';
 import {
   heightPercentageToDP as hp,
@@ -51,6 +52,14 @@ const CreateRequestUi = ({route, ...props}) => {
   const [showLocationList, set_showLocationList] = useState(false);
   const [locationName, set_locationName] = useState('');
   const [locationId, set_locationId] = useState(0);
+
+
+  const [showFabLocationList, set_showFabLocationList] = useState(false);
+  const [fabLocationName, set_fabLocationName] = useState('');
+  const [fabLocationId, set_fabLocationId] = useState(0);
+  const [filteredFabLocation, set_filteredFabLocation] = useState([]);
+  const [fabLocationList, set_fabLocationList] = useState([]);
+
 
   // Fabric
   const [showFabricList, set_showFabricList] = useState(false);
@@ -291,30 +300,14 @@ const CreateRequestUi = ({route, ...props}) => {
       set_itemsObj(prev => ({
         ...prev,
         approvedFabric: STOREDETAILSAPIObj.responseData.approvedFabric,
-      }));
-      set_itemsObj(prev => ({
-        ...prev,
-        approvedFabricConsumption:
-          STOREDETAILSAPIObj.responseData.approvedFabricConsumption,
-      }));
-      set_itemsObj(prev => ({
-        ...prev,
+        approvedFabricConsumption: STOREDETAILSAPIObj.responseData.approvedFabricConsumption,
         allowanceFabric: STOREDETAILSAPIObj.responseData.allowanceFabric,
-      }));
-      set_itemsObj(prev => ({
-        ...prev,
-        totalFabricApprovedWithAllowance:
-          STOREDETAILSAPIObj.responseData.totalFabricApprovedWithAllowance,
-      }));
-      set_itemsObj(prev => ({
-        ...prev,
+        totalFabricApprovedWithAllowance: STOREDETAILSAPIObj.responseData.totalFabricApprovedWithAllowance,
         availFabricQty: STOREDETAILSAPIObj.responseData.availFabricQty,
-      }));
-      set_itemsObj(prev => ({
-        ...prev,
         uomfabric: STOREDETAILSAPIObj.responseData.uomType,
       }));
-
+      set_fabLocationId(STOREDETAILSAPIObj.responseData.fabricLocationId)
+      
       if (
         STOREDETAILSAPIObj?.responseData?.trimConstructionsList &&
         STOREDETAILSAPIObj?.responseData?.trimConstructionsList?.length > 0
@@ -730,10 +723,15 @@ const CreateRequestUi = ({route, ...props}) => {
   const ApproveAction = () => {
     console.log('Approved');
 
+    // if(rows.length<=0){
+    //   Alert("")
+    // }
+
+
     const requestDetails = rows.map(detail => ({
-      stockType: detail.stockTypeId,
+      stockType: detail.stockTypeId ? detail.stockTypeId: 0,
       stockTypeName: detail.stockType,
-      stock: detail.stockId,
+      stock: detail.stockId ? detail.stockId : 0,
       stock_rm_lot: 0,
       stockLocationId: 1,
       styleRmSizeId: detail.size,
@@ -745,18 +743,17 @@ const CreateRequestUi = ({route, ...props}) => {
       processId: processId,
       woStyleId: stylesId,
       trimId: fabricId,
-      locationId: locationId,
+      locationId: fabLocationId,
       unitMasterId: unitMasterId,
       comments: remarks,
       general: generalRadio === 'Yes' ? '1' : '0',
       styleWise: displayStyleRadio === 'Yes' ? '1' : '0',
+      buyerpowise: buyerRadio === 'Yes' ? '1' : '0',
       fabricQty: enteredFabQty,
       uom: itemsObj?.uomfabric,
       rmDetails: requestDetails,
       ts_create:date
     };
-
-    // console.log("SAVING OBJ=====>   ", tempObj.ts_create);
     props.submitAction(tempObj);
   };
 
@@ -794,6 +791,13 @@ const CreateRequestUi = ({route, ...props}) => {
     set_unitMasterName(unitMasterName);
     set_showUnitMasterList(false);
   };
+
+  const actionOnFabLocation = (fabLocationId, fabLocationName) => {
+    set_fabLocationId(fabLocationId);
+    set_fabLocationName(fabLocationName);
+    set_showFabLocationList(false);
+  };
+  
 
   const actionOnStocks = async (item, rowId) => {
     set_dataFromStock({
@@ -872,6 +876,18 @@ const CreateRequestUi = ({route, ...props}) => {
     }
   };
 
+  const handleSearchFabLocation = text => {
+    if (text.trim().length > 0) {
+      const filtered = fabLocations.filter(fabLocation =>
+        fabLocation.name.toLowerCase().includes(text.toLowerCase()),
+      );
+      set_filteredFabLocation(filtered);
+    } else {
+      set_filteredFabLocation(fabLocations);
+    }
+  };
+  
+
   const handleSearchStockType = (text, rowId) => {
     setRows(
       rows.map(r =>
@@ -938,228 +954,6 @@ const CreateRequestUi = ({route, ...props}) => {
         extraScrollHeight={130}
         showsVerticalScrollIndicator={false}>
         <View style={{marginBottom: hp('5%')}}>
-          {/* <View
-            style={{
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginTop: hp('3%'),
-              // backgroundColor: '#ffffff',
-            }}>
-            <View style={{flexDirection: 'column', marginTop: hp('1%')}}>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  marginBottom: hp('1%'),
-                }}>
-                <Text style={{width: '50%', fontWeight: 'bold', color: '#000'}}>
-                  General
-                </Text>
-                <Text style={{marginRight: wp('2%'), color: '#000'}}>Yes</Text>
-                <RadioButton
-                  value="Yes"
-                  status={generalRadio === 'Yes' ? 'checked' : 'unchecked'}
-                  onPress={() => {
-                    set_generalRadio('Yes');
-                    set_buyerRadio('No');
-                    set_displayStyleRadio('No');
-                  }}
-                />
-
-                <Text
-                  style={{
-                    marginRight: wp('2%'),
-                    marginLeft: wp('4%'),
-                    color: '#000',
-                  }}>
-                  No
-                </Text>
-                <RadioButton
-                  value="No"
-                  status={generalRadio === 'No' ? 'checked' : 'unchecked'}
-                  onPress={() => set_generalRadio('No')}
-                />
-              </View>
-
-              {generalRadio === 'No' && (
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    marginBottom: hp('1%'),
-                  }}>
-                  <Text
-                    style={{width: '50%', fontWeight: 'bold', color: '#000'}}>
-                    Buyer PO Wise
-                  </Text>
-                  <Text style={{marginRight: wp('2%'), color: '#000'}}>
-                    Yes
-                  </Text>
-                  <RadioButton
-                    value="Yes"
-                    status={buyerRadio === 'Yes' ? 'checked' : 'unchecked'}
-                    onPress={() => set_buyerRadio('Yes')}
-                  />
-                  <Text
-                    style={{
-                      marginRight: wp('2%'),
-                      marginLeft: wp('4%'),
-                      color: '#000',
-                    }}>
-                    No
-                  </Text>
-                  <RadioButton
-                    value="No"
-                    status={buyerRadio === 'No' ? 'checked' : 'unchecked'}
-                    onPress={() => set_buyerRadio('No')}
-                  />
-                </View>
-              )}
-
-              {generalRadio === 'No' && (
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    marginBottom: hp('1%'),
-                  }}>
-                  <Text
-                    style={{width: '50%', fontWeight: 'bold', color: '#000'}}>
-                    Display Style Wise
-                  </Text>
-                  <Text
-                    style={{
-                      marginRight: wp('2%'),
-                      color: '#000',
-                      color: '#000',
-                    }}>
-                    Yes
-                  </Text>
-                  <RadioButton
-                    value="Yes"
-                    status={
-                      displayStyleRadio === 'Yes' ? 'checked' : 'unchecked'
-                    }
-                    onPress={() => set_displayStyleRadio('Yes')}
-                  />
-                  <Text
-                    style={{
-                      marginRight: wp('2%'),
-                      marginLeft: wp('4%'),
-                      color: '#000',
-                    }}>
-                    No
-                  </Text>
-                  <RadioButton
-                    value="No"
-                    status={
-                      displayStyleRadio === 'No' ? 'checked' : 'unchecked'
-                    }
-                    onPress={() => set_displayStyleRadio('No')}
-                  />
-                </View>
-              )}
-            </View>
-          </View> */}
-          {/* <View
-        style={{
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginTop: hp('3%'),
-      }}>
-      <View style={{ flexDirection: 'column', marginTop: hp('1%') }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: hp('1%') }}>
-          <Text style={{ width: '50%', fontWeight: 'bold', color: '#000' }}>General</Text>
-          <RadioButton.Group
-            onValueChange={(newValue) => {
-              set_generalRadio(newValue);
-              if (newValue === 'Yes') {
-                set_buyerRadio('No');
-                set_displayStyleRadio('No');
-              }
-            }}
-            value={generalRadio}>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Text style={{ marginRight: wp('2%'), color: '#000' }}>Yes</Text>
-              <RadioButton value="Yes" />
-              <Text style={{ marginRight: wp('2%'), marginLeft: wp('4%'), color: '#000' }}>No</Text>
-              <RadioButton value="No" />
-            </View>
-          </RadioButton.Group>
-        </View>
-
-        {generalRadio === 'No' && (
-          <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: hp('1%') }}>
-            <Text style={{ width: '50%', fontWeight: 'bold', color: '#000' }}>Buyer PO Wise</Text>
-            <RadioButton.Group
-              onValueChange={(newValue) => set_buyerRadio(newValue)}
-              value={buyerRadio}>
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Text style={{ marginRight: wp('2%'), color: '#000' }}>Yes</Text>
-                <RadioButton value="Yes" />
-                <Text style={{ marginRight: wp('2%'), marginLeft: wp('4%'), color: '#000' }}>No</Text>
-                <RadioButton value="No" />
-              </View>
-            </RadioButton.Group>
-          </View>
-        )}
-
-        {generalRadio === 'No' && (
-          <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: hp('1%') }}>
-            <Text style={{ width: '50%', fontWeight: 'bold', color: '#000' }}>Display Style Wise</Text>
-            <RadioButton.Group
-              onValueChange={(newValue) => set_displayStyleRadio(newValue)}
-              value={displayStyleRadio}>
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Text style={{ marginRight: wp('2%'), color: '#000' }}>Yes</Text>
-                <RadioButton value="Yes" />
-                <Text style={{ marginRight: wp('2%'), marginLeft: wp('4%'), color: '#000' }}>No</Text>
-                <RadioButton value="No" />
-              </View>
-            </RadioButton.Group>
-          </View>
-        )}
-      </View>
-          </View> */}
-
-          {/* <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: 20 }}>
-         <View style={{ marginTop: 10 }}>
-          <View style={{ marginBottom: 10, flexDirection:'row',justifyContent: 'space-between'}}>
-          <Text style={{ width: '50%', fontWeight: 'bold', color: '#000' }}>General</Text>
-          <RadioGroup
-            style={{ flexDirection: 'row' }}
-            radioButtons={generalRadioButtons}
-            onPress={handleGeneralRadioChange}
-            selectedId={generalRadioButtons.find((item) => item.value === generalRadio)?.id}
-          />
-          </View>
-
-        {generalRadio === 'No' && (
-          <View style={{ marginBottom: 10 }}>
-            <Text style={{ width: '50%', fontWeight: 'bold', color: '#000' }}>Buyer PO Wise</Text>
-            <RadioGroup
-            style={{ flexDirection: 'row' }}
-              radioButtons={buyerRadioButtons}
-              onPress={handleBuyerRadioChange}
-              selectedId={buyerRadioButtons.find((item) => item.value === buyerRadio)?.id}
-            />
-          </View>
-        )}
-
-        {generalRadio === 'No' && (
-          <View style={{ marginBottom: 10 }}>
-            <Text style={{ width: '50%', fontWeight: 'bold', color: '#000' }}>Display Style Wise</Text>
-            <RadioGroup
-              style={{ flexDirection: 'row' }}
-              radioButtons={displayStyleRadioButtons}
-              onPress={handleDisplayStyleRadioChange}
-              selectedId={displayStyleRadioButtons.find((item) => item.value === displayStyleRadio)?.id}
-            />
-          </View>
-        )}
-      </View>
-          </View> */}
-
           <View
             style={{
               alignItems: 'center',
@@ -1269,25 +1063,7 @@ const CreateRequestUi = ({route, ...props}) => {
                   onConfirm={handleConfirm}
                   onCancel={hideDatePicker}
                   />
-              {/* 
-     <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  marginTop: hp('2%'),
-                }}>
-                <Text style={{width: '50%', fontWeight: 'bold', color: '#000'}}>
-                  Roll Wise
-                </Text>
-                <RadioGroup
-            style={{ flexDirection: 'row' }}
-            radioButtons={rollWiseRadioButtons}
-            onPress={handleRollWiseChange}
-            layout="row"
-            selectedId={rollWiseRadioButtons.find((item) => item.value === rollWise)?.id}
-          />
-              </View> */}
+              
             </View>
           </View>
 
@@ -1451,6 +1227,78 @@ const CreateRequestUi = ({route, ...props}) => {
               style={{
                 alignItems: 'center',
                 justifyContent: 'center',
+                marginTop: hp('2%'),
+                // backgroundColor: '#f8f8f8',
+              }}>
+              <TouchableOpacity
+                style={{
+                  flexDirection: 'row',
+                  borderWidth: 0.5,
+                  borderColor: '#D8D8D8',
+                  borderRadius: hp('0.5%'),
+                  width: wp('90%'),
+                  backgroundColor: '#fff',
+                }}
+                onPress={() => {
+                  set_showFabLocationList(!showFabLocationList);
+                }}>
+                <View style={[styles.SectionStyle1, {}]}>
+                  <View style={{flexDirection: 'column'}}>
+                    <Text
+                      style={
+                        fabLocationId
+                          ? [styles.dropTextLightStyle]
+                          : [styles.dropTextInputStyle]
+                      }>
+                      {'Fabric Location '}
+                    </Text>
+                    <Text style={[styles.dropTextInputStyle]}>
+                      {fabLocationId ? fabLocationName : 'Select '}
+                    </Text>
+                  </View>
+                </View>
+
+                <View style={{justifyContent: 'center'}}>
+                  <Image source={downArrowImg} style={styles.imageStyle} />
+                </View>
+              </TouchableOpacity>
+
+              {showFabLocationList && (
+                <View style={styles.dropdownContent1}>
+                  <TextInput
+                    style={styles.searchInput}
+                    placeholder="Search "
+                    onChangeText={handleSearchFabLocation}
+                    placeholderTextColor="#000"
+                  />
+                  <ScrollView
+                    style={styles.scrollView}
+                    nestedScrollEnabled={true}>
+                    {filteredFabLocation.length === 0 ? (
+                      <Text style={styles.noCategoriesText}>
+                        Sorry, no results found!
+                      </Text>
+                    ) : (
+                      filteredFabLocation.map((item, index) => (
+                        <TouchableOpacity
+                          key={index}
+                          style={styles.dropdownOption}
+                          onPress={() => actionOnFabLocation(item.id, item.name)}>
+                          <Text style={{color: '#000'}}>{item.name}</Text>
+                        </TouchableOpacity>
+                      ))
+                    )}
+                  </ScrollView>
+                </View>
+              )}
+            </View>
+          )}
+
+          {generalRadio === 'No' && (
+            <View
+              style={{
+                alignItems: 'center',
+                justifyContent: 'center',
                 marginTop: hp('1%'),
               }}>
               <TextInputComponent
@@ -1468,6 +1316,8 @@ const CreateRequestUi = ({route, ...props}) => {
               />
             </View>
           )}
+
+         
 
           {generalRadio === 'No' && (
             <View

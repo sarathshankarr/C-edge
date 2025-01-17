@@ -34,10 +34,7 @@ const CreateRawMaterialTypeUI = ({route, navigation, ...props}) => {
   const [rmTypeCode, set_rmTypeCode] = useState('');
   const [bomStatus, set_bomStatus] = useState('Yes');
 
-  useEffect(() => {
-    if (props?.itemsArray) {
-    }
-  }, [props.itemsArray]);
+
 
   const backBtnAction = () => {
     props.backBtnAction();
@@ -48,30 +45,13 @@ const CreateRawMaterialTypeUI = ({route, navigation, ...props}) => {
   };
 
   const submitAction = async () => {
-    console.log({
-      date: date,
-      shiftId: shiftId,
-      inTime: inTime,
-      batchNoId: batchNoId,
-      batch: batch,
-      MachineNoId: MachineNoId,
-      attendedById: attendedById,
-      processId: processId,
-      OrderNoId: OrderNoId,
-      designNoId: designNoId,
-      matchingNoId: matchingNoId,
-    });
+    let obj = {
+      "trimtype":rmType,
+      "trim_type_code":rmTypeCode,
+      "trim_bom_status":bomStatus==='Yes'? 1:0
+    };
 
-    const s = batchNoId.split('_');
-    const a = s[0];
-    const b = s[1];
-
-    let obj1;
-
-    // console.log("saving obj ", Obj)
-    // return;
-    props.submitAction(Obj);
-    // Alert.alert("Save Button Clicked");
+    props.submitAction(obj);
   };
 
   const backAction = async () => {
