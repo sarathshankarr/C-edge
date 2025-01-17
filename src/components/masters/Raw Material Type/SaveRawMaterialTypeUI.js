@@ -150,12 +150,8 @@ const SaveRawMaterialTypeUI = ({route, navigation, ...props}) => {
           rightBtnTitle={'Save'}
           leftBtnTitle={'Back'}
           isLeftBtnEnable={true}
-          rigthBtnState={true}
-          isRightBtnEnable={
-            props.itemsObj.fpt_fabricProcessed +
-              props.itemsObj.fpt_fabric_rejected !==
-            props.itemsObj.fpt_issued
-          }
+          rigthBtnState={false}
+          isRightBtnEnable={false}
           rightButtonAction={async () => submitAction()}
           leftButtonAction={async () => backAction()}
         />

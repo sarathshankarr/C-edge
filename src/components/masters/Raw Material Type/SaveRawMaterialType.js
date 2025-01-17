@@ -20,12 +20,11 @@ const SaveRawMaterialType = ({ navigation, route, ...props }) => {
   React.useEffect(() => {
     
     if(route.params) {
-      if(route.params?.id) {
-        getInitialData(route.params?.id);
-        set_fptid(route.params?.id);
+      if(route.params?.item) {
+        getInitialData(route.params?.item?.trimTypeId);
+       console.log("Route param to edit ==> ", route.params?.item);
       } 
     }
-    console.log("Route Params ===> ", route?.params)
     
   }, [route.params]);
 
@@ -44,15 +43,15 @@ const SaveRawMaterialType = ({ navigation, route, ...props }) => {
     let companyObj = await AsyncStorage.getItem('companyObj');
     set_isLoading(true);
     let obj = {
-      "menuId": 588,
+     "menuid":82,
       "fptid":id,
       "username": userName,
       "password" : userPsd,
       "compIds": usercompanyId,
       "company":JSON.parse(companyObj),
-
+      "trimTypeId": id,
     }      
-    let EditFabricProcessInObj = await APIServiceCall.getEditDetailsOfFabricProcessIn(obj);
+    let EditFabricProcessInObj = await APIServiceCall.getEditDetailsOfRawMaterialTypeMasters(obj);
     // console.log('Fabric process in edit  data ====> ,',JSON.stringify(EditFabricProcessInObj))
     set_isLoading(false);
     

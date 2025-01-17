@@ -52,6 +52,8 @@ const StockRequestEdit = ({ navigation, route, ...props }) => {
 
     if (STOREDETAILSAPIObj && STOREDETAILSAPIObj.statusData) {
       set_itemsObj(STOREDETAILSAPIObj.responseData);
+      console.log("itemsObj stock req ==============> ", STOREDETAILSAPIObj.responseData );
+
     } else {
       popUpAction(Constant.SERVICE_FAIL_MSG, Constant.DefaultAlert_MSG, 'OK', true, false);
     }
@@ -107,24 +109,29 @@ const StockRequestEdit = ({ navigation, route, ...props }) => {
       "password": userPsd,
       "compIds": usercompanyId,
       "company":JSON.parse(companyObj),
-      "processId":0,
       "woStyleId":tempObj?.styleId,
       "trimId":tempObj?.fabricId,
       "fabricid":tempObj?.fabricId,
       "locationId":tempObj?.fabricLocationId,
       "comments":tempObj?.comments,
-      "general":tempObj?.general,
-      "styleWise":tempObj?.styleWise,
+      // "general":tempObj?.general,
+      // "styleWise":tempObj?.styleWise,
+      // "processId":0,
+      // "general": "1",
+      // "styleWise": "0",
+      // "processId": "1",
+      "fabricWidthId":0,
       "fabricQty":tempObj?.fabricqty,
       "uom":tempObj.uomfabric,
       "rmDetails":tempObj?.requestDetails,
       "unitMasterId":tempObj?.unitmasterId,
-      "fablot":tempObj?.stock_fab_lot,
+      // "fablot":tempObj?.stock_fab_lot,
+      // "fabricWidthId":tempObj?.stock_fab_width,
+      "fablot":0,
       "ts_create":tempObj?.requestedDateStr,
-      "fabricWidthId":tempObj?.stock_fab_width,
     }
 
-    console.log("req edit save of stock req  ================> ", obj );
+    // console.log("req edit save of stock req  ================> ", obj );
     // return;
 
     set_isLoading(true);

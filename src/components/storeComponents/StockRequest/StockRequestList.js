@@ -4,6 +4,7 @@ import * as Constant from "./../../../utils/constants/constant";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import StockRequestListUI from './StockRequestListUI';
+import { useFocusEffect } from '@react-navigation/native';
  
 
 const StockRequestList = ({ navigation, route, ...props }) => {
@@ -21,9 +22,15 @@ const StockRequestList = ({ navigation, route, ...props }) => {
   const [page, setpage] = useState(0);
   const [hasMore, setHasMore] = useState(true); 
 
-  React.useEffect(() => {   
-    getInitialData(0, true);
-  }, []);
+   React.useEffect(() => {
+     getInitialData(0, true);
+   }, []);
+ 
+   useFocusEffect(
+     React.useCallback(() => {
+       getInitialData(0, true);
+     }, [])
+   );
 
   const backBtnAction = () => {
     navigation.navigate('Main');
@@ -58,6 +65,8 @@ const StockRequestList = ({ navigation, route, ...props }) => {
       "company":JSON.parse(companyObj),
 
   }
+
+  console.log("stock req list req ==> ", obj);
 
     let stockStylesAPIObj = await APIServiceCall.stockRequestListDetails(obj);
     set_isLoading(false);

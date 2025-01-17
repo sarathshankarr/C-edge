@@ -53,7 +53,6 @@ const CreateRequest = ({ navigation, route, ...props }) => {
     }
 
     let STOREDETAILSAPIObj = await APIServiceCall.getStockFabrics(obj);
-    // console.log('STOREDETAILSAPIObj,', STOREDETAILSAPIObj,'\nSTOREDETAILSAPIObj,',  STOREDETAILSAPIObj.responseData.sizeDetails)
     set_isLoading(false);
 
     if (STOREDETAILSAPIObj && STOREDETAILSAPIObj.statusData) {
@@ -88,7 +87,6 @@ const CreateRequest = ({ navigation, route, ...props }) => {
     }
 
     let STOREDETAILSAPIObj = await APIServiceCall.getStockStyles(obj);
-    // console.log('STOREDETAILSAPIObj,', STOREDETAILSAPIObj,'\nSTOREDETAILSAPIObj,',  STOREDETAILSAPIObj.responseData.sizeDetails)
     set_isLoading(false);
 
     if (STOREDETAILSAPIObj && STOREDETAILSAPIObj.statusData) {
@@ -122,7 +120,6 @@ const CreateRequest = ({ navigation, route, ...props }) => {
     }
 
     let STOREDETAILSAPIObj = await APIServiceCall.getMenus(obj);
-    // console.log('STOREDETAILSAPIObj,', STOREDETAILSAPIObj,'\nSTOREDETAILSAPIObj,',  STOREDETAILSAPIObj.responseData.sizeDetails)
     set_isLoading(false);
 
     if (STOREDETAILSAPIObj && STOREDETAILSAPIObj.statusData) {
@@ -154,11 +151,9 @@ const CreateRequest = ({ navigation, route, ...props }) => {
       "company":JSON.parse(companyObj),
 
     }
-    // console.log("geeeeeeeeeeeeee==> ", obj);
 
     let STOREDETAILSAPIObj = await APIServiceCall.getBatches(obj);
     set_isLoading(false);
-    console.log("response ==> ", STOREDETAILSAPIObj.statusData, STOREDETAILSAPIObj.responseData)
     if (STOREDETAILSAPIObj && STOREDETAILSAPIObj.statusData) {
       set_lists(prevLists => ({
         ...prevLists,
@@ -243,7 +238,7 @@ const CreateRequest = ({ navigation, route, ...props }) => {
 
 
   const actionOnRow = (item, index) => {
-    console.log("Clicked on the row");
+    // console.log("Clicked on the row");
   };
 
   const popUpAction = (popMsg, popAlert, rBtnTitle, isPopup, isPopLeft) => {
@@ -259,8 +254,7 @@ const CreateRequest = ({ navigation, route, ...props }) => {
   };
 
   const submitAction = (reqBody) => {
-    // let tempObj = itemsObj;
-    // tempObj.comments = remarks;
+
     saveStoreRequest(reqBody);
   };
 
@@ -276,7 +270,6 @@ const CreateRequest = ({ navigation, route, ...props }) => {
       "password": userPsd,
       "compIds": usercompanyId,
       "company":JSON.parse(companyObj),
-
       "processId": tempObj.processId,
       "woStyleId": tempObj.woStyleId,
       "trimId": tempObj.trimId,
@@ -285,6 +278,7 @@ const CreateRequest = ({ navigation, route, ...props }) => {
       "comments": tempObj.comments,
       "general": tempObj.general,
       "styleWise": tempObj.styleWise,
+      "buyerpowise": tempObj.buyerpowise,
       "fabricQty": tempObj.fabricQty,
       "uom": tempObj.uom,
       "rmDetails": tempObj.rmDetails,
@@ -298,7 +292,7 @@ const CreateRequest = ({ navigation, route, ...props }) => {
     set_isLoading(false);
 
     if (SAVEAPIObj && SAVEAPIObj.statusData && SAVEAPIObj.responseData !== "false") {
-      console.log("Sucess");
+      console.log("Sucessfully saved edit stock");
       backBtnAction();
     } else {
       popUpAction(Constant.Fail_Save_Dtls_MSG, Constant.DefaultAlert_MSG, 'OK', true, false);
