@@ -86,6 +86,11 @@ const dropdownMenus = {
         route: 'ScaleOrSizeMasterList',
         src: require('../../../assets/images/png/measuring-tape.png'),
       },
+      {
+        label: 'Color  Master',
+        route: 'ColorMasterList',
+        src: require('../../../assets/images/png/measuring-tape.png'),
+      },
     ],
   },
   store: {

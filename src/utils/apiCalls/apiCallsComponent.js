@@ -3275,7 +3275,6 @@ export async function validateRawMaterialTypeMasters(jsonValue) {
         obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
         return obj;
     }
-    // console.log('saveCreateProcessIn ', jsonValue, Environment.uri + "rawmaterialtype/checkRawMaterialType")
     await fetch(Environment.uri + "rawmaterialtype/checkRawMaterialType",
         {
             method: "POST",

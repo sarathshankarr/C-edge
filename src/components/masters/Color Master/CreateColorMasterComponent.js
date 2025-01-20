@@ -4,9 +4,10 @@ import * as Constant from "../../../utils/constants/constant";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { useNavigation } from '@react-navigation/native';
-import CreateRawMaterialTypeUI from './CreateRawMaterialTypeUI';
+import CreateUomMasterUI from './CreateColorMasterUI';
+import CreateColorMasterUI from './CreateColorMasterUI';
 
-const CreateRawMaterialTypeComponent = ({ route }) => {
+const CreateColorMasterComponent = ({ route }) => {
   const navigation = useNavigation();
 
   const [isLoading, set_isLoading] = useState(false);
@@ -15,8 +16,7 @@ const CreateRawMaterialTypeComponent = ({ route }) => {
   const [popUpAlert, set_popUpAlert] = useState(undefined);
   const [popUpRBtnTitle, set_popUpRBtnTitle] = useState(undefined);
   const [isPopupLeft, set_isPopupLeft] = useState(false);
-
-
+  
 
 
   const backBtnAction = () => {
@@ -37,48 +37,13 @@ const CreateRawMaterialTypeComponent = ({ route }) => {
     popUpAction(undefined, undefined, '', false, false)
   };
 
-  const ValidateAction = async (type) => {
-    let userName = await AsyncStorage.getItem('userName');
-    let userPsd = await AsyncStorage.getItem('userPsd');
-    let usercompanyId = await AsyncStorage.getItem('companyId');
-    let companyObj = await AsyncStorage.getItem('companyObj');
-
-    let Obj={
-     "menuid":82,
-    "username": userName,
-    "password": userPsd,
-    "trimtype": type,
-    "compIds" : usercompanyId,
-    "company" :JSON.parse(companyObj),
-    }
-
-    set_isLoading(true);
-
-    let SAVEAPIObj = await APIServiceCall.validateRawMaterialTypeMasters(Obj);
-    set_isLoading(false);
-
-    console.log("Sucess before returned obj ", SAVEAPIObj);
-
-    return SAVEAPIObj?.responseData;
-  };
-
-
   const submitAction = async (tempObj) => {
-
-    const validateRMT= await ValidateAction()
-
-    if(validateRMT==="no"){
-      console.log("failed  saving =====> ")
-      popUpAction(Constant.Fail_Validate_RMT_MSG, Constant.DefaultAlert_MSG, 'OK', true, false);
-      return;
-    }
-
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
     let companyObj = await AsyncStorage.getItem('companyObj');
-    
-    tempObj.menuid= 82;
+
+    tempObj.menuid = 123;
     tempObj.username = userName;
     tempObj.password = userPsd;
     tempObj.compIds = usercompanyId;
@@ -89,7 +54,7 @@ const CreateRawMaterialTypeComponent = ({ route }) => {
 
     set_isLoading(true);
 
-    let SAVEAPIObj = await APIServiceCall.saveCreateRawMaterialTypeMasters(tempObj);
+    let SAVEAPIObj = await APIServiceCall.saveCreateUomMasters(tempObj);
     set_isLoading(false);
 
     console.log("Sucess before returned obj ", SAVEAPIObj);
@@ -111,7 +76,7 @@ const CreateRawMaterialTypeComponent = ({ route }) => {
 
   return (
 
-    <CreateRawMaterialTypeUI
+    <CreateColorMasterUI
       isLoading={isLoading}
       popUpAction={popUpAction}
       set_isLoading={set_isLoading}
@@ -129,8 +94,7 @@ const CreateRawMaterialTypeComponent = ({ route }) => {
 
 }
 
-export default CreateRawMaterialTypeComponent;
-
+export default CreateColorMasterComponent;
 
 
 
