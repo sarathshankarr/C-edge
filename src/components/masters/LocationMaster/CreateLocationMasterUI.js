@@ -103,9 +103,9 @@ const CreateLocationMasterUI = ({route, navigation, ...props}) => {
       const filtered = statusList.filter(user =>
         user.name.toLowerCase().includes(text.toLowerCase()),
       );
-      setFilteredStatus(filtered);
+      setFilteredCustomer(filtered);
     } else {
-      setFilteredStatus(statusList);
+      setFilteredCustomer(statusList);
     }
   };
 
@@ -337,7 +337,7 @@ const CreateLocationMasterUI = ({route, navigation, ...props}) => {
                 width: wp('90%'),
               }}
               onPress={() => {
-                set_showLocationList(!showCustomerList);
+                setShowCustomerList(!showCustomerList);
               }}>
               <View>
                 <View style={[styles.SectionStyle1, {}]}>
