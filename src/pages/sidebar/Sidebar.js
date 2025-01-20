@@ -14,9 +14,12 @@ import {Easing} from 'react-native';
 import { ColorContext } from '../../components/colorTheme/colorTheme';
 import { useFocusEffect } from '@react-navigation/native';
 
+
+
 const dropdownMenus = {
   style: {
     label: 'Style Management',
+    menu_id: 3,
     icon: require('../../../assets/images/png/shirt.png'),
     style: [
       {
@@ -33,6 +36,7 @@ const dropdownMenus = {
   },
   order: {
     label: 'Order Management',
+    menu_id: 28,
     icon: require('../../../assets/images/png/orderrr.png'),
     style: [
       {
@@ -43,7 +47,8 @@ const dropdownMenus = {
     ],
   },
   masters: {
-    label: 'Master',
+    label: 'Masters',
+    menu_id: 1,
     icon: require('../../../assets/images/png/mentor.png'),
     style: [
       {
@@ -91,10 +96,16 @@ const dropdownMenus = {
         route: 'ColorMasterList',
         src: require('../../../assets/images/png/measuring-tape.png'),
       },
+      {
+        label: 'Vendor/Customer Master',
+        route: 'VendorOrCustomerMasterList',
+        src: require('../../../assets/images/png/measuring-tape.png'),
+      },
     ],
   },
   store: {
     label: 'Store Management',
+    menu_id: 96,
     icon: require('../../../assets/images/png/store.png'),
     style: [
       {
@@ -116,6 +127,7 @@ const dropdownMenus = {
   },
   inventory: {
     label: 'Inventory',
+    menu_id: 91,
     icon: require('../../../assets/images/png/inventoryy.png'),
     style: [
       {
@@ -137,6 +149,7 @@ const dropdownMenus = {
   },
   inhouseProduction: {
     label: 'Inhouse Production',
+    menu_id: 2,
     icon: require('../../../assets/images/png/inbox-in.png'),
     style: [
       {
@@ -163,6 +176,7 @@ const dropdownMenus = {
   },
   outwardProcess: {
     label: 'Outward Process',
+    menu_id: 46,
     icon: require('../../../assets/images/png/out-of-the-box.png'),
     style: [
       {
@@ -184,6 +198,7 @@ const dropdownMenus = {
   },
   reports: {
     label: 'Reports',
+    menu_id: 100,
     icon: require('../../../assets/images/png/sales.png'),
     style: [
       {
@@ -216,6 +231,8 @@ const dropdownMenus = {
 };
 
 const Sidebar = ({navigation}) => {
+
+  
   const [userName, set_userName] = useState('');
   const [admin, set_admin] = useState('');
   const [companyName, set_companyName] = useState('');
@@ -326,7 +343,6 @@ const Sidebar = ({navigation}) => {
       setTempBackgroundEffect({[key]: true});
       setTimeout(() => setTempBackgroundEffect({[key]: false}), 2000);
 
-      // console.log("slected dropdown ====> ", menu.style[0].label==="Location Wise Style Inventory");
       // Animate dropdown height
       Animated.timing(animationValue, {
         toValue: isSelected ? 0 : menu.style[0].label==="Location Wise Style Inventory" ? menu.style.length * 80 : menu.style.length * 60, 
@@ -512,10 +528,6 @@ const Sidebar = ({navigation}) => {
     </View>
   );
 };
-
-
-
-
 
 
 export default Sidebar;
@@ -734,54 +746,27 @@ deleteText: {color: '#f00', marginTop: 5, fontSize: 14},
 });
 
 
-// Reusable Components
-// const NavItem = ({title, icon, onPress}) => (
-//   <TouchableOpacity style={styles.navItem} onPress={onPress}>
-//     <Image style={styles.navIcon} source={icon} />
-//     <Text style={styles.navText}>{title}</Text>
-//   </TouchableOpacity>
-// );
 
-
- {/* Logout and Delete */}
-      {/* <View style={styles.bottomSection}>
-        <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
-          <Image
-            style={styles.logoutIcon}
-            source={require('../../../assets/images/png/logOut.png')}
-          />
-          <Text style={styles.logoutText}>Logout</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.deleteButton}>
-          <Image
-            style={styles.deleteIcon}
-            source={require('../../../assets/images/png/bin.png')}
-          />
-          <Text style={styles.deleteText}>Delete Account</Text>
-        </TouchableOpacity>
-      </View> */}
-
-{/* <View style={styles.bottomSection}>
-  <TouchableOpacity
-    onPress={handleLogout}
-    style={[styles.actionButton, styles.logoutButton]}
-  >
-    <Image
-      style={styles.iconStyle}
-      source={require('../../../assets/images/png/logOut.png')}
-    />
-    <Text style={[styles.textStyle, styles.logoutText]}>Logout</Text>
-  </TouchableOpacity>
-
-  <TouchableOpacity
-    onPress={() => setModalVisible(true)}
-    style={[styles.actionButton, styles.deleteButton]}
-  >
-    <Image
-      style={styles.iconStyle}
-      source={require('../../../assets/images/png/bin.png')}
-    />
-    <Text style={[styles.textStyle, styles.deleteText]}>Delete Account</Text>
-  </TouchableOpacity>
-</View> */}
+// [
+//   { menu_id: 28, menu_name: 'Order Management' },
+//   { menu_id: 320, menu_name: 'Production Planning' },
+//   { menu_id: 2, menu_name: 'In-House Production' },
+//   { menu_id: 46, menu_name: 'Out Processes' },
+//   { menu_id: 174, menu_name: 'Washing Process' },
+//   { menu_id: 52, menu_name: 'Yarn Processes' },
+//   { menu_id: 3, menu_name: 'Style Management' },
+//   { menu_id: 1, menu_name: 'Masters' },
+//   { menu_id: 91, menu_name: 'Inventory Management' },
+//   { menu_id: 448, menu_name: 'Vendor Portal' },
+//   { menu_id: 392, menu_name: 'Notification ' },
+//   { menu_id: 96, menu_name: 'Store Management' },
+//   { menu_id: 116, menu_name: 'Packing' },
+//   { menu_id: 381, menu_name: 'Menu Configuration' },
+//   { menu_id: 111, menu_name: 'Login Management' },
+//   { menu_id: 465, menu_name: 'Field Configuration' },
+//   { menu_id: 192, menu_name: 'Quality' },
+//   { menu_id: 100, menu_name: 'Reports' },
+//   { menu_id: 497, menu_name: 'HR Module' },
+//   { menu_id: 341, menu_name: 'Accounts' },
+//   { menu_id: 616, menu_name: 'Your Plan & Billing' }
+// ]

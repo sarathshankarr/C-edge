@@ -4,7 +4,6 @@ import * as Constant from "../../../utils/constants/constant";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { useNavigation } from '@react-navigation/native';
-import CreateUomMasterUI from './CreateColorMasterUI';
 import CreateColorMasterUI from './CreateColorMasterUI';
 
 const CreateColorMasterComponent = ({ route }) => {

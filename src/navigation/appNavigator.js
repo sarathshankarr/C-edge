@@ -94,6 +94,9 @@ import SaveScaleOrSizeMaster from '../components/masters/ScaleOrSizeGroupMaster/
 import CreateColorMasterComponent from '../components/masters/Color Master/CreateColorMasterComponent';
 import ColorMasterList from '../components/masters/Color Master/ColorMasterList';
 import SaveColorMaster from '../components/masters/Color Master/SaveColorMaster';
+import CreateVendorOrCustomerMasterComponent from '../components/masters/VendorOrCustomerMaster/CreateVendorOrCustomerMasterComponent';
+import VendorOrCustomerMasterList from '../components/masters/VendorOrCustomerMaster/VendorOrCustomerMasterList';
+import VendorOrCustomerMasterEdit from '../components/masters/VendorOrCustomerMaster/VendorOrCustomerMasterEdit';
 
 
 const Stack = createNativeStackNavigator();
@@ -191,6 +194,9 @@ const AppStack = () => {
       <Stack.Screen name="CreateColorMasterComponent" component={CreateColorMasterComponent} options={{ headerShown: false }} /> 
       <Stack.Screen name="ColorMasterList" component={ColorMasterList} options={{ headerShown: false }} /> 
       <Stack.Screen name="SaveColorMaster" component={SaveColorMaster} options={{ headerShown: false }} /> 
+      <Stack.Screen name="CreateVendorOrCustomerMasterComponent" component={CreateVendorOrCustomerMasterComponent} options={{ headerShown: false }} /> 
+      <Stack.Screen name="VendorOrCustomerMasterList" component={VendorOrCustomerMasterList} options={{ headerShown: false }} /> 
+      <Stack.Screen name="VendorOrCustomerMasterEdit" component={VendorOrCustomerMasterEdit} options={{ headerShown: false }} /> 
     </Stack.Navigator>
   );
 };
