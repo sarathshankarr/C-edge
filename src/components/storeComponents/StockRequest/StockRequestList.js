@@ -66,7 +66,7 @@ const StockRequestList = ({ navigation, route, ...props }) => {
 
   }
 
-  console.log("stock req list req ==> ", obj);
+  // console.log("stock req list req ==> ", obj);
 
     let stockStylesAPIObj = await APIServiceCall.stockRequestListDetails(obj);
     set_isLoading(false);
