@@ -657,6 +657,7 @@ const CreateRequestUi = ({route, ...props}) => {
       );
     }
   };
+  
   const getFabQtyByLocation = async () => {
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
@@ -723,9 +724,10 @@ const CreateRequestUi = ({route, ...props}) => {
   const ApproveAction = () => {
     console.log('Approved');
 
-    // if(rows.length<=0){
-    //   Alert("")
-    // }
+    if(rows.length==0  && displayStyleRadio!=='Yes'){
+      Alert("Please select Stock Details !");
+      return;
+    }
 
 
     const requestDetails = rows.map(detail => ({
@@ -739,6 +741,18 @@ const CreateRequestUi = ({route, ...props}) => {
       uomstock: detail.uom,
     }));
 
+     const requestDetails2 = [{
+      stockType:  0,
+      stockTypeName: '',
+      stock:  0,
+      stock_rm_lot: 0,
+      stockLocationId: 0,
+      styleRmSizeId: '',
+      inputQty: '',
+      uomstock: '',
+    }];
+
+   
     let tempObj = {
       processId: processId,
       woStyleId: stylesId,
@@ -751,7 +765,7 @@ const CreateRequestUi = ({route, ...props}) => {
       buyerpowise: buyerRadio === 'Yes' ? '1' : '0',
       fabricQty: enteredFabQty,
       uom: itemsObj?.uomfabric,
-      rmDetails: requestDetails,
+      rmDetails:  displayStyleRadio==='Yes' ? requestDetails2 : requestDetails,
       ts_create:date
     };
     props.submitAction(tempObj);

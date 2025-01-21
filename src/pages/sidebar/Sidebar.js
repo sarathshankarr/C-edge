@@ -16,222 +16,231 @@ import { useFocusEffect } from '@react-navigation/native';
 
 
 
-const dropdownMenus = {
-  style: {
-    label: 'Style Management',
-    menu_id: 3,
-    icon: require('../../../assets/images/png/shirt.png'),
-    style: [
-      {
-        label: 'Style',
-        route: 'StyleManageComponent',
-        src: require('../../../assets/images/png/shirt.png'),
-      },
-      {
-        label: 'Design Directory Approval',
-        route: 'DDAList',
-        src: require('../../../assets/images/png/website.png'),
-      },
-    ],
-  },
-  order: {
-    label: 'Order Management',
-    menu_id: 28,
-    icon: require('../../../assets/images/png/orderrr.png'),
-    style: [
-      {
-        label: 'PO Approval',
-        route: 'POApproveListComponent',
-        src: require('../../../assets/images/png/stamp.png'),
-      },
-    ],
-  },
-  masters: {
-    label: 'Masters',
-    menu_id: 1,
-    icon: require('../../../assets/images/png/mentor.png'),
-    style: [
-      {
-        label: 'Fabric',
-        route: 'masterFabricList',
-        src: require('../../../assets/images/png/textile.png'),
-      },
-      {
-        label: 'Raw Materials Master',
-        route: 'RawMaterialsMasterList',
-        src: require('../../../assets/images/png/metal.png'),
-      },
-      {
-        label: 'UOM Master',
-        route: 'UomMasterList',
-        src: require('../../../assets/images/png/measuring-tape.png'),
-      },
-      {
-        label: 'Location Master',
-        route: 'LocationMasterList',
-        src: require('../../../assets/images/png/measuring-tape.png'),
-      },
-      {
-        label: 'Raw Material Type',
-        route: 'RawMaterialTypeList',
-        src: require('../../../assets/images/png/measuring-tape.png'),
-      },
-      {
-        label: 'Season Group Master',
-        route: 'SeasonMasterList',
-        src: require('../../../assets/images/png/measuring-tape.png'),
-      },
-      {
-        label: 'Size Master',
-        route: 'SizeMasterList',
-        src: require('../../../assets/images/png/measuring-tape.png'),
-      },
-      {
-        label: 'Scale/Size group Master',
-        route: 'ScaleOrSizeMasterList',
-        src: require('../../../assets/images/png/measuring-tape.png'),
-      },
-      {
-        label: 'Color  Master',
-        route: 'ColorMasterList',
-        src: require('../../../assets/images/png/measuring-tape.png'),
-      },
-      {
-        label: 'Vendor/Customer Master',
-        route: 'VendorOrCustomerMasterList',
-        src: require('../../../assets/images/png/measuring-tape.png'),
-      },
-    ],
-  },
-  store: {
-    label: 'Store Management',
-    menu_id: 96,
-    icon: require('../../../assets/images/png/store.png'),
-    style: [
-      {
-        label: 'Store Request',
-        route: 'StockRequestList',
-        src: require('../../../assets/images/png/stockRequest.png'),
-      },
-      {
-        label: 'Store Approval',
-        route: 'StoreApproveListComponent',
-        src: require('../../../assets/images/png/stockApproval.png'),
-      },
-      {
-        label: 'Store Receive',
-        route: 'StockRecieveList',
-        src: require('../../../assets/images/png/stockRecieve.png'),
-      },
-    ],
-  },
-  inventory: {
-    label: 'Inventory',
-    menu_id: 91,
-    icon: require('../../../assets/images/png/inventoryy.png'),
-    style: [
-      {
-        label: 'Location Wise Style Inventory',
-        route: 'StyleLocationInventory',
-        src: require('../../../assets/images/png/tracking.png'),
-      },
-      {
-        label: 'Location wise RM/Fabric Inventory',
-        route: 'LocationWiseRMFabInv',
-        src: require('../../../assets/images/png/consignment.png'),
-      },
-      {
-        label: 'Style Wise RM/Fabric Inventory',
-        route: 'LocationStyleWiseInventory',
-        src: require('../../../assets/images/png/inventory.png'),
-      },
-    ],
-  },
-  inhouseProduction: {
-    label: 'Inhouse Production',
-    menu_id: 2,
-    icon: require('../../../assets/images/png/inbox-in.png'),
-    style: [
-      {
-        label: 'Cutting in',
-        route: 'CuttingMainComponent',
-        src: require('../../../assets/images/png/scissors.png'),
-      },
-      {
-        label: 'Stitching in',
-        route: 'StichingInComponent',
-        src: require('../../../assets/images/png/sewing.png'),
-      },
-      {
-        label: 'Finishing in',
-        route: 'FinishingStyleComponent',
-        src: require('../../../assets/images/png/success.png'),
-      },
-      {
-        label: 'Fabric Process in',
-        route: 'FabricProcessInList',
-        src: require('../../../assets/images/png/fabricProce.png'),
-      },
-    ],
-  },
-  outwardProcess: {
-    label: 'Outward Process',
-    menu_id: 46,
-    icon: require('../../../assets/images/png/out-of-the-box.png'),
-    style: [
-      {
-        label: 'Stitching Out',
-        route: 'StichingOutComponent',
-        src: require('../../../assets/images/png/sewing.png'),
-      },
-      {
-        label: 'Finishing Out',
-        route: 'FinishingOutListComponent',
-        src: require('../../../assets/images/png/success.png'),
-      },
-      {
-        label: 'Gate Pass Acknowledgement',
-        route: 'GatePassAckList',
-        src: require('../../../assets/images/png/acknowledge.png'),
-      },
-    ],
-  },
-  reports: {
-    label: 'Reports',
-    menu_id: 100,
-    icon: require('../../../assets/images/png/sales.png'),
-    style: [
-      {
-        label: 'Inventory Consumption Report',
-        route: 'InventoryConsumptionReport',
-        src: require('../../../assets/images/png/report.png'),
-      },
-      {
-        label: 'Sales Order Report',
-        route: 'SalesOrderReport',
-        src: require('../../../assets/images/png/report.png'),
-      },
-      {
-        label: 'Production Process Report',
-        route: 'ProductionProcessReport',
-        src: require('../../../assets/images/png/report.png'),
-      },
-      {
-        label: 'Style Bom Report',
-        route: 'StyleBomReport',
-        src: require('../../../assets/images/png/report.png'),
-      },
-      {
-        label: 'Worker Wages Report',
-        route: 'WorkerWagesReport',
-        src: require('../../../assets/images/png/report.png'),
-      },
-    ],
-  },
-};
+
 
 const Sidebar = ({navigation}) => {
 
+  const { colors,menuIds } = useContext(ColorContext);
+  // console.log("reciewved color and menuIDs ==> ", colors.color2,menuIds)
+  const dropdownMenus = {
+    style: {
+      label: 'Style Management',
+      menu_id: 3,
+      icon: require('../../../assets/images/png/shirt.png'),
+      style: [
+        {
+          label: 'Style',
+          route: 'StyleManageComponent',
+          src: require('../../../assets/images/png/shirt.png'),
+        },
+        {
+          label: 'Design Directory Approval',
+          route: 'DDAList',
+          src: require('../../../assets/images/png/website.png'),
+        },
+      ],
+    },
+    order: {
+      label: 'Order Management',
+      menu_id: 28,
+      icon: require('../../../assets/images/png/orderrr.png'),
+      style: [
+        {
+          label: 'PO Approval',
+          route: 'POApproveListComponent',
+          src: require('../../../assets/images/png/stamp.png'),
+        },
+      ],
+    },
+    masters: {
+      label: 'Masters',
+      menu_id: 1,
+      icon: require('../../../assets/images/png/mentor.png'),
+      style: [
+        {
+          label: 'Fabric',
+          route: 'masterFabricList',
+          src: require('../../../assets/images/png/textile.png'),
+        },
+        {
+          label: 'Raw Materials Master',
+          route: 'RawMaterialsMasterList',
+          src: require('../../../assets/images/png/metal.png'),
+        },
+        {
+          label: 'UOM Master',
+          route: 'UomMasterList',
+          src: require('../../../assets/images/png/measuring-tape.png'),
+        },
+        {
+          label: 'Location Master',
+          route: 'LocationMasterList',
+          src: require('../../../assets/images/png/measuring-tape.png'),
+        },
+        {
+          label: 'Raw Material Type',
+          route: 'RawMaterialTypeList',
+          src: require('../../../assets/images/png/measuring-tape.png'),
+        },
+        {
+          label: 'Season Group Master',
+          route: 'SeasonMasterList',
+          src: require('../../../assets/images/png/measuring-tape.png'),
+        },
+        {
+          label: 'Size Master',
+          route: 'SizeMasterList',
+          src: require('../../../assets/images/png/measuring-tape.png'),
+        },
+        {
+          label: 'Scale/Size group Master',
+          route: 'ScaleOrSizeMasterList',
+          src: require('../../../assets/images/png/measuring-tape.png'),
+        },
+        {
+          label: 'Color  Master',
+          route: 'ColorMasterList',
+          src: require('../../../assets/images/png/measuring-tape.png'),
+        },
+        {
+          label: 'Vendor/Customer Master',
+          route: 'VendorOrCustomerMasterList',
+          src: require('../../../assets/images/png/measuring-tape.png'),
+        },
+      ],
+    },
+    store: {
+      label: 'Store Management',
+      menu_id: 96,
+      icon: require('../../../assets/images/png/store.png'),
+      style: [
+        {
+          label: 'Store Request',
+          route: 'StockRequestList',
+          src: require('../../../assets/images/png/stockRequest.png'),
+        },
+        {
+          label: 'Store Approval',
+          route: 'StoreApproveListComponent',
+          src: require('../../../assets/images/png/stockApproval.png'),
+        },
+        {
+          label: 'Store Receive',
+          route: 'StockRecieveList',
+          src: require('../../../assets/images/png/stockRecieve.png'),
+        },
+      ],
+    },
+    inventory: {
+      label: 'Inventory',
+      menu_id: 91,
+      icon: require('../../../assets/images/png/inventoryy.png'),
+      style: [
+        {
+          label: 'Location Wise Style Inventory',
+          route: 'StyleLocationInventory',
+          src: require('../../../assets/images/png/tracking.png'),
+        },
+        {
+          label: 'Location wise RM/Fabric Inventory',
+          route: 'LocationWiseRMFabInv',
+          src: require('../../../assets/images/png/consignment.png'),
+        },
+        {
+          label: 'Style Wise RM/Fabric Inventory',
+          route: 'LocationStyleWiseInventory',
+          src: require('../../../assets/images/png/inventory.png'),
+        },
+      ],
+    },
+    inhouseProduction: {
+      label: 'Inhouse Production',
+      menu_id: 2,
+      icon: require('../../../assets/images/png/inbox-in.png'),
+      style: [
+        {
+          label: 'Cutting in',
+          route: 'CuttingMainComponent',
+          src: require('../../../assets/images/png/scissors.png'),
+        },
+        {
+          label: 'Stitching in',
+          route: 'StichingInComponent',
+          src: require('../../../assets/images/png/sewing.png'),
+        },
+        {
+          label: 'Finishing in',
+          route: 'FinishingStyleComponent',
+          src: require('../../../assets/images/png/success.png'),
+        },
+        {
+          label: 'Fabric Process in',
+          route: 'FabricProcessInList',
+          src: require('../../../assets/images/png/fabricProce.png'),
+        },
+      ],
+    },
+    outwardProcess: {
+      label: 'Outward Process',
+      menu_id: 46,
+      icon: require('../../../assets/images/png/out-of-the-box.png'),
+      style: [
+        {
+          label: 'Stitching Out',
+          route: 'StichingOutComponent',
+          src: require('../../../assets/images/png/sewing.png'),
+        },
+        {
+          label: 'Finishing Out',
+          route: 'FinishingOutListComponent',
+          src: require('../../../assets/images/png/success.png'),
+        },
+        {
+          label: 'Gate Pass Acknowledgement',
+          route: 'GatePassAckList',
+          src: require('../../../assets/images/png/acknowledge.png'),
+        },
+      ],
+    },
+    reports: {
+      label: 'Reports',
+      menu_id: 100,
+      icon: require('../../../assets/images/png/sales.png'),
+      style: [
+        {
+          label: 'Inventory Consumption Report',
+          route: 'InventoryConsumptionReport',
+          src: require('../../../assets/images/png/report.png'),
+        },
+        {
+          label: 'Sales Order Report',
+          route: 'SalesOrderReport',
+          src: require('../../../assets/images/png/report.png'),
+        },
+        {
+          label: 'Production Process Report',
+          route: 'ProductionProcessReport',
+          src: require('../../../assets/images/png/report.png'),
+        },
+        {
+          label: 'Style Bom Report',
+          route: 'StyleBomReport',
+          src: require('../../../assets/images/png/report.png'),
+        },
+        {
+          label: 'Worker Wages Report',
+          route: 'WorkerWagesReport',
+          src: require('../../../assets/images/png/report.png'),
+        },
+      ],
+    },
+  };
+
+  const filteredMenus = Object.fromEntries(
+    Object.entries(dropdownMenus).filter(([key, menu]) =>
+      menuIds.includes(menu.menu_id)
+    )
+  );
   
   const [userName, set_userName] = useState('');
   const [admin, set_admin] = useState('');
@@ -242,7 +251,6 @@ const Sidebar = ({navigation}) => {
   const [selectedDropdown, setSelectedDropdown] = useState(null);
   const [tempBackgroundEffect, setTempBackgroundEffect] = useState({}); 
   
-  const { colors } = useContext(ColorContext);
   const styles = getStyles(colors);
 
 
@@ -470,17 +478,17 @@ const Sidebar = ({navigation}) => {
       <ScrollView
         style={styles.scrollContainer}
         contentContainerStyle={styles.scrollContent}>
-        <View style={styles.navContainer}>
+        {/* <View style={styles.navContainer}>
           <NavItem
             title="Home"
             icon={require('../../../assets/images/png/homeN.png')}
             onPress={() => navigation.navigate('NewComponent')}
           />
-        </View>
+        </View> */}
       
 
-        {Object.entries(dropdownMenus).map(([key, menu], index) => (
-          <View key={index}>
+        {Object.entries(filteredMenus).map(([key, menu], index) => (
+          <View key={menu.menu_id}>
             {renderDropdown(key, menu)}
           </View>
         ))}

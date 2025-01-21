@@ -95,7 +95,7 @@ const SettingsSidebar = ({navigation}) => {
   const [companyList, setcompanyList] = useState({});
   const [selectedCompanyName, setselectedCompanyName] = useState('');
   const [selectedCompanyId, setselectedCompanyId] = useState(0);
-  const {colors, updateColor, updateAllColors} = useContext(ColorContext);
+  const {colors, updateColor, updateAllColors,updateMenuIds} = useContext(ColorContext);
   const [query, setquery] = useState('');
 
   const styles = getStyles(colors);
@@ -155,6 +155,9 @@ const SettingsSidebar = ({navigation}) => {
       await AsyncStorage.removeItem('companyIds');
       await AsyncStorage.removeItem('brandIds');
       await AsyncStorage.removeItem('CurrentCompanyLocations');
+      // const ans=[341, 497];
+      // updateMenuIds(ans);
+      
       navigation.reset({
         index: 0,
         routes: [{name: 'LoginComponent'}],

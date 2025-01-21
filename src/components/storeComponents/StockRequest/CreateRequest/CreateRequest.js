@@ -292,7 +292,7 @@ const CreateRequest = ({ navigation, route, ...props }) => {
     set_isLoading(false);
 
     if (SAVEAPIObj && SAVEAPIObj.statusData && SAVEAPIObj.responseData !== "false") {
-      console.log("Sucessfully saved edit stock");
+      console.log("Sucessfully saved create stock");
       backBtnAction();
     } else {
       popUpAction(Constant.Fail_Save_Dtls_MSG, Constant.DefaultAlert_MSG, 'OK', true, false);

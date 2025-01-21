@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Keyboard } from 'react-native';
 import LoginUI from './loginUI';
 import * as APIServiceCall from './../../utils/apiCalls/apiCallsComponent';
@@ -10,9 +10,11 @@ import { isValidUrl } from '../../utils/helper/helper';
 import { setUrlInGlobal } from '../../config/environment/environmentConfig';
 import axios from 'axios';
 import useOnlineStatus from '../../utils/Hooks/useOnlineStatus';
-
+import { ColorContext } from '../colorTheme/colorTheme';
 
 const LoginComponent = ({ navigation, route, ...props }) => {
+
+  const { updateMenuIds } = useContext(ColorContext);
 
   const [isHidePassword, set_isHidePassword] = useState(true);
   const [code, set_code] = useState('');
@@ -141,10 +143,15 @@ const LoginComponent = ({ navigation, route, ...props }) => {
         if (loginAPIObj?.responseData?.brandIds) await AsyncStorage.setItem('brandIds', (loginAPIObj.responseData.brandIds));
 
         if (loginAPIObj?.responseData?.locIds && loginAPIObj?.responseData?.usercompanyId) {
-
           const extractedLocationIds = await Constant.extractLocationIds(loginAPIObj?.responseData?.locIds, loginAPIObj?.responseData?.usercompanyId)
           console.log("CurrentCompanyLocations", extractedLocationIds);
           await AsyncStorage.setItem('CurrentCompanyLocations', extractedLocationIds);
+        }
+
+        if (loginAPIObj?.responseData?.menusList) {
+          const menus=loginAPIObj?.responseData?.menusList;
+          const MenuListIds=menus.map((item)=> item.menu_id);
+          updateMenuIds(MenuListIds);
         }
 
         if (isChecked) {
