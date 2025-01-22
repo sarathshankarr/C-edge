@@ -18,18 +18,16 @@ const CreateRawMaterialsMasterComponent = ({ route }) => {
 
   
   const [lists, set_lists] = useState({
-    processMap: [],
-    machineNosMap: [],
-    shiftMap: [],
-    empMap: [],
-    batchNoMap: [],
-    ordersMap: [],
-    colorsMap: [],
+    trimTypesMap: [],
+    uomMap: [],
+    colorMap: [],
+    locationsMap: [],
+    brandsMap: [],
   });
 
 
   React.useEffect(() => {
-    // getInitialData();
+    getInitialData();
   }, []);
 
 
@@ -43,114 +41,87 @@ const CreateRawMaterialsMasterComponent = ({ route }) => {
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
     let companyObj = await AsyncStorage.getItem('companyObj');
-    
+
     set_isLoading(true);
     let obj = {
       "username": userName,
       "password": userPsd,
-      "menuId": 587,
+      "menuId": 69,
+      "flag": 1,
       "compIds": usercompanyId,
       "company":JSON.parse(companyObj),
 
     }
-    let LISTAPIOBJ = await APIServiceCall.GetProcessList(obj);
+    let LISTAPIOBJ = await APIServiceCall.GetCreateDropdownsList(obj);
     set_isLoading(false);
 
     if (LISTAPIOBJ && LISTAPIOBJ.statusData) {
       if (LISTAPIOBJ && LISTAPIOBJ.responseData) {
 
-        if (LISTAPIOBJ?.responseData?.processMap) {
-          const processList = Object.keys(LISTAPIOBJ.responseData.processMap).map(key => ({
+       
+        if (LISTAPIOBJ?.responseData?.trimTypesMap) {
+          const trimTypesMapList = Object.keys(LISTAPIOBJ.responseData.trimTypesMap).map(key => ({
             id: key,
-            name: LISTAPIOBJ.responseData.processMap[key]
-          }));
-          set_lists(prevLists => ({
-            ...prevLists,
-            processMap: processList
-          }));
-        }
-
-        console.log("LISTAPIOBJ?.responseData?.machineNosMap===> ", LISTAPIOBJ?.responseData?.machineNosMap)
-        if (LISTAPIOBJ?.responseData?.machineNosMap) {
-          const machineNosList = Object.keys(LISTAPIOBJ.responseData.machineNosMap).map(key => ({
-            id: key,
-            name: LISTAPIOBJ.responseData.machineNosMap[key]
+            name: LISTAPIOBJ.responseData.trimTypesMap[key]
           }));
 
-          const prioritizedMachine = { id: "ADD", name: "Add Machine No" }; // Define your first element
-          const updatedMachineNosList = [prioritizedMachine, ...machineNosList];
+          const prioritizedMachine = { id: "ADD_NEW_TRIMTYPE", name: "Add New Raw Material Type" }; // Define your first element
+          const updatedtrimTypesMapList = [prioritizedMachine, ...trimTypesMapList];
       
           set_lists(prevLists => ({
               ...prevLists,
-              machineNosMap: updatedMachineNosList
+              trimTypesMap: updatedtrimTypesMapList
+          }));
+        }
+        if (LISTAPIOBJ?.responseData?.uomMap) {
+          const uomMapList = Object.keys(LISTAPIOBJ.responseData.uomMap).map(key => ({
+            id: key,
+            name: LISTAPIOBJ.responseData.uomMap[key]
           }));
 
-
-          // set_lists(prevLists => ({
-          //   ...prevLists,
-          //   machineNosMap: machineNosList
-          // }));
+          const prioritizeduomMap = { id: "ADD_NEW_UOM", name: "Add New UOM" }; // Define your first element
+          const updateduomMapList = [prioritizeduomMap, ...uomMapList];
+      
+          set_lists(prevLists => ({
+              ...prevLists,
+              uomMap: updateduomMapList
+          }));
         }
-
-        // Handle shiftMap
-        if (LISTAPIOBJ?.responseData?.shiftMap) {
-          const shiftList = Object.keys(LISTAPIOBJ.responseData.shiftMap).map(key => ({
+        if (LISTAPIOBJ?.responseData?.colorMap) {
+          const colorMapList = Object.keys(LISTAPIOBJ.responseData.colorMap).map(key => ({
             id: key,
-            name: LISTAPIOBJ.responseData.shiftMap[key]
+            name: LISTAPIOBJ.responseData.colorMap[key]
+          }));
+
+          const prioritizedcolorMap = { id: "ADD_NEW_COLOR", name: "Add New Color" }; 
+          const updatedcolorMapList = [prioritizedcolorMap, ...colorMapList];
+
+          set_lists(prevLists => ({
+            ...prevLists,
+            colorMap: updatedcolorMapList
+          }));
+        }
+        if (LISTAPIOBJ?.responseData?.locationsMap) {
+          const locationsMapList = Object.keys(LISTAPIOBJ.responseData.locationsMap).map(key => ({
+            id: key,
+            name: LISTAPIOBJ.responseData.locationsMap[key]
           }));
           set_lists(prevLists => ({
             ...prevLists,
-            shiftMap: shiftList
+            locationsMap: locationsMapList
           }));
         }
-
-        // Handle empMap
-        if (LISTAPIOBJ?.responseData?.empMap) {
-          const empList = Object.keys(LISTAPIOBJ.responseData.empMap).map(key => ({
+        if (LISTAPIOBJ?.responseData?.brandsMap) {
+          const brandsMapList = Object.keys(LISTAPIOBJ.responseData.brandsMap).map(key => ({
             id: key,
-            name: LISTAPIOBJ.responseData.empMap[key]
+            name: LISTAPIOBJ.responseData.brandsMap[key]
           }));
           set_lists(prevLists => ({
             ...prevLists,
-            empMap: empList
+            brandsMap: brandsMapList
           }));
         }
-
-        // Handle batchNoMap
-        if (LISTAPIOBJ?.responseData?.batchNoMap) {
-          const batchNoList = Object.keys(LISTAPIOBJ.responseData.batchNoMap).map(key => ({
-            id: key,
-            name: LISTAPIOBJ.responseData.batchNoMap[key]
-          }));
-          set_lists(prevLists => ({
-            ...prevLists,
-            batchNoMap: batchNoList
-          }));
-        }
-
-        // Handle ordersMap
-        if (LISTAPIOBJ?.responseData?.ordersMap) {
-          const ordersList = Object.keys(LISTAPIOBJ.responseData.ordersMap).map(key => ({
-            id: key,
-            name: LISTAPIOBJ.responseData.ordersMap[key]
-          }));
-          set_lists(prevLists => ({
-            ...prevLists,
-            ordersMap: ordersList  // Store the array format
-          }));
-        }
-
-        // Handle colorsMap
-        if (LISTAPIOBJ?.responseData?.colorsMap) {
-          const colorsList = Object.keys(LISTAPIOBJ.responseData.colorsMap).map(key => ({
-            id: key,
-            name: LISTAPIOBJ.responseData.colorsMap[key]
-          }));
-          set_lists(prevLists => ({
-            ...prevLists,
-            colorsMap: colorsList  // Store the array format
-          }));
-        }
+   
       }
     }
     else {
@@ -180,23 +151,27 @@ const CreateRawMaterialsMasterComponent = ({ route }) => {
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
     let companyObj = await AsyncStorage.getItem('companyObj');
+    let userId = await AsyncStorage.getItem('userId');
 
+  
+    tempObj.menuid = 69;
     tempObj.username = userName;
     tempObj.password = userPsd;
+    tempObj.userId = userId;
     tempObj.compIds = usercompanyId;
+    tempObj.companyId = usercompanyId;
     tempObj.company = JSON.parse(companyObj);
 
-    console.log("saving obj ==>", tempObj);
 
-
+    console.log("saving obj for create save==>", tempObj);
     set_isLoading(true);
 
-    let SAVEAPIObj = await APIServiceCall.saveCreateProcessIn(tempObj);
+    let SAVEAPIObj = await APIServiceCall.saveCreateRawMaterialMasters(tempObj);
     set_isLoading(false);
 
-    console.log("Sucess before returned obj ", SAVEAPIObj);
+    console.log("Sucess before returned obj ", SAVEAPIObj?.responseData);
 
-    if (SAVEAPIObj && SAVEAPIObj?.statusData && SAVEAPIObj?.responseData !== 0) {
+    if (SAVEAPIObj && SAVEAPIObj?.statusData && SAVEAPIObj?.responseData === "True") {
       console.log("Sucessfully saved ===> ");
       backBtnAction();
     } else {

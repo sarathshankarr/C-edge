@@ -1164,7 +1164,7 @@ export async function saveStitchingInDetails(jsonValue) {
         obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
         return obj;
     }
-    console.log('saveStitchingInDetails ', jsonValue, Environment.uri + "stitching/stitchingInsave")
+    // console.log('saveStitchingInDetails ', jsonValue, Environment.uri + "stitching/stitchingInsave")
     await fetch(Environment.uri + "stitching/stitchingInsave",
         {
             method: "POST",
@@ -1175,7 +1175,7 @@ export async function saveStitchingInDetails(jsonValue) {
             body: JSON.stringify(jsonValue),
         }
     ).then((response) => response.json()).then(async (data) => {
-        console.log('saveStitchingInDetails ', data)
+        // console.log('saveStitchingInDetails ', data)
 
         if (data) {
             statusData = true;
@@ -1753,7 +1753,7 @@ export async function saveStoreApproval(jsonValue) {
         obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
         return obj;
     }
-    console.log('saveStitchingInDetails ', jsonValue, Environment.uri + "stockapprove/saveStockApprove")
+    // console.log('saveStitchingInDetails ', jsonValue, Environment.uri + "stockapprove/saveStockApprove")
     await fetch(Environment.uri + "stockapprove/saveStockApprove",
         {
             method: "POST",
@@ -2788,6 +2788,45 @@ export async function loadAllUomMastersList(jsonValue) {
     obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet }
     return obj;
 };
+export async function loadAllRawMaterialMastersList(jsonValue) {
+
+    let returnError = undefined;
+    let statusData = undefined;
+    let responseData = undefined;
+    let logoutData = false;
+    let obj = undefined;
+
+    let internet = await internetCheck();
+    if (!internet) {
+        obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
+        return obj;
+    }
+    console.log("URL", Environment.uri + "rawmaterials/loadAllRawMaterials");
+    await fetch(Environment.uri + "rawmaterials/loadAllRawMaterials",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            },
+            body: JSON.stringify(jsonValue),
+        }
+    ).then((response) => response.json()).then(async (data) => {
+        if (data) {
+            statusData = true;
+            responseData = data
+        } else {
+            statusData = undefined;
+        }
+
+    }).catch((error) => {
+        console.log('loadAllFabricProcessInList error ', error)
+        returnError = error;
+    });
+
+    obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet }
+    return obj;
+};
 export async function loadAllRawMaterialTypeMastersList(jsonValue) {
 
     let returnError = undefined;
@@ -2842,6 +2881,45 @@ export async function GetProcessList(jsonValue) {
     }
     console.log("URL", Environment.uri + "fabricprocessinapi/apiFabricProcessInAdd");
     await fetch(Environment.uri + "fabricprocessinapi/apiFabricProcessInAdd",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            },
+            body: JSON.stringify(jsonValue),
+        }
+    ).then((response) => response.json()).then(async (data) => {
+        if (data) {
+            statusData = true;
+            responseData = data
+        } else {
+            statusData = undefined;
+        }
+
+    }).catch((error) => {
+        console.log('GetProcessList error ', error)
+        returnError = error;
+    });
+
+    obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet }
+    return obj;
+};
+export async function GetCreateDropdownsList(jsonValue) {
+
+    let returnError = undefined;
+    let statusData = undefined;
+    let responseData = undefined;
+    let logoutData = false;
+    let obj = undefined;
+
+    let internet = await internetCheck();
+    if (!internet) {
+        obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
+        return obj;
+    }
+    console.log("URL", Environment.uri + "rawmaterials/createRawMaterials");
+    await fetch(Environment.uri + "rawmaterials/createRawMaterials",
         {
             method: "POST",
             headers: {
@@ -3154,6 +3232,47 @@ export async function saveCreateProcessIn(jsonValue) {
     }
     // console.log('saveCreateProcessIn ', jsonValue, Environment.uri + "fabricprocessinapi/apisaveFabricProcessIn")
     await fetch(Environment.uri + "fabricprocessinapi/apisaveFabricProcessIn",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            },
+            body: JSON.stringify(jsonValue),
+        }
+    ).then((response) => response.json()).then(async (data) => {
+        // console.log('apisaveFabricProcessIn ', data)
+
+        if (data) {
+            statusData = true;
+            responseData = data
+        } else {
+            statusData = undefined;
+        }
+
+    }).catch((error) => {
+        console.log('apisaveFabricProcessIn', error)
+        returnError = error;
+    });
+
+    obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet }
+    return obj;
+};
+export async function saveCreateRawMaterialMasters(jsonValue) {
+
+    let returnError = undefined;
+    let statusData = undefined;
+    let responseData = undefined;
+    let logoutData = false;
+    let obj = undefined;
+
+    let internet = await internetCheck();
+    if (!internet) {
+        obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
+        return obj;
+    }
+    // console.log('saveCreateProcessIn ', jsonValue, Environment.uri + "rawmaterials/saveRawMaterials")
+    await fetch(Environment.uri + "rawmaterials/saveRawMaterials",
         {
             method: "POST",
             headers: {
@@ -3633,6 +3752,47 @@ export async function getEditDetailsOfRawMaterialTypeMasters(jsonValue) {
     obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet }
     return obj;
 };
+export async function getEditDetailsOfRawMaterialMasters(jsonValue) {
+
+    let returnError = undefined;
+    let statusData = undefined;
+    let responseData = undefined;
+    let logoutData = false;
+    let obj = undefined;
+
+    let internet = await internetCheck();
+    if (!internet) {
+        obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
+        return obj;
+    }
+    // console.log("url ==>", Environment.uri + "rawmaterials/EditRawMaterials", "JSON VALUE ==>", jsonValue)
+    await fetch(Environment.uri + "rawmaterials/EditRawMaterials",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            },
+            body: JSON.stringify(jsonValue),
+        }
+    ).then((response) => response.json()).then(async (data) => {
+        // console.log('apiFabricProcessOutAdd', '', data)
+
+        if (data) {
+            statusData = true;
+            responseData = data
+        } else {
+            statusData = undefined;
+        }
+
+    }).catch((error) => {
+        console.log('apiFabricProcessOutAdd error ', error)
+        returnError = error;
+    });
+
+    obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet }
+    return obj;
+};
 
 export async function SaveFabricProcessInDetails(jsonValue) {
 
@@ -3690,6 +3850,46 @@ export async function SaveUomMastersEdit(jsonValue) {
     }
     // console.log('saveCreateProcessIn ', jsonValue, Environment.uri + "uomapi/saveEditUoms")
     await fetch(Environment.uri + "uomapi/saveEditUoms",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            },
+            body: JSON.stringify(jsonValue),
+        }
+    ).then((response) => response.json()).then(async (data) => {
+        // console.log('apisaveFabricProcessIn ', data)
+
+        if (data) {
+            statusData = true;
+            responseData = data
+        } else {
+            statusData = undefined;
+        }
+
+    }).catch((error) => {
+        console.log('apisaveFabricProcessIn', error)
+        returnError = error;
+    });
+
+    obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet }
+    return obj;
+};
+export async function SaveRawMaterialsMastersEdit(jsonValue) {
+
+    let returnError = undefined;
+    let statusData = undefined;
+    let responseData = undefined;
+    let logoutData = false;
+    let obj = undefined;
+
+    let internet = await internetCheck();
+    if (!internet) {
+        obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
+        return obj;
+    }
+    await fetch(Environment.uri + "rawmaterials/editSaveRawMaterials",
         {
             method: "POST",
             headers: {

@@ -702,7 +702,7 @@ const CreateInProcessUI = ({ route, navigation, ...props }) => {
           }));
           set_filteredDesignNo(designList);
           set_designNoList(designList);
-          console.log("design List ===> ", designList);
+          // console.log("design List ===> ", designList);
 
         }
 
@@ -750,7 +750,7 @@ const CreateInProcessUI = ({ route, navigation, ...props }) => {
         }));
         set_filteredDesignNo(designList);
         set_designNoList(designList);
-        console.log("design List ===> ", designList);
+        // console.log("design List ===> ", designList);
       }
     } else {
       props?.popUpAction(Constant.SERVICE_FAIL_MSG, Constant.DefaultAlert_MSG, 'OK', true, false);

@@ -56,6 +56,7 @@ const StockRecieveEditUi = ({ route, ...props }) => {
       if (props?.itemsObj?.stockreceive_remarks) {
         set_remarks(props?.itemsObj?.stockreceive_remarks);
       }
+      // console.log("props from ===> ", props?.itemsObj)
     }
 
   }, [props?.itemsObj]);
@@ -65,6 +66,7 @@ const StockRecieveEditUi = ({ route, ...props }) => {
 
   const backBtnAction = () => {
     props.backBtnAction();
+    
   };
 
   const popOkBtnAction = () => {
@@ -147,7 +149,7 @@ const StockRecieveEditUi = ({ route, ...props }) => {
           <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: hp('1%') }} >
 
             <TextInputComponent
-              inputText={props.itemsObj ? props.itemsObj.fabric : ''}
+              inputText={props.itemsObj ? props.itemsObj.stylename : ''}
               labelText={'Style(Color)'}
               isEditable={false}
               maxLengthVal={200}
