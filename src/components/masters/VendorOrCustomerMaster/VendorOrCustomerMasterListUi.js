@@ -266,7 +266,7 @@ const VendorOrCustomerMasterListUi = ({route, ...props}) => {
           </View>
 
           {/* Filter Button */}
-          <TouchableOpacity
+          {/* <TouchableOpacity
             style={{
               flexDirection: 'row',
               alignItems: 'center',
@@ -312,7 +312,7 @@ const VendorOrCustomerMasterListUi = ({route, ...props}) => {
             ) : (
               <Text style={{color: '#7F7F81', fontSize: 14}}>{'Filter'}</Text>
             )}
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
 
         {filterArray && filterArray.length > 0 ? (

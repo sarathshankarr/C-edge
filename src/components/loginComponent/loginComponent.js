@@ -14,7 +14,7 @@ import { ColorContext } from '../colorTheme/colorTheme';
 
 const LoginComponent = ({ navigation, route, ...props }) => {
 
-  const { updateMenuIds } = useContext(ColorContext);
+  const { updateMenuIds,clearMenuIds } = useContext(ColorContext);
 
   const [isHidePassword, set_isHidePassword] = useState(true);
   const [code, set_code] = useState('');
@@ -152,6 +152,8 @@ const LoginComponent = ({ navigation, route, ...props }) => {
           const menus=loginAPIObj?.responseData?.menusList;
           const MenuListIds=menus.map((item)=> item.menu_id);
           updateMenuIds(MenuListIds);
+        }else{
+          clearMenuIds();
         }
 
         if (isChecked) {

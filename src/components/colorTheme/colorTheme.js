@@ -14,7 +14,7 @@ const ColorProvider = ({children}) => {
     color5: '#DDD',
   });
 
-  const [menuIds, setMenuIDs] = useState([341,497]);
+  const [menuIds, setMenuIDs] = useState([]);
   // [28, 320, 2, 46, 174, 52, 3, 1, 91, 448, 392, 96, 116, 381, 111, 465, 192,100, 497, 341, 616]
   useEffect(() => {
     const getColorfromStorage = async () => {
