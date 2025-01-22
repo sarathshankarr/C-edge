@@ -24,13 +24,13 @@ const RawMaterialsMasterList = ({ route }) => {
 
     const [hasMore, setHasMore] = useState(true); 
 
-  // React.useEffect(() => {
-  //   getInitialData(0, true);
-  // }, []);
+  React.useEffect(() => {
+    getInitialData(0, true);
+  }, []);
 
   useFocusEffect(
     React.useCallback(() => {
-      // getInitialData(0, true);
+      getInitialData(0, true);
     }, [])
   );
   
@@ -54,7 +54,6 @@ const RawMaterialsMasterList = ({ route }) => {
   }
 
 
-
   const getInitialData = async (page = 0, reload = false) => {
     
     let userName = await AsyncStorage.getItem('userName');
@@ -74,15 +73,17 @@ const RawMaterialsMasterList = ({ route }) => {
       let obj = {  
         "username": userName,
         "password" : userPsd,
-        "menuId": 587,
+        "menuId": 69,
         "fromRecord": fromRecord,
         "toRecord": toRecord,
+        "dataFilter": "60Days",
         "searchKeyValue": "",
         "styleSearchDropdown": "-1",
         "compIds": usercompanyId,
         "company":JSON.parse(companyObj),
+        "flag": 1,
     }
-      let LISTAPIOBJ = await APIServiceCall.loadAllFabricProcessInList(obj);
+      let LISTAPIOBJ = await APIServiceCall.loadAllRawMaterialMastersList(obj);
       set_isLoading(false);
       
       if(LISTAPIOBJ && LISTAPIOBJ.statusData){
@@ -170,8 +171,8 @@ const RawMaterialsMasterList = ({ route }) => {
   };
 
   const actionOnRow = (item,index) => {
-    // console.log("selected item ===>  ", item)
-    navigation.navigate('SaveFabricProcessIn', {id:item?.so_style_id});
+    console.log("NAvigation ==> ", item);
+    navigation.navigate('SaveRawMaterialsMaster', {item:item});
   };
   const actionOnCreate= () => {
     navigation.navigate('CreateInProcess');

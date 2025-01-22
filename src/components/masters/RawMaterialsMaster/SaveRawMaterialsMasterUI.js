@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useContext} from 'react';
+import React, {useState, useEffect, useContext, useMemo} from 'react';
 import {
   View,
   Text,
@@ -23,6 +23,8 @@ import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import {formatDateIntoDMY} from '../../../utils/constants/constant';
 import {RadioButton, TextInput} from 'react-native-paper';
 import {ColorContext} from '../../colorTheme/colorTheme';
+import { RadioGroup } from 'react-native-radio-buttons-group';
+import CustomCheckBox from '../../../utils/commonComponents/CustomCheckBox';
 
 let downArrowImg = require('./../../../../assets/images/png/dropDownImg.png');
 const SaveRawMaterialsMasterUI = ({route, navigation, ...props}) => {
@@ -44,214 +46,313 @@ const SaveRawMaterialsMasterUI = ({route, navigation, ...props}) => {
     }
   }, [props.itemsObj]);
 
-  const [rawMaterialName, setRawMaterialName] = useState('');
-  const [hsn, setHsn] = useState('');
-  const [gstRate, setGstRate] = useState('');
 
-  // Raw Material Type
-  const [rawMaterialTypeList, setRawMaterialTypeList] = useState([]);
-  const [filteredRawMaterialType, set_filteredRawMaterialType] = useState([]);
-  const [showRawMaterialTypeList, set_showRawMaterialTypeList] =
-    useState(false);
-  const [rawMaterialTypeName, set_rawMaterialTypeName] = useState('');
-  const [rawMaterialTypeId, set_rawMaterialTypeId] = useState('');
 
-  const actionOnRawMaterialType = item => {
-    set_rawMaterialTypeId(item.id);
-    set_rawMaterialTypeName(item.name);
-    set_showRawMaterialTypeList(false);
-  };
-
-  const handleSearchRawMaterialType = text => {
-    if (text.trim().length > 0) {
-      const filtered = rawMaterialTypeList.filter(user =>
-        user.name.toLowerCase().includes(text.toLowerCase()),
-      );
-      set_filteredRawMaterialType(filtered);
-    } else {
-      set_filteredRawMaterialType(rawMaterialTypeList);
-    }
-  };
-
-  // Location
-  const [locationList, setLocationList] = useState([]);
-  const [filteredLocation, set_filteredLocation] = useState([]);
-  const [showLocationList, set_showLocationList] = useState(false);
-  const [locationName, set_locationName] = useState('');
-  const [locationId, set_locationId] = useState('');
-
-  const actionOnLocation = item => {
-    set_locationId(item.id);
-    set_locationName(item.name);
-    set_showLocationList(false);
-  };
-
-  const handleSearchLocation = text => {
-    if (text.trim().length > 0) {
-      const filtered = locationList.filter(user =>
-        user.name.toLowerCase().includes(text.toLowerCase()),
-      );
-      set_filteredLocation(filtered);
-    } else {
-      set_filteredLocation(locationList);
-    }
-  };
-
-  // Color
-  const [colorList, setColorList] = useState([]);
-  const [filteredColor, set_filteredColor] = useState([]);
-  const [showColorList, set_showColorList] = useState(false);
-  const [colorName, set_colorName] = useState('');
-  const [colorId, set_colorId] = useState('');
-
-  const actionOnColor = item => {
-    set_colorId(item.id);
-    set_colorName(item.name);
-    set_showColorList(false);
-  };
-
-  const handleSearchColor = text => {
-    if (text.trim().length > 0) {
-      const filtered = colorList.filter(user =>
-        user.name.toLowerCase().includes(text.toLowerCase()),
-      );
-      set_filteredColor(filtered);
-    } else {
-      set_filteredColor(colorList);
-    }
-  };
-
-  // UOM (Unit of Measurement)
-  const [uomList, setUOMList] = useState([]);
-  const [filteredUOM, set_filteredUOM] = useState([]);
-  const [showUOMList, set_showUOMList] = useState(false);
-  const [uomName, set_uomName] = useState('');
-  const [uomId, set_uomId] = useState('');
-
-  const actionOnUOM = item => {
-    set_uomId(item.id);
-    set_uomName(item.name);
-    set_showUOMList(false);
-  };
-
-  const handleSearchUOM = text => {
-    if (text.trim().length > 0) {
-      const filtered = uomList.filter(user =>
-        user.name.toLowerCase().includes(text.toLowerCase()),
-      );
-      set_filteredUOM(filtered);
-    } else {
-      set_filteredUOM(uomList);
-    }
-  };
-
-  const popOkBtnAction = () => {
-    props.popOkBtnAction();
-  };
-
-  const submitAction = async () => {
-    if (!outTime) {
-      Alert.alert('Please Enter outTime  !');
-      return;
-    }
-    if (props.itemsObj.fpt_menuOut_id === 608 && !fabricType) {
-      Alert.alert('Please Enter  Fabric type');
-      return;
-    }
-
-    let obj1 = {
-      printedMtr: table_ip,
-      printedmtrId: table[0]?.poft_id,
-      totalPrintedMtr:
-        Number(table[0]?.poft_tot_printed_mtr) +
-        Number(table_ip ? table_ip : '0'),
-      remainingPrint: table[0]?.poft_remaining_print,
-      matchingId: table[0]?.poft_matcing_id,
-    };
-    const formatted_date = formatDateForSave(date);
-    // let Obj=props?.itemsObj;
-    // Obj.fpt_entry_date=formatted_date,
-    // Obj.fpt_intime=inTime,
-    // Obj.fpt_outtime=outTime,
-    // Obj.fpt_machine_id=MachineNoId,
-    // Obj.fpt_attendby_id=attendedById,
-    // Obj.fpt_roll_trolley=rollNo,
-    // Obj.fpt_fabricProcessed=fabricProcessed
-    // Obj.Fpt_temparature = props.itemsObj.fpt_temparature;
-    // Obj.previousqty =props?.itemsObj?.fpt_issued ;
-    // Obj.inmenuId = props?.itemsObj?.fpt_menuIn_id;
-    // Obj.fpt_printing_id =obj1?.printedmtrId;
-    // Obj.fpt_matching_id = obj1?.matchingId;
-    // Obj.fpt_order_id = props?.itemsObj?.fpt_order_id;
-    // Obj.fpt_desing_id = props?.itemsObj?.fpt_desing_id;
-    // Obj.sfpt_batchNo_id = props?.itemsObj?.fpt_batchNo_id;
-    // Obj.printedMtr = Number(obj1?.printedMtr);
-    // Obj.printedmtrId = obj1?.printedmtrId;
-    // Obj.totalPrintedMtr = obj1?.totalPrintedMtr;
-    // Obj.remainingPrint = obj1?.remainingPrint;
-    // Obj.matchingId = obj1?.matchingId;
-    // console.log("saving, table Obj ==> ", Obj.printedMtr,Obj.printedmtrId , Obj.remainingPrint,  Obj.totalPrintedMtr, Obj.matchingId);
-
-    // console.log("condn for proccc ================> ", props?.itemsObj?.fpt_menuIn_id,Number(obj1?.printedMtr), props?.itemsObj?.fpt_menuIn_id===591  )
-    let obj2 = {
-      fpt_entry_date: formatted_date,
-      fpt_machine_id: MachineNoId,
-      fpt_attendby_id: attendedById,
-      fpt_intime: inTime ? inTime : '',
-      fpt_outtime: outTime ? outTime : '',
-      Fpt_temparature: props.itemsObj.fpt_temparature,
-      fpt_mcspeed: props.itemsObj.fpt_mcspeed,
-      fpt_qty: props.itemsObj.fpt_qty,
-      fpt_afterprocessedwidth: props?.itemsObj?.fpt_afterprocessedwidth,
-      fpt_fabricProcessed:
-        props?.itemsObj?.fpt_menuIn_id === 591
-          ? Number(obj1?.printedMtr)
-          : fabricProcessed,
-      fpt_fabric_rejected: props?.itemsObj?.fpt_fabric_rejected,
-      fpt_ph: props?.itemsObj?.fpt_ph,
-      fpt_roll_trolley: props?.itemsObj?.fpt_roll_trolley,
-      fpt_partyno: props?.itemsObj?.fpt_partyno,
-      previousqty: props?.itemsObj?.fpt_issued,
-      inmenuId: props?.itemsObj?.fpt_menuIn_id,
-      fpt_menuOut_id: props?.itemsObj?.fpt_menuOut_id,
-      printingId: props?.itemsObj?.printingId,
-      fpt_printing_id: obj1?.printedmtrId,
-      fpt_matching_id: obj1?.matchingId,
-      fpt_order_id: props?.itemsObj?.fpt_order_id,
-      fpt_desing_id: props?.itemsObj?.fpt_desing_id,
-      fpt_batchNo_id: props?.itemsObj?.fpt_batchNo_id,
-      fpt_pound: props?.itemsObj?.fpt_pound,
-      fpt_shrinkage: props?.itemsObj?.fpt_shrinkage,
-      fabricType: fabricType,
-      fpt_freshPcs: Number(fresh),
-      fpt_twoPcs: Number(twoPieces),
-      fpt_printDamgePcs: Number(printDamagePieces),
-      fpt_bgradePcs: Number(bGradePieces),
-      fpt_fent: Number(fent),
-      fpt_chindi: Number(chindi),
-      fpt_steam: props?.itemsObj?.fpt_steam,
-      fpt_speed: props?.itemsObj?.fpt_speed,
-      fpt_weight: props?.itemsObj?.fpt_weight,
-      fpt_yard: props?.itemsObj?.fpt_yard,
-      fpt_glm: props?.itemsObj?.fpt_glm,
-      fpt_shift_id: props?.itemsObj?.fpt_shift_id,
-      printedMtr: Number(obj1?.printedMtr),
-      printedmtrId: obj1?.printedmtrId,
-      totalPrintedMtr: obj1?.totalPrintedMtr,
-      remainingPrint: obj1?.remainingPrint,
-      matchingId: obj1?.matchingId,
-      templist: props?.itemsObj?.templist,
-      applilist: props?.itemsObj?.applilist,
-      niplist: props?.itemsObj?.niplist,
-      stlist: props?.itemsObj?.stlist,
-    };
-    // console.log("REQ OBJ ========> ", obj2);
-    props.submitAction(obj2);
-  };
-
-  const backAction = async () => {
-    props.backBtnAction();
-  };
+ const [showAddRawMaterialType, setShowAddRawMaterialType] = useState(false);
+   const [showAddColor, setShowAddColor] = useState(false);
+   const [showAddUom, setShowAddUom] = useState(false);
+ 
+   const [rawMaterialName, setRawMaterialName] = useState('');
+   const [gstRate, setGstRate] = useState('');
+   const [hsn, setHsn] = useState('');
+   const [price, setPrice] = useState('');
+   const [inventoryLimit, setInventoryLimit] = useState('');
+   const [packageQty, setPackageQty] = useState('');
+   const [mergeInPoPdf, setMergeInPoPdf] = useState("Yes");
+   const [bomStatus, set_bomStatus] = useState('Yes');
+   const [rmBomStatus, set_rmBomStatus] = useState('Yes');
+   const [scaleWise, setScaleWise] = useState(false);
+   const [newRawMaterialType, setNewRawMaterialType] = useState('');
+   const [newRmCode, setNewRmCode] = useState('');
+   const [newColor, setNewColor] = useState('');
+   const [colorCode, setColorCode] = useState('');
+   const [uomType, setUomType] = useState('');
+   const [uomDescription, setUomDescription] = useState('');
+ 
+ 
+   // Raw Material Type
+   const [rawMaterialTypeList, setRawMaterialTypeList] = useState([]);
+   const [filteredRawMaterialType, set_filteredRawMaterialType] = useState([]);
+   const [showRawMaterialTypeList, set_showRawMaterialTypeList] =
+     useState(false);
+   const [rawMaterialTypeName, set_rawMaterialTypeName] = useState('');
+   const [rawMaterialTypeId, set_rawMaterialTypeId] = useState('');
+ 
+   const actionOnRawMaterialType = item => {
+     set_rawMaterialTypeId(item.id);
+     set_rawMaterialTypeName(item.name);
+     set_showRawMaterialTypeList(false);
+     if (item.id === 'ADD_NEW_TRIMTYPE') {
+       setShowAddRawMaterialType(true);
+       console.log('setted true');
+     } else {
+       setShowAddRawMaterialType(false);
+     }
+   };
+ 
+   const handleSearchRawMaterialType = text => {
+     if (text.trim().length > 0) {
+       const filtered = rawMaterialTypeList.filter(user =>
+         user.name.toLowerCase().includes(text.toLowerCase()),
+       );
+       set_filteredRawMaterialType(filtered);
+     } else {
+       set_filteredRawMaterialType(rawMaterialTypeList);
+     }
+   };
+ 
+   // Color
+   const [colorList, setColorList] = useState([]);
+   const [filteredColor, set_filteredColor] = useState([]);
+   const [showColorList, set_showColorList] = useState(false);
+   const [colorName, set_colorName] = useState('');
+   const [colorId, set_colorId] = useState('');
+ 
+   const actionOnColor = item => {
+     set_colorId(item.id);
+     set_colorName(item.name);
+     set_showColorList(false);
+     if (item.id === 'ADD_NEW_COLOR') {
+       setShowAddColor(true);
+     } else {
+       setShowAddColor(false);
+     }
+   };
+ 
+   const handleSearchColor = text => {
+     if (text.trim().length > 0) {
+       const filtered = colorList.filter(user =>
+         user.name.toLowerCase().includes(text.toLowerCase()),
+       );
+       set_filteredColor(filtered);
+     } else {
+       set_filteredColor(colorList);
+     }
+   };
+ 
+   // UOM (Unit of Measurement)
+   const [uomList, setUOMList] = useState([]);
+   const [filteredUOM, set_filteredUOM] = useState([]);
+   const [showUOMList, set_showUOMList] = useState(false);
+   const [uomName, set_uomName] = useState('');
+   const [uomId, set_uomId] = useState('');
+ 
+   const actionOnUOM = item => {
+     set_uomId(item.id);
+     set_uomName(item.name);
+     set_showUOMList(false);
+     if (item.id === 'ADD_NEW_UOM') {
+       setShowAddUom(true);
+     } else {
+       setShowAddUom(false);
+     }
+   };
+ 
+   const handleSearchUOM = text => {
+     if (text.trim().length > 0) {
+       const filtered = uomList.filter(user =>
+         user.name.toLowerCase().includes(text.toLowerCase()),
+       );
+       set_filteredUOM(filtered);
+     } else {
+       set_filteredUOM(uomList);
+     }
+   };
+ 
+   // BrandOrProject
+   const [brandOrProjectList, setBrandOrProjectList] = useState([]);
+   const [filteredBrandOrProject, setFilteredBrandOrProject] = useState([]);
+   const [showBrandOrProjectList, setShowBrandOrProjectList] = useState(false);
+   const [brandOrProjectName, setBrandOrProjectName] = useState('');
+   const [brandOrProjectId, setBrandOrProjectId] = useState('');
+ 
+   // Location
+   const [locationList, setLocationList] = useState([]);
+   const [filteredLocation, setFilteredLocation] = useState([]);
+   const [showLocationList, setShowLocationList] = useState(false);
+   const [locationName, setLocationName] = useState('');
+   const [locationId, setLocationId] = useState('');
+ 
+   // Handlers for BrandOrProject
+   const actionOnBrandOrProject = item => {
+     setBrandOrProjectId(item.id);
+     setBrandOrProjectName(item.name);
+     setShowBrandOrProjectList(false);
+   };
+ 
+   const handleSearchBrandOrProject = text => {
+     if (text.trim().length > 0) {
+       const filtered = brandOrProjectList.filter(project =>
+         project.name.toLowerCase().includes(text.toLowerCase()),
+       );
+       setFilteredBrandOrProject(filtered);
+     } else {
+       setFilteredBrandOrProject(brandOrProjectList);
+     }
+   };
+ 
+   // Handlers for Location
+   const actionOnLocation = item => {
+     setLocationId(item.id);
+     setLocationName(item.name);
+     setShowLocationList(false);
+   };
+ 
+   const handleSearchLocation = text => {
+     if (text.trim().length > 0) {
+       const filtered = locationList.filter(location =>
+         location.name.toLowerCase().includes(text.toLowerCase()),
+       );
+       setFilteredLocation(filtered);
+     } else {
+       setFilteredLocation(locationList);
+     }
+   };
+ 
+   const backBtnAction = () => {
+     props.backBtnAction();
+   };
+ 
+   const popOkBtnAction = () => {
+     props.popOkBtnAction();
+   };
+ 
+   const submitAction = async () => {
+     // props.submitAction(Obj);
+ 
+     const obj={
+     "styleId":"",
+    "ids":"",
+    "trimconstruction_id":0,
+    "trimTypeId":rawMaterialTypeId,
+    "availQty":0,
+    "fabricBrandId":"",
+    "colorid":colorId,
+    "color_shades":"",
+    "newTrimBrandId":brandOrProjectId,
+    "isFabric":0,
+    "multi_rm_flag":0,
+    "lycra_id":"",
+    "trimName":rawMaterialName,
+    "trimTypeName":rawMaterialTypeName,
+    "packageQty":packageQty,
+    "description":"",
+    "allowedAdjustmentPercent":1,
+    "sizeId":"",
+    "uomId":uomId,
+    "hsn":hsn,
+    "locationId":locationId,
+    "comments":"",
+    "price":price,
+    "aisbinSts":0,
+    "copiedRMId":0,
+    "batchid":0,
+    "rmcode":"",
+    "scale":scaleWise ? 1: 0,
+    "menumapq":0,
+    "brandItem":"",
+    "inv_limit":inventoryLimit,
+    "ispopdfScalewise":mergeInPoPdf==="Yes" ? 1:0,
+    "trimTypeCode":newRmCode,
+    "bomststatus":rmBomStatus ==="Yes" ? 1:0,
+    "activeStatus":bomStatus ==="Yes"? "Y" :"N",
+    "uomType":uomType,
+    "uomTypeDescription":uomDescription,
+    "newBatch":"",
+    "batchDescription":"",
+    "newColor":newColor,
+    "colorCode":colorCode,
+    "gstRate":gstRate,
+    "Count":0,
+    "procured_or_supplied":0,
+    "budgeted":0
+     }
+   props.submitAction(obj);
+   };
+ 
+   const backAction = async () => {
+     props.backBtnAction();
+   };
+ 
+   const bomStatusRadioButtons = useMemo(
+     () => [
+       {
+         id: '1',
+         label: 'Yes',
+         value: 'Yes',
+         selected: bomStatus === 'Yes',
+         labelStyle: {color: '#000'},
+       },
+       {
+         id: '2',
+         label: 'No',
+         value: 'No',
+         selected: bomStatus === 'No',
+         labelStyle: {color: '#000'},
+       },
+     ],
+     [bomStatus],
+   );
+ 
+   const handlebomStatusChange = selectedId => {
+     const selectedOption = bomStatusRadioButtons.find(
+       button => button.id === selectedId,
+     );
+     set_bomStatus(selectedOption.value);
+   };
+ 
+   const rmBomStatusRadioButtons = useMemo(
+     () => [
+       {
+         id: '1',
+         label: 'Yes',
+         value: 'Yes',
+         selected: rmBomStatus === 'Yes',
+         labelStyle: {color: '#000'},
+       },
+       {
+         id: '2',
+         label: 'No',
+         value: 'No',
+         selected: rmBomStatus === 'No',
+         labelStyle: {color: '#000'},
+       },
+     ],
+     [rmBomStatus],
+   );
+ 
+   const handleRmbomStatusChange = selectedId => {
+     const selectedOption = rmBomStatusRadioButtons.find(
+       button => button.id === selectedId,
+     );
+     set_rmBomStatus(selectedOption.value);
+   };
+ 
+   const mergeInPoPdfRadioButtons = useMemo(
+     () => [
+       {
+         id: '1',
+         label: 'Yes',
+         value: 'Yes',
+         selected: mergeInPoPdf === 'Yes',
+         labelStyle: {color: '#000'},
+       },
+       {
+         id: '2',
+         label: 'No',
+         value: 'No',
+         selected: mergeInPoPdf === 'No',
+         labelStyle: {color: '#000'},
+       },
+     ],
+     [mergeInPoPdf],
+   );
+   const handlemergeInPoPdfChange = selectedId => {
+     const selectedOption = mergeInPoPdfRadioButtons.find(
+       button => button.id === selectedId,
+     );
+     setMergeInPoPdf(selectedOption.value);
+   };
 
   return (
     <View style={[CommonStyles.mainComponentViewStyle]}>
@@ -271,7 +372,8 @@ const SaveRawMaterialsMasterUI = ({route, navigation, ...props}) => {
         enableOnAndroid={true}
         extraHeight={130}
         extraScrollHeight={130}
-        showsVerticalScrollIndicator={false}>
+        showsVerticalScrollIndicator={false}
+        style={{marginBottom: hp('15%')}}>
         <View
           style={{
             marginBottom: hp('5%'),
@@ -351,28 +453,57 @@ const SaveRawMaterialsMasterUI = ({route, navigation, ...props}) => {
             )}
           </View>
 
+          {showAddRawMaterialType && (
+            <View style={{marginTop: hp('2%')}}>
+              <TextInput
+                label="New Raw Material Type "
+                value={newRawMaterialType}
+                mode="outlined"
+                onChangeText={text => setNewRawMaterialType(text)}
+              />
+            </View>
+          )}
+
+          {showAddRawMaterialType && (
+            <View style={{marginTop: hp('2%')}}>
+              <TextInput
+                label="New RM Code "
+                value={newRmCode}
+                mode="outlined"
+                onChangeText={text => setNewRmCode(text)}
+              />
+            </View>
+          )}
+
+          {showAddRawMaterialType && <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginTop: hp('4%'),
+            }}>
+            <Text style={{width: '50%', fontWeight: 'bold', color: '#000'}}>
+            RM Type BOM Status
+            </Text>
+            <RadioGroup
+              style={{flexDirection: 'row'}}
+              radioButtons={rmBomStatusRadioButtons}
+              onPress={handleRmbomStatusChange}
+              layout="row"
+              selectedId={
+                rmBomStatusRadioButtons.find(
+                  item => item.value === rmBomStatus,
+                )?.id
+              }
+            />
+          </View>}
+
           <View style={{marginTop: hp('2%')}}>
             <TextInput
               label="Raw Material Name *"
               value={rawMaterialName}
               mode="outlined"
               onChangeText={text => setRawMaterialName(text)}
-            />
-          </View>
-          <View style={{marginTop: hp('2%')}}>
-            <TextInput
-              label="GST Rate(%) *"
-              value={gstRate}
-              mode="outlined"
-              onChangeText={text => setGstRate(text)}
-            />
-          </View>
-          <View style={{marginTop: hp('2%')}}>
-            <TextInput
-              label="HSN *"
-              value={hsn}
-              mode="outlined"
-              onChangeText={text => setHsn(text)}
             />
           </View>
 
@@ -392,7 +523,7 @@ const SaveRawMaterialsMasterUI = ({route, navigation, ...props}) => {
                 width: wp('90%'),
               }}
               onPress={() => {
-                set_showLocationList(!showLocationList);
+                setShowLocationList(!showLocationList);
               }}>
               <View>
                 <View style={[styles.SectionStyle1, {}]}>
@@ -403,9 +534,9 @@ const SaveRawMaterialsMasterUI = ({route, navigation, ...props}) => {
                           ? [styles.dropTextLightStyle]
                           : [styles.dropTextInputStyle]
                       }>
-                      {'Raw Material Type *  '}
+                      {'Location *  '}
                     </Text>
-                    {locationName ? (
+                    {locationId ? (
                       <Text style={[styles.dropTextInputStyle]}>
                         {locationName}
                       </Text>
@@ -522,6 +653,60 @@ const SaveRawMaterialsMasterUI = ({route, navigation, ...props}) => {
             )}
           </View>
 
+          {showAddColor && (
+            <View style={{marginTop: hp('2%')}}>
+              <TextInput
+                label="New Color "
+                value={newColor}
+                mode="outlined"
+                onChangeText={text => setNewColor(text)}
+              />
+            </View>
+          )}
+
+          {showAddColor && (
+            <View style={{marginTop: hp('2%')}}>
+              <TextInput
+                label="Color Code "
+                value={colorCode}
+                mode="outlined"
+                onChangeText={text => setColorCode(text)}
+              />
+            </View>
+          )}
+
+          <View style={[styles.checkboxItem, {marginTop: hp('2%')}]}>
+            <CustomCheckBox
+              isChecked={scaleWise}
+              onToggle={() => setScaleWise(!scaleWise)}
+            />
+            <Text style={styles.checkboxLabel}>{'Scale Wise'}</Text>
+          </View>
+
+          {scaleWise && (
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginTop: hp('4%'),
+              }}>
+              <Text style={{width: '50%', fontWeight: 'bold', color: '#000'}}>
+                Merge in PO PDF
+              </Text>
+              <RadioGroup
+                style={{flexDirection: 'row'}}
+                radioButtons={bomStatusRadioButtons}
+                onPress={handlebomStatusChange}
+                layout="row"
+                selectedId={
+                  bomStatusRadioButtons.find(item => item.value === bomStatus)
+                    ?.id
+                }
+              />
+            </View>
+          )}
+
           <View
             style={{
               alignItems: 'center',
@@ -593,7 +778,167 @@ const SaveRawMaterialsMasterUI = ({route, navigation, ...props}) => {
             )}
           </View>
 
-          <View style={{height: 100}} />
+          {showAddUom && (
+            <View style={{marginTop: hp('2%')}}>
+              <TextInput
+                label="UOM Type * "
+                value={uomType}
+                mode="outlined"
+                onChangeText={text => setUomType(text)}
+              />
+            </View>
+          )}
+
+          {showAddUom && (
+            <View style={{marginTop: hp('2%')}}>
+              <TextInput
+                label="UOM Description "
+                value={uomDescription}
+                mode="outlined"
+                onChangeText={text => setUomDescription(text)}
+              />
+            </View>
+          )}
+
+          <View style={{marginTop: hp('2%')}}>
+            <TextInput
+              label="HSN *"
+              value={hsn}
+              mode="outlined"
+              onChangeText={text => setHsn(text)}
+            />
+          </View>
+
+          <View style={{marginTop: hp('2%')}}>
+            <TextInput
+              label="Price"
+              value={price}
+              mode="outlined"
+              onChangeText={text => setPrice(text)}
+            />
+          </View>
+          <View style={{marginTop: hp('2%')}}>
+            <TextInput
+              label="Inventory Limit"
+              value={inventoryLimit}
+              mode="outlined"
+              onChangeText={text => setInventoryLimit(text)}
+            />
+          </View>
+          <View style={{marginTop: hp('2%')}}>
+            <TextInput
+              label="Package Qty"
+              value={packageQty}
+              mode="outlined"
+              onChangeText={text => setPackageQty(text)}
+            />
+          </View>
+
+          <View style={{marginTop: hp('2%')}}>
+            <TextInput
+              label="GST Rate(%) *"
+              value={gstRate}
+              mode="outlined"
+              onChangeText={text => setGstRate(text)}
+            />
+          </View>
+
+          <View
+            style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: '#fff',
+              marginTop: hp('2%'),
+            }}>
+            <TouchableOpacity
+              style={{
+                flexDirection: 'row',
+                borderWidth: 0.5,
+                borderColor: '#D8D8D8',
+                borderRadius: hp('0.5%'),
+                width: wp('90%'),
+              }}
+              onPress={() => {
+                setShowBrandOrProjectList(!showBrandOrProjectList);
+              }}>
+              <View>
+                <View style={[styles.SectionStyle1, {}]}>
+                  <View style={{flexDirection: 'column'}}>
+                    <Text
+                      style={
+                        brandOrProjectId
+                          ? [styles.dropTextLightStyle]
+                          : [styles.dropTextInputStyle]
+                      }>
+                      {'Brand/Project   '}
+                    </Text>
+                    {brandOrProjectId ? (
+                      <Text style={[styles.dropTextInputStyle]}>
+                        {brandOrProjectName}
+                      </Text>
+                    ) : null}
+                  </View>
+                </View>
+              </View>
+
+              <View style={{justifyContent: 'center'}}>
+                <Image source={downArrowImg} style={styles.imageStyle} />
+              </View>
+            </TouchableOpacity>
+
+            {showBrandOrProjectList && (
+              <View style={styles.dropdownContent1}>
+                <TextInput
+                  style={styles.searchInput}
+                  placeholder="Search "
+                  onChangeText={handleSearchBrandOrProject}
+                  placeholderTextColor="#000"
+                />
+                <ScrollView
+                  style={styles.scrollView}
+                  nestedScrollEnabled={true}>
+                  {filteredBrandOrProject.length === 0 ? (
+                    <Text style={styles.noCategoriesText}>
+                      Sorry, no results found!
+                    </Text>
+                  ) : (
+                    filteredBrandOrProject.map((item, index) => (
+                      <TouchableOpacity
+                        key={index}
+                        style={styles.dropdownOption}
+                        onPress={() => actionOnBrandOrProject(item)}>
+                        <Text style={{color: '#000'}}>{item.name}</Text>
+                      </TouchableOpacity>
+                    ))
+                  )}
+                </ScrollView>
+              </View>
+            )}
+          </View>
+
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginTop: hp('4%'),
+            }}>
+            <Text style={{width: '50%', fontWeight: 'bold', color: '#000'}}>
+              BOM Status
+            </Text>
+            <RadioGroup
+              style={{flexDirection: 'row'}}
+              radioButtons={mergeInPoPdfRadioButtons}
+              onPress={handlemergeInPoPdfChange}
+              layout="row"
+              selectedId={
+                mergeInPoPdfRadioButtons.find(
+                  item => item.value === mergeInPoPdf,
+                )?.id
+              }
+            />
+          </View>
+
         </View>
       </KeyboardAwareScrollView>
 
@@ -796,5 +1141,17 @@ const getStyles = colors =>
       fontSize: 16,
       fontWeight: '600',
       color: '#000000',
+    },
+    checkboxItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      width: '45%', 
+      marginVertical: 5,
+      marginHorizontal: 5,
+    },
+    checkboxLabel: {
+      marginLeft: 8,
+      fontSize: 14,
+      color: '#000',
     },
   });

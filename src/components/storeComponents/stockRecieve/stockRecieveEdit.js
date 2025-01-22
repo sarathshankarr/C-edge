@@ -108,7 +108,7 @@ const StockRecieveEdit = ({ navigation, route, ...props }) => {
       inputQty: item.inputQty // rmqty
   }));
 
-  console.log("filteredRequestDetails==>", filteredRequestDetails)
+  // console.log("filteredRequestDetails==>", filteredRequestDetails)
   tempObj.requestDetails = filteredRequestDetails;
 
     tempObj.stockapprove_remarks = remarks;
@@ -132,9 +132,13 @@ const StockRecieveEdit = ({ navigation, route, ...props }) => {
       "fabricQty": tempObj.fabricqty,
       "stockId": tempObj.id,
       "rmDetails": tempObj.requestDetails,
+      "rmDetails": tempObj.requestDetails,
+      "receiveDate":"2025-01-25",
+
       
     }
     console.log("SAVING ITEM ===> ", obj);
+    // return;
     
     set_isLoading(true);
     let SAVEAPIObj = await APIServiceCall.saveStockReceive(obj);

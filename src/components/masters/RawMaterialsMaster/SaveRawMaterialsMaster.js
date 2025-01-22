@@ -20,9 +20,9 @@ const SaveRawMaterialsMaster = ({ navigation, route, ...props }) => {
   React.useEffect(() => {
     
     if(route.params) {
-      if(route.params?.id) {
-        getInitialData(route.params?.id);
-        set_fptid(route.params?.id);
+      if(route.params) {
+              console.log("props.itemsObj==> ", props.itemsObj)
+        // getInitialData(route.params?.item);
       } 
     }
     console.log("Route Params ===> ", route?.params)
@@ -52,8 +52,7 @@ const SaveRawMaterialsMaster = ({ navigation, route, ...props }) => {
       "company":JSON.parse(companyObj),
 
     }      
-    let EditFabricProcessInObj = await APIServiceCall.getEditDetailsOfFabricProcessIn(obj);
-    // console.log('Fabric process in edit  data ====> ,',JSON.stringify(EditFabricProcessInObj))
+    let EditFabricProcessInObj = await APIServiceCall.getEditDetailsOfRawMaterialMasters(obj);
     set_isLoading(false);
     
     if(EditFabricProcessInObj && EditFabricProcessInObj.statusData){
@@ -110,7 +109,7 @@ const SaveRawMaterialsMaster = ({ navigation, route, ...props }) => {
     // return ;
 
     set_isLoading(true);   
-    let saveEditFPI = await APIServiceCall.SaveFabricProcessInDetails(tempObj);
+    let saveEditFPI = await APIServiceCall.SaveRawMaterialsMastersEdit(tempObj);
     set_isLoading(false);
     
     if(saveEditFPI && saveEditFPI.statusData && saveEditFPI.responseData ){

@@ -48,12 +48,14 @@ const StoreApproveEditUi = ({ route, ...props }) => {
       if (props?.itemsObj?.fabricApprovalStatus) {
         set_checkboxT2(props?.itemsObj?.fabricApprovalStatus !== 3 ? false : true);
       }
+      console.log("props from ===> ", props?.itemsObj)
     }
 
-  }, [props]);
+  }, [props?.itemsObj]);
 
   const backBtnAction = () => {
     props.backBtnAction();
+
   };
 
   const popOkBtnAction = () => {
@@ -69,19 +71,19 @@ const StoreApproveEditUi = ({ route, ...props }) => {
   const ApproveAction = () => {
     console.log("Approved");
 
-    // if (data?.fabricApprovalStatus !== 0) {
-    //   if (stockTable?.length > 0) {
-    //     props.submitAction(remarks, checkboxT1, checkboxT2,1, 1, true);
-    //   } else {
-    //     props.submitAction(remarks, checkboxT1, checkboxT2,0, 1, true);
-    //   }
-    // } else {
-    //   if (stockTable?.length > 0) {
-    //     props.submitAction(remarks, checkboxT1, checkboxT2,1, 0, true);
-    //   } else {
-    //     props.submitAction(remarks, checkboxT1, checkboxT2,0, 0 , true);
-    //   }
-    // }
+    if (data?.fabricApprovalStatus !== 0) {
+      if (stockTable?.length > 0) {
+        props.submitAction(remarks, checkboxT1, checkboxT2,1, 1, true);
+      } else {
+        props.submitAction(remarks, checkboxT1, checkboxT2,0, 1, true);
+      }
+    } else {
+      if (stockTable?.length > 0) {
+        props.submitAction(remarks, checkboxT1, checkboxT2,1, 0, true);
+      } else {
+        props.submitAction(remarks, checkboxT1, checkboxT2,0, 0 , true);
+      }
+    }
     props.submitAction(remarks, checkboxT1, checkboxT2,stockTable?.length > 0? 1:0,  data?.fabricApprovalStatus !== 0 ? 1 :0, true );
   };
 
@@ -140,7 +142,7 @@ const StoreApproveEditUi = ({ route, ...props }) => {
           <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: hp('1%') }} >
 
             <TextInputComponent
-              inputText={props.itemsObj ? props.itemsObj.fabric : ''}
+              inputText={props.itemsObj ? props.itemsObj.stylename : ''}
               labelText={'Style(Color)'}
               isEditable={false}
               maxLengthVal={200}
@@ -163,6 +165,7 @@ const StoreApproveEditUi = ({ route, ...props }) => {
             />
 
           </View>
+
 
           {stockTable?.length > 0 && <View style={styles.wrapper}>
             <View style={styles.table}>
@@ -211,7 +214,7 @@ const StoreApproveEditUi = ({ route, ...props }) => {
           </View>}
 
           {/* { data && console.log("data==>",data?.fabric?.length)} */}
-          {data && data?.fabric?.length > 0 && data?.fabricApprovalStatus !== 0 && (<View style={styles.wrapper}>
+          {data && data?.fabric?.length > 0 && (<View style={styles.wrapper}>
             <View style={styles.table}>
               {/* Table Head */}
               <View style={styles.table_head}>
@@ -278,11 +281,6 @@ const StoreApproveEditUi = ({ route, ...props }) => {
           </View>
 
           <View style={{ marginBottom: 150 }} />
-
-
-
-
-
         </KeyboardAwareScrollView>
 
       </View>

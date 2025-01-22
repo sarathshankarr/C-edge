@@ -138,15 +138,14 @@ const StoreApproveEdit = ({ navigation, route, ...props }) => {
       "stockRequest": tempObj,
     }
 
-    console.log("saving OBj==> ", obj);
-
+    console.log("saving OBj edit ==> ", obj);
     set_isLoading(true);
     let SAVEAPIObj = await APIServiceCall.saveStoreApproval(obj);
     set_isLoading(false);
 
     if (SAVEAPIObj && SAVEAPIObj.statusData && SAVEAPIObj.responseData && SAVEAPIObj.responseData.status === true) {
       console.log("Sucess");
-      // backBtnAction();
+      backBtnAction();
     } else {
       popUpAction(Constant.Fail_Save_Dtls_MSG, Constant.DefaultAlert_MSG, 'OK', true, false);
     }
