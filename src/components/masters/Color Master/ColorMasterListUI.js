@@ -64,10 +64,9 @@ const ColorMasterListUI = ({route, navigation, ...props}) => {
     if (props.itemsArray) {
       set_filterArray(props.itemsArray);
       set_ItemsArray(props.itemsArray);
-    console.log("props lis ===> ",  props.itemsArray);
+      console.log('props lis ===> ', props.itemsArray);
     }
     // getRequestBody();
-
   }, [props?.itemsArray]);
 
   const getRequestBody = async () => {
@@ -76,11 +75,11 @@ const ColorMasterListUI = ({route, navigation, ...props}) => {
     let usercompanyId = await AsyncStorage.getItem('companyId');
     let companyObj = await AsyncStorage.getItem('companyObj');
     let Obj = {
-      username: userName,
-      password: userPsd,
-      categoryType: '',
-      compIds: usercompanyId,
-      company: JSON.parse(companyObj),
+      'username': userName,
+      'password': userPsd,
+      'categoryType': '',
+      'compIds': usercompanyId,
+      "company": JSON.parse(companyObj),
     };
     setfilterReqBody(Obj);
   };
@@ -117,8 +116,8 @@ const ColorMasterListUI = ({route, navigation, ...props}) => {
         (item?.umoType !== '' &&
           item?.umoType?.toLowerCase().includes(searchTerm)) ||
         (item?.umoDescription !== '' &&
-          item?.umoDescription?.toLowerCase().includes(searchTerm)) 
-      )
+          item?.umoDescription?.toLowerCase().includes(searchTerm))
+      );
     });
 
     set_filterArray(styleArray || []);
@@ -150,27 +149,23 @@ const ColorMasterListUI = ({route, navigation, ...props}) => {
     setIsFiltering(false);
   };
 
-
   const renderItem = ({item, index}) => {
     return (
       <TouchableOpacity
         onPress={() => actionOnRow(item, index)}
         style={[CommonStyles.cellBackViewStyle, {marginBottom: 3}]}>
         <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-          <View
-            style={{flex: 1, justifyContent: 'center'}}>
+          <View style={{flex: 1, justifyContent: 'center'}}>
             <Text style={[CommonStyles.tylesTextStyle, {textAlign: 'center'}]}>
               {item.umoType}
             </Text>
           </View>
-          <View
-            style={{flex: 1, justifyContent: 'center'}}>
+          <View style={{flex: 1, justifyContent: 'center'}}>
             <Text style={[CommonStyles.tylesTextStyle, {textAlign: 'center'}]}>
               {item.umoDescription}
             </Text>
           </View>
-          <View
-            style={{flex: 1, justifyContent: 'center'}}>
+          <View style={{flex: 1, justifyContent: 'center'}}>
             <Text style={[CommonStyles.tylesTextStyle, {textAlign: 'center'}]}>
               {item.umoDescription}
             </Text>
@@ -250,7 +245,7 @@ const ColorMasterListUI = ({route, navigation, ...props}) => {
           </View>
 
           {/* Filter Button */}
-          <TouchableOpacity
+          {/* <TouchableOpacity
             style={{
               flexDirection: 'row',
               alignItems: 'center',
@@ -296,14 +291,13 @@ const ColorMasterListUI = ({route, navigation, ...props}) => {
             ) : (
               <Text style={{color: '#7F7F81', fontSize: 14}}>{'Filter'}</Text>
             )}
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
 
         {/* ) : null} */}
 
         {filterArray && filterArray.length > 0 ? (
           <View style={CommonStyles.listCommonHeader}>
-           
             {/* <Text style={[CommonStyles.tylesHeaderTextStyle, { flex: 1, textAlign: 'center', }]}>{'Brand Name'}</Text> */}
             <Text
               style={[
@@ -368,7 +362,6 @@ const ColorMasterListUI = ({route, navigation, ...props}) => {
         </View>
       </View>
 
-    
       <FilterModal
         isVisible={isFilterVisible}
         categoriesList={categories}
@@ -435,4 +428,3 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 });
-

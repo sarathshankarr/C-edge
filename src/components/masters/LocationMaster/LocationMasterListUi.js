@@ -227,7 +227,7 @@ setfilterReqBody(Obj)
                   </View>
                 
                   {/* Filter Button */}
-                  <TouchableOpacity
+                  {/* <TouchableOpacity
                     style={{
                       flexDirection: 'row',
                       alignItems: 'center',
@@ -261,7 +261,7 @@ setfilterReqBody(Obj)
                     }
                     
                     
-                  </TouchableOpacity>
+                  </TouchableOpacity> */}
                 
                 </View>
                 

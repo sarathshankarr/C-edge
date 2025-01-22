@@ -278,7 +278,7 @@ const ScaleOrSizeMasterListUI = ({route, navigation, ...props}) => {
   </View>
 
                 {/* Filter Button */}
-                <TouchableOpacity
+                {/* <TouchableOpacity
     style={{
       flexDirection: 'row',
       alignItems: 'center',
@@ -312,7 +312,7 @@ const ScaleOrSizeMasterListUI = ({route, navigation, ...props}) => {
     }
     
     
-                </TouchableOpacity>
+                </TouchableOpacity> */}
 
         </View>
 

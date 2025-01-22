@@ -244,7 +244,7 @@ const UomMasterListUI = ({route, navigation, ...props}) => {
           </View>
 
           {/* Filter Button */}
-          <TouchableOpacity
+          {/* <TouchableOpacity
             style={{
               flexDirection: 'row',
               alignItems: 'center',
@@ -290,7 +290,7 @@ const UomMasterListUI = ({route, navigation, ...props}) => {
             ) : (
               <Text style={{color: '#7F7F81', fontSize: 14}}>{'Filter'}</Text>
             )}
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
 
         {/* ) : null} */}

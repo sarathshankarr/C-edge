@@ -30,10 +30,10 @@ let arrowImg = require('./../../../../assets/images/png/arrowImg.png');
 
 
 const HeadingItemsList = [
-  {id: 1, title: 'Production Summary' },
-  {id: 2, title: 'View Time and Action' },
-  {id: 3, title: 'RM Allocation(BOM)'},
-  // {id: 4, title: 'Thread'},
+  {id: 1, title: ' Edit Style'},
+  {id: 2, title: 'Production Summary' },
+  {id: 3, title: 'View Time and Action' },
+  {id: 4, title: 'RM Allocation(BOM)'},
 ];
 
 const StyleDetailsUI = ({route, ...props}) => {
@@ -114,18 +114,16 @@ const StyleDetailsUI = ({route, ...props}) => {
         extraScrollHeight={130}
         showsVerticalScrollIndicator={false}>
         <View style={CommonStyles.headerStyle}>
-          <View style={[CommonStyles.topViewStyle]}>
+          {/* <View style={[CommonStyles.topViewStyle]}>
             <View style={CommonStyles.topSubViewStyle}>
-              {/* {console.log('Image URL ====>', imgURL)} */}
               <Image
-                // borderRadius={100}
                 style={[CommonStyles.imgStyle]}
                 source={{uri: imgURL}}
               />
             </View>
-          </View>
+          </View> */}
 
-          <View style={{marginTop: hp('5%'), marginBottom: hp('5%')}}>
+          {/* <View style={{marginTop: hp('5%'), marginBottom: hp('5%')}}>
             <View
               style={{
                 width: '100%',
@@ -350,17 +348,17 @@ const StyleDetailsUI = ({route, ...props}) => {
                     : 'N/A'}
                 </Text>
               </View>
-              {/* <View style={{flex: 1, alignItems: 'flex-end'}}>
+               <View style={{flex: 1, alignItems: 'flex-end'}}>
                 <TouchableOpacity
                   onPress={sizeDetailsAction}
                   style={styles.buttonStyle}>
                   <Image source={arrowImg} style={styles.arrowIconStyle} />
                 </TouchableOpacity>
-              </View> */}
+              </View> 
             </View>
-          </View>
+          </View> */}
 
-          {props.listItems.styleDetailsList &&
+          {/* {props.listItems.styleDetailsList &&
           props.listItems.styleDetailsList.styleSizeDataResponseList &&
           props.listItems.styleDetailsList.styleSizeDataResponseList.length > 0 ? (
             <View style={[CommonStyles.listCommonHeader1, {marginTop: 10}]}>
@@ -378,12 +376,12 @@ const StyleDetailsUI = ({route, ...props}) => {
                 ]}>
                 {'Quantity'}
               </Text>
-              {/* <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:1,textAlign:'left'}]}>{'L'}</Text>
-            <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:1,textAlign:'left',}]}>{'XL'}</Text> */}
+              <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:1,textAlign:'left'}]}>{'L'}</Text>
+            <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:1,textAlign:'left',}]}>{'XL'}</Text> 
             </View>
-          ) : null}
+          ) : null} */}
 
-          {props.listItems.styleDetailsList &&
+          {/* {props.listItems.styleDetailsList &&
           props.listItems.styleDetailsList.styleSizeDataResponseList &&
           props.listItems.styleDetailsList.styleSizeDataResponseList.length > 0 ? (
             <View style={[CommonStyles.listStyle1]}>
@@ -404,7 +402,7 @@ const StyleDetailsUI = ({route, ...props}) => {
                 </Text>
               ) : null}
             </View>
-          )}
+          )} */}
 
           <View style={{}}>
             <ScrollView
