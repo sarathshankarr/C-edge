@@ -227,27 +227,32 @@ const CreateRawMaterialsMasterUI = ({route, navigation, ...props}) => {
 
   const submitAction = async () => {
     // props.submitAction(Obj);
+    if(!rawMaterialTypeId || !rawMaterialName || !locationId || !uomId || !hsn || !gstRate){
+      Alert("Please fill All the mandatory fields !!");
+      return;
+    }
+
 
     const obj={
     "styleId":"",
 	  "ids":"",
 	  "trimconstruction_id":0,
-	  "trimTypeId":rawMaterialTypeId,
+	  "trimTypeId":rawMaterialTypeId==='ADD_NEW_TRIMTYPE' ? 0 : rawMaterialTypeId,
 	  "availQty":0,
 	  "fabricBrandId":"",
-	  "colorid":colorId,
+	  "colorid":colorId==='ADD_NEW_COLOR' ? 0 : colorId,
 	  "color_shades":"",
 	  "newTrimBrandId":brandOrProjectId,
 	  "isFabric":0,
 	  "multi_rm_flag":0,
 	  "lycra_id":"",
 	  "trimName":rawMaterialName,
-	  "trimTypeName":rawMaterialTypeName,
+	  "trimTypeName":newRawMaterialType,
 	  "packageQty":packageQty,
 	  "description":"",
 	  "allowedAdjustmentPercent":1,
 	  "sizeId":"",
-	  "uomId":uomId,
+	  "uomId":uomId==='ADD_NEW_UOM' ? 0 :uomId,
 	  "hsn":hsn,
 	  "locationId":locationId,
 	  "comments":"",
@@ -275,6 +280,7 @@ const CreateRawMaterialsMasterUI = ({route, navigation, ...props}) => {
 	  "procured_or_supplied":0,
 	  "budgeted":0
     }
+
   props.submitAction(obj);
   };
 

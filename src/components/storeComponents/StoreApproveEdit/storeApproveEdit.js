@@ -76,7 +76,7 @@ const StoreApproveEdit = ({ navigation, route, ...props }) => {
     popUpAction(undefined, undefined, '', false, false)
   };
 
-  const submitAction = (remarks, checkboxT1, checkboxT2, T1, T2 , status) => {
+  const submitAction = (remarks, checkboxT1, checkboxT2, T1, T2 , status,date) => {
 
     let tempObj = itemsObj;
 
@@ -119,6 +119,8 @@ const StoreApproveEdit = ({ navigation, route, ...props }) => {
     }
 
     tempObj.stockapprove_remarks=remarks;
+    tempObj.date=date;
+    tempObj.fabricRecievedQty=1;
     saveStoreApprove(tempObj);
   };
 
@@ -134,8 +136,8 @@ const StoreApproveEdit = ({ navigation, route, ...props }) => {
       "password": userPsd,
       "compIds": usercompanyId,
       "company":JSON.parse(companyObj),
-
       "stockRequest": tempObj,
+      "receiveDate":tempObj.date,
     }
 
     console.log("saving OBj edit ==> ", obj);

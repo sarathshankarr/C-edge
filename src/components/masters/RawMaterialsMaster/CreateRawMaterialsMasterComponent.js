@@ -146,7 +146,42 @@ const CreateRawMaterialsMasterComponent = ({ route }) => {
     popUpAction(undefined, undefined, '', false, false)
   };
 
+  const ValidateAction = async (type) => {
+    let userName = await AsyncStorage.getItem('userName');
+    let userPsd = await AsyncStorage.getItem('userPsd');
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
+
+    let Obj={
+     "menuid":82,
+    "username": userName,
+    "password": userPsd,
+    "trimtype": type,
+    "compIds" : usercompanyId,
+    "company" :JSON.parse(companyObj),
+    }
+
+    set_isLoading(true);
+
+    let SAVEAPIObj = await APIServiceCall.validateRawMaterialTypeMasters(Obj);
+    set_isLoading(false);
+
+    console.log("validation result ", SAVEAPIObj?.responseData);
+
+    return SAVEAPIObj?.responseData;
+  };
+
   const submitAction = async (tempObj) => {
+
+    
+    const checked= await ValidateAction();
+    if(!checked){
+      popUpAction(Constant.Fail_Validate_RMM_MSG, Constant.DefaultAlert_MSG, 'OK', true, false);
+      return;
+    }
+
+    // return;
+
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
@@ -163,7 +198,7 @@ const CreateRawMaterialsMasterComponent = ({ route }) => {
     tempObj.company = JSON.parse(companyObj);
 
 
-    console.log("saving obj for create save==>", tempObj);
+    console.log("saving obj for create save 1==>", tempObj);
     set_isLoading(true);
 
     let SAVEAPIObj = await APIServiceCall.saveCreateRawMaterialMasters(tempObj);

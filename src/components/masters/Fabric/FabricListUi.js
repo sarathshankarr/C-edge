@@ -55,8 +55,9 @@ const FabricListUi = ({route, ...props}) => {
     if (props.itemsArray) {
       set_filterArray(props.itemsArray);
       set_ItemsArray(props.itemsArray);
+      console.log("props.itemsArray ==> ", props.itemsArray);
     }
-    getRequestBody();
+    // getRequestBody();
   }, [props.itemsArray]);
 
   const getRequestBody = async () => {
@@ -124,8 +125,8 @@ const FabricListUi = ({route, ...props}) => {
     // const styleArray = ItemsArray.filter(style => (style.styleno.toString().toUpperCase().includes(name.toUpperCase()) || style.color.toUpperCase().includes(name.toUpperCase()) || style.wono.toString().toUpperCase().includes(name.toUpperCase())));
     const styleArray = ItemsArray.filter(
       style =>
-        style.designName?.toUpperCase().includes(name.toUpperCase()) ||
-        style.designType?.toUpperCase().includes(name.toUpperCase()),
+        style.fabricNo?.toUpperCase().includes(name.toUpperCase()) ||
+        style.colorName?.toUpperCase().includes(name.toUpperCase()),
     );
     if (styleArray && styleArray.length > 0) {
       set_filterArray(styleArray);
@@ -173,11 +174,11 @@ const FabricListUi = ({route, ...props}) => {
       <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
         <Text
           style={[CommonStyles.tylesTextStyle, {textAlign: 'center', flex: 1}]}>
-          {item.designName}
+          {item.fabricNo}
         </Text>
         <Text
           style={[CommonStyles.tylesTextStyle, {textAlign: 'center', flex: 1}]}>
-          {item.designType}
+          {item.fabricNo}
         </Text>
         <View style={{flex: 1.2}}>
           <Text
@@ -185,14 +186,14 @@ const FabricListUi = ({route, ...props}) => {
               CommonStyles.tylesTextStyle,
               {textAlign: 'center', flex: 1},
             ]}>
-            {item.approveBy}
+            {item.colorName}
           </Text>
           <Text
             style={[
               CommonStyles.tylesTextStyle,
               {textAlign: 'center', flex: 1},
             ]}>
-            {item.approvedate}
+            {item.colorName}
           </Text>
         </View>
         <Image
@@ -309,28 +310,28 @@ const FabricListUi = ({route, ...props}) => {
                 CommonStyles.tylesHeaderTextStyle,
                 {textAlign: 'center', flex: 1},
               ]}>
-              Design Name
+              Fabric No
             </Text>
             <Text
               style={[
                 CommonStyles.tylesHeaderTextStyle,
                 {textAlign: 'center', flex: 1},
               ]}>
-              Design Type
+             Color
             </Text>
             <Text
               style={[
                 CommonStyles.tylesHeaderTextStyle,
                 {textAlign: 'center', flex: 1},
               ]}>
-              Approved By & Date
+              Fabric Code
             </Text>
             <Text
               style={[
                 CommonStyles.tylesHeaderTextStyle,
                 {textAlign: 'center', flex: 1.3},
               ]}>
-              Design Image
+             Style Codes
             </Text>
           </View>
         ) : (
@@ -343,12 +344,7 @@ const FabricListUi = ({route, ...props}) => {
           </View>
         )}
 
-        <Button
-          onPress={handleNavigation}
-          title="Fabric Edit"
-          color="#841584"
-          accessibilityLabel="Learn more about this purple button"
-        />
+        
 
         <View style={CommonStyles.listStyle}>
           {showFilteredList ? (

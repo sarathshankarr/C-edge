@@ -44,6 +44,8 @@ export const MAIL_NOT_FOUND = 'The provided email address is not found in the sy
 export const PSWD_NOT_MATCH = 'Passwords do not match. Please try again.';
 export const PSWD_MIN_LENG = 'Password must be at least 8 characters long.';
 export const PSWD_SET_SUCC = 'New password set successfully.';
+export const Fail_Validate_RMM_MSG = 'Entered RM  is already exist !!';
+
 
 
 

@@ -24,7 +24,7 @@ const FabricList = ({ navigation, route, ...props }) => {
   
   useFocusEffect(
     React.useCallback(() => {
-      //  getInitialData(0, true);
+       getInitialData(0, true);
     }, [])
 );
   
@@ -53,23 +53,24 @@ const FabricList = ({ navigation, route, ...props }) => {
     let obj = {
       "searchKeyValue": "",
       "styleSearchDropdown": "-1",
-      "menuId": 728,
+      "menuId": 29,
       "dataFilter": "",
       "fromRecord":fromRecord,
       "toRecord": toRecord,
-      "userName": userName,
-      "userPwd": userPsd,
+      "username": userName,
+      "password": userPsd,
       "compIds": usercompanyId,
       "company":JSON.parse(companyObj),
-
     }
+    console.log("load all ==> ", obj);
 
-    let DDAListAPIObj = await APIServiceCall.loadDesignDirectoryApprovalList(obj);
+    let DDAListAPIObj = await APIServiceCall.loadAllFabricMastersList(obj);
 
     if (DDAListAPIObj && DDAListAPIObj.statusData) {
 
       if (DDAListAPIObj && DDAListAPIObj.responseData) {
         // set_itemsArray(DDAListAPIObj.responseData);
+        console.log("DDAListAPIObj.responseData ==> ", DDAListAPIObj.responseData)
         set_itemsArray(prevItems => reload 
           ? DDAListAPIObj.responseData 
           : [...prevItems, ...DDAListAPIObj.responseData] 
