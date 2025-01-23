@@ -31,31 +31,107 @@ const SaveRawMaterialsMasterUI = ({route, navigation, ...props}) => {
   const {colors} = useContext(ColorContext);
   const styles = getStyles(colors);
 
+  const [showScaleCheckbox, set_showScaleCheckbox]=useState(false);
+
   useEffect(() => {
     if (props.itemsObj) {
-      // if (props.itemsObj.datestr) {
-      //   setDate(props.itemsObj.datestr);
-      // }
-      // if (props.itemsObj.machineNosMap) {
-      //   const menuID = props.itemsObj.fpt_machine_id.toString();
-      //   set_MachineNoName(props?.itemsObj?.machineNosMap[menuID]);
-      //   set_MachineNoId(props.itemsObj.fpt_machine_id.toString());
-      //   setMachineNoList(props.itemsObj.machineNosMap);
-      //   set_filteredmachineNo(Object.keys(props.itemsObj.machineNosMap || {}));
-      // }
+      if (props.itemsObj.trimName) {
+        setRawMaterialName(props.itemsObj.trimName);
+      }
+      if (props.itemsObj.scale) {
+        setScaleWise(props.itemsObj.scale===1);
+        set_showScaleCheckbox(props.itemsObj.scale===1);
+      }
+      if (props.itemsObj.hsn) {
+        setHsn(props.itemsObj.hsn);
+      }
+      if (props.itemsObj.gstRate) {
+        setGstRate(props.itemsObj.gstRate);
+      }
+      if (props.itemsObj.inv_limit) {
+        setInventoryLimit(props.itemsObj.inv_limit);
+      }
+      if (props.itemsObj.price) {
+        setPrice(props.itemsObj.price);
+      }
+      if (props.itemsObj.packageQty) {
+        setPackageQty(props.itemsObj.packageQty);
+      }
+      if (props.itemsObj.activeStatus) {
+        set_bomStatus(props.itemsObj.activeStatus==='Y'? "Yes" : "No");
+      }
+      if (props.itemsObj.ispopdfScalewise) {
+        setMergeInPoPdf(props.itemsObj.ispopdfScalewise===1 ? "Yes" : "No");
+      }
+      if (props.itemsObj.uomMap) {
+        const menuID = props.itemsObj.uomId.toString();
+        set_uomName(props?.itemsObj?.uomMap[menuID]);
+        set_uomId(props.itemsObj.uomId.toString());
+        const arrayList = Object.keys(props.itemsObj.uomMap).map(key => ({
+          id: key,
+          name: props.itemsObj.uomMap[key]
+        }));
+        setUOMList(arrayList);
+        set_filteredUOM(arrayList);
+      }
+      if (props.itemsObj.colorMap) {
+        const menuID = props.itemsObj.colorid.toString();
+        set_colorName(props?.itemsObj?.colorMap[menuID]);
+        set_colorId(props.itemsObj.colorid.toString());
+        const arrayList = Object.keys(props.itemsObj.colorMap).map(key => ({
+          id: key,
+          name: props.itemsObj.colorMap[key]
+        }));
+        setColorList(arrayList);
+        set_filteredColor(arrayList);
+      }
+      if (props.itemsObj.locationsMap) {
+        const menuID = props.itemsObj.locationId.toString();
+        setLocationName(props?.itemsObj?.locationsMap[menuID]);
+        setLocationId(props.itemsObj.locationId.toString());
+        const arrayList = Object.keys(props.itemsObj.locationsMap).map(key => ({
+          id: key,
+          name: props.itemsObj.locationsMap[key]
+        }));
+        setLocationList(arrayList);
+        setFilteredLocation(arrayList);
+      }
+      if (props.itemsObj.trimTypesMap) {
+        const menuID = props.itemsObj.trimTypeId.toString();
+        set_rawMaterialTypeName(props?.itemsObj?.trimTypesMap[menuID]);
+        set_rawMaterialTypeId(props.itemsObj.trimTypeId.toString());
+        const arrayList = Object.keys(props.itemsObj.trimTypesMap).map(key => ({
+          id: key,
+          name: props.itemsObj.trimTypesMap[key]
+        }));
+        setRawMaterialTypeList(arrayList);
+        set_filteredRawMaterialType(arrayList);
+      }
+      if (props.itemsObj.brandsMap) {
+        const menuID = props.itemsObj.newTrimBrandId.toString();
+        setBrandOrProjectName(props?.itemsObj?.brandsMap[menuID]);
+        setBrandOrProjectId(props.itemsObj.newTrimBrandId.toString());
+        const arrayList = Object.keys(props.itemsObj.brandsMap).map(key => ({
+          id: key,
+          name: props.itemsObj.brandsMap[key]
+        }));
+        setBrandOrProjectList(arrayList);
+        setFilteredBrandOrProject(arrayList);
+      }
     }
+    console.log("ui props ==>>  ", props.itemsObj);
   }, [props.itemsObj]);
 
 
 
- const [showAddRawMaterialType, setShowAddRawMaterialType] = useState(false);
+   const [showAddRawMaterialType, setShowAddRawMaterialType] = useState(false);
    const [showAddColor, setShowAddColor] = useState(false);
    const [showAddUom, setShowAddUom] = useState(false);
  
    const [rawMaterialName, setRawMaterialName] = useState('');
-   const [gstRate, setGstRate] = useState('');
+   const [gstRate, setGstRate] = useState('0');
    const [hsn, setHsn] = useState('');
-   const [price, setPrice] = useState('');
+   const [price, setPrice] = useState('0');
    const [inventoryLimit, setInventoryLimit] = useState('');
    const [packageQty, setPackageQty] = useState('');
    const [mergeInPoPdf, setMergeInPoPdf] = useState("Yes");
@@ -73,10 +149,10 @@ const SaveRawMaterialsMasterUI = ({route, navigation, ...props}) => {
    // Raw Material Type
    const [rawMaterialTypeList, setRawMaterialTypeList] = useState([]);
    const [filteredRawMaterialType, set_filteredRawMaterialType] = useState([]);
-   const [showRawMaterialTypeList, set_showRawMaterialTypeList] =
-     useState(false);
+   const [showRawMaterialTypeList, set_showRawMaterialTypeList] =useState(false);
    const [rawMaterialTypeName, set_rawMaterialTypeName] = useState('');
    const [rawMaterialTypeId, set_rawMaterialTypeId] = useState('');
+
  
    const actionOnRawMaterialType = item => {
      set_rawMaterialTypeId(item.id);
@@ -384,7 +460,7 @@ const SaveRawMaterialsMasterUI = ({route, navigation, ...props}) => {
             style={{
               alignItems: 'center',
               justifyContent: 'center',
-              backgroundColor: '#fff',
+              backgroundColor: rawMaterialTypeId ? '#D8D8D8' : '#fff',
               marginTop: hp('2%'),
             }}>
             <TouchableOpacity
@@ -423,7 +499,7 @@ const SaveRawMaterialsMasterUI = ({route, navigation, ...props}) => {
               </View>
             </TouchableOpacity>
 
-            {showRawMaterialTypeList && (
+            {showRawMaterialTypeList && !rawMaterialTypeId && (
               <View style={styles.dropdownContent1}>
                 <TextInput
                   style={styles.searchInput}
@@ -503,7 +579,9 @@ const SaveRawMaterialsMasterUI = ({route, navigation, ...props}) => {
               label="Raw Material Name *"
               value={rawMaterialName}
               mode="outlined"
+              editable={props.itemsObj.trimName ? false : true}
               onChangeText={text => setRawMaterialName(text)}
+              style={{backgroundColor:'#D8D8D8'}}
             />
           </View>
 
@@ -511,7 +589,7 @@ const SaveRawMaterialsMasterUI = ({route, navigation, ...props}) => {
             style={{
               alignItems: 'center',
               justifyContent: 'center',
-              backgroundColor: '#fff',
+              backgroundColor: locationId ? '#D8D8D8' : '#fff',
               marginTop: hp('2%'),
             }}>
             <TouchableOpacity
@@ -550,7 +628,7 @@ const SaveRawMaterialsMasterUI = ({route, navigation, ...props}) => {
               </View>
             </TouchableOpacity>
 
-            {showLocationList && (
+            {showLocationList && !locationId && (
               <View style={styles.dropdownContent1}>
                 <TextInput
                   style={styles.searchInput}
@@ -584,7 +662,7 @@ const SaveRawMaterialsMasterUI = ({route, navigation, ...props}) => {
             style={{
               alignItems: 'center',
               justifyContent: 'center',
-              backgroundColor: '#fff',
+              backgroundColor: colorId ? "#D8D8D8": '#fff',
               marginTop: hp('2%'),
             }}>
             <TouchableOpacity
@@ -623,7 +701,7 @@ const SaveRawMaterialsMasterUI = ({route, navigation, ...props}) => {
               </View>
             </TouchableOpacity>
 
-            {showColorList && (
+            {showColorList && !colorId && (
               <View style={styles.dropdownContent1}>
                 <TextInput
                   style={styles.searchInput}
@@ -675,13 +753,13 @@ const SaveRawMaterialsMasterUI = ({route, navigation, ...props}) => {
             </View>
           )}
 
-          <View style={[styles.checkboxItem, {marginTop: hp('2%')}]}>
+          {showScaleCheckbox && <View style={[styles.checkboxItem, {marginTop: hp('2%')}]}>
             <CustomCheckBox
               isChecked={scaleWise}
               onToggle={() => setScaleWise(!scaleWise)}
             />
             <Text style={styles.checkboxLabel}>{'Scale Wise'}</Text>
-          </View>
+          </View>}
 
           {scaleWise && (
             <View
@@ -711,7 +789,7 @@ const SaveRawMaterialsMasterUI = ({route, navigation, ...props}) => {
             style={{
               alignItems: 'center',
               justifyContent: 'center',
-              backgroundColor: '#fff',
+              backgroundColor: uomId ? '#D8D8D8':'#fff',
               marginTop: hp('2%'),
             }}>
             <TouchableOpacity
@@ -748,7 +826,7 @@ const SaveRawMaterialsMasterUI = ({route, navigation, ...props}) => {
               </View>
             </TouchableOpacity>
 
-            {showUOMList && (
+            {showUOMList && !uomId && (
               <View style={styles.dropdownContent1}>
                 <TextInput
                   style={styles.searchInput}
@@ -812,7 +890,7 @@ const SaveRawMaterialsMasterUI = ({route, navigation, ...props}) => {
           <View style={{marginTop: hp('2%')}}>
             <TextInput
               label="Price"
-              value={price}
+              value={price.toString()}
               mode="outlined"
               onChangeText={text => setPrice(text)}
             />
@@ -820,7 +898,7 @@ const SaveRawMaterialsMasterUI = ({route, navigation, ...props}) => {
           <View style={{marginTop: hp('2%')}}>
             <TextInput
               label="Inventory Limit"
-              value={inventoryLimit}
+              value={inventoryLimit.toString()}
               mode="outlined"
               onChangeText={text => setInventoryLimit(text)}
             />
@@ -828,7 +906,7 @@ const SaveRawMaterialsMasterUI = ({route, navigation, ...props}) => {
           <View style={{marginTop: hp('2%')}}>
             <TextInput
               label="Package Qty"
-              value={packageQty}
+              value={packageQty.toString()}
               mode="outlined"
               onChangeText={text => setPackageQty(text)}
             />
@@ -837,7 +915,7 @@ const SaveRawMaterialsMasterUI = ({route, navigation, ...props}) => {
           <View style={{marginTop: hp('2%')}}>
             <TextInput
               label="GST Rate(%) *"
-              value={gstRate}
+              value={gstRate.toString()}
               mode="outlined"
               onChangeText={text => setGstRate(text)}
             />
@@ -847,7 +925,7 @@ const SaveRawMaterialsMasterUI = ({route, navigation, ...props}) => {
             style={{
               alignItems: 'center',
               justifyContent: 'center',
-              backgroundColor: '#fff',
+              backgroundColor: brandOrProjectId ? '#D8D8D8' : '#fff',
               marginTop: hp('2%'),
             }}>
             <TouchableOpacity
@@ -886,7 +964,7 @@ const SaveRawMaterialsMasterUI = ({route, navigation, ...props}) => {
               </View>
             </TouchableOpacity>
 
-            {showBrandOrProjectList && (
+            {showBrandOrProjectList && !brandOrProjectId && (
               <View style={styles.dropdownContent1}>
                 <TextInput
                   style={styles.searchInput}

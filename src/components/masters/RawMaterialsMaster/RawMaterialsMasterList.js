@@ -171,7 +171,7 @@ const RawMaterialsMasterList = ({ route }) => {
   };
 
   const actionOnRow = (item,index) => {
-    console.log("NAvigation ==> ", item);
+    // console.log("NAvigation ==> ", item);
     navigation.navigate('SaveRawMaterialsMaster', {item:item});
   };
   const actionOnCreate= () => {

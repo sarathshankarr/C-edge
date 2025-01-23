@@ -19,6 +19,7 @@ let downArrowImg = require('./../../../../assets/images/png/dropDownImg.png');
 const StoreApproveEditUi = ({ route, ...props }) => {
 
   const [data, setData] = useState([]);
+  const [date, setDate] = useState('2025-01-23');
   const [stockTable, set_stockTable] = useState([]);
   const [checkboxT1, set_checkboxT1] = useState(false);
   const [checkboxT2, set_checkboxT2] = useState(false);
@@ -46,9 +47,9 @@ const StoreApproveEditUi = ({ route, ...props }) => {
         set_flag(props?.itemsObj?.declinedStatus === 1 ? false : true);
       }
       if (props?.itemsObj?.fabricApprovalStatus) {
-        set_checkboxT2(props?.itemsObj?.fabricApprovalStatus !== 3 ? false : true);
+        set_checkboxT1(props?.itemsObj?.fabricApprovalStatus !== 3 ? false : true);
       }
-      console.log("props from ===> ", props?.itemsObj)
+      console.log("props from before===> ", props?.itemsObj)
     }
 
   }, [props?.itemsObj]);
@@ -71,24 +72,24 @@ const StoreApproveEditUi = ({ route, ...props }) => {
   const ApproveAction = () => {
     console.log("Approved");
 
-    if (data?.fabricApprovalStatus !== 0) {
-      if (stockTable?.length > 0) {
-        props.submitAction(remarks, checkboxT1, checkboxT2,1, 1, true);
-      } else {
-        props.submitAction(remarks, checkboxT1, checkboxT2,0, 1, true);
-      }
-    } else {
-      if (stockTable?.length > 0) {
-        props.submitAction(remarks, checkboxT1, checkboxT2,1, 0, true);
-      } else {
-        props.submitAction(remarks, checkboxT1, checkboxT2,0, 0 , true);
-      }
-    }
-    props.submitAction(remarks, checkboxT1, checkboxT2,stockTable?.length > 0? 1:0,  data?.fabricApprovalStatus !== 0 ? 1 :0, true );
+    // if (data?.fabricApprovalStatus !== 0) {
+    //   if (stockTable?.length > 0) {
+    //     props.submitAction(remarks, checkboxT1, checkboxT2,1, 1, true,date);
+    //   } else {
+    //     props.submitAction(remarks, checkboxT1, checkboxT2,0, 1, true,date);
+    //   }
+    // } else {
+    //   if (stockTable?.length > 0) {
+    //     props.submitAction(remarks, checkboxT1, checkboxT2,1, 0, true,date);
+    //   } else {
+    //     props.submitAction(remarks, checkboxT1, checkboxT2,0, 0 , true,date);
+    //   }
+    // }
+    props.submitAction(remarks, checkboxT1, checkboxT2,stockTable?.length > 0? 1:0,  data?.fabricApprovalStatus !== 0 ? 1 :0, true,date );
   };
 
   const RejectAction = () => {
-    props.submitAction(remarks, checkboxT1, checkboxT2,stockTable?.length > 0? 1:0,  data?.fabricApprovalStatus !== 0 ? 1 :0, false );
+    props.submitAction(remarks, checkboxT1, checkboxT2,stockTable?.length > 0? 1:0,  data?.fabricApprovalStatus !== 0 ? 1 :0, false,date);
     console.log("Rejected");
   };
 
@@ -142,7 +143,7 @@ const StoreApproveEditUi = ({ route, ...props }) => {
           <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: hp('1%') }} >
 
             <TextInputComponent
-              inputText={props.itemsObj ? props.itemsObj.stylename : ''}
+              inputText={props.itemsObj ? `${props.itemsObj.stylename} ( ${props.itemsObj.styleColor} ) ` : '' }
               labelText={'Style(Color)'}
               isEditable={false}
               maxLengthVal={200}
