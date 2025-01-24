@@ -31,6 +31,7 @@ const FabricEditUi = ({ route, ...props }) => {
       //     set_shiftList(props.itemsArray.shiftMap);
       //   }
       // }
+      console.log("edit details ==> ", props?.itemsArray);
     }, [props.itemsArray]);
   
     const [rawMaterialName, setRawMaterialName] = useState('');

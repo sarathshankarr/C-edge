@@ -20,6 +20,7 @@ const CreateRequest = ({ navigation, route, ...props }) => {
     getMenus: [],
     getBatches: [],
     getStockTypes:[],
+    getCompanyLocations:[]
   });
 
 

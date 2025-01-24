@@ -55,7 +55,6 @@ const FabricListUi = ({route, ...props}) => {
     if (props.itemsArray) {
       set_filterArray(props.itemsArray);
       set_ItemsArray(props.itemsArray);
-      console.log("props.itemsArray ==> ", props.itemsArray);
     }
     // getRequestBody();
   }, [props.itemsArray]);
@@ -126,7 +125,8 @@ const FabricListUi = ({route, ...props}) => {
     const styleArray = ItemsArray.filter(
       style =>
         style.fabricNo?.toUpperCase().includes(name.toUpperCase()) ||
-        style.colorName?.toUpperCase().includes(name.toUpperCase()),
+        style.colorName?.toUpperCase().includes(name.toUpperCase())||
+        style.username?.toUpperCase().includes(name.toUpperCase())
     );
     if (styleArray && styleArray.length > 0) {
       set_filterArray(styleArray);
@@ -178,28 +178,21 @@ const FabricListUi = ({route, ...props}) => {
         </Text>
         <Text
           style={[CommonStyles.tylesTextStyle, {textAlign: 'center', flex: 1}]}>
-          {item.fabricNo}
+          {item.colorName}
         </Text>
-        <View style={{flex: 1.2}}>
-          <Text
-            style={[
-              CommonStyles.tylesTextStyle,
-              {textAlign: 'center', flex: 1},
-            ]}>
-            {item.colorName}
-          </Text>
-          <Text
-            style={[
-              CommonStyles.tylesTextStyle,
-              {textAlign: 'center', flex: 1},
-            ]}>
-            {item.colorName}
-          </Text>
-        </View>
-        <Image
-          source={{uri: `data:image/png;base64,${item.designImg}`}}
-          style={[styles.imageStyle, {flex: 1.3}]}
-        />
+        <Text
+          style={[CommonStyles.tylesTextStyle, {textAlign: 'center', flex: 1}]}>
+          {item.fabriccode}
+        </Text>
+        <Text
+          style={[CommonStyles.tylesTextStyle, {textAlign: 'center', flex: 1}]}>
+          {item.fabriccontent}
+        </Text>
+        <Text
+          style={[CommonStyles.tylesTextStyle, {textAlign: 'center', flex: 1}]}>
+          {item.username}
+        </Text>
+        
       </View>
     </TouchableOpacity>
   );
@@ -331,7 +324,14 @@ const FabricListUi = ({route, ...props}) => {
                 CommonStyles.tylesHeaderTextStyle,
                 {textAlign: 'center', flex: 1.3},
               ]}>
-             Style Codes
+             Fabric Content
+            </Text>
+            <Text
+              style={[
+                CommonStyles.tylesHeaderTextStyle,
+                {textAlign: 'center', flex: 1.3},
+              ]}>
+             UserName
             </Text>
           </View>
         ) : (

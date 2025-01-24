@@ -12,6 +12,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import BottomComponent from '../../../utils/commonComponents/bottomComponent';
 import CustomCheckBox from '../../../utils/commonComponents/CustomCheckBox';
 import { ColorContext } from '../../colorTheme/colorTheme';
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 let downArrowImg = require('./../../../../assets/images/png/dropDownImg.png');
 
@@ -19,6 +20,9 @@ let downArrowImg = require('./../../../../assets/images/png/dropDownImg.png');
 const StockRecieveEditUi = ({ route, ...props }) => {
 
   const [data, setData] = useState([]);
+  const [date, setDate] = useState('');
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+
   const [stockTable, set_stockTable] = useState([]);
   const [checkboxT1, set_checkboxT1] = useState(false);
   const [checkboxT2, set_checkboxT2] = useState(false);
@@ -61,7 +65,9 @@ const StockRecieveEditUi = ({ route, ...props }) => {
 
   }, [props?.itemsObj]);
 
-
+ useEffect(() => {
+    handleConfirm(new Date());
+  }, []);
 
 
   const backBtnAction = () => {
@@ -88,9 +94,9 @@ const StockRecieveEditUi = ({ route, ...props }) => {
 
   const ApproveAction = () => {
       if (data && data?.fabric?.length > 0) {
-        props.submitAction(remarks, checkboxT2, 1, fabricCheckboxes);
+        props.submitAction(remarks, checkboxT2, 1, fabricCheckboxes,date);
       } else {
-        props.submitAction(remarks, checkboxT2, 0, fabricCheckboxes);
+        props.submitAction(remarks, checkboxT2, 0, fabricCheckboxes,date);
       }
     console.log("Approved");
 
@@ -123,7 +129,21 @@ const StockRecieveEditUi = ({ route, ...props }) => {
     const updatedCheckboxes = fabricCheckboxes.map(() => newValue);
     setFabricCheckboxes(updatedCheckboxes);
   };
-  
+
+
+    const handleConfirm = d => {
+    const formattedDate = d.toISOString().split('T')[0];
+    setDate(formattedDate);
+    hideDatePicker();
+  };
+
+  const showDatePicker = () => {
+    setDatePickerVisibility(true);
+  };
+
+  const hideDatePicker = () => {
+    setDatePickerVisibility(false);
+  };
 
   return (
 
@@ -264,6 +284,39 @@ const StockRecieveEditUi = ({ route, ...props }) => {
 
             </View>
           </View>}
+
+          {flag && <View
+             style={{
+               alignItems: 'center',
+               justifyContent: 'center',
+               backgroundColor: '#fff',
+               marginTop: hp('2%'),
+               flexDirection: 'row',
+               // width: '90%',
+               marginHorizontal:20
+             }}>
+             <View style={{width: '85%', paddingHorizontal: 10}}>
+               <TextInput
+                 label="Date"
+                 value={date ? Constant.formatDateIntoDMY(date) : ''}
+                 mode="outlined"
+                 color="#000"
+               />
+             </View>
+             <TouchableOpacity onPress={showDatePicker} style={{padding: 5}}>
+               <Image
+                 source={require('./../../../../assets/images/png/calendar11.png')}
+                 style={{width: 40, height: 40}}
+               />
+             </TouchableOpacity>
+          </View>}
+
+          <DateTimePickerModal
+             isVisible={isDatePickerVisible}
+             mode="date"
+             onConfirm={handleConfirm}
+             onCancel={hideDatePicker}
+           />
 
           <View style={{ width: '90%', marginTop: 10, marginBottom: 30, marginHorizontal: 15 }}>
             <Text style={[CommonStyles.tylesHeaderTextStyle, { alignItems: 'center', marginLeft: 10 }]}>{'Remarks  :'}</Text>

@@ -62,7 +62,6 @@ const FabricList = ({ navigation, route, ...props }) => {
       "compIds": usercompanyId,
       "company":JSON.parse(companyObj),
     }
-    console.log("load all ==> ", obj);
 
     let DDAListAPIObj = await APIServiceCall.loadAllFabricMastersList(obj);
 
@@ -70,7 +69,6 @@ const FabricList = ({ navigation, route, ...props }) => {
 
       if (DDAListAPIObj && DDAListAPIObj.responseData) {
         // set_itemsArray(DDAListAPIObj.responseData);
-        console.log("DDAListAPIObj.responseData ==> ", DDAListAPIObj.responseData)
         set_itemsArray(prevItems => reload 
           ? DDAListAPIObj.responseData 
           : [...prevItems, ...DDAListAPIObj.responseData] 
@@ -149,7 +147,7 @@ const FabricList = ({ navigation, route, ...props }) => {
   };
 
   const actionOnRow = (item, index) => {
-    navigation.navigate('DDAEdit', { item: item });
+    navigation.navigate('masterFabricEdit', { item });
   };
 
   const fetchMore= (more) =>{

@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { View, StyleSheet, TouchableOpacity, Text, FlatList, Image, TextInput, ScrollView, TouchableWithoutFeedback } from 'react-native';
+import React, { useState, useRef, useEffect, useContext } from 'react';
+import { View, StyleSheet, TouchableOpacity, Text, FlatList, Image, ScrollView, TouchableWithoutFeedback } from 'react-native';
 import { heightPercentageToDP as hp, widthPercentageToDP as wp, } from "react-native-responsive-screen";
 import * as Constant from "./../../../utils/constants/constant";
 import CommonStyles from "./../../../utils/commonStyles/commonStyles";
@@ -12,9 +12,13 @@ import BottomComponent from './../../../utils/commonComponents/bottomComponent';
 // import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { TextInput } from 'react-native-paper';
+import { ColorContext } from '../../colorTheme/colorTheme';
 
 let downArrowImg = require('./../../../../assets/images/png/dropDownImg.png');
 const CuttingSaveUI = ({ route, ...props }) => {
+
+  const { colors } = useContext(ColorContext);
 
   const [unitPrice, set_unitPrice] = useState(0);
   const [fabricWaste, set_fabricWaste] = useState('0');
@@ -500,15 +504,42 @@ const CuttingSaveUI = ({ route, ...props }) => {
             </View>
             <View style={CommonStyles.listStyle}>
               {enterSizesArray && enterSizesArray.map((item, index) => (
-                <View key={index} style={{ marginTop: hp('1%') }}>
-                  <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-                    <TextInputComponent
-                      labelText={item.size}
-                      isEditable={true}
-                      maxLengthVal={10}
-                      autoCapitalize={"none"}
-                      keyboardType={'numeric'}
-                      setValue={(textAnswer) => { untiPriceValue(textAnswer, index) }}
+                  <View key={index} style={{marginTop: hp('2%'), flexDirection: 'row'}}>
+                  <View style={{width: '65%', marginRight: '9%'}}>
+                     <View style={{ flexDirection: 'row'}}>
+                        <View style={{width: '90%'}}>
+                          <TextInput
+                            label={item.size}
+                            value={item.enterQty}
+                            mode="outlined"
+                            editable={true}
+                            onChangeText={(textAnswer) => { untiPriceValue(textAnswer, index) }}
+                          />
+                        </View>
+                        <View style={{position: 'relative'}}>
+                          <Text
+                            style={{
+                              backgroundColor: colors.color2,
+                              color: 'white',
+                              padding: 3,
+                              paddingHorizontal: 10,
+                              borderRadius: 30,
+                              position: 'absolute',
+                              left: -10,
+                              bottom: 15,
+                            }}>
+                            {(item.sizeQty - item.remQty).toString()}
+                          </Text>
+                        </View>
+                      </View>
+                  </View>
+                  <View style={{width: '25%'}}>
+                    <TextInput
+                      label="Rem Qty"
+                      value={item.remQty.toString()}
+                      mode="outlined"
+                      editable={false}
+                      onChangeText={text => console.log(text)}
                     />
                   </View>
                 </View>

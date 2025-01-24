@@ -1569,6 +1569,46 @@ export async function EditDDA(jsonValue) {
     obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet }
     return obj;
 };
+export async function EditFabricMasters(jsonValue) {
+
+    let returnError = undefined;
+    let statusData = undefined;
+    let responseData = undefined;
+    let logoutData = false;
+    let obj = undefined;
+
+    let internet = await internetCheck();
+    if (!internet) {
+        obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
+        return obj;
+    }
+    await fetch(Environment.uri + "fabricmaster/editFabric",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            },
+            body: JSON.stringify(jsonValue),
+        }
+    ).then((response) => response.json()).then(async (data) => {
+        // console.log('EditDDA   ==>', '', data.designId)
+
+        if (data) {
+            statusData = true;
+            responseData = data
+        } else {
+            statusData = undefined;
+        }
+
+    }).catch((error) => {
+        console.log('EditFabricMasters error ', error)
+        returnError = error;
+    });
+
+    obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet }
+    return obj;
+};
 
 export async function saveDDA(jsonValue) {
 
@@ -2985,6 +3025,45 @@ export async function GetCreateDropdownsList(jsonValue) {
     obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet }
     return obj;
 };
+export async function GetCreateFabricMastersList(jsonValue) {
+
+    let returnError = undefined;
+    let statusData = undefined;
+    let responseData = undefined;
+    let logoutData = false;
+    let obj = undefined;
+
+    let internet = await internetCheck();
+    if (!internet) {
+        obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
+        return obj;
+    }
+    console.log("URL", Environment.uri + "fabricmaster/createFabrics");
+    await fetch(Environment.uri + "fabricmaster/createFabrics",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            },
+            body: JSON.stringify(jsonValue),
+        }
+    ).then((response) => response.json()).then(async (data) => {
+        if (data) {
+            statusData = true;
+            responseData = data
+        } else {
+            statusData = undefined;
+        }
+
+    }).catch((error) => {
+        console.log('GetCreateFabricMastersList error ', error)
+        returnError = error;
+    });
+
+    obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet }
+    return obj;
+};
 export async function getBatchNoListByProcessId(jsonValue) {
 
     let returnError = undefined;
@@ -3375,6 +3454,47 @@ export async function saveCreateUomMasters(jsonValue) {
 
     }).catch((error) => {
         console.log('apisaveFabricProcessIn', error)
+        returnError = error;
+    });
+
+    obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet }
+    return obj;
+};
+export async function saveCreateFabricMasters(jsonValue) {
+
+    let returnError = undefined;
+    let statusData = undefined;
+    let responseData = undefined;
+    let logoutData = false;
+    let obj = undefined;
+
+    let internet = await internetCheck();
+    if (!internet) {
+        obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
+        return obj;
+    }
+    // console.log('saveCreateProcessIn ', jsonValue, Environment.uri + "fabricmaster/saveFabric")
+    await fetch(Environment.uri + "fabricmaster/saveFabric",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            },
+            body: JSON.stringify(jsonValue),
+        }
+    ).then((response) => response.json()).then(async (data) => {
+        // console.log('saveCreateFabricMasters ', data)
+
+        if (data) {
+            statusData = true;
+            responseData = data
+        } else {
+            statusData = undefined;
+        }
+
+    }).catch((error) => {
+        console.log('saveCreateFabricMasters', error)
         returnError = error;
     });
 

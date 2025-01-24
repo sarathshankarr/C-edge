@@ -20,8 +20,8 @@ const FabricEdit = ({ navigation, route, ...props }) => {
   React.useEffect(() => {
 
     if (route.params?.item) {
-      // getInitialData(route.params?.item);
-      console.log("route.params?.item===========> ", route.params?.item.designId);
+      getInitialData(route.params.item.fabricId);
+      console.log("route.params?.item===========> ", route.params.item.fabricId);
     }
 
   }, [route.params]);
@@ -38,7 +38,7 @@ const FabricEdit = ({ navigation, route, ...props }) => {
 
 
 
-  const getInitialData = async (item) => {
+  const getInitialData = async (id) => {
 
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
@@ -47,19 +47,17 @@ const FabricEdit = ({ navigation, route, ...props }) => {
 
     set_isLoading(true);
     let obj = {
-      "designId": item.designId,
-      "menuId": 728,
-      "userName": userName,
-      "userPwd": userPsd,
+      "fabricId":id,
+      "username": userName,
+      "password": userPsd,
+      "menuid":29,
       "compIds": usercompanyId,
       "company":JSON.parse(companyObj),
 
     }
-    console.log(' DDA edit request body --->,',obj);
-    let EditDDAAPIObj = await APIServiceCall.EditDDA(obj);
+    let EditDDAAPIObj = await APIServiceCall.EditFabricMasters(obj);
     set_isLoading(false);
 
-    console.log("edit get data ==> ", EditDDAAPIObj.statusData);
     if (EditDDAAPIObj && EditDDAAPIObj.statusData) {
       set_itemsObj(EditDDAAPIObj.responseData);
     } else {
