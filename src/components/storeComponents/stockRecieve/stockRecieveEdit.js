@@ -79,7 +79,7 @@ const StockRecieveEdit = ({ navigation, route, ...props }) => {
     popUpAction(undefined, undefined, '', false, false)
   };
 
-  const submitAction = (remarks, checkboxT2, T2, fabricCheckboxes) => {
+  const submitAction = (remarks, checkboxT2, T2, fabricCheckboxes,date) => {
     let tempObj = itemsObj;
     console.log("SUBMIT ACTION==> ", remarks, checkboxT2, T2, fabricCheckboxes);
 
@@ -94,6 +94,7 @@ const StockRecieveEdit = ({ navigation, route, ...props }) => {
       tempObj.fabricApprovalStatus = 3;
     }
     tempObj.comments = remarks;
+    tempObj.datestr = date;
     const reqList = tempObj?.requestDetails.map((item, index) => {
       item.approveStatus = fabricCheckboxes[index] ? 3 : 1;
       return item;
@@ -102,10 +103,10 @@ const StockRecieveEdit = ({ navigation, route, ...props }) => {
     tempObj.requestDetails = reqList;
 
     const filteredRequestDetails = tempObj?.requestDetails.map(item => ({
-      id: item.id, // stockChildId
-      stock: item.stock, // rmId
-      styleRmSizeId: item.styleRmSizeId, // sizeId
-      inputQty: item.inputQty // rmqty
+      id: item.id, 
+      stock: item.stock, 
+      styleRmSizeId: item.styleRmSizeId, 
+      inputQty: item.inputQty 
   }));
 
   // console.log("filteredRequestDetails==>", filteredRequestDetails)
@@ -132,8 +133,7 @@ const StockRecieveEdit = ({ navigation, route, ...props }) => {
       "fabricQty": tempObj.fabricqty,
       "stockId": tempObj.id,
       "rmDetails": tempObj.requestDetails,
-      "rmDetails": tempObj.requestDetails,
-      "receiveDate":"2025-01-25",
+      "receiveDate":tempObj.datestr,
 
       
     }

@@ -61,7 +61,7 @@ const [itemsArray, set_itemsArray] = useState([]);
         "compIds": usercompanyId,
         "company":JSON.parse(companyObj),
     }
-    console.log( "styleId ",id,"soId ",  sid,)
+    console.log( "styleId ",id,"soId ",  sid)
     // console.log( "re body before getting fab details ==> ","start", obj, "end");
 
 

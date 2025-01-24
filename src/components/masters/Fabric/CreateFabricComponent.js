@@ -17,18 +17,16 @@ const CreateFabricComponent = ({ route }) => {
   const [isPopupLeft, set_isPopupLeft] = useState(false);
   
   const [lists, set_lists] = useState({
-    processMap: [],
-    machineNosMap: [],
-    shiftMap: [],
-    empMap: [],
-    batchNoMap: [],
-    ordersMap: [],
-    colorsMap: [],
+    locationsMap: [],
+    colorMap: [],
+    uomMap: [],
+    brandsMap: [],
+    fabrictypeMap: [],
   });
 
 
   React.useEffect(() => {
-    // getInitialData();
+    getInitialData();
   }, []);
 
 
@@ -47,109 +45,84 @@ const CreateFabricComponent = ({ route }) => {
     let obj = {
       "username": userName,
       "password": userPsd,
-      "menuId": 587,
+      "menuId": 12,
       "compIds": usercompanyId,
       "company":JSON.parse(companyObj),
 
     }
-    let LISTAPIOBJ = await APIServiceCall.GetProcessList(obj);
+    let LISTAPIOBJ = await APIServiceCall.GetCreateFabricMastersList(obj);
     set_isLoading(false);
 
     if (LISTAPIOBJ && LISTAPIOBJ.statusData) {
       if (LISTAPIOBJ && LISTAPIOBJ.responseData) {
 
-        if (LISTAPIOBJ?.responseData?.processMap) {
-          const processList = Object.keys(LISTAPIOBJ.responseData.processMap).map(key => ({
+        if (LISTAPIOBJ?.responseData?.locationsMap) {
+          const locationsMapList = Object.keys(LISTAPIOBJ.responseData.locationsMap).map(key => ({
             id: key,
-            name: LISTAPIOBJ.responseData.processMap[key]
+            name: LISTAPIOBJ.responseData.locationsMap[key]
           }));
           set_lists(prevLists => ({
             ...prevLists,
-            processMap: processList
+            locationsMap: locationsMapList
           }));
         }
-
-        console.log("LISTAPIOBJ?.responseData?.machineNosMap===> ", LISTAPIOBJ?.responseData?.machineNosMap)
-        if (LISTAPIOBJ?.responseData?.machineNosMap) {
-          const machineNosList = Object.keys(LISTAPIOBJ.responseData.machineNosMap).map(key => ({
+        if (LISTAPIOBJ?.responseData?.colorMap) {
+          const colorMapList = Object.keys(LISTAPIOBJ.responseData.colorMap).map(key => ({
             id: key,
-            name: LISTAPIOBJ.responseData.machineNosMap[key]
+            name: LISTAPIOBJ.responseData.colorMap[key]
           }));
 
-          const prioritizedMachine = { id: "ADD", name: "Add Machine No" }; // Define your first element
-          const updatedMachineNosList = [prioritizedMachine, ...machineNosList];
+          const prioritized = { id: "ADD_NEW_COLOR", name: "Add New Color" }; 
+          const updatedcolorMapList = [prioritized, ...colorMapList];
       
           set_lists(prevLists => ({
               ...prevLists,
-              machineNosMap: updatedMachineNosList
+              colorMap: updatedcolorMapList
           }));
-
-
-          // set_lists(prevLists => ({
-          //   ...prevLists,
-          //   machineNosMap: machineNosList
-          // }));
         }
-
-        // Handle shiftMap
-        if (LISTAPIOBJ?.responseData?.shiftMap) {
-          const shiftList = Object.keys(LISTAPIOBJ.responseData.shiftMap).map(key => ({
+        if (LISTAPIOBJ?.responseData?.uomMap) {
+          const uomMapList = Object.keys(LISTAPIOBJ.responseData.uomMap).map(key => ({
             id: key,
-            name: LISTAPIOBJ.responseData.shiftMap[key]
+            name: LISTAPIOBJ.responseData.uomMap[key]
           }));
+
+          const prioritized = { id: "ADD_NEW_UOM", name: "Add New UOM " }; 
+          const updateduomMapList = [prioritized, ...uomMapList];
+      
           set_lists(prevLists => ({
-            ...prevLists,
-            shiftMap: shiftList
+              ...prevLists,
+              uomMap: updateduomMapList
+          }));
+        }
+        if (LISTAPIOBJ?.responseData?.fabrictypeMap) {
+          const fabrictypeMapList = Object.keys(LISTAPIOBJ.responseData.fabrictypeMap).map(key => ({
+            id: key,
+            name: LISTAPIOBJ.responseData.fabrictypeMap[key]
+          }));
+
+          const prioritized = { id: "ADD_NEW_FABRIC_TYPE", name: "Add New Fabric Type " }; 
+          const updatedfabrictypeMapList = [prioritized, ...fabrictypeMapList];
+      
+          set_lists(prevLists => ({
+              ...prevLists,
+              fabrictypeMap: updatedfabrictypeMapList
+          }));
+        }
+        if (LISTAPIOBJ?.responseData?.brandsMap) {
+          const brandsMapList = Object.keys(LISTAPIOBJ.responseData.brandsMap).map(key => ({
+            id: key,
+            name: LISTAPIOBJ.responseData.brandsMap[key]
+          }));
+
+          const prioritized = { id: "ADD_NEW_BRAND", name: "Add New Brand/Project" }; 
+          const updatedbrandsMapList = [prioritized, ...brandsMapList];
+      
+          set_lists(prevLists => ({
+              ...prevLists,
+              brandsMap: updatedbrandsMapList
           }));
         }
 
-        // Handle empMap
-        if (LISTAPIOBJ?.responseData?.empMap) {
-          const empList = Object.keys(LISTAPIOBJ.responseData.empMap).map(key => ({
-            id: key,
-            name: LISTAPIOBJ.responseData.empMap[key]
-          }));
-          set_lists(prevLists => ({
-            ...prevLists,
-            empMap: empList
-          }));
-        }
-
-        // Handle batchNoMap
-        if (LISTAPIOBJ?.responseData?.batchNoMap) {
-          const batchNoList = Object.keys(LISTAPIOBJ.responseData.batchNoMap).map(key => ({
-            id: key,
-            name: LISTAPIOBJ.responseData.batchNoMap[key]
-          }));
-          set_lists(prevLists => ({
-            ...prevLists,
-            batchNoMap: batchNoList
-          }));
-        }
-
-        // Handle ordersMap
-        if (LISTAPIOBJ?.responseData?.ordersMap) {
-          const ordersList = Object.keys(LISTAPIOBJ.responseData.ordersMap).map(key => ({
-            id: key,
-            name: LISTAPIOBJ.responseData.ordersMap[key]
-          }));
-          set_lists(prevLists => ({
-            ...prevLists,
-            ordersMap: ordersList  // Store the array format
-          }));
-        }
-
-        // Handle colorsMap
-        if (LISTAPIOBJ?.responseData?.colorsMap) {
-          const colorsList = Object.keys(LISTAPIOBJ.responseData.colorsMap).map(key => ({
-            id: key,
-            name: LISTAPIOBJ.responseData.colorsMap[key]
-          }));
-          set_lists(prevLists => ({
-            ...prevLists,
-            colorsMap: colorsList  // Store the array format
-          }));
-        }
       }
     }
     else {
@@ -190,7 +163,7 @@ const CreateFabricComponent = ({ route }) => {
 
     set_isLoading(true);
 
-    let SAVEAPIObj = await APIServiceCall.saveCreateProcessIn(tempObj);
+    let SAVEAPIObj = await APIServiceCall.saveCreateFabricMasters(tempObj);
     set_isLoading(false);
 
     console.log("Sucess before returned obj ", SAVEAPIObj);

@@ -1,4 +1,4 @@
-import React, {useState, useRef, useEffect} from 'react';
+import React, {useState, useRef, useEffect, useMemo} from 'react';
 import {
   View,
   FlatList,
@@ -26,54 +26,60 @@ import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import {formatDateIntoDMY} from '../../../utils/constants/constant';
 import {RadioButton, TextInput} from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {RadioGroup} from 'react-native-radio-buttons-group';
 
 let downArrowImg = require('./../../../../assets/images/png/dropDownImg.png');
 const CreateFabricUI = ({route, navigation, ...props}) => {
   useEffect(() => {
-    // if (props?.itemsArray) {
-    //   if (props.itemsArray.machineNosMap) {
-    //     set_filteredmachineNo(props.itemsArray.machineNosMap);
-    //     setMachineNoList(props.itemsArray.machineNosMap);
-    //   }
-    //   if (props.itemsArray.empMap) {
-    //     set_filteredattendedBy(props.itemsArray.empMap);
-    //     setAttendedByList(props.itemsArray.empMap);
-    //   }
-    //   if (props.itemsArray.shiftMap) {
-    //     set_shiftList(props.itemsArray.shiftMap);
-    //   }
-    // }
+    if (props?.itemsArray) {
+      if (props.itemsArray.fabrictypeMap) {
+        setFabricTypeList(props.itemsArray.fabrictypeMap);
+        set_filteredFabricType(props.itemsArray.fabrictypeMap);
+      }
+      if (props.itemsArray.uomMap) {
+        set_filteredUOM(props.itemsArray.uomMap);
+        setUOMList(props.itemsArray.uomMap);
+      }
+      if (props.itemsArray.colorMap) {
+        set_filteredColor(props.itemsArray.colorMap);
+        setColorList(props.itemsArray.colorMap);
+      }
+      if (props.itemsArray.locationsMap) {
+        set_filteredLocation(props.itemsArray.locationsMap);
+        setLocationList(props.itemsArray.locationsMap);
+      }
+      if (props.itemsArray.brandsMap) {
+        setFilteredBrandOrProject(props.itemsArray.brandsMap);
+        setBrandOrProjectList(props.itemsArray.brandsMap);
+      }
+    }
   }, [props.itemsArray]);
 
-  const [rawMaterialName, setRawMaterialName] = useState('');
+  const [fabricNo, setFabricNo] = useState('');
+  const [fabricCode, setFabricCode] = useState('');
   const [hsn, setHsn] = useState('');
   const [gstRate, setGstRate] = useState('');
+  const [rate, setRate] = useState('');
+  const [gsm, setGsm] = useState('');
+  const [fabricWidth, setFabricWidth] = useState('');
+  const [inventoryLimit, setInventoryLimit] = useState('');
 
-// Fabric No
-const [fabricNoList, setFabricNoList] = useState([]);
-const [filteredFabricNo, set_filteredFabricNo] = useState([]);
-const [showFabricNoList, set_showFabricNoList] = useState(false);
-const [fabricNoName, set_fabricNoName] = useState('');
-const [fabricNoId, set_fabricNoId] = useState('');
-const [showFabricNo, setShowFabricNo] = useState(false);
+  const [showAddColor, setShowAddColor] = useState(false);
+  const [showAddUom, setShowAddUom] = useState(false);
+  const [showAddBrandOrProject, setShowAddBrandOrProject] = useState(false);
+  const [showAddFabricType, setShowAddFabricType] = useState(false);
 
-const actionOnFabricNo = (item) => {
-  set_fabricNoId(item.id);
-  set_fabricNoName(item.name);
-  set_showFabricNoList(false);
-};
+  const [trimFabricRadio, set_trimFabricRadio] = useState('Yes');
+  const [updateRollWiseQtyRadio, set_updateRollWiseQtyRadio] = useState('Yes');
 
-const handleSearchFabricNo = (text) => {
-  if (text.trim().length > 0) {
-    const filtered = fabricNoList.filter(user =>
-      user.name.toLowerCase().includes(text.toLowerCase()),
-    );
-    set_filteredFabricNo(filtered);
-  } else {
-    set_filteredFabricNo(fabricNoList);
-  }
-};
-
+  const [addBrandProjectName, setAddBrandProjectName] = useState('');
+  const [addBrandProjectDescription, setAddBrandProjectDescription] =useState('');
+  const [addNewFabricType, setAddNewFabricType] = useState('');
+  const [addFabricTypeDescription, setAddFabricTypeDescription] = useState('');
+  const [newColor, setNewColor] = useState('');
+  const [colorCode, setColorCode] = useState('');
+  const [uomType, setUomType] = useState('');
+  const [uomDescription, setUomDescription] = useState('');
 
   // Location
   const [locationList, setLocationList] = useState([]);
@@ -110,6 +116,11 @@ const handleSearchFabricNo = (text) => {
     set_colorId(item.id);
     set_colorName(item.name);
     set_showColorList(false);
+    if (item.id === 'ADD_NEW_COLOR') {
+      setShowAddColor(true);
+    } else {
+      setShowAddColor(false);
+    }
   };
 
   const handleSearchColor = text => {
@@ -134,6 +145,11 @@ const handleSearchFabricNo = (text) => {
     set_uomId(item.id);
     set_uomName(item.name);
     set_showUOMList(false);
+    if (item.id === 'ADD_NEW_UOM') {
+      setShowAddUom(true);
+    } else {
+      setShowAddUom(false);
+    }
   };
 
   const handleSearchUOM = text => {
@@ -147,6 +163,62 @@ const handleSearchFabricNo = (text) => {
     }
   };
 
+  const [brandOrProjectList, setBrandOrProjectList] = useState([]);
+  const [filteredBrandOrProject, setFilteredBrandOrProject] = useState([]);
+  const [showBrandOrProjectList, setShowBrandOrProjectList] = useState(false);
+  const [brandOrProjectName, setBrandOrProjectName] = useState('');
+  const [brandOrProjectId, setBrandOrProjectId] = useState('');
+
+  const actionOnBrandOrProject = item => {
+    setBrandOrProjectId(item.id);
+    setBrandOrProjectName(item.name);
+    setShowBrandOrProjectList(false);
+    if (item.id === 'ADD_NEW_BRAND') {
+      setShowAddBrandOrProject(true);
+    } else {
+      setShowAddBrandOrProject(false);
+    }
+  };
+
+  const handleSearchBrandOrProject = text => {
+    if (text.trim().length > 0) {
+      const filtered = brandOrProjectList.filter(project =>
+        project.name.toLowerCase().includes(text.toLowerCase()),
+      );
+      setFilteredBrandOrProject(filtered);
+    } else {
+      setFilteredBrandOrProject(brandOrProjectList);
+    }
+  };
+
+  const [fabricTypeList, setFabricTypeList] = useState([]);
+  const [filteredFabricType, set_filteredFabricType] = useState([]);
+  const [showFabricTypeList, set_showFabricTypeList] = useState(false);
+  const [fabricTypeName, set_fabricTypeName] = useState('');
+  const [fabricTypeId, set_fabricTypeId] = useState('');
+
+  const actionOnFabricType = item => {
+    set_fabricTypeId(item.id);
+    set_fabricTypeName(item.name);
+    set_showFabricTypeList(false);
+    if (item.id === 'ADD_NEW_FABRIC_TYPE') {
+      setShowAddFabricType(true);
+    } else {
+      setShowAddFabricType(false);
+    }
+  };
+
+  const handleSearchFabricType = text => {
+    if (text.trim().length > 0) {
+      const filtered = fabricTypeList.filter(item =>
+        item.name.toLowerCase().includes(text.toLowerCase()),
+      );
+      set_filteredFabricType(filtered);
+    } else {
+      set_filteredFabricType(fabricTypeList);
+    }
+  };
+
   const backBtnAction = () => {
     props.backBtnAction();
   };
@@ -156,132 +228,101 @@ const handleSearchFabricNo = (text) => {
   };
 
   const submitAction = async () => {
-    console.log({
-      date: date,
-      shiftId: shiftId,
-      inTime: inTime,
-      batchNoId: batchNoId,
-      batch: batch,
-      MachineNoId: MachineNoId,
-      attendedById: attendedById,
-      processId: processId,
-      OrderNoId: OrderNoId,
-      designNoId: designNoId,
-      matchingNoId: matchingNoId,
-    });
-
-    if (
-      !processId ||
-      !date ||
-      !Number(shiftId) ||
-      !inTime ||
-      !batchNoId ||
-      !batch ||
-      (!MachineNoId && !(showAddmcNO && addmachno)) ||
-      !attendedById
-    ) {
-      Alert.alert('Please fill all mandatory fields !');
-      return;
+    const obj={
+       "fabricNo":fabricNo,
+	     "designCodes":"",
+	     "newColor":newColor,
+	     "fabriccode":fabricCode,
+	     "fabricsort":"",
+	     "fabriccontent":"",
+	     "millname":"",
+	     "fabricId":"0",
+	     "fabricType":addNewFabricType,
+	     "fabricDescription":addFabricTypeDescription,
+	     "fabricTypeId":fabricTypeId==="ADD_NEW_FABRIC_TYPE" ? '0' : fabricTypeId,
+	     "rate":rate,
+	     "brandName":addBrandProjectName,
+	     "brandDescription":addBrandProjectDescription,
+	     "gsm":gsm,
+       "fabricWidth":fabricWidth,
+       "colorid":colorId ==='ADD_NEW_COLOR' ? '0' : colorId,
+       "locationId":locationId,
+       "uomId":uomId ==='ADD_NEW_UOM' ? '0': uomId,
+       "hsn":hsn,
+       "gstRate":gstRate,
+       "inv_limit":inventoryLimit,
+       "bomststatus":1,
+       "fabricBrandId":brandOrProjectId ==='ADD_NEW_BRAND' ? '0' : brandOrProjectId,
+       "newcolor":newColor,
+       "newcolorcode":colorCode,
+       "umoType":uomType,
+       "umoDescription":uomDescription,
+       "newFabricType":addNewFabricType,
+       "newFabricDescription":addFabricTypeDescription,
+       "newBrandName":addBrandProjectName,
+       "newBrandDescription":addBrandProjectDescription,
+       "bomststatus":trimFabricRadio ==="Yes"?1:0,
+       "aisbinSts":updateRollWiseQtyRadio ==="Yes"?1:0,
     }
-
-    if (Number(processId) >= 591) {
-      // if (!OrderNoId || !designNoId || (Number(processId) !== 591 || !matchingNoId)) {
-      //   Alert.alert("Please fill all mandatory fields !");
-      //   return;
-      // }
-      if (
-        !OrderNoId ||
-        !designNoId ||
-        (Number(processId) !== 591 && !matchingNoId)
-      ) {
-        Alert.alert('Please fill all mandatory fields!');
-        return;
-      }
-    }
-
-    if (Number(processId) === 591) {
-      if (selectedIndex === null) {
-        Alert.alert('Please Select Atleast one Matching ');
-        return;
-      }
-    }
-    if (Number(fabricIssued) > Number(fabricIssuedLimit)) {
-      Alert.alert('Qty Should Not Be More than ', fabricIssuedLimit);
-      return;
-    }
-
-    const s = batchNoId.split('_');
-    const a = s[0];
-    const b = s[1];
-
-    let obj1;
-
-    table.map((item, index) => {
-      if (index === selectedIndex) {
-        obj1 = {
-          matchingName: item.matchingName,
-          orderMtr: item.ordermtr,
-          totMtr: item.totMtr,
-          img: item.Image,
-          matchId: item.matchId,
-          remainTot: item.remainTot,
-        };
-      }
-    });
-
-    const Obj = {
-      processid: processId ? Number(processId) : 0,
-      fabricId: fabricId ? fabricId : 0,
-      batchId: b ? Number(b) : 0,
-      creationDate: date ? date : '',
-      machineId: MachineNoId ? Number(MachineNoId) : 0,
-      shiftId: Number(shiftId),
-      attendedById: attendedById ? Number(attendedById) : 0,
-      intime: inTime,
-      batchNo: a ? Number(a) : '',
-      quality: quality,
-      lotNo: lotNo ? lotNo : '',
-      partyName: partyName,
-      rollTrolley: rollNo ? rollNo : '0',
-      fabricGreyWidth: fabricGreyWidth ? fabricGreyWidth : '',
-      noOfPieces: pieces ? pieces : '',
-      fabricIssued: fabricIssued ? Number(fabricIssued) : 0,
-      colorid: 0,
-      previousqty: previousQty ? Number(previousQty) : 0.0,
-      orderNo: OrderNoId ? Number(OrderNoId) : 0,
-      designId: designNoId ? Number(designNoId) : 0,
-      beforeProcessWidth: beforeProcessWidth ? beforeProcessWidth : '',
-      printingId: printingId ? Number(printingId) : 0,
-      addmachno: addmachno,
-      matchId: matchingNoId ? Number(matchingNoId) : 0,
-      matchimg: '',
-      orderId: OrderNoId ? Number(OrderNoId) : 0,
-      designNo: designNoId ? Number(designNoId) : 0,
-      newdesignNo: designNoId ? Number(designNoId) : 0,
-      matchingId: matchingNoId ? Number(matchingNoId) : 0,
-      fabricPrintingOrderFormDAO: [
-        {
-          poft_fpt_batchNo_id: a ? Number(a) : 0,
-          poft_order_id: OrderNoId ? Number(OrderNoId) : 0,
-          poft_design_id: designNoId ? Number(designNoId) : 0,
-          poft_matcing_id: obj1?.matchId ? Number(obj1?.matchId) : 0,
-          poft_design_img: obj1?.img ? obj1?.img : '',
-          poft_order_mtr: obj1?.orderMtr ? obj1?.orderMtr : 0,
-          poft_tot_printed_mtr: obj1?.totMtr ? obj1?.totMtr : 0,
-          poft_remaining_print: obj1?.remainTot ? obj1?.remainTot : 0,
-          poft_printingMenuId: processId ? Number(processId) : 0,
-        },
-      ],
-    };
-
-    // console.log("saving obj ", Obj)
-    // return;
-    props.submitAction(Obj);
-    // Alert.alert("Save Button Clicked");
+    props.submitAction(obj);
   };
 
   const backAction = async () => {
     props.backBtnAction();
+  };
+
+  const trimFabricRadioButtons = useMemo(
+    () => [
+      {
+        id: '1',
+        label: 'Yes',
+        value: 'Yes',
+        selected: trimFabricRadio === 'Yes',
+        labelStyle: {color: '#000'},
+      },
+      {
+        id: '2',
+        label: 'No',
+        value: 'No',
+        selected: trimFabricRadio === 'No',
+        labelStyle: {color: '#000'},
+      },
+    ],
+    [trimFabricRadio],
+  );
+
+  const handletrimFabricRadioChange = selectedId => {
+    const selectedOption = trimFabricRadioButtons.find(
+      button => button.id === selectedId,
+    );
+    set_trimFabricRadio(selectedOption.value);
+  };
+
+  const updateRollWiseQtyRadioButtons = useMemo(
+    () => [
+      {
+        id: '1',
+        label: 'Yes',
+        value: 'Yes',
+        selected: updateRollWiseQtyRadio === 'Yes',
+        labelStyle: {color: '#000'},
+      },
+      {
+        id: '2',
+        label: 'No',
+        value: 'No',
+        selected: updateRollWiseQtyRadio === 'No',
+        labelStyle: {color: '#000'},
+      },
+    ],
+    [updateRollWiseQtyRadio],
+  );
+
+  const handleUpdateRollWiseQtyRadioChange = selectedId => {
+    const selectedOption = updateRollWiseQtyRadioButtons.find(
+      button => button.id === selectedId,
+    );
+    set_updateRollWiseQtyRadio(selectedOption.value);
   };
 
   return (
@@ -310,175 +351,13 @@ const handleSearchFabricNo = (text) => {
             width: '90%',
             marginHorizontal: wp('5%'),
           }}>
-          <View
-            style={{
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: '#fff',
-              marginTop: hp('2%'),
-            }}>
-            <TouchableOpacity
-              style={{
-                flexDirection: 'row',
-                borderWidth: 0.5,
-                borderColor: '#D8D8D8',
-                borderRadius: hp('0.5%'),
-                width: wp('90%'),
-              }}
-              onPress={() => {
-                set_showFabricNoList(!showFabricNoList);
-              }}>
-              <View>
-                <View style={[styles.SectionStyle1, {}]}>
-                  <View style={{flexDirection: 'column'}}>
-                    <Text
-                      style={
-                        fabricNoId
-                          ? [styles.dropTextLightStyle]
-                          : [styles.dropTextInputStyle]
-                      }>
-                      {'Fabric No *  '}
-                    </Text>
-                    {fabricNoId ? (
-                      <Text style={[styles.dropTextInputStyle]}>
-                        {fabricNoName}
-                      </Text>
-                    ) : null}
-                  </View>
-                </View>
-              </View>
-
-              <View style={{justifyContent: 'center'}}>
-                <Image source={downArrowImg} style={styles.imageStyle} />
-              </View>
-            </TouchableOpacity>
-
-            {showFabricNoList && (
-              <View style={styles.dropdownContent1}>
-                <TextInput
-                  style={styles.searchInput}
-                  placeholder="Search "
-                  onChangeText={handleSearchFabricNo}
-                  placeholderTextColor="#000"
-                />
-                <ScrollView
-                  style={styles.scrollView}
-                  nestedScrollEnabled={true}>
-                  {filteredFabricNo.length === 0 ? (
-                    <Text style={styles.noCategoriesText}>
-                      Sorry, no results found!
-                    </Text>
-                  ) : (
-                    filteredFabricNo.map((item, index) => (
-                      <TouchableOpacity
-                        key={index}
-                        style={styles.dropdownOption}
-                        onPress={() => actionOnFabricNo(item)}>
-                        <Text style={{color: '#000'}}>{item.name}</Text>
-                      </TouchableOpacity>
-                    ))
-                  )}
-                </ScrollView>
-              </View>
-            )}
-          </View>
-
           <View style={{marginTop: hp('2%')}}>
             <TextInput
-              label="Raw Material Name *"
-              value={rawMaterialName}
+              label="Fabric No *"
+              value={fabricNo}
               mode="outlined"
-              onChangeText={text => setRawMaterialName(text)}
+              onChangeText={text => setFabricNo(text)}
             />
-          </View>
-          <View style={{marginTop: hp('2%')}}>
-            <TextInput
-              label="GST Rate(%) *"
-              value={gstRate}
-              mode="outlined"
-              onChangeText={text => setGstRate(text)}
-            />
-          </View>
-          <View style={{marginTop: hp('2%')}}>
-            <TextInput
-              label="HSN *"
-              value={hsn}
-              mode="outlined"
-              onChangeText={text => setHsn(text)}
-            />
-          </View>
-
-          <View
-            style={{
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: '#fff',
-              marginTop: hp('2%'),
-            }}>
-            <TouchableOpacity
-              style={{
-                flexDirection: 'row',
-                borderWidth: 0.5,
-                borderColor: '#D8D8D8',
-                borderRadius: hp('0.5%'),
-                width: wp('90%'),
-              }}
-              onPress={() => {
-                set_showLocationList(!showLocationList);
-              }}>
-              <View>
-                <View style={[styles.SectionStyle1, {}]}>
-                  <View style={{flexDirection: 'column'}}>
-                    <Text
-                      style={
-                        locationId
-                          ? [styles.dropTextLightStyle]
-                          : [styles.dropTextInputStyle]
-                      }>
-                      {'Raw Material Type *  '}
-                    </Text>
-                    {locationName ? (
-                      <Text style={[styles.dropTextInputStyle]}>
-                        {locationName}
-                      </Text>
-                    ) : null}
-                  </View>
-                </View>
-              </View>
-
-              <View style={{justifyContent: 'center'}}>
-                <Image source={downArrowImg} style={styles.imageStyle} />
-              </View>
-            </TouchableOpacity>
-
-            {showLocationList && (
-              <View style={styles.dropdownContent1}>
-                <TextInput
-                  style={styles.searchInput}
-                  placeholder="Search "
-                  onChangeText={handleSearchLocation}
-                  placeholderTextColor="#000"
-                />
-                <ScrollView
-                  style={styles.scrollView}
-                  nestedScrollEnabled={true}>
-                  {filteredLocation.length === 0 ? (
-                    <Text style={styles.noCategoriesText}>
-                      Sorry, no results found!
-                    </Text>
-                  ) : (
-                    filteredLocation.map((item, index) => (
-                      <TouchableOpacity
-                        key={index}
-                        style={styles.dropdownOption}
-                        onPress={() => actionOnLocation(item)}>
-                        <Text style={{color: '#000'}}>{item.name}</Text>
-                      </TouchableOpacity>
-                    ))
-                  )}
-                </ScrollView>
-              </View>
-            )}
           </View>
 
           <View
@@ -545,6 +424,110 @@ const handleSearchFabricNo = (text) => {
                         key={index}
                         style={styles.dropdownOption}
                         onPress={() => actionOnColor(item)}>
+                        <Text style={{color: '#000'}}>{item.name}</Text>
+                      </TouchableOpacity>
+                    ))
+                  )}
+                </ScrollView>
+              </View>
+            )}
+          </View>
+
+          {showAddColor && (
+            <View style={{marginTop: hp('2%')}}>
+              <TextInput
+                label="New Color "
+                value={newColor}
+                mode="outlined"
+                onChangeText={text => setNewColor(text)}
+              />
+            </View>
+          )}
+
+          {showAddColor && (
+            <View style={{marginTop: hp('2%')}}>
+              <TextInput
+                label="Color Code "
+                value={colorCode}
+                mode="outlined"
+                onChangeText={text => setColorCode(text)}
+              />
+            </View>
+          )}
+
+          <View style={{marginTop: hp('2%')}}>
+            <TextInput
+              label="Fabric Code"
+              value={fabricCode}
+              mode="outlined"
+              onChangeText={text => setFabricCode(text)}
+            />
+          </View>
+
+          <View
+            style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: '#fff',
+              marginTop: hp('2%'),
+            }}>
+            <TouchableOpacity
+              style={{
+                flexDirection: 'row',
+                borderWidth: 0.5,
+                borderColor: '#D8D8D8',
+                borderRadius: hp('0.5%'),
+                width: wp('90%'),
+              }}
+              onPress={() => {
+                set_showLocationList(!showLocationList);
+              }}>
+              <View>
+                <View style={[styles.SectionStyle1, {}]}>
+                  <View style={{flexDirection: 'column'}}>
+                    <Text
+                      style={
+                        locationId
+                          ? [styles.dropTextLightStyle]
+                          : [styles.dropTextInputStyle]
+                      }>
+                      {'Location *  '}
+                    </Text>
+                    {locationId ? (
+                      <Text style={[styles.dropTextInputStyle]}>
+                        {locationName}
+                      </Text>
+                    ) : null}
+                  </View>
+                </View>
+              </View>
+
+              <View style={{justifyContent: 'center'}}>
+                <Image source={downArrowImg} style={styles.imageStyle} />
+              </View>
+            </TouchableOpacity>
+
+            {showLocationList && (
+              <View style={styles.dropdownContent1}>
+                <TextInput
+                  style={styles.searchInput}
+                  placeholder="Search "
+                  onChangeText={handleSearchLocation}
+                  placeholderTextColor="#000"
+                />
+                <ScrollView
+                  style={styles.scrollView}
+                  nestedScrollEnabled={true}>
+                  {filteredLocation.length === 0 ? (
+                    <Text style={styles.noCategoriesText}>
+                      Sorry, no results found!
+                    </Text>
+                  ) : (
+                    filteredLocation.map((item, index) => (
+                      <TouchableOpacity
+                        key={index}
+                        style={styles.dropdownOption}
+                        onPress={() => actionOnLocation(item)}>
                         <Text style={{color: '#000'}}>{item.name}</Text>
                       </TouchableOpacity>
                     ))
@@ -623,6 +606,315 @@ const handleSearchFabricNo = (text) => {
                 </ScrollView>
               </View>
             )}
+          </View>
+
+          {showAddUom && (
+            <View style={{marginTop: hp('2%')}}>
+              <TextInput
+                label="UOM Type * "
+                value={uomType}
+                mode="outlined"
+                onChangeText={text => setUomType(text)}
+              />
+            </View>
+          )}
+
+          {showAddUom && (
+            <View style={{marginTop: hp('2%')}}>
+              <TextInput
+                label="UOM Description "
+                value={uomDescription}
+                mode="outlined"
+                onChangeText={text => setUomDescription(text)}
+              />
+            </View>
+          )}
+
+          <View
+            style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: '#fff',
+              marginTop: hp('2%'),
+            }}>
+            <TouchableOpacity
+              style={{
+                flexDirection: 'row',
+                borderWidth: 0.5,
+                borderColor: '#D8D8D8',
+                borderRadius: hp('0.5%'),
+                width: wp('90%'),
+              }}
+              onPress={() => {
+                set_showFabricTypeList(!showFabricTypeList);
+              }}>
+              <View>
+                <View style={[styles.SectionStyle1, {}]}>
+                  <View style={{flexDirection: 'column'}}>
+                    <Text
+                      style={
+                        fabricTypeId
+                          ? [styles.dropTextLightStyle]
+                          : [styles.dropTextInputStyle]
+                      }>
+                      {'Fabric Type   '}
+                    </Text>
+                    {fabricTypeId ? (
+                      <Text style={[styles.dropTextInputStyle]}>
+                        {fabricTypeName}
+                      </Text>
+                    ) : null}
+                  </View>
+                </View>
+              </View>
+
+              <View style={{justifyContent: 'center'}}>
+                <Image source={downArrowImg} style={styles.imageStyle} />
+              </View>
+            </TouchableOpacity>
+
+            {showFabricTypeList && (
+              <View style={styles.dropdownContent1}>
+                <TextInput
+                  style={styles.searchInput}
+                  placeholder="Search "
+                  onChangeText={handleSearchFabricType}
+                  placeholderTextColor="#000"
+                />
+                <ScrollView
+                  style={styles.scrollView}
+                  nestedScrollEnabled={true}>
+                  {filteredFabricType.length === 0 ? (
+                    <Text style={styles.noCategoriesText}>
+                      Sorry, no results found!
+                    </Text>
+                  ) : (
+                    filteredFabricType.map((item, index) => (
+                      <TouchableOpacity
+                        key={index}
+                        style={styles.dropdownOption}
+                        onPress={() => actionOnFabricType(item)}>
+                        <Text style={{color: '#000'}}>{item.name}</Text>
+                      </TouchableOpacity>
+                    ))
+                  )}
+                </ScrollView>
+              </View>
+            )}
+          </View>
+
+          {showAddFabricType && (
+            <View style={{marginTop: hp('2%')}}>
+              <TextInput
+                label="New Fabric Type "
+                value={addNewFabricType}
+                mode="outlined"
+                onChangeText={text => setAddNewFabricType(text)}
+              />
+            </View>
+          )}
+
+          {showAddFabricType && (
+            <View style={{marginTop: hp('2%')}}>
+              <TextInput
+                label="Fabric Type Description "
+                value={addFabricTypeDescription}
+                mode="outlined"
+                onChangeText={text => setAddFabricTypeDescription(text)}
+              />
+            </View>
+          )}
+
+          <View style={{marginTop: hp('2%')}}>
+            <TextInput
+              label="HSN *"
+              value={hsn}
+              mode="outlined"
+              onChangeText={text => setHsn(text)}
+            />
+          </View>
+          <View style={{marginTop: hp('2%')}}>
+            <TextInput
+              label="GST Rate(%) *"
+              value={gstRate}
+              mode="outlined"
+              onChangeText={text => setGstRate(text)}
+            />
+          </View>
+          <View style={{marginTop: hp('2%')}}>
+            <TextInput
+              label="Rate "
+              value={rate}
+              mode="outlined"
+              onChangeText={text => setRate(text)}
+            />
+          </View>
+
+          <View
+            style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: '#fff',
+              marginTop: hp('2%'),
+            }}>
+            <TouchableOpacity
+              style={{
+                flexDirection: 'row',
+                borderWidth: 0.5,
+                borderColor: '#D8D8D8',
+                borderRadius: hp('0.5%'),
+                width: wp('90%'),
+              }}
+              onPress={() => {
+                setShowBrandOrProjectList(!showBrandOrProjectList);
+              }}>
+              <View>
+                <View style={[styles.SectionStyle1, {}]}>
+                  <View style={{flexDirection: 'column'}}>
+                    <Text
+                      style={
+                        brandOrProjectId
+                          ? [styles.dropTextLightStyle]
+                          : [styles.dropTextInputStyle]
+                      }>
+                      {'Brand/Project   '}
+                    </Text>
+                    {brandOrProjectId ? (
+                      <Text style={[styles.dropTextInputStyle]}>
+                        {brandOrProjectName}
+                      </Text>
+                    ) : null}
+                  </View>
+                </View>
+              </View>
+
+              <View style={{justifyContent: 'center'}}>
+                <Image source={downArrowImg} style={styles.imageStyle} />
+              </View>
+            </TouchableOpacity>
+
+            {showBrandOrProjectList && (
+              <View style={styles.dropdownContent1}>
+                <TextInput
+                  style={styles.searchInput}
+                  placeholder="Search "
+                  onChangeText={handleSearchBrandOrProject}
+                  placeholderTextColor="#000"
+                />
+                <ScrollView
+                  style={styles.scrollView}
+                  nestedScrollEnabled={true}>
+                  {filteredBrandOrProject.length === 0 ? (
+                    <Text style={styles.noCategoriesText}>
+                      Sorry, no results found!
+                    </Text>
+                  ) : (
+                    filteredBrandOrProject.map((item, index) => (
+                      <TouchableOpacity
+                        key={index}
+                        style={styles.dropdownOption}
+                        onPress={() => actionOnBrandOrProject(item)}>
+                        <Text style={{color: '#000'}}>{item.name}</Text>
+                      </TouchableOpacity>
+                    ))
+                  )}
+                </ScrollView>
+              </View>
+            )}
+          </View>
+
+          {showAddBrandOrProject && (
+            <View style={{marginTop: hp('2%')}}>
+              <TextInput
+                label="Brand/Project Name "
+                value={addBrandProjectName}
+                mode="outlined"
+                onChangeText={text => setAddBrandProjectName(text)}
+              />
+            </View>
+          )}
+
+          {showAddBrandOrProject && (
+            <View style={{marginTop: hp('2%')}}>
+              <TextInput
+                label="Brand/Project Description "
+                value={addBrandProjectDescription}
+                mode="outlined"
+                onChangeText={text => setAddBrandProjectDescription(text)}
+              />
+            </View>
+          )}
+
+          <View style={{marginTop: hp('2%')}}>
+            <TextInput
+              label="Fabric Width  "
+              value={fabricWidth}
+              mode="outlined"
+              onChangeText={text => setFabricWidth(text)}
+            />
+          </View>
+          <View style={{marginTop: hp('2%')}}>
+            <TextInput
+              label="GSM "
+              value={gsm}
+              mode="outlined"
+              onChangeText={text => setGsm(text)}
+            />
+          </View>
+
+          <View style={{marginTop: hp('2%')}}>
+            <TextInput
+              label="Inventory Limit "
+              value={inventoryLimit}
+              mode="outlined"
+              onChangeText={text => setInventoryLimit(text)}
+            />
+          </View>
+
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginTop: hp('4%'),
+            }}>
+            <Text style={{width: '50%', fontWeight: 'bold', color: '#000'}}>
+              Trim Fabric
+            </Text>
+            <RadioGroup
+              style={{flexDirection: 'row'}}
+              radioButtons={trimFabricRadioButtons}
+              onPress={handletrimFabricRadioChange}
+              layout="row"
+              selectedId={
+                trimFabricRadioButtons.find(
+                  item => item.value === trimFabricRadio,
+                )?.id
+              }
+            />
+          </View>
+
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginTop: hp('4%'),
+            }}>
+            <Text style={{width: '50%', fontWeight: 'bold', color: '#000'}}>
+              Update Roll Wise Qty
+            </Text>
+            <RadioGroup
+              style={{flexDirection: 'row'}}
+              radioButtons={updateRollWiseQtyRadioButtons}
+              onPress={handleUpdateRollWiseQtyRadioChange}
+              layout="row"
+              selectedId={
+                updateRollWiseQtyRadioButtons.find(
+                  item => item.value === updateRollWiseQtyRadio,
+                )?.id
+              }
+            />
           </View>
         </View>
       </KeyboardAwareScrollView>

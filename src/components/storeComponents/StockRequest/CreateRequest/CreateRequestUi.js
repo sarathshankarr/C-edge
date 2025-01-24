@@ -203,8 +203,12 @@ const CreateRequestUi = ({route, ...props}) => {
       if (props.lists.getBatches) {
         set_filteredUnitMaster(props.lists.getBatches);
       }
+      if (props.lists.getCompanyLocations) {
+        set_filteredFabLocation(props.lists.getCompanyLocations);
+        set_fabLocationList(props.lists.getCompanyLocations);
+      }
     }
-  }, [props]);
+  }, [props?.lists]);
 
   useEffect(()=>{
         handleConfirm(new Date());
@@ -306,7 +310,9 @@ const CreateRequestUi = ({route, ...props}) => {
         availFabricQty: STOREDETAILSAPIObj.responseData.availFabricQty,
         uomfabric: STOREDETAILSAPIObj.responseData.uomType,
       }));
-      set_fabLocationId(STOREDETAILSAPIObj.responseData.fabricLocationId)
+      set_fabLocationId(STOREDETAILSAPIObj.responseData.fabricLocationId);
+      const found= fabLocationList.filter((item)=> item.id=== (STOREDETAILSAPIObj.responseData.fabricLocationId).toString())
+      set_fabLocationName(found ? found[0].name : "");
       
       if (
         STOREDETAILSAPIObj?.responseData?.trimConstructionsList &&
@@ -892,12 +898,12 @@ const CreateRequestUi = ({route, ...props}) => {
 
   const handleSearchFabLocation = text => {
     if (text.trim().length > 0) {
-      const filtered = fabLocations.filter(fabLocation =>
+      const filtered = fabLocationList.filter(fabLocation =>
         fabLocation.name.toLowerCase().includes(text.toLowerCase()),
       );
       set_filteredFabLocation(filtered);
     } else {
-      set_filteredFabLocation(fabLocations);
+      set_filteredFabLocation(fabLocationList);
     }
   };
   
@@ -1121,20 +1127,6 @@ const CreateRequestUi = ({route, ...props}) => {
                   <Image source={downArrowImg} style={styles.imageStyle} />
                 </View>
               </TouchableOpacity>
-
-              {/* {showStylesList ? (
-                            <View style={styles.popSearchViewStyle}>
-                                <ScrollView nestedScrollEnabled={true}>
-                                    {props?.lists?.getStockStyles?.map((item) => (
-                                        <TouchableOpacity key={item?.id} onPress={() => actionOnStyles(item.id, item.name)}>
-                                            <View style={styles.flatview}>
-                                                <Text style={styles.dropTextInputStyle}>{item?.name}</Text>
-                                            </View>
-                                        </TouchableOpacity>
-                                    ))}
-                                </ScrollView>
-                            </View>
-                        ) : null} */}
 
               {showStylesList && (
                 <View style={styles.dropdownContent1}>

@@ -81,8 +81,7 @@ const CreateRawMaterialsMasterUI = ({route, navigation, ...props}) => {
   // Raw Material Type
   const [rawMaterialTypeList, setRawMaterialTypeList] = useState([]);
   const [filteredRawMaterialType, set_filteredRawMaterialType] = useState([]);
-  const [showRawMaterialTypeList, set_showRawMaterialTypeList] =
-    useState(false);
+  const [showRawMaterialTypeList, set_showRawMaterialTypeList] = useState(false);
   const [rawMaterialTypeName, set_rawMaterialTypeName] = useState('');
   const [rawMaterialTypeId, set_rawMaterialTypeId] = useState('');
 
