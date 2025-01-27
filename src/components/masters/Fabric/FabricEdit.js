@@ -4,12 +4,12 @@ import * as APIServiceCall from '../../../utils/apiCalls/apiCallsComponent';
 import * as Constant from "../../../utils/constants/constant";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import { useFocusEffect } from '@react-navigation/native';
 import FabricEditUi from './FabricEditUi';
 
 const FabricEdit = ({ navigation, route, ...props }) => {
 
   const [itemsObj, set_itemsObj] = useState([]);
+  const [fabricId, set_fabricId] = useState('');
   const [isLoading, set_isLoading] = useState(false);
   const [isPopUp, set_isPopUp] = useState(false);
   const [popUpMessage, set_popUpMessage] = useState(undefined);
@@ -21,6 +21,7 @@ const FabricEdit = ({ navigation, route, ...props }) => {
 
     if (route.params?.item) {
       getInitialData(route.params.item.fabricId);
+      set_fabricId(route.params.item.fabricId);
       console.log("route.params?.item===========> ", route.params.item.fabricId);
     }
 
@@ -32,9 +33,7 @@ const FabricEdit = ({ navigation, route, ...props }) => {
     navigation.goBack();
   };
 
-  const saveBack = () => {
-    navigation.navigate('DDAList', {reload:true});
-  };
+
 
 
 
@@ -87,50 +86,30 @@ const FabricEdit = ({ navigation, route, ...props }) => {
   };
 
 
-  const submitAction = async (designId,remarks1, statusId, remarks) => {
+  const submitAction = async (tempObj) => {
 
-    if(statusId===0){
-      popUpAction(Constant.SELECT_STATUS, Constant.DefaultAlert_MSG, 'OK', true, false);
-      return;
-    }
-
-    console.log("saving params ==> ", designId, statusId, remarks?.length);
-
-    if (statusId === 2 && remarks.trim().length === 0) {
-      popUpAction(Constant.PO_Rejected_MSG_WITHOUT_REMARKS, Constant.DefaultAlert_MSG, 'OK', true, false);
-      return;
-    }
+    set_isLoading(true);
 
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
     let companyObj = await AsyncStorage.getItem('companyObj');
-    const obj = {
-      "designId": designId,
-      "menuId": 728,
-      "approvedStatus": statusId,
-      "remarks": remarks,
-      "note": remarks1,
-      "userName": userName,
-      "userPwd": userPsd,
-      "compIds": usercompanyId,
-      "company":JSON.parse(companyObj),
+    let userId = await AsyncStorage.getItem('userId');
 
-    }
-    saveEditObj(obj);
-
-  };
-
-  const saveEditObj = async (tempObj) => {
+    tempObj.username=userName,
+    tempObj.password=userPsd,
+    tempObj.compIds=usercompanyId,
+    tempObj.fabricId=fabricId,
+    tempObj.userId=userId,
+    tempObj.company=JSON.parse(companyObj)
  
-    set_isLoading(true);
-    let saveEditObj = await APIServiceCall.saveDDA(tempObj);
+    let  saveEditObj = await APIServiceCall.saveFabricEdit(tempObj);
     set_isLoading(false);
     console.log("response after approving", saveEditObj?.responseData)
 
-    if (saveEditObj && saveEditObj.statusData && saveEditObj.responseData && saveEditObj.responseData.status !== 'false') {
+    if (saveEditObj && saveEditObj.statusData && saveEditObj.responseData && saveEditObj.responseData === 'True') {
       console.log("sucess");
-      saveBack();
+      backBtnAction();
     } else {
       popUpAction(Constant.Fail_Save_Dtls_MSG, Constant.DefaultAlert_MSG, 'OK', true, false);
     }
