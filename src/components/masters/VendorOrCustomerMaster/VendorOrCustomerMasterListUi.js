@@ -56,7 +56,8 @@ const VendorOrCustomerMasterListUi = ({route, ...props}) => {
       set_filterArray(props.itemsArray);
       set_ItemsArray(props.itemsArray);
     }
-    getRequestBody();
+    console.log("itemsa array ==>  ", props.itemsArray)
+    // getRequestBody();
   }, [props.itemsArray]);
 
   const getRequestBody = async () => {
@@ -125,11 +126,11 @@ const VendorOrCustomerMasterListUi = ({route, ...props}) => {
     }
     setIsFiltering(true);
 
-    // const styleArray = ItemsArray.filter(style => (style.styleno.toString().toUpperCase().includes(name.toUpperCase()) || style.color.toUpperCase().includes(name.toUpperCase()) || style.wono.toString().toUpperCase().includes(name.toUpperCase())));
     const styleArray = ItemsArray.filter(
       style =>
-        style.designName?.toUpperCase().includes(name.toUpperCase()) ||
-        style.designType?.toUpperCase().includes(name.toUpperCase()),
+        style.vendor_name?.toUpperCase().includes(name.toUpperCase()) ||
+        style.user_type?.toUpperCase().includes(name.toUpperCase()) ||
+        style.city?.toUpperCase().includes(name.toUpperCase()),
     );
     if (styleArray && styleArray.length > 0) {
       set_filterArray(styleArray);
@@ -174,32 +175,18 @@ const VendorOrCustomerMasterListUi = ({route, ...props}) => {
       <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
         <Text
           style={[CommonStyles.tylesTextStyle, {textAlign: 'center', flex: 1}]}>
-          {item.designName}
+          {item.vendor_name}
         </Text>
         <Text
           style={[CommonStyles.tylesTextStyle, {textAlign: 'center', flex: 1}]}>
-          {item.designType}
+          {item.user_type}
         </Text>
-        <View style={{flex: 1.2}}>
-          <Text
-            style={[
-              CommonStyles.tylesTextStyle,
-              {textAlign: 'center', flex: 1},
-            ]}>
-            {item.approveBy}
-          </Text>
-          <Text
-            style={[
-              CommonStyles.tylesTextStyle,
-              {textAlign: 'center', flex: 1},
-            ]}>
-            {item.approvedate}
-          </Text>
-        </View>
-        <Image
-          source={{uri: `data:image/png;base64,${item.designImg}`}}
-          style={[styles.imageStyle, {flex: 1.3}]}
-        />
+        <Text
+          style={[CommonStyles.tylesTextStyle, {textAlign: 'center', flex: 1}]}>
+          {item.city}
+        </Text>
+       
+
       </View>
     </TouchableOpacity>
   );
@@ -322,28 +309,21 @@ const VendorOrCustomerMasterListUi = ({route, ...props}) => {
                 CommonStyles.tylesHeaderTextStyle,
                 {textAlign: 'center', flex: 1},
               ]}>
-              Design Name
+              Vendor Name
             </Text>
             <Text
               style={[
                 CommonStyles.tylesHeaderTextStyle,
                 {textAlign: 'center', flex: 1},
               ]}>
-              Design Type
+              Type
             </Text>
             <Text
               style={[
                 CommonStyles.tylesHeaderTextStyle,
                 {textAlign: 'center', flex: 1},
               ]}>
-              Approved By & Date
-            </Text>
-            <Text
-              style={[
-                CommonStyles.tylesHeaderTextStyle,
-                {textAlign: 'center', flex: 1.3},
-              ]}>
-              Design Image
+              City
             </Text>
           </View>
         ) : (
@@ -356,12 +336,6 @@ const VendorOrCustomerMasterListUi = ({route, ...props}) => {
           </View>
         )}
 
-        <Button
-          onPress={handleNavigationn}
-          title="Vendor/Customer Master Edit"
-          color="#1F74BA"
-          accessibilityLabel="Learn more about this purple button"
-        />
 
         <View style={CommonStyles.listStyle}>
           {showFilteredList ? (

@@ -17,18 +17,20 @@ const CreateVendorOrCustomerMasterComponent = ({ route }) => {
   const [isPopupLeft, set_isPopupLeft] = useState(false);
   
   const [lists, set_lists] = useState({
+    termsMap: [],
+    priceMap: [],
     processMap: [],
-    machineNosMap: [],
-    shiftMap: [],
-    empMap: [],
-    batchNoMap: [],
-    ordersMap: [],
-    colorsMap: [],
+    paymenttermsMap: [],
+    invfrmts: [],
+    taxType: [],
+    currencys: [],
+    regionMap: [],
+    shipMode: [],
   });
 
 
   React.useEffect(() => {
-    // getInitialData();
+    getInitialData();
   }, []);
 
 
@@ -52,102 +54,100 @@ const CreateVendorOrCustomerMasterComponent = ({ route }) => {
       "company":JSON.parse(companyObj),
 
     }
-    let LISTAPIOBJ = await APIServiceCall.GetProcessList(obj);
+    let LISTAPIOBJ = await APIServiceCall.GetCreateVendorsMastersList(obj);
     set_isLoading(false);
 
     if (LISTAPIOBJ && LISTAPIOBJ.statusData) {
       if (LISTAPIOBJ && LISTAPIOBJ.responseData) {
 
+        if (LISTAPIOBJ?.responseData?.termsMap) {
+          const termsMapList = Object.keys(LISTAPIOBJ.responseData.termsMap).map(key => ({
+            id: key,
+            name: LISTAPIOBJ.responseData.termsMap[key]
+          }));
+          set_lists(prevLists => ({
+            ...prevLists,
+            termsMap: termsMapList
+          }));
+        }
+        if (LISTAPIOBJ?.responseData?.priceMap) {
+          const priceMapList = Object.keys(LISTAPIOBJ.responseData.priceMap).map(key => ({
+            id: key,
+            name: LISTAPIOBJ.responseData.priceMap[key]
+          }));
+          set_lists(prevLists => ({
+            ...prevLists,
+            priceMap: priceMapList
+          }));
+        }
         if (LISTAPIOBJ?.responseData?.processMap) {
-          const processList = Object.keys(LISTAPIOBJ.responseData.processMap).map(key => ({
+          const processMapList = Object.keys(LISTAPIOBJ.responseData.processMap).map(key => ({
             id: key,
             name: LISTAPIOBJ.responseData.processMap[key]
           }));
           set_lists(prevLists => ({
             ...prevLists,
-            processMap: processList
+            processMap: processMapList
           }));
         }
-
-        console.log("LISTAPIOBJ?.responseData?.machineNosMap===> ", LISTAPIOBJ?.responseData?.machineNosMap)
-        if (LISTAPIOBJ?.responseData?.machineNosMap) {
-          const machineNosList = Object.keys(LISTAPIOBJ.responseData.machineNosMap).map(key => ({
+        if (LISTAPIOBJ?.responseData?.paymenttermsMap) {
+          const paymenttermsMapList = Object.keys(LISTAPIOBJ.responseData.paymenttermsMap).map(key => ({
             id: key,
-            name: LISTAPIOBJ.responseData.machineNosMap[key]
-          }));
-
-          const prioritizedMachine = { id: "ADD", name: "Add Machine No" }; // Define your first element
-          const updatedMachineNosList = [prioritizedMachine, ...machineNosList];
-      
-          set_lists(prevLists => ({
-              ...prevLists,
-              machineNosMap: updatedMachineNosList
-          }));
-
-
-          // set_lists(prevLists => ({
-          //   ...prevLists,
-          //   machineNosMap: machineNosList
-          // }));
-        }
-
-        // Handle shiftMap
-        if (LISTAPIOBJ?.responseData?.shiftMap) {
-          const shiftList = Object.keys(LISTAPIOBJ.responseData.shiftMap).map(key => ({
-            id: key,
-            name: LISTAPIOBJ.responseData.shiftMap[key]
+            name: LISTAPIOBJ.responseData.paymenttermsMap[key]
           }));
           set_lists(prevLists => ({
             ...prevLists,
-            shiftMap: shiftList
+            paymenttermsMap: paymenttermsMapList
           }));
         }
-
-        // Handle empMap
-        if (LISTAPIOBJ?.responseData?.empMap) {
-          const empList = Object.keys(LISTAPIOBJ.responseData.empMap).map(key => ({
+        if (LISTAPIOBJ?.responseData?.invfrmts) {
+          const invfrmtsList = Object.keys(LISTAPIOBJ.responseData.invfrmts).map(key => ({
             id: key,
-            name: LISTAPIOBJ.responseData.empMap[key]
+            name: LISTAPIOBJ.responseData.invfrmts[key]
           }));
           set_lists(prevLists => ({
             ...prevLists,
-            empMap: empList
+            invfrmts: invfrmtsList
           }));
         }
-
-        // Handle batchNoMap
-        if (LISTAPIOBJ?.responseData?.batchNoMap) {
-          const batchNoList = Object.keys(LISTAPIOBJ.responseData.batchNoMap).map(key => ({
+        if (LISTAPIOBJ?.responseData?.taxType) {
+          const taxTypeList = Object.keys(LISTAPIOBJ.responseData.taxType).map(key => ({
             id: key,
-            name: LISTAPIOBJ.responseData.batchNoMap[key]
+            name: LISTAPIOBJ.responseData.taxType[key]
           }));
           set_lists(prevLists => ({
             ...prevLists,
-            batchNoMap: batchNoList
+            taxType: taxTypeList
           }));
         }
-
-        // Handle ordersMap
-        if (LISTAPIOBJ?.responseData?.ordersMap) {
-          const ordersList = Object.keys(LISTAPIOBJ.responseData.ordersMap).map(key => ({
+        if (LISTAPIOBJ?.responseData?.currencys) {
+          const currencysList = Object.keys(LISTAPIOBJ.responseData.currencys).map(key => ({
             id: key,
-            name: LISTAPIOBJ.responseData.ordersMap[key]
+            name: LISTAPIOBJ.responseData.currencys[key]
           }));
           set_lists(prevLists => ({
             ...prevLists,
-            ordersMap: ordersList  // Store the array format
+            currencys: currencysList
           }));
         }
-
-        // Handle colorsMap
-        if (LISTAPIOBJ?.responseData?.colorsMap) {
-          const colorsList = Object.keys(LISTAPIOBJ.responseData.colorsMap).map(key => ({
+        if (LISTAPIOBJ?.responseData?.regionMap) {
+          const regionMapList = Object.keys(LISTAPIOBJ.responseData.regionMap).map(key => ({
             id: key,
-            name: LISTAPIOBJ.responseData.colorsMap[key]
+            name: LISTAPIOBJ.responseData.regionMap[key]
           }));
           set_lists(prevLists => ({
             ...prevLists,
-            colorsMap: colorsList  // Store the array format
+            regionMap: regionMapList
+          }));
+        }
+        if (LISTAPIOBJ?.responseData?.shipMode) {
+          const shipModeList = Object.keys(LISTAPIOBJ.responseData.shipMode).map(key => ({
+            id: key,
+            name: LISTAPIOBJ.responseData.shipMode[key]
+          }));
+          set_lists(prevLists => ({
+            ...prevLists,
+            shipMode: shipModeList
           }));
         }
       }
@@ -190,7 +190,7 @@ const CreateVendorOrCustomerMasterComponent = ({ route }) => {
 
     set_isLoading(true);
 
-    let SAVEAPIObj = await APIServiceCall.saveCreateProcessIn(tempObj);
+    let SAVEAPIObj = await APIServiceCall.saveCreateVendorMasters(tempObj);
     set_isLoading(false);
 
     console.log("Sucess before returned obj ", SAVEAPIObj);
