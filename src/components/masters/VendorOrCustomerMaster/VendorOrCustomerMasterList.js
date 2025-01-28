@@ -24,7 +24,7 @@ const VendorOrCustomerMasterList = ({ navigation, route, ...props }) => {
   
   useFocusEffect(
     React.useCallback(() => {
-      //  getInitialData(0, true);
+       getInitialData(0, true);
     }, [])
 );
   
@@ -53,23 +53,21 @@ const VendorOrCustomerMasterList = ({ navigation, route, ...props }) => {
     let obj = {
       "searchKeyValue": "",
       "styleSearchDropdown": "-1",
-      "menuId": 728,
-      "dataFilter": "",
       "fromRecord":fromRecord,
       "toRecord": toRecord,
-      "userName": userName,
-      "userPwd": userPsd,
+      "username": userName,
+      "password": userPsd,
       "compIds": usercompanyId,
       "company":JSON.parse(companyObj),
-
     }
 
-    let DDAListAPIObj = await APIServiceCall.loadDesignDirectoryApprovalList(obj);
+
+
+    let DDAListAPIObj = await APIServiceCall.loadAllVendorMastersList(obj);
 
     if (DDAListAPIObj && DDAListAPIObj.statusData) {
 
       if (DDAListAPIObj && DDAListAPIObj.responseData) {
-        // set_itemsArray(DDAListAPIObj.responseData);
         set_itemsArray(prevItems => reload 
           ? DDAListAPIObj.responseData 
           : [...prevItems, ...DDAListAPIObj.responseData] 
@@ -147,9 +145,9 @@ const VendorOrCustomerMasterList = ({ navigation, route, ...props }) => {
     popUpAction(undefined, undefined, '', false, false)
   };
 
-  // const actionOnRow = (item, index) => {
-  //   navigation.navigate('LocationMasterEdit', { item: item });
-  // };
+  const actionOnRow = (item, index) => {
+    navigation.navigate('VendorOrCustomerMasterEdit', { item: item });
+  };
 
   const fetchMore= (more) =>{
     console.log("fetch more ==> ", hasMore, isLoading );

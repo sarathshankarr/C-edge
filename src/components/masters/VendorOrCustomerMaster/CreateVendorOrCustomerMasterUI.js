@@ -31,21 +31,44 @@ import {RadioGroup} from 'react-native-radio-buttons-group';
 let downArrowImg = require('./../../../../assets/images/png/dropDownImg.png');
 const CreateVendorOrCustomerMasterUI = ({route, navigation, ...props}) => {
   useEffect(() => {
-    // if (props?.itemsArray) {
-    //   if (props.itemsArray.machineNosMap) {
-    //     set_filteredmachineNo(props.itemsArray.machineNosMap);
-    //     setMachineNoList(props.itemsArray.machineNosMap);
-    //   }
-    //   if (props.itemsArray.empMap) {
-    //     set_filteredattendedBy(props.itemsArray.empMap);
-    //     setAttendedByList(props.itemsArray.empMap);
-    //   }
-    //   if (props.itemsArray.shiftMap) {
-    //     set_shiftList(props.itemsArray.shiftMap);
-    //   }
-    // }
+    if (props?.itemsArray) {
+      if (props.itemsArray.termsMap) {
+        setFilteredShippingTerms(props.itemsArray.termsMap);
+        setShippingTermsList(props.itemsArray.termsMap);
+      }
+      if (props.itemsArray.priceMap) {
+        setFilteredPriceList(props.itemsArray.priceMap);
+        setPriceList(props.itemsArray.priceMap);
+      }
+      if (props.itemsArray.processMap) {
+        setFilteredProcess(props.itemsArray.processMap);
+        setProcessList(props.itemsArray.processMap);
+      }
+
+      if (props.itemsArray.invfrmts) {
+        setFilteredInvoiceFormat(props.itemsArray.invfrmts);
+        setInvoiceFormatList(props.itemsArray.invfrmts);
+      }
+      if (props.itemsArray.taxType) {
+        setFilteredTaxType(props.itemsArray.taxType);
+        setTaxTypeList(props.itemsArray.taxType);
+      }
+      if (props.itemsArray.currencys) {
+        setFilteredCurrency(props.itemsArray.currencys);
+        setCurrencyList(props.itemsArray.currencys);
+      }
+      if (props.itemsArray.regionMap) {
+        setReligionList(props.itemsArray.regionMap);
+        setFilteredReligion(props.itemsArray.regionMap);
+      }
+      if (props.itemsArray.shipMode) {
+        setFilteredShipMode(props.itemsArray.shipMode);
+        setShipModeList(props.itemsArray.shipMode);
+      }
+    }
+    console.log('props =====>  ', props?.itemsArray);
   }, [props.itemsArray]);
-  
+
   const [code, setCode] = useState('');
   const [name, setName] = useState('');
   const [address1, setAddress1] = useState('');
@@ -58,20 +81,19 @@ const CreateVendorOrCustomerMasterUI = ({route, navigation, ...props}) => {
   const [panNo, setPanNo] = useState('');
   const [gst, setGst] = useState('');
 
-
   const [countryList, setCountryList] = useState([]);
   const [filteredCountry, setFilteredCountry] = useState([]);
   const [showCountryList, setShowCountryList] = useState(false);
   const [countryName, setCountryName] = useState('');
   const [countryId, setCountryId] = useState('');
   const [showCountry, setShowCountry] = useState(false);
-  
+
   const actionOnCountry = item => {
     setCountryId(item.id);
     setCountryName(item.name);
     setShowCountryList(false);
   };
-  
+
   const handleSearchCountry = text => {
     if (text.trim().length > 0) {
       const filtered = countryList.filter(item =>
@@ -82,7 +104,7 @@ const CreateVendorOrCustomerMasterUI = ({route, navigation, ...props}) => {
       setFilteredCountry(countryList);
     }
   };
-  
+
   // State
   const [stateList, setStateList] = useState([]);
   const [filteredState, setFilteredState] = useState([]);
@@ -90,13 +112,13 @@ const CreateVendorOrCustomerMasterUI = ({route, navigation, ...props}) => {
   const [stateName, setStateName] = useState('');
   const [stateId, setStateId] = useState('');
   const [showState, setShowState] = useState(false);
-  
+
   const actionOnState = item => {
     setStateId(item.id);
     setStateName(item.name);
     setShowStateList(false);
   };
-  
+
   const handleSearchState = text => {
     if (text.trim().length > 0) {
       const filtered = stateList.filter(item =>
@@ -107,8 +129,31 @@ const CreateVendorOrCustomerMasterUI = ({route, navigation, ...props}) => {
       setFilteredState(stateList);
     }
   };
-  
-  
+
+  const [processList, setProcessList] = useState([]);
+  const [filteredProcess, setFilteredProcess] = useState([]);
+  const [showProcessList, setShowProcessList] = useState(false);
+  const [processName, setProcessName] = useState('');
+  const [processId, setProcessId] = useState('');
+  const [showProcess, setShowProcess] = useState(false);
+
+  const actionOnProcess = item => {
+    setProcessId(item.id);
+    setProcessName(item.name);
+    setShowProcessList(false);
+  };
+
+  const handleSearchProcess = text => {
+    if (text.trim().length > 0) {
+      const filtered = processList.filter(item =>
+        item.name.toLowerCase().includes(text.toLowerCase()),
+      );
+      setFilteredProcess(filtered);
+    } else {
+      setFilteredProcess(processList);
+    }
+  };
+
   // Religion
   const [religionList, setReligionList] = useState([]);
   const [filteredReligion, setFilteredReligion] = useState([]);
@@ -116,13 +161,13 @@ const CreateVendorOrCustomerMasterUI = ({route, navigation, ...props}) => {
   const [religionName, setReligionName] = useState('');
   const [religionId, setReligionId] = useState('');
   const [showReligion, setShowReligion] = useState(false);
-  
+
   const actionOnReligion = item => {
     setReligionId(item.id);
     setReligionName(item.name);
     setShowReligionList(false);
   };
-  
+
   const handleSearchReligion = text => {
     if (text.trim().length > 0) {
       const filtered = religionList.filter(item =>
@@ -135,182 +180,213 @@ const CreateVendorOrCustomerMasterUI = ({route, navigation, ...props}) => {
   };
 
   // Shipping Terms
-const [shippingTermsList, setShippingTermsList] = useState([]);
-const [filteredShippingTerms, setFilteredShippingTerms] = useState([]);
-const [showShippingTermsList, setShowShippingTermsList] = useState(false);
-const [shippingTermsName, setShippingTermsName] = useState('');
-const [shippingTermsId, setShippingTermsId] = useState('');
-const [showShippingTerms, setShowShippingTerms] = useState(false);
+  const [shippingTermsList, setShippingTermsList] = useState([]);
+  const [filteredShippingTerms, setFilteredShippingTerms] = useState([]);
+  const [showShippingTermsList, setShowShippingTermsList] = useState(false);
+  const [shippingTermsName, setShippingTermsName] = useState('');
+  const [shippingTermsId, setShippingTermsId] = useState('');
+  const [showShippingTerms, setShowShippingTerms] = useState(false);
 
-const actionOnShippingTerms = item => {
-  setShippingTermsId(item.id);
-  setShippingTermsName(item.name);
-  setShowShippingTermsList(false);
-};
+  const actionOnShippingTerms = item => {
+    setShippingTermsId(item.id);
+    setShippingTermsName(item.name);
+    setShowShippingTermsList(false);
+  };
 
-const handleSearchShippingTerms = text => {
-  if (text.trim().length > 0) {
-    const filtered = shippingTermsList.filter(item =>
-      item.name.toLowerCase().includes(text.toLowerCase()),
-    );
-    setFilteredShippingTerms(filtered);
-  } else {
-    setFilteredShippingTerms(shippingTermsList);
-  }
-};
+  const handleSearchShippingTerms = text => {
+    if (text.trim().length > 0) {
+      const filtered = shippingTermsList.filter(item =>
+        item.name.toLowerCase().includes(text.toLowerCase()),
+      );
+      setFilteredShippingTerms(filtered);
+    } else {
+      setFilteredShippingTerms(shippingTermsList);
+    }
+  };
 
- // Price 
-const [priceList, setPriceList] = useState([]);
-const [filteredPriceList, setFilteredPriceList] = useState([]);
-const [showPriceList, setShowPriceList] = useState(false);
-const [priceValue, setPriceValue] = useState('');
-const [priceId, setPriceId] = useState('');
-const [showPrice, setShowPrice] = useState(false);
+  // Price
+  const [priceList, setPriceList] = useState([]);
+  const [filteredPriceList, setFilteredPriceList] = useState([]);
+  const [showPriceList, setShowPriceList] = useState(false);
+  const [priceValue, setPriceValue] = useState('');
+  const [priceId, setPriceId] = useState('');
+  const [showPrice, setShowPrice] = useState(false);
 
-const actionOnPrice = item => {
-  setPriceId(item.id);
-  setPriceValue(item.value);
-  setShowPriceList(false);
-};
+  const actionOnPrice = item => {
+    setPriceId(item.id);
+    setPriceValue(item.value);
+    setShowPriceList(false);
+  };
 
-const handleSearchPrice = text => {
-  if (text.trim().length > 0) {
-    const filtered = priceList.filter(item =>
-      item.value.toLowerCase().includes(text.toLowerCase()),
-    );
-    setFilteredPriceList(filtered);
-  } else {
-    setFilteredPriceList(priceList);
-  }
-};
+  const handleSearchPrice = text => {
+    if (text.trim().length > 0) {
+      const filtered = priceList.filter(item =>
+        item.value.toLowerCase().includes(text.toLowerCase()),
+      );
+      setFilteredPriceList(filtered);
+    } else {
+      setFilteredPriceList(priceList);
+    }
+  };
 
+  // Payment Priority
+  const [paymentPriorityList, setPaymentPriorityList] = useState([
+    {
+      id: '0',
+      name: 'Select',
+    },
+    {
+      id: '1',
+      name: 'High',
+    },
+    {
+      id: '2',
+      name: 'Medium',
+    },
+    {
+      id: '3',
+      name: 'Low',
+    },
+  ]);
+  const [filteredPaymentPriority, setFilteredPaymentPriority] = useState([
+    {
+      id: '0',
+      name: 'Select',
+    },
+    {
+      id: '1',
+      name: 'High',
+    },
+    {
+      id: '2',
+      name: 'Medium',
+    },
+    {
+      id: '3',
+      name: 'Low',
+    },
+  ]);
+  const [showPaymentPriorityList, setShowPaymentPriorityList] = useState(false);
+  const [paymentPriorityName, setPaymentPriorityName] = useState('');
+  const [paymentPriorityId, setPaymentPriorityId] = useState('');
+  const [showPaymentPriority, setShowPaymentPriority] = useState(false);
 
-// Payment Priority
-const [paymentPriorityList, setPaymentPriorityList] = useState([]);
-const [filteredPaymentPriority, setFilteredPaymentPriority] = useState([]);
-const [showPaymentPriorityList, setShowPaymentPriorityList] = useState(false);
-const [paymentPriorityName, setPaymentPriorityName] = useState('');
-const [paymentPriorityId, setPaymentPriorityId] = useState('');
-const [showPaymentPriority, setShowPaymentPriority] = useState(false);
+  const actionOnPaymentPriority = item => {
+    setPaymentPriorityId(item.id);
+    setPaymentPriorityName(item.name);
+    setShowPaymentPriorityList(false);
+  };
 
-const actionOnPaymentPriority = item => {
-  setPaymentPriorityId(item.id);
-  setPaymentPriorityName(item.name);
-  setShowPaymentPriorityList(false);
-};
+  const handleSearchPaymentPriority = text => {
+    if (text.trim().length > 0) {
+      const filtered = paymentPriorityList.filter(item =>
+        item.name.toLowerCase().includes(text.toLowerCase()),
+      );
+      setFilteredPaymentPriority(filtered);
+    } else {
+      setFilteredPaymentPriority(paymentPriorityList);
+    }
+  };
 
-const handleSearchPaymentPriority = text => {
-  if (text.trim().length > 0) {
-    const filtered = paymentPriorityList.filter(item =>
-      item.name.toLowerCase().includes(text.toLowerCase()),
-    );
-    setFilteredPaymentPriority(filtered);
-  } else {
-    setFilteredPaymentPriority(paymentPriorityList);
-  }
-};
+  // Currency
+  const [currencyList, setCurrencyList] = useState([]);
+  const [filteredCurrency, setFilteredCurrency] = useState([]);
+  const [showCurrencyList, setShowCurrencyList] = useState(false);
+  const [currencyName, setCurrencyName] = useState('');
+  const [currencyId, setCurrencyId] = useState('');
+  const [showCurrency, setShowCurrency] = useState(false);
 
-// Currency
-const [currencyList, setCurrencyList] = useState([]);
-const [filteredCurrency, setFilteredCurrency] = useState([]);
-const [showCurrencyList, setShowCurrencyList] = useState(false);
-const [currencyName, setCurrencyName] = useState('');
-const [currencyId, setCurrencyId] = useState('');
-const [showCurrency, setShowCurrency] = useState(false);
+  const actionOnCurrency = item => {
+    setCurrencyId(item.id);
+    setCurrencyName(item.name);
+    setShowCurrencyList(false);
+  };
 
-const actionOnCurrency = item => {
-  setCurrencyId(item.id);
-  setCurrencyName(item.name);
-  setShowCurrencyList(false);
-};
+  const handleSearchCurrency = text => {
+    if (text.trim().length > 0) {
+      const filtered = currencyList.filter(item =>
+        item.name.toLowerCase().includes(text.toLowerCase()),
+      );
+      setFilteredCurrency(filtered);
+    } else {
+      setFilteredCurrency(currencyList);
+    }
+  };
 
-const handleSearchCurrency = text => {
-  if (text.trim().length > 0) {
-    const filtered = currencyList.filter(item =>
-      item.name.toLowerCase().includes(text.toLowerCase()),
-    );
-    setFilteredCurrency(filtered);
-  } else {
-    setFilteredCurrency(currencyList);
-  }
-};
+  // Tax Type
+  const [taxTypeList, setTaxTypeList] = useState([]);
+  const [filteredTaxType, setFilteredTaxType] = useState([]);
+  const [showTaxTypeList, setShowTaxTypeList] = useState(false);
+  const [taxTypeName, setTaxTypeName] = useState('');
+  const [taxTypeId, setTaxTypeId] = useState('');
+  const [showTaxType, setShowTaxType] = useState(false);
 
-// Tax Type
-const [taxTypeList, setTaxTypeList] = useState([]);
-const [filteredTaxType, setFilteredTaxType] = useState([]);
-const [showTaxTypeList, setShowTaxTypeList] = useState(false);
-const [taxTypeName, setTaxTypeName] = useState('');
-const [taxTypeId, setTaxTypeId] = useState('');
-const [showTaxType, setShowTaxType] = useState(false);
+  const actionOnTaxType = item => {
+    setTaxTypeId(item.id);
+    setTaxTypeName(item.name);
+    setShowTaxTypeList(false);
+  };
 
-const actionOnTaxType = item => {
-  setTaxTypeId(item.id);
-  setTaxTypeName(item.name);
-  setShowTaxTypeList(false);
-};
+  const handleSearchTaxType = text => {
+    if (text.trim().length > 0) {
+      const filtered = taxTypeList.filter(item =>
+        item.name.toLowerCase().includes(text.toLowerCase()),
+      );
+      setFilteredTaxType(filtered);
+    } else {
+      setFilteredTaxType(taxTypeList);
+    }
+  };
 
-const handleSearchTaxType = text => {
-  if (text.trim().length > 0) {
-    const filtered = taxTypeList.filter(item =>
-      item.name.toLowerCase().includes(text.toLowerCase()),
-    );
-    setFilteredTaxType(filtered);
-  } else {
-    setFilteredTaxType(taxTypeList);
-  }
-};
+  // Invoice Formats
+  const [invoiceFormatList, setInvoiceFormatList] = useState([]);
+  const [filteredInvoiceFormat, setFilteredInvoiceFormat] = useState([]);
+  const [showInvoiceFormatList, setShowInvoiceFormatList] = useState(false);
+  const [invoiceFormatName, setInvoiceFormatName] = useState('');
+  const [invoiceFormatId, setInvoiceFormatId] = useState('');
+  const [showInvoiceFormat, setShowInvoiceFormat] = useState(false);
 
-// Invoice Formats
-const [invoiceFormatList, setInvoiceFormatList] = useState([]);
-const [filteredInvoiceFormat, setFilteredInvoiceFormat] = useState([]);
-const [showInvoiceFormatList, setShowInvoiceFormatList] = useState(false);
-const [invoiceFormatName, setInvoiceFormatName] = useState('');
-const [invoiceFormatId, setInvoiceFormatId] = useState('');
-const [showInvoiceFormat, setShowInvoiceFormat] = useState(false);
+  const actionOnInvoiceFormat = item => {
+    setInvoiceFormatId(item.id);
+    setInvoiceFormatName(item.name);
+    setShowInvoiceFormatList(false);
+  };
 
-const actionOnInvoiceFormat = item => {
-  setInvoiceFormatId(item.id);
-  setInvoiceFormatName(item.name);
-  setShowInvoiceFormatList(false);
-};
+  const handleSearchInvoiceFormat = text => {
+    if (text.trim().length > 0) {
+      const filtered = invoiceFormatList.filter(item =>
+        item.name.toLowerCase().includes(text.toLowerCase()),
+      );
+      setFilteredInvoiceFormat(filtered);
+    } else {
+      setFilteredInvoiceFormat(invoiceFormatList);
+    }
+  };
 
-const handleSearchInvoiceFormat = text => {
-  if (text.trim().length > 0) {
-    const filtered = invoiceFormatList.filter(item =>
-      item.name.toLowerCase().includes(text.toLowerCase()),
-    );
-    setFilteredInvoiceFormat(filtered);
-  } else {
-    setFilteredInvoiceFormat(invoiceFormatList);
-  }
-};
+  // Ship Mode
+  const [shipModeList, setShipModeList] = useState([]);
+  const [filteredShipMode, setFilteredShipMode] = useState([]);
+  const [showShipModeList, setShowShipModeList] = useState(false);
+  const [shipModeName, setShipModeName] = useState('');
+  const [shipModeId, setShipModeId] = useState('');
+  const [showShipMode, setShowShipMode] = useState(false);
 
-// Ship Mode
-const [shipModeList, setShipModeList] = useState([]);
-const [filteredShipMode, setFilteredShipMode] = useState([]);
-const [showShipModeList, setShowShipModeList] = useState(false);
-const [shipModeName, setShipModeName] = useState('');
-const [shipModeId, setShipModeId] = useState('');
-const [showShipMode, setShowShipMode] = useState(false);
+  const actionOnShipMode = item => {
+    setShipModeId(item.id);
+    setShipModeName(item.name);
+    setShowShipModeList(false);
+  };
 
-const actionOnShipMode = item => {
-  setShipModeId(item.id);
-  setShipModeName(item.name);
-  setShowShipModeList(false);
-};
-
-const handleSearchShipMode = text => {
-  if (text.trim().length > 0) {
-    const filtered = shipModeList.filter(item =>
-      item.name.toLowerCase().includes(text.toLowerCase()),
-    );
-    setFilteredShipMode(filtered);
-  } else {
-    setFilteredShipMode(shipModeList);
-  }
-};
-
-  
+  const handleSearchShipMode = text => {
+    if (text.trim().length > 0) {
+      const filtered = shipModeList.filter(item =>
+        item.name.toLowerCase().includes(text.toLowerCase()),
+      );
+      setFilteredShipMode(filtered);
+    } else {
+      setFilteredShipMode(shipModeList);
+    }
+  };
 
   const backBtnAction = () => {
     props.backBtnAction();
@@ -330,7 +406,6 @@ const handleSearchShipMode = text => {
   const backAction = async () => {
     props.backBtnAction();
   };
-
 
   // User Type State
   const [userType, setUserType] = useState('Vendor');
@@ -561,6 +636,15 @@ const handleSearchShipMode = text => {
             />
           </View>
 
+          <View style={{marginTop: hp('2%')}}>
+            <TextInput
+              label="Name *"
+              value={name}
+              mode="outlined"
+              onChangeText={text => setName(text)}
+            />
+          </View>
+
           <View
             style={{
               alignItems: 'center',
@@ -707,14 +791,8 @@ const handleSearchShipMode = text => {
             )}
           </View>
 
-          <View style={{marginTop: hp('2%')}}>
-            <TextInput
-              label="Name *"
-              value={name}
-              mode="outlined"
-              onChangeText={text => setName(text)}
-            />
-          </View>
+         
+
           <View style={{marginTop: hp('2%')}}>
             <TextInput
               label="Address1 *"
@@ -1379,8 +1457,6 @@ const handleSearchShipMode = text => {
               </View>
             )}
           </View>
-
-
         </View>
       </KeyboardAwareScrollView>
 
