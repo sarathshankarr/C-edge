@@ -17,15 +17,9 @@ const CreateVendorOrCustomerMasterComponent = ({ route }) => {
   const [isPopupLeft, set_isPopupLeft] = useState(false);
   
   const [lists, set_lists] = useState({
-    termsMap: [],
-    priceMap: [],
-    processMap: [],
-    paymenttermsMap: [],
-    invfrmts: [],
-    taxType: [],
     currencys: [],
-    regionMap: [],
-    shipMode: [],
+    stateMap:[],
+    countryMap:[]
   });
 
 
@@ -59,67 +53,6 @@ const CreateVendorOrCustomerMasterComponent = ({ route }) => {
 
     if (LISTAPIOBJ && LISTAPIOBJ.statusData) {
       if (LISTAPIOBJ && LISTAPIOBJ.responseData) {
-
-        if (LISTAPIOBJ?.responseData?.termsMap) {
-          const termsMapList = Object.keys(LISTAPIOBJ.responseData.termsMap).map(key => ({
-            id: key,
-            name: LISTAPIOBJ.responseData.termsMap[key]
-          }));
-          set_lists(prevLists => ({
-            ...prevLists,
-            termsMap: termsMapList
-          }));
-        }
-        if (LISTAPIOBJ?.responseData?.priceMap) {
-          const priceMapList = Object.keys(LISTAPIOBJ.responseData.priceMap).map(key => ({
-            id: key,
-            name: LISTAPIOBJ.responseData.priceMap[key]
-          }));
-          set_lists(prevLists => ({
-            ...prevLists,
-            priceMap: priceMapList
-          }));
-        }
-        if (LISTAPIOBJ?.responseData?.processMap) {
-          const processMapList = Object.keys(LISTAPIOBJ.responseData.processMap).map(key => ({
-            id: key,
-            name: LISTAPIOBJ.responseData.processMap[key]
-          }));
-          set_lists(prevLists => ({
-            ...prevLists,
-            processMap: processMapList
-          }));
-        }
-        if (LISTAPIOBJ?.responseData?.paymenttermsMap) {
-          const paymenttermsMapList = Object.keys(LISTAPIOBJ.responseData.paymenttermsMap).map(key => ({
-            id: key,
-            name: LISTAPIOBJ.responseData.paymenttermsMap[key]
-          }));
-          set_lists(prevLists => ({
-            ...prevLists,
-            paymenttermsMap: paymenttermsMapList
-          }));
-        }
-        if (LISTAPIOBJ?.responseData?.invfrmts) {
-          const invfrmtsList = Object.keys(LISTAPIOBJ.responseData.invfrmts).map(key => ({
-            id: key,
-            name: LISTAPIOBJ.responseData.invfrmts[key]
-          }));
-          set_lists(prevLists => ({
-            ...prevLists,
-            invfrmts: invfrmtsList
-          }));
-        }
-        if (LISTAPIOBJ?.responseData?.taxType) {
-          const taxTypeList = Object.keys(LISTAPIOBJ.responseData.taxType).map(key => ({
-            id: key,
-            name: LISTAPIOBJ.responseData.taxType[key]
-          }));
-          set_lists(prevLists => ({
-            ...prevLists,
-            taxType: taxTypeList
-          }));
-        }
         if (LISTAPIOBJ?.responseData?.currencys) {
           const currencysList = Object.keys(LISTAPIOBJ.responseData.currencys).map(key => ({
             id: key,
@@ -130,26 +63,17 @@ const CreateVendorOrCustomerMasterComponent = ({ route }) => {
             currencys: currencysList
           }));
         }
-        if (LISTAPIOBJ?.responseData?.regionMap) {
-          const regionMapList = Object.keys(LISTAPIOBJ.responseData.regionMap).map(key => ({
+        if (LISTAPIOBJ?.responseData?.countryMap) {
+          const countryMapList = Object.keys(LISTAPIOBJ.responseData.countryMap).map(key => ({
             id: key,
-            name: LISTAPIOBJ.responseData.regionMap[key]
+            name: LISTAPIOBJ.responseData.countryMap[key]
           }));
           set_lists(prevLists => ({
             ...prevLists,
-            regionMap: regionMapList
+            countryMap: countryMapList
           }));
         }
-        if (LISTAPIOBJ?.responseData?.shipMode) {
-          const shipModeList = Object.keys(LISTAPIOBJ.responseData.shipMode).map(key => ({
-            id: key,
-            name: LISTAPIOBJ.responseData.shipMode[key]
-          }));
-          set_lists(prevLists => ({
-            ...prevLists,
-            shipMode: shipModeList
-          }));
-        }
+        
       }
     }
     else {
@@ -157,6 +81,50 @@ const CreateVendorOrCustomerMasterComponent = ({ route }) => {
     }
 
     if (LISTAPIOBJ && LISTAPIOBJ.error) {
+      popUpAction(Constant.SERVICE_FAIL_MSG, Constant.DefaultAlert_MSG, 'OK', true, false)
+    }
+
+  };
+
+  const getStatelist = async (selectedCountryId) => {
+
+    let userName = await AsyncStorage.getItem('userName');
+    let userPsd = await AsyncStorage.getItem('userPsd');
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
+
+    set_isLoading(true);
+    let obj = {
+      "countryId": selectedCountryId,
+      "username": userName,
+      "password": userPsd,
+      "compIds": usercompanyId,
+      "company":JSON.parse(companyObj),
+    }
+    let EditDDAAPIObj = await APIServiceCall.loadVendorMasterStatesList(obj);
+    set_isLoading(false);
+
+    
+    if (EditDDAAPIObj && EditDDAAPIObj.statusData) {
+
+      if (EditDDAAPIObj?.responseData?.stateMap) {
+        const stateMapList = Object.keys(EditDDAAPIObj.responseData.stateMap).map(key => ({
+          id: key,
+          name: EditDDAAPIObj.responseData.stateMap[key]
+        }));
+        set_lists(prevLists => ({
+          ...prevLists,
+          stateMap: stateMapList,
+          phoneCode: EditDDAAPIObj?.responseData?.ph
+        }));
+      }
+      
+      
+    } else {
+      popUpAction(Constant.SERVICE_FAIL_MSG, Constant.DefaultAlert_MSG, 'OK', true, false);
+    }
+
+    if (EditDDAAPIObj && EditDDAAPIObj.error) {
       popUpAction(Constant.SERVICE_FAIL_MSG, Constant.DefaultAlert_MSG, 'OK', true, false)
     }
 
@@ -225,6 +193,7 @@ const CreateVendorOrCustomerMasterComponent = ({ route }) => {
       submitAction={submitAction}
       backBtnAction={backBtnAction}
       popOkBtnAction={popOkBtnAction}
+      getStatelist={getStatelist}
     />
 
   );
