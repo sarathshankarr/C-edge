@@ -26,25 +26,101 @@ let downArrowImg = require('./../../../../assets/images/png/dropDownImg.png');
 
 const VendorOrCustomerMasterEditUI = ({route, ...props}) => {
   const {colors} = useContext(ColorContext);
-  const styles = getStyles(colors);
 
   useEffect(() => {
-    // if (props?.itemsArray) {
-    //   if (props.itemsArray.machineNosMap) {
-    //     set_filteredmachineNo(props.itemsArray.machineNosMap);
-    //     setMachineNoList(props.itemsArray.machineNosMap);
-    //   }
-    //   if (props.itemsArray.empMap) {
-    //     set_filteredattendedBy(props.itemsArray.empMap);
-    //     setAttendedByList(props.itemsArray.empMap);
-    //   }
-    //   if (props.itemsArray.shiftMap) {
-    //     set_shiftList(props.itemsArray.shiftMap);
-    //   }
-    // }
-  }, [props.itemsArray]);
+    if (props.itemsObj.updateVendor) {
+      if (props.itemsObj?.updateVendor?.user_type) {
+        handleUserTypeChange(props.itemsObj?.updateVendor?.user_type);
+      }
+      if (props.itemsObj.updateVendor.group_code) {
+        handleGroupChange(props.itemsObj.updateVendor.group_code);
+      }
+      if (props.itemsObj.updateVendor.type_code) {
+        handleTypeChange(props.itemsObj.updateVendor.type_code);
+      }
+      if (props.itemsObj.updateVendor.vendor_name) {
+        setName(props.itemsObj.updateVendor.vendor_name);
+      }
+      if (props.itemsObj.updateVendor.address1) {
+        setAddress1(props.itemsObj.updateVendor.address1);
+      }
+      if (props.itemsObj.updateVendor.address2) {
+        setAddress2(props.itemsObj.updateVendor.address2);
+      }
+      if (props.itemsObj.updateVendor.address3) {
+        setAddress3(props.itemsObj.updateVendor.address3);
+      }
+      if (props.itemsObj.updateVendor.country) {
+        setCountryId(props.itemsObj.updateVendor.country);
+        setCountryName(
+          props.itemsObj.countryMap[props.itemsObj.updateVendor.country],
+        );
 
-  const [code, setCode] = useState('');
+        if(!stateName){
+          props.getStatelist(props.itemsObj.updateVendor.country);
+        }
+
+        const countryMapList = Object.keys(props.itemsObj.countryMap).map(
+          key => ({
+            id: key,
+            name: props.itemsObj.countryMap[key],
+          }),
+        );
+        setFilteredCountry(countryMapList);
+        setCountryList(countryMapList);
+      }
+      if (props.itemsObj.updateVendor.city) {
+        setCity(props.itemsObj.updateVendor.city);
+      }
+      if (props.itemsObj.updateVendor.state && props.itemsObj?.state?.stateMap ) {
+        setStateId(props.itemsObj.updateVendor.state);
+        setStateName(
+          props.itemsObj.state.stateMap[props.itemsObj.updateVendor.state],
+        );
+
+        const stateMapList = Object.keys(props.itemsObj.state.stateMap).map(
+          key => ({
+            id: key,
+            name: props.itemsObj.state.stateMap[key],
+          }),
+        );
+        setFilteredState(stateMapList);
+        setStateList(stateMapList);
+      }
+      if (props.itemsObj.updateVendor.pin_code) {
+        setZipPostalCode(props.itemsObj.updateVendor.pin_code);
+      }
+      if (props.itemsObj.updateVendor.tele_phone) {
+        setPhone(props.itemsObj.updateVendor.tele_phone);
+      }
+      if (props.itemsObj.updateVendor.whatsapp) {
+        setWhatsappPhone(props.itemsObj.updateVendor.whatsapp);
+      }
+      if (props.itemsObj.updateVendor.location) {
+        setLocationName(props.itemsObj.updateVendor.location);
+      }
+      if (props.itemsObj.updateVendor.currency) {
+        setCurrencyId(props.itemsObj.updateVendor.currency);
+        setCurrencyName(
+          props.itemsObj.currencys[props.itemsObj.updateVendor.currency],
+        );
+
+        const currencysList = Object.keys(props.itemsObj.currencys).map(
+          key => ({
+            id: key,
+            name: props.itemsObj.currencys[key],
+          }),
+        );
+        setFilteredCurrency(currencysList);
+        setCurrencyList(currencysList);
+      }
+      if (props.itemsObj.updateVendor.gst) {
+        set_shiftList(props.itemsObj.updateVendor.gst);
+      }
+    }
+    console.log('items obj ===> ', props.itemsObj);
+  }, [props.itemsObj]);
+
   const [name, setName] = useState('');
   const [address1, setAddress1] = useState('');
   const [address2, setAddress2] = useState('');
@@ -53,23 +129,21 @@ const VendorOrCustomerMasterEditUI = ({route, ...props}) => {
   const [zipPostalCode, setZipPostalCode] = useState('');
   const [phone, setPhone] = useState('');
   const [whatsappPhone, setWhatsappPhone] = useState('');
-  const [panNo, setPanNo] = useState('');
   const [gst, setGst] = useState('');
-
+  const [locationName, setLocationName] = useState('');
 
   const [countryList, setCountryList] = useState([]);
   const [filteredCountry, setFilteredCountry] = useState([]);
   const [showCountryList, setShowCountryList] = useState(false);
   const [countryName, setCountryName] = useState('');
   const [countryId, setCountryId] = useState('');
-  const [showCountry, setShowCountry] = useState(false);
-  
+
   const actionOnCountry = item => {
     setCountryId(item.id);
     setCountryName(item.name);
     setShowCountryList(false);
   };
-  
+
   const handleSearchCountry = text => {
     if (text.trim().length > 0) {
       const filtered = countryList.filter(item =>
@@ -80,7 +154,7 @@ const VendorOrCustomerMasterEditUI = ({route, ...props}) => {
       setFilteredCountry(countryList);
     }
   };
-  
+
   // State
   const [stateList, setStateList] = useState([]);
   const [filteredState, setFilteredState] = useState([]);
@@ -88,13 +162,13 @@ const VendorOrCustomerMasterEditUI = ({route, ...props}) => {
   const [stateName, setStateName] = useState('');
   const [stateId, setStateId] = useState('');
   const [showState, setShowState] = useState(false);
-  
+
   const actionOnState = item => {
     setStateId(item.id);
     setStateName(item.name);
     setShowStateList(false);
   };
-  
+
   const handleSearchState = text => {
     if (text.trim().length > 0) {
       const filtered = stateList.filter(item =>
@@ -105,210 +179,31 @@ const VendorOrCustomerMasterEditUI = ({route, ...props}) => {
       setFilteredState(stateList);
     }
   };
-  
-  
-  // Religion
-  const [religionList, setReligionList] = useState([]);
-  const [filteredReligion, setFilteredReligion] = useState([]);
-  const [showReligionList, setShowReligionList] = useState(false);
-  const [religionName, setReligionName] = useState('');
-  const [religionId, setReligionId] = useState('');
-  const [showReligion, setShowReligion] = useState(false);
-  
-  const actionOnReligion = item => {
-    setReligionId(item.id);
-    setReligionName(item.name);
-    setShowReligionList(false);
+
+  // Currency
+  const [currencyList, setCurrencyList] = useState([]);
+  const [filteredCurrency, setFilteredCurrency] = useState([]);
+  const [showCurrencyList, setShowCurrencyList] = useState(false);
+  const [currencyName, setCurrencyName] = useState('');
+  const [currencyId, setCurrencyId] = useState('');
+  const [showCurrency, setShowCurrency] = useState(false);
+
+  const actionOnCurrency = item => {
+    setCurrencyId(item.id);
+    setCurrencyName(item.name);
+    setShowCurrencyList(false);
   };
-  
-  const handleSearchReligion = text => {
+
+  const handleSearchCurrency = text => {
     if (text.trim().length > 0) {
-      const filtered = religionList.filter(item =>
+      const filtered = currencyList.filter(item =>
         item.name.toLowerCase().includes(text.toLowerCase()),
       );
-      setFilteredReligion(filtered);
+      setFilteredCurrency(filtered);
     } else {
-      setFilteredReligion(religionList);
+      setFilteredCurrency(currencyList);
     }
   };
-
-  // Shipping Terms
-const [shippingTermsList, setShippingTermsList] = useState([]);
-const [filteredShippingTerms, setFilteredShippingTerms] = useState([]);
-const [showShippingTermsList, setShowShippingTermsList] = useState(false);
-const [shippingTermsName, setShippingTermsName] = useState('');
-const [shippingTermsId, setShippingTermsId] = useState('');
-const [showShippingTerms, setShowShippingTerms] = useState(false);
-
-const actionOnShippingTerms = item => {
-  setShippingTermsId(item.id);
-  setShippingTermsName(item.name);
-  setShowShippingTermsList(false);
-};
-
-const handleSearchShippingTerms = text => {
-  if (text.trim().length > 0) {
-    const filtered = shippingTermsList.filter(item =>
-      item.name.toLowerCase().includes(text.toLowerCase()),
-    );
-    setFilteredShippingTerms(filtered);
-  } else {
-    setFilteredShippingTerms(shippingTermsList);
-  }
-};
-
- // Price 
-const [priceList, setPriceList] = useState([]);
-const [filteredPriceList, setFilteredPriceList] = useState([]);
-const [showPriceList, setShowPriceList] = useState(false);
-const [priceValue, setPriceValue] = useState('');
-const [priceId, setPriceId] = useState('');
-const [showPrice, setShowPrice] = useState(false);
-
-const actionOnPrice = item => {
-  setPriceId(item.id);
-  setPriceValue(item.value);
-  setShowPriceList(false);
-};
-
-const handleSearchPrice = text => {
-  if (text.trim().length > 0) {
-    const filtered = priceList.filter(item =>
-      item.value.toLowerCase().includes(text.toLowerCase()),
-    );
-    setFilteredPriceList(filtered);
-  } else {
-    setFilteredPriceList(priceList);
-  }
-};
-
-
-// Payment Priority
-const [paymentPriorityList, setPaymentPriorityList] = useState([]);
-const [filteredPaymentPriority, setFilteredPaymentPriority] = useState([]);
-const [showPaymentPriorityList, setShowPaymentPriorityList] = useState(false);
-const [paymentPriorityName, setPaymentPriorityName] = useState('');
-const [paymentPriorityId, setPaymentPriorityId] = useState('');
-const [showPaymentPriority, setShowPaymentPriority] = useState(false);
-
-const actionOnPaymentPriority = item => {
-  setPaymentPriorityId(item.id);
-  setPaymentPriorityName(item.name);
-  setShowPaymentPriorityList(false);
-};
-
-const handleSearchPaymentPriority = text => {
-  if (text.trim().length > 0) {
-    const filtered = paymentPriorityList.filter(item =>
-      item.name.toLowerCase().includes(text.toLowerCase()),
-    );
-    setFilteredPaymentPriority(filtered);
-  } else {
-    setFilteredPaymentPriority(paymentPriorityList);
-  }
-};
-
-// Currency
-const [currencyList, setCurrencyList] = useState([]);
-const [filteredCurrency, setFilteredCurrency] = useState([]);
-const [showCurrencyList, setShowCurrencyList] = useState(false);
-const [currencyName, setCurrencyName] = useState('');
-const [currencyId, setCurrencyId] = useState('');
-const [showCurrency, setShowCurrency] = useState(false);
-
-const actionOnCurrency = item => {
-  setCurrencyId(item.id);
-  setCurrencyName(item.name);
-  setShowCurrencyList(false);
-};
-
-const handleSearchCurrency = text => {
-  if (text.trim().length > 0) {
-    const filtered = currencyList.filter(item =>
-      item.name.toLowerCase().includes(text.toLowerCase()),
-    );
-    setFilteredCurrency(filtered);
-  } else {
-    setFilteredCurrency(currencyList);
-  }
-};
-
-// Tax Type
-const [taxTypeList, setTaxTypeList] = useState([]);
-const [filteredTaxType, setFilteredTaxType] = useState([]);
-const [showTaxTypeList, setShowTaxTypeList] = useState(false);
-const [taxTypeName, setTaxTypeName] = useState('');
-const [taxTypeId, setTaxTypeId] = useState('');
-const [showTaxType, setShowTaxType] = useState(false);
-
-const actionOnTaxType = item => {
-  setTaxTypeId(item.id);
-  setTaxTypeName(item.name);
-  setShowTaxTypeList(false);
-};
-
-const handleSearchTaxType = text => {
-  if (text.trim().length > 0) {
-    const filtered = taxTypeList.filter(item =>
-      item.name.toLowerCase().includes(text.toLowerCase()),
-    );
-    setFilteredTaxType(filtered);
-  } else {
-    setFilteredTaxType(taxTypeList);
-  }
-};
-
-// Invoice Formats
-const [invoiceFormatList, setInvoiceFormatList] = useState([]);
-const [filteredInvoiceFormat, setFilteredInvoiceFormat] = useState([]);
-const [showInvoiceFormatList, setShowInvoiceFormatList] = useState(false);
-const [invoiceFormatName, setInvoiceFormatName] = useState('');
-const [invoiceFormatId, setInvoiceFormatId] = useState('');
-const [showInvoiceFormat, setShowInvoiceFormat] = useState(false);
-
-const actionOnInvoiceFormat = item => {
-  setInvoiceFormatId(item.id);
-  setInvoiceFormatName(item.name);
-  setShowInvoiceFormatList(false);
-};
-
-const handleSearchInvoiceFormat = text => {
-  if (text.trim().length > 0) {
-    const filtered = invoiceFormatList.filter(item =>
-      item.name.toLowerCase().includes(text.toLowerCase()),
-    );
-    setFilteredInvoiceFormat(filtered);
-  } else {
-    setFilteredInvoiceFormat(invoiceFormatList);
-  }
-};
-
-// Ship Mode
-const [shipModeList, setShipModeList] = useState([]);
-const [filteredShipMode, setFilteredShipMode] = useState([]);
-const [showShipModeList, setShowShipModeList] = useState(false);
-const [shipModeName, setShipModeName] = useState('');
-const [shipModeId, setShipModeId] = useState('');
-const [showShipMode, setShowShipMode] = useState(false);
-
-const actionOnShipMode = item => {
-  setShipModeId(item.id);
-  setShipModeName(item.name);
-  setShowShipModeList(false);
-};
-
-const handleSearchShipMode = text => {
-  if (text.trim().length > 0) {
-    const filtered = shipModeList.filter(item =>
-      item.name.toLowerCase().includes(text.toLowerCase()),
-    );
-    setFilteredShipMode(filtered);
-  } else {
-    setFilteredShipMode(shipModeList);
-  }
-};
-
-
 
   const backBtnAction = () => {
     props.backBtnAction();
@@ -326,7 +221,7 @@ const handleSearchShipMode = text => {
       remarks2,
     );
   };
-// User Type State
+  // User Type State
   const [userType, setUserType] = useState('Vendor');
   const userTypeRadioButtons = useMemo(
     () => [
@@ -367,35 +262,6 @@ const handleSearchShipMode = text => {
       button => button.id === selectedId,
     );
     setUserType(selectedOption.value);
-  };
-
-  // In House (Contractor) State
-  const [inHouse, setInHouse] = useState('Vendor');
-  const inHouseRadioButtons = useMemo(
-    () => [
-      {
-        id: '1',
-        label: 'Vendor',
-        value: 'Vendor',
-        selected: inHouse === 'Vendor',
-        labelStyle: {color: '#000'},
-      },
-      {
-        id: '2',
-        label: 'Contractor',
-        value: 'Contractor',
-        selected: inHouse === 'Contractor',
-        labelStyle: {color: '#000'},
-      },
-    ],
-    [inHouse],
-  );
-
-  const handleInHouseChange = selectedId => {
-    const selectedOption = inHouseRadioButtons.find(
-      button => button.id === selectedId,
-    );
-    setInHouse(selectedOption.value);
   };
 
   // Group State
@@ -456,7 +322,6 @@ const handleSearchShipMode = text => {
     setType(selectedOption.value);
   };
 
-
   return (
     <View style={[CommonStyles.mainComponentViewStyle]}>
       <View style={[CommonStyles.headerView]}>
@@ -484,6 +349,7 @@ const handleSearchShipMode = text => {
             marginHorizontal: wp('5%'),
             marginTop: hp('2%'),
           }}>
+          {/* User Type */}
           <View style={{marginBottom: 20}}>
             <Text style={{fontWeight: 'bold', color: '#000'}}>User Type</Text>
             <RadioGroup
@@ -498,22 +364,6 @@ const handleSearchShipMode = text => {
               layout="row"
               selectedId={
                 userTypeRadioButtons.find(item => item.value === userType)?.id
-              }
-            />
-          </View>
-
-          {/* In House (Contractor) */}
-          <View style={{marginBottom: 20}}>
-            <Text style={{fontWeight: 'bold', color: '#000'}}>
-              In House (Contractor):
-            </Text>
-            <RadioGroup
-              style={{flexDirection: 'row'}}
-              radioButtons={inHouseRadioButtons}
-              onPress={handleInHouseChange}
-              layout="row"
-              selectedId={
-                inHouseRadioButtons.find(item => item.value === inHouse)?.id
               }
             />
           </View>
@@ -546,175 +396,23 @@ const handleSearchShipMode = text => {
             />
           </View>
 
-          {/* code text  */}
-          <View style={{marginTop: hp('2%')}}>
-            <TextInput
-              label="Code"
-              value={code}
-              mode="outlined"
-              onChangeText={text => setCode(text)}
-            />
-          </View>
-
-          <View
-            style={{
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: '#fff',
-              marginTop: hp('2%'),
-            }}>
-            <TouchableOpacity
-              style={{
-                flexDirection: 'row',
-                borderWidth: 0.5,
-                borderColor: '#D8D8D8',
-                borderRadius: hp('0.5%'),
-                width: wp('90%'),
-              }}
-              onPress={() => {
-                setShowShippingTermsList(!showShippingTermsList);
-              }}>
-              <View>
-                <View style={[styles.SectionStyle1, {}]}>
-                  <View style={{flexDirection: 'column'}}>
-                    <Text
-                      style={
-                        shippingTermsId
-                          ? [styles.dropTextLightStyle]
-                          : [styles.dropTextInputStyle]
-                      }>
-                      {'Shipping Terms'}
-                    </Text>
-                    {shippingTermsId ? (
-                      <Text style={[styles.dropTextInputStyle]}>
-                        {shippingTermsName}
-                      </Text>
-                    ) : null}
-                  </View>
-                </View>
-              </View>
-
-              <View style={{justifyContent: 'center'}}>
-                <Image source={downArrowImg} style={styles.imageStyle} />
-              </View>
-            </TouchableOpacity>
-
-            {showShippingTermsList && (
-              <View style={styles.dropdownContent1}>
-                <TextInput
-                  style={styles.searchInput}
-                  placeholder="Search "
-                  onChangeText={handleSearchShippingTerms}
-                  placeholderTextColor="#000"
-                />
-                <ScrollView
-                  style={styles.scrollView}
-                  nestedScrollEnabled={true}>
-                  {filteredShippingTerms.length === 0 ? (
-                    <Text style={styles.noCategoriesText}>
-                      Sorry, no results found!
-                    </Text>
-                  ) : (
-                    filteredShippingTerms.map((item, index) => (
-                      <TouchableOpacity
-                        key={index}
-                        style={styles.dropdownOption}
-                        onPress={() => actionOnShippingTerms(item)}>
-                        <Text style={{color: '#000'}}>{item.name}</Text>
-                      </TouchableOpacity>
-                    ))
-                  )}
-                </ScrollView>
-              </View>
-            )}
-          </View>
-
-          <View
-            style={{
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: '#fff',
-              marginTop: hp('2%'),
-            }}>
-            <TouchableOpacity
-              style={{
-                flexDirection: 'row',
-                borderWidth: 0.5,
-                borderColor: '#D8D8D8',
-                borderRadius: hp('0.5%'),
-                width: wp('90%'),
-              }}
-              onPress={() => {
-                setShowPriceList(!showPriceList);
-              }}>
-              <View>
-                <View style={[styles.SectionStyle1, {}]}>
-                  <View style={{flexDirection: 'column'}}>
-                    <Text
-                      style={
-                        priceId
-                          ? [styles.dropTextLightStyle]
-                          : [styles.dropTextInputStyle]
-                      }>
-                      {'Price'}
-                    </Text>
-                    {priceId ? (
-                      <Text style={[styles.dropTextInputStyle]}>
-                        {priceValue}
-                      </Text>
-                    ) : null}
-                  </View>
-                </View>
-              </View>
-
-              <View style={{justifyContent: 'center'}}>
-                <Image source={downArrowImg} style={styles.imageStyle} />
-              </View>
-            </TouchableOpacity>
-
-            {showPriceList && (
-              <View style={styles.dropdownContent1}>
-                <TextInput
-                  style={styles.searchInput}
-                  placeholder="Search "
-                  onChangeText={handleSearchPrice}
-                  placeholderTextColor="#000"
-                />
-                <ScrollView
-                  style={styles.scrollView}
-                  nestedScrollEnabled={true}>
-                  {filteredPriceList.length === 0 ? (
-                    <Text style={styles.noCategoriesText}>
-                      Sorry, no results found!
-                    </Text>
-                  ) : (
-                    filteredPriceList.map((item, index) => (
-                      <TouchableOpacity
-                        key={index}
-                        style={styles.dropdownOption}
-                        onPress={() => actionOnPrice(item)}>
-                        <Text style={{color: '#000'}}>{item.name}</Text>
-                      </TouchableOpacity>
-                    ))
-                  )}
-                </ScrollView>
-              </View>
-            )}
-          </View>
-
           <View style={{marginTop: hp('2%')}}>
             <TextInput
               label="Name *"
               value={name}
               mode="outlined"
+              editable={false}
+              style={{backgroundColor: '#e8e8e8'}}
               onChangeText={text => setName(text)}
             />
           </View>
+
           <View style={{marginTop: hp('2%')}}>
             <TextInput
               label="Address1 *"
               value={address1}
               mode="outlined"
+              placeholder="Plot no/flat no/shop no"
               numberOfLines={3}
               multiline
               onChangeText={text => setAddress1(text)}
@@ -725,6 +423,7 @@ const handleSearchShipMode = text => {
               label="Address2 "
               value={address2}
               mode="outlined"
+              placeholder="Landmark/area/street"
               numberOfLines={3}
               multiline
               onChangeText={text => setAddress2(text)}
@@ -735,133 +434,11 @@ const handleSearchShipMode = text => {
               label="Address3 *"
               value={address3}
               mode="outlined"
+              placeholder="City/town"
               numberOfLines={3}
               multiline
               onChangeText={text => setAddress3(text)}
             />
-          </View>
-          <View style={{marginTop: hp('2%')}}>
-            <TextInput
-              label="city"
-              value={city}
-              mode="outlined"
-              onChangeText={text => setCity(text)}
-            />
-          </View>
-          <View style={{marginTop: hp('2%')}}>
-            <TextInput
-              label="Zip PostalCode"
-              value={zipPostalCode}
-              mode="outlined"
-              onChangeText={text => setZipPostalCode(text)}
-            />
-          </View>
-          <View style={{marginTop: hp('2%')}}>
-            <TextInput
-              label="Phone"
-              value={phone}
-              mode="outlined"
-              onChangeText={text => setPhone(text)}
-            />
-          </View>
-          <View style={{marginTop: hp('2%')}}>
-            <TextInput
-              label="Whatsapp Phone"
-              value={whatsappPhone}
-              mode="outlined"
-              onChangeText={text => setWhatsappPhone(text)}
-            />
-          </View>
-          <View style={{marginTop: hp('2%')}}>
-            <TextInput
-              label="Pan No"
-              value={panNo}
-              mode="outlined"
-              onChangeText={text => setWhatsappPhone(text)}
-            />
-          </View>
-          <View style={{marginTop: hp('2%')}}>
-            <TextInput
-              label="GST"
-              value={gst}
-              mode="outlined"
-              onChangeText={text => setGst(text)}
-            />
-          </View>
-
-          {/* Country Dropdown */}
-
-          <View
-            style={{
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: '#fff',
-              marginTop: hp('2%'),
-            }}>
-            <TouchableOpacity
-              style={{
-                flexDirection: 'row',
-                borderWidth: 0.5,
-                borderColor: '#D8D8D8',
-                borderRadius: hp('0.5%'),
-                width: wp('90%'),
-              }}
-              onPress={() => {
-                setShowStateList(!showStateList);
-              }}>
-              <View>
-                <View style={[styles.SectionStyle1, {}]}>
-                  <View style={{flexDirection: 'column'}}>
-                    <Text
-                      style={
-                        stateId
-                          ? [styles.dropTextLightStyle]
-                          : [styles.dropTextInputStyle]
-                      }>
-                      {'State *'}
-                    </Text>
-                    {stateId ? (
-                      <Text style={[styles.dropTextInputStyle]}>
-                        {stateName}
-                      </Text>
-                    ) : null}
-                  </View>
-                </View>
-              </View>
-
-              <View style={{justifyContent: 'center'}}>
-                <Image source={downArrowImg} style={styles.imageStyle} />
-              </View>
-            </TouchableOpacity>
-
-            {showStateList && (
-              <View style={styles.dropdownContent1}>
-                <TextInput
-                  style={styles.searchInput}
-                  placeholder="Search "
-                  onChangeText={handleSearchState}
-                  placeholderTextColor="#000"
-                />
-                <ScrollView
-                  style={styles.scrollView}
-                  nestedScrollEnabled={true}>
-                  {filteredState.length === 0 ? (
-                    <Text style={styles.noCategoriesText}>
-                      Sorry, no results found!
-                    </Text>
-                  ) : (
-                    filteredState.map((item, index) => (
-                      <TouchableOpacity
-                        key={index}
-                        style={styles.dropdownOption}
-                        onPress={() => actionOnState(item)}>
-                        <Text style={{color: '#000'}}>{item.name}</Text>
-                      </TouchableOpacity>
-                    ))
-                  )}
-                </ScrollView>
-              </View>
-            )}
           </View>
 
           <View
@@ -953,22 +530,22 @@ const handleSearchShipMode = text => {
                 width: wp('90%'),
               }}
               onPress={() => {
-                setShowReligion(!showReligionList);
+                setShowStateList(!showStateList);
               }}>
               <View>
                 <View style={[styles.SectionStyle1, {}]}>
                   <View style={{flexDirection: 'column'}}>
                     <Text
                       style={
-                        religionId
+                        stateId
                           ? [styles.dropTextLightStyle]
                           : [styles.dropTextInputStyle]
                       }>
-                      {'Religion '}
+                      {'State *'}
                     </Text>
-                    {countryId ? (
+                    {stateId ? (
                       <Text style={[styles.dropTextInputStyle]}>
-                        {religionName}
+                        {stateName}
                       </Text>
                     ) : null}
                   </View>
@@ -980,27 +557,27 @@ const handleSearchShipMode = text => {
               </View>
             </TouchableOpacity>
 
-            {showReligionList && (
+            {showStateList && (
               <View style={styles.dropdownContent1}>
                 <TextInput
                   style={styles.searchInput}
                   placeholder="Search "
-                  onChangeText={handleSearchReligion}
+                  onChangeText={handleSearchState}
                   placeholderTextColor="#000"
                 />
                 <ScrollView
                   style={styles.scrollView}
                   nestedScrollEnabled={true}>
-                  {filteredReligion.length === 0 ? (
+                  {filteredState.length === 0 ? (
                     <Text style={styles.noCategoriesText}>
                       Sorry, no results found!
                     </Text>
                   ) : (
-                    filteredReligion.map((item, index) => (
+                    filteredState.map((item, index) => (
                       <TouchableOpacity
                         key={index}
                         style={styles.dropdownOption}
-                        onPress={() => actionOnReligion(item)}>
+                        onPress={() => actionOnState(item)}>
                         <Text style={{color: '#000'}}>{item.name}</Text>
                       </TouchableOpacity>
                     ))
@@ -1010,77 +587,47 @@ const handleSearchShipMode = text => {
             )}
           </View>
 
-          <View
-            style={{
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: '#fff',
-              marginTop: hp('2%'),
-            }}>
-            <TouchableOpacity
-              style={{
-                flexDirection: 'row',
-                borderWidth: 0.5,
-                borderColor: '#D8D8D8',
-                borderRadius: hp('0.5%'),
-                width: wp('90%'),
-              }}
-              onPress={() => {
-                setShowPaymentPriorityList(!showPaymentPriorityList);
-              }}>
-              <View>
-                <View style={[styles.SectionStyle1, {}]}>
-                  <View style={{flexDirection: 'column'}}>
-                    <Text
-                      style={
-                        paymentPriorityId
-                          ? [styles.dropTextLightStyle]
-                          : [styles.dropTextInputStyle]
-                      }>
-                      {'Payment Priority '}
-                    </Text>
-                    {paymentPriorityId ? (
-                      <Text style={[styles.dropTextInputStyle]}>
-                        {paymentPriorityName}
-                      </Text>
-                    ) : null}
-                  </View>
-                </View>
-              </View>
-
-              <View style={{justifyContent: 'center'}}>
-                <Image source={downArrowImg} style={styles.imageStyle} />
-              </View>
-            </TouchableOpacity>
-
-            {showPaymentPriorityList && (
-              <View style={styles.dropdownContent1}>
-                <TextInput
-                  style={styles.searchInput}
-                  placeholder="Search "
-                  onChangeText={handleSearchPaymentPriority}
-                  placeholderTextColor="#000"
-                />
-                <ScrollView
-                  style={styles.scrollView}
-                  nestedScrollEnabled={true}>
-                  {filteredPaymentPriority.length === 0 ? (
-                    <Text style={styles.noCategoriesText}>
-                      Sorry, no results found!
-                    </Text>
-                  ) : (
-                    filteredPaymentPriority.map((item, index) => (
-                      <TouchableOpacity
-                        key={index}
-                        style={styles.dropdownOption}
-                        onPress={() => actionOnPaymentPriority(item)}>
-                        <Text style={{color: '#000'}}>{item.name}</Text>
-                      </TouchableOpacity>
-                    ))
-                  )}
-                </ScrollView>
-              </View>
-            )}
+          <View style={{marginTop: hp('2%')}}>
+            <TextInput
+              label="city"
+              value={city}
+              mode="outlined"
+              onChangeText={text => setCity(text)}
+            />
+          </View>
+          <View style={{marginTop: hp('2%')}}>
+            <TextInput
+              label="Zip PostalCode"
+              value={zipPostalCode}
+              mode="outlined"
+              onChangeText={text => setZipPostalCode(text)}
+            />
+          </View>
+          <View style={{marginTop: hp('2%')}}>
+            <TextInput
+              label="Phone"
+              value={phone}
+              mode="outlined"
+              onChangeText={text => setPhone(text)}
+            />
+          </View>
+          <View style={{marginTop: hp('2%')}}>
+            <TextInput
+              label="Whatsapp Phone"
+              value={whatsappPhone}
+              mode="outlined"
+              onChangeText={text => setWhatsappPhone(text)}
+            />
+          </View>
+          <View style={{marginTop: hp('2%')}}>
+            <TextInput
+              label="Location Name"
+              value={locationName}
+              mode="outlined"
+              editable={false}
+              style={{backgroundColor:'#e8e8e8'}}
+              onChangeText={text => setLocationName(text)}
+            />
           </View>
 
           <View
@@ -1112,7 +659,7 @@ const handleSearchShipMode = text => {
                       }>
                       {'Currency'}
                     </Text>
-                    {paymentPriorityId ? (
+                    {currencyId ? (
                       <Text style={[styles.dropTextInputStyle]}>
                         {currencyName}
                       </Text>
@@ -1156,223 +703,13 @@ const handleSearchShipMode = text => {
             )}
           </View>
 
-          <View
-            style={{
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: '#fff',
-              marginTop: hp('2%'),
-            }}>
-            <TouchableOpacity
-              style={{
-                flexDirection: 'row',
-                borderWidth: 0.5,
-                borderColor: '#D8D8D8',
-                borderRadius: hp('0.5%'),
-                width: wp('90%'),
-              }}
-              onPress={() => {
-                setShowTaxTypeList(!showTaxTypeList);
-              }}>
-              <View>
-                <View style={[styles.SectionStyle1, {}]}>
-                  <View style={{flexDirection: 'column'}}>
-                    <Text
-                      style={
-                        taxTypeId
-                          ? [styles.dropTextLightStyle]
-                          : [styles.dropTextInputStyle]
-                      }>
-                      {'Tax Type'}
-                    </Text>
-                    {taxTypeId ? (
-                      <Text style={[styles.dropTextInputStyle]}>
-                        {taxTypeName}
-                      </Text>
-                    ) : null}
-                  </View>
-                </View>
-              </View>
-
-              <View style={{justifyContent: 'center'}}>
-                <Image source={downArrowImg} style={styles.imageStyle} />
-              </View>
-            </TouchableOpacity>
-
-            {showTaxTypeList && (
-              <View style={styles.dropdownContent1}>
-                <TextInput
-                  style={styles.searchInput}
-                  placeholder="Search "
-                  onChangeText={handleSearchCurrency}
-                  placeholderTextColor="#000"
-                />
-                <ScrollView
-                  style={styles.scrollView}
-                  nestedScrollEnabled={true}>
-                  {filteredTaxType.length === 0 ? (
-                    <Text style={styles.noCategoriesText}>
-                      Sorry, no results found!
-                    </Text>
-                  ) : (
-                    filteredTaxType.map((item, index) => (
-                      <TouchableOpacity
-                        key={index}
-                        style={styles.dropdownOption}
-                        onPress={() => actionOnTaxType(item)}>
-                        <Text style={{color: '#000'}}>{item.name}</Text>
-                      </TouchableOpacity>
-                    ))
-                  )}
-                </ScrollView>
-              </View>
-            )}
-          </View>
-
-          <View
-            style={{
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: '#fff',
-              marginTop: hp('2%'),
-            }}>
-            <TouchableOpacity
-              style={{
-                flexDirection: 'row',
-                borderWidth: 0.5,
-                borderColor: '#D8D8D8',
-                borderRadius: hp('0.5%'),
-                width: wp('90%'),
-              }}
-              onPress={() => {
-                setShowInvoiceFormatList(!showInvoiceFormatList);
-              }}>
-              <View>
-                <View style={[styles.SectionStyle1, {}]}>
-                  <View style={{flexDirection: 'column'}}>
-                    <Text
-                      style={
-                        invoiceFormatId
-                          ? [styles.dropTextLightStyle]
-                          : [styles.dropTextInputStyle]
-                      }>
-                      {'Invoice Format Name'}
-                    </Text>
-                    {invoiceFormatId ? (
-                      <Text style={[styles.dropTextInputStyle]}>
-                        {invoiceFormatName}
-                      </Text>
-                    ) : null}
-                  </View>
-                </View>
-              </View>
-
-              <View style={{justifyContent: 'center'}}>
-                <Image source={downArrowImg} style={styles.imageStyle} />
-              </View>
-            </TouchableOpacity>
-
-            {showInvoiceFormatList && (
-              <View style={styles.dropdownContent1}>
-                <TextInput
-                  style={styles.searchInput}
-                  placeholder="Search "
-                  onChangeText={handleSearchInvoiceFormat}
-                  placeholderTextColor="#000"
-                />
-                <ScrollView
-                  style={styles.scrollView}
-                  nestedScrollEnabled={true}>
-                  {filteredInvoiceFormat.length === 0 ? (
-                    <Text style={styles.noCategoriesText}>
-                      Sorry, no results found!
-                    </Text>
-                  ) : (
-                    filteredInvoiceFormat.map((item, index) => (
-                      <TouchableOpacity
-                        key={index}
-                        style={styles.dropdownOption}
-                        onPress={() => actionOnInvoiceFormat(item)}>
-                        <Text style={{color: '#000'}}>{item.name}</Text>
-                      </TouchableOpacity>
-                    ))
-                  )}
-                </ScrollView>
-              </View>
-            )}
-          </View>
-
-          <View
-            style={{
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: '#fff',
-              marginTop: hp('2%'),
-            }}>
-            <TouchableOpacity
-              style={{
-                flexDirection: 'row',
-                borderWidth: 0.5,
-                borderColor: '#D8D8D8',
-                borderRadius: hp('0.5%'),
-                width: wp('90%'),
-              }}
-              onPress={() => {
-                setShowShipModeList(!showShipModeList);
-              }}>
-              <View>
-                <View style={[styles.SectionStyle1, {}]}>
-                  <View style={{flexDirection: 'column'}}>
-                    <Text
-                      style={
-                        shipModeId
-                          ? [styles.dropTextLightStyle]
-                          : [styles.dropTextInputStyle]
-                      }>
-                      {'ship Mode'}
-                    </Text>
-                    {shipModeId ? (
-                      <Text style={[styles.dropTextInputStyle]}>
-                        {shipModeName}
-                      </Text>
-                    ) : null}
-                  </View>
-                </View>
-              </View>
-
-              <View style={{justifyContent: 'center'}}>
-                <Image source={downArrowImg} style={styles.imageStyle} />
-              </View>
-            </TouchableOpacity>
-
-            {showShipModeList && (
-              <View style={styles.dropdownContent1}>
-                <TextInput
-                  style={styles.searchInput}
-                  placeholder="Search "
-                  onChangeText={handleSearchShipMode}
-                  placeholderTextColor="#000"
-                />
-                <ScrollView
-                  style={styles.scrollView}
-                  nestedScrollEnabled={true}>
-                  {filteredShipMode.length === 0 ? (
-                    <Text style={styles.noCategoriesText}>
-                      Sorry, no results found!
-                    </Text>
-                  ) : (
-                    filteredShipMode.map((item, index) => (
-                      <TouchableOpacity
-                        key={index}
-                        style={styles.dropdownOption}
-                        onPress={() => actionOnShipMode(item)}>
-                        <Text style={{color: '#000'}}>{item.name}</Text>
-                      </TouchableOpacity>
-                    ))
-                  )}
-                </ScrollView>
-              </View>
-            )}
+          <View style={{marginTop: hp('2%')}}>
+            <TextInput
+              label="GST"
+              value={gst}
+              mode="outlined"
+              onChangeText={text => setGst(text)}
+            />
           </View>
         </View>
       </KeyboardAwareScrollView>
@@ -1417,130 +754,158 @@ const handleSearchShipMode = text => {
 
 export default VendorOrCustomerMasterEditUI;
 
-const getStyles = colors =>
-  StyleSheet.create({
-    popSearchViewStyle: {
-      height: hp('40%'),
-      width: wp('90%'),
-      backgroundColor: '#E5E4E2',
-      // bottom: 220,
-      // position: 'absolute',
-      // flex:1,
-      alignSelf: 'center',
-      borderTopRightRadius: 15,
-      borderTopLeftRadius: 15,
-      alignItems: 'center',
-    },
+const styles = StyleSheet.create({
+  popSearchViewStyle: {
+    height: hp('40%'),
+    width: wp('90%'),
+    backgroundColor: '#f0f0f0',
+    // bottom: 220,
+    // position: 'absolute',
+    // flex:1,
+    alignSelf: 'center',
+    // borderTopRightRadius: 15,
+    // borderTopLeftRadius: 15,
+    alignItems: 'center',
+  },
+  popSearchViewStyle1: {
+    width: wp('90%'),
+    backgroundColor: '#f0f0f0',
+    // bottom: 220,
+    // position: 'absolute',
+    // flex:1,
+    alignSelf: 'center',
+    alignItems: 'center',
+  },
 
-    flatcontainer: {
-      flex: 1,
-    },
+  flatcontainer: {
+    flex: 1,
+  },
 
-    flatview: {
-      height: hp('8%'),
-      marginBottom: hp('0.3%'),
-      alignContent: 'center',
-      justifyContent: 'center',
-      borderBottomColor: 'black',
-      borderBottomWidth: wp('0.1%'),
-      width: wp('80%'),
-      alignItems: 'center',
-    },
+  flatview: {
+    height: hp('8%'),
+    marginBottom: hp('0.3%'),
+    alignContent: 'center',
+    justifyContent: 'center',
+    borderBottomColor: 'black',
+    borderBottomWidth: wp('0.1%'),
+    width: wp('80%'),
+    alignItems: 'center',
+  },
 
-    SectionStyle1: {
-      flexDirection: 'row',
-      // justifyContent: "center",
-      alignItems: 'center',
-      height: hp('7%'),
-      width: wp('75%'),
-      borderRadius: hp('0.5%'),
-      // alignSelf: "center",
-      // backgroundColor: "grey",
-    },
+  SectionStyle1: {
+    flexDirection: 'row',
+    // justifyContent: "center",
+    alignItems: 'center',
+    height: hp('7%'),
+    width: wp('75%'),
+    borderRadius: hp('0.5%'),
+    // alignSelf: "center",
+    // backgroundColor: "grey",
+  },
 
-    imageStyle: {
-      // margin: "4%",
-      height: wp('12%'),
-      aspectRatio: 1,
-      marginRight: wp('8%'),
-      resizeMode: 'stretch',
-    },
+  imageStyle: {
+    // margin: "4%",
+    height: wp('12%'),
+    aspectRatio: 1,
+    marginRight: wp('8%'),
+    resizeMode: 'stretch',
+  },
 
-    dropTextInputStyle: {
-      fontWeight: 'normal',
-      fontSize: 18,
-      marginLeft: wp('4%'),
-      color: 'black',
-      width: wp('80%'),
-    },
+  dropTextInputStyle: {
+    fontWeight: 'normal',
+    fontSize: 18,
+    marginLeft: wp('4%'),
+    color: 'black',
+    width: wp('80%'),
+  },
 
-    dropTextLightStyle: {
-      fontWeight: 300,
-      fontSize: 12,
-      width: wp('60%'),
-      alignSelf: 'flex-start',
-      marginTop: hp('1%'),
-      marginLeft: wp('4%'),
-      color: '#000',
-    },
-    wrapper: {
-      justifyContent: 'center',
-      alignItems: 'center',
-      flex: 1,
-      marginTop: hp('2%'),
-      width: '90%',
-      marginBottom: 10,
-      // marginHorizontal:10
-    },
-    table_head: {
-      flexDirection: 'row',
-      borderBottomWidth: 1,
-      borderColor: '#ddd',
-      padding: 7,
-      backgroundColor: colors.color2,
-      alignItems: 'center',
-    },
-    table_head_captions: {
-      fontSize: 15,
-      color: 'white',
-      alignItems: 'center',
-    },
-
-    table_body_single_row: {
-      backgroundColor: '#fff',
-      flexDirection: 'row',
-      borderBottomWidth: 1,
-      borderColor: '#ddd',
-      padding: 7,
-    },
-    table_data: {
-      fontSize: 11,
-      color: '#000',
-    },
-    table: {
-      margin: 15,
-      // width:'100%',
-      justifyContent: 'center',
-      alignItems: 'center',
-      elevation: 1,
-      backgroundColor: '#fff',
-    },
-    dropdownContent1: {
-      elevation: 5,
-      // height: 220,
-      maxHeight: 220,
-      alignSelf: 'center',
-      width: '98%',
-      backgroundColor: '#fff',
-      borderRadius: 10,
-      borderColor: 'lightgray', // Optional: Adds subtle border (for effect)
-      borderWidth: 1,
-      marginTop: 3,
-    },
-    dropdownOption: {
-      paddingHorizontal: 10,
-      paddingVertical: 12,
-      borderBottomWidth: 1,
-      borderBottomColor: '#ccc',
-    },
-  });
+  dropTextLightStyle: {
+    fontWeight: 300,
+    fontSize: 12,
+    width: wp('60%'),
+    alignSelf: 'flex-start',
+    marginTop: hp('1%'),
+    marginLeft: wp('4%'),
+    color: '#000',
+  },
+  wrapper: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    flex: 1,
+    marginTop: hp('2%'),
+    width: '100%',
+  },
+  table: {
+    width: '95%', // Reduces extra space on the sides
+    backgroundColor: '#fff',
+    elevation: 1,
+    borderRadius: 5,
+    overflow: 'hidden',
+  },
+  table_head: {
+    flexDirection: 'row',
+    borderBottomWidth: 1,
+    borderColor: '#ddd',
+    backgroundColor: '#5177c0',
+    alignItems: 'center',
+    paddingVertical: 5,
+    paddingHorizontal: 5,
+  },
+  table_head_captions: {
+    fontSize: 14,
+    color: 'white',
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+  table_body_single_row: {
+    flexDirection: 'row',
+    borderBottomWidth: 1,
+    borderColor: '#ddd',
+    paddingVertical: 7,
+    backgroundColor: '#fff',
+    paddingHorizontal: 5,
+  },
+  table_data: {
+    fontSize: 13,
+    color: '#333',
+  },
+  searchInput: {
+    marginTop: 10,
+    borderRadius: 10,
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    marginHorizontal: 10,
+    paddingLeft: 10,
+    marginBottom: 10,
+    color: '#000000',
+  },
+  scrollView: {
+    maxHeight: 150,
+  },
+  dropdownOption: {
+    paddingHorizontal: 10,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+  },
+  dropdownContent1: {
+    elevation: 5,
+    // height: 220,
+    maxHeight: 220,
+    alignSelf: 'center',
+    width: '98%',
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    borderColor: 'lightgray', // Optional: Adds subtle border (for effect)
+    borderWidth: 1,
+    marginTop: 3,
+  },
+  noCategoriesText: {
+    textAlign: 'center',
+    marginTop: 20,
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#000000',
+  },
+});

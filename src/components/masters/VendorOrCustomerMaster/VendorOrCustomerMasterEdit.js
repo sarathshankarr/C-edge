@@ -16,12 +16,15 @@ const VendorOrCustomerMasterEdit = ({ navigation, route, ...props }) => {
   const [popUpAlert, set_popUpAlert] = useState(undefined);
   const [popUpRBtnTitle, set_popUpRBtnTitle] = useState(undefined);
   const [isPopupLeft, set_isPopupLeft] = useState(false);
+  const [vendorId, set_vendorId]=useState('');
+
 
   React.useEffect(() => {
 
     if (route.params?.item) {
-      // getInitialData(route.params?.item);
-      console.log("route.params?.item===========> ", route.params?.item.designId);
+      getInitialData(route.params?.item.vendorId);
+      set_vendorId(route.params?.item.vendorId)
+      console.log("route.params?.item===========> ", route.params?.item.vendorId);
     }
 
   }, [route.params]);
@@ -32,13 +35,8 @@ const VendorOrCustomerMasterEdit = ({ navigation, route, ...props }) => {
     navigation.goBack();
   };
 
-  const saveBack = () => {
-    navigation.navigate('DDAList', {reload:true});
-  };
 
-
-
-  const getInitialData = async (item) => {
+  const getInitialData = async (id) => {
 
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
@@ -47,19 +45,16 @@ const VendorOrCustomerMasterEdit = ({ navigation, route, ...props }) => {
 
     set_isLoading(true);
     let obj = {
-      "designId": item.designId,
-      "menuId": 728,
-      "userName": userName,
-      "userPwd": userPsd,
+      "vendor_id": id,
+      "menuId":17,
+      "username": userName,
+      "password": userPsd,
       "compIds": usercompanyId,
       "company":JSON.parse(companyObj),
-
     }
-    console.log(' DDA edit request body --->,',obj);
-    let EditDDAAPIObj = await APIServiceCall.EditDDA(obj);
+    let EditDDAAPIObj = await APIServiceCall.EditVendorMasters(obj);
     set_isLoading(false);
 
-    console.log("edit get data ==> ", EditDDAAPIObj.statusData);
     if (EditDDAAPIObj && EditDDAAPIObj.statusData) {
       set_itemsObj(EditDDAAPIObj.responseData);
     } else {
@@ -72,9 +67,38 @@ const VendorOrCustomerMasterEdit = ({ navigation, route, ...props }) => {
 
   };
 
-  // const actionOnRow = (item,index) => {
-  //   navigation.navigate('FabricMainComponent',{styleId:item.styleId});
-  // };
+  const getStatelist = async (selectedCountryId) => {
+
+    let userName = await AsyncStorage.getItem('userName');
+    let userPsd = await AsyncStorage.getItem('userPsd');
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
+
+    set_isLoading(true);
+    let obj = {
+      "countryId": selectedCountryId,
+      "username": userName,
+      "password": userPsd,
+      "compIds": usercompanyId,
+      "company":JSON.parse(companyObj),
+    }
+    let EditDDAAPIObj = await APIServiceCall.loadVendorMasterStatesList(obj);
+    set_isLoading(false);
+
+    
+    if (EditDDAAPIObj && EditDDAAPIObj.statusData) {
+      set_itemsObj({...itemsObj, state:EditDDAAPIObj.responseData});
+    } else {
+      popUpAction(Constant.SERVICE_FAIL_MSG, Constant.DefaultAlert_MSG, 'OK', true, false);
+    }
+
+    if (EditDDAAPIObj && EditDDAAPIObj.error) {
+      popUpAction(Constant.SERVICE_FAIL_MSG, Constant.DefaultAlert_MSG, 'OK', true, false)
+    }
+
+  };
+
+
 
   const popUpAction = (popMsg, popAlert, rBtnTitle, isPopup, isPopLeft) => {
     set_popUpMessage(popMsg);
@@ -132,7 +156,7 @@ const VendorOrCustomerMasterEdit = ({ navigation, route, ...props }) => {
 
     if (saveEditObj && saveEditObj.statusData && saveEditObj.responseData && saveEditObj.responseData.status !== 'false') {
       console.log("sucess");
-      saveBack();
+      backBtnAction();
     } else {
       popUpAction(Constant.Fail_Save_Dtls_MSG, Constant.DefaultAlert_MSG, 'OK', true, false);
     }
@@ -153,9 +177,9 @@ const VendorOrCustomerMasterEdit = ({ navigation, route, ...props }) => {
       isPopupLeft={isPopupLeft}
       isPopUp={isPopUp}
       backBtnAction={backBtnAction}
-      // actionOnRow = {actionOnRow}
       popOkBtnAction={popOkBtnAction}
       submitAction={submitAction}
+      getStatelist={getStatelist}
     />
 
   );

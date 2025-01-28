@@ -175,7 +175,7 @@ const VendorOrCustomerMasterList = ({ navigation, route, ...props }) => {
       isPopupLeft={isPopupLeft}
       isPopUp={isPopUp}
       backBtnAction={backBtnAction}
-      // actionOnRow={actionOnRow}
+      actionOnRow={actionOnRow}
       popOkBtnAction={popOkBtnAction}
       fetchMore={fetchMore}
       MainLoading = {MainLoading}
