@@ -44,9 +44,8 @@ const CreateVendorOrCustomerMasterUI = ({route, navigation, ...props}) => {
         setFilteredCountry(props.itemsArray.countryMap);
         setCountryList(props.itemsArray.countryMap);
       }
-    
     }
-    console.log('props =====>  ', props?.itemsArray);
+    // console.log('props =====>  ', props?.itemsArray);
   }, [props.itemsArray]);
 
   const [name, setName] = useState('');
@@ -59,6 +58,10 @@ const CreateVendorOrCustomerMasterUI = ({route, navigation, ...props}) => {
   const [whatsappPhone, setWhatsappPhone] = useState('');
   const [locationName, setLocationName] = useState('');
   const [gst, setGst] = useState('');
+  const [newState, setNewState] = useState('');
+  const [newCountry, setNewCountry] = useState('');
+  const [showAddCountry, setShowAddCountry] = useState(false);
+  const [showAddNewState, setShowAddNewState] = useState(false);
 
   const [countryList, setCountryList] = useState([]);
   const [filteredCountry, setFilteredCountry] = useState([]);
@@ -70,7 +73,19 @@ const CreateVendorOrCustomerMasterUI = ({route, navigation, ...props}) => {
     setCountryId(item.id);
     setCountryName(item.name);
     setShowCountryList(false);
-    props.getStatelist(item.id);
+    if (item.id === 'ADD_NEW_COUNTRY') {
+      setShowAddCountry(true);
+      setShowAddNewState(true);
+      const newItem = {id: 'ADD_NEW_STATE', name: 'Add New State'};
+      setStateId(newItem?.id);
+      setStateName(newItem?.name);
+    } else {
+      props.getStatelist(item.id);
+      setShowAddCountry(false);
+      setStateId('');
+      setStateName('');
+      setShowAddNewState(false);
+    }
   };
 
   const handleSearchCountry = text => {
@@ -90,12 +105,16 @@ const CreateVendorOrCustomerMasterUI = ({route, navigation, ...props}) => {
   const [showStateList, setShowStateList] = useState(false);
   const [stateName, setStateName] = useState('');
   const [stateId, setStateId] = useState('');
-  const [showState, setShowState] = useState(false);
 
   const actionOnState = item => {
     setStateId(item.id);
     setStateName(item.name);
     setShowStateList(false);
+    if (item.id === 'ADD_NEW_STATE') {
+      setShowAddNewState(true);
+    } else {
+      setShowAddNewState(false);
+    }
   };
 
   const handleSearchState = text => {
@@ -108,7 +127,6 @@ const CreateVendorOrCustomerMasterUI = ({route, navigation, ...props}) => {
       setFilteredState(stateList);
     }
   };
-
 
   // Currency
   const [currencyList, setCurrencyList] = useState([]);
@@ -135,10 +153,6 @@ const CreateVendorOrCustomerMasterUI = ({route, navigation, ...props}) => {
     }
   };
 
-
-
-
-
   const backBtnAction = () => {
     props.backBtnAction();
   };
@@ -147,11 +161,111 @@ const CreateVendorOrCustomerMasterUI = ({route, navigation, ...props}) => {
     props.popOkBtnAction();
   };
 
+  const isValidPhoneNumber = phone => {
+    // const phoneRegex = /^[0-9]{10}$/; // Allows only 10-digit numeric values
+    const phoneRegex = /^[0-9]+$/; // Only numbers
+    return phoneRegex.test(phone);
+  };
+
+  const isValidName = name => {
+    const nameRegex = /^[a-zA-Z0-9 ()&,.-]+$/; // Allows only letters, numbers, spaces, (), &, -, .
+    return nameRegex.test(name);
+  };
+
   const submitAction = async () => {
-    // console.log("saving obj ", Obj)
-    // return;
-    props.submitAction(Obj);
-    // Alert.alert("Save Button Clicked");
+
+    if (!name && !address1 && !countryId && !stateId) {
+      Alert.alert('Please fill all mandatory fields !');
+      return;
+    }
+
+    if(phone){
+      if (!isValidPhoneNumber(phone)) {
+        Alert.alert(
+          'Invalid Mobile Number',
+          'Please enter a valid 10-digit mobile number.',
+        );
+        return;
+      }
+    }
+   
+    if(whatsappPhone){
+      if (!isValidPhoneNumber(whatsappPhone)) {
+        Alert.alert(
+          'Invalid WhatsApp Number',
+          'Please enter a valid 10-digit mobile number.',
+        );
+        return;
+      }
+    }
+
+    if (!name || !isValidName(name)) {
+      Alert.alert(
+        'Invalid Name',
+        'Only ( ) , & - these special characters are allowed in Vendor/Customer Name.',
+      );
+      return;
+    }
+
+    if (type === '1' && !currencyId) {
+      Alert.alert('Please Select Currency');
+      return;
+    }
+
+    if (type === '2' && !gst) {
+      Alert.alert(
+        'Confirm',
+        'Do you want to Continue without GST?',
+        [
+          {
+            text: 'Cancel',
+            style: 'cancel',
+          },
+          {
+            text: 'OK',
+            onPress: () => proceedWithSubmission(),
+          },
+        ],
+        {cancelable: false},
+      );
+      return;
+    }
+
+    proceedWithSubmission();
+  };
+
+  const proceedWithSubmission = () => {
+    const tempObj = {
+      vendorcontractor: 1,
+      user_type: userType,
+      type_code: type,
+      group_code: group,
+      vendor_code: '',
+      terms_id: '',
+      priceId: '',
+      vendor_name: name,
+      address1: address1,
+      address2: address2,
+      address3: address3,
+      city: city,
+      pin_code: zipPostalCode,
+      mobile: phone,
+      panno: '',
+      gst: gst,
+      whatsapp: whatsappPhone,
+      state: stateId==="ADD_NEW_STATE" ? '0' : stateId,
+      country: countryId==="ADD_NEW_COUNTRY" ? '0' : countryId,
+      tax_type: '0',
+      invfrm: '0',
+      ship_mode: '0',
+      region: '0',
+      payment_priority: '',
+      currency: currencyId,
+      addnewstate:newState,
+      addnewcountry:newCountry,
+      location:locationName
+    };
+    props.submitAction(tempObj);
   };
 
   const backAction = async () => {
@@ -159,7 +273,7 @@ const CreateVendorOrCustomerMasterUI = ({route, navigation, ...props}) => {
   };
 
   // User Type State
-  const [userType, setUserType] = useState('Vendor');
+  const [userType, setUserType] = useState('1');
   const userTypeRadioButtons = useMemo(
     () => [
       {
@@ -198,12 +312,11 @@ const CreateVendorOrCustomerMasterUI = ({route, navigation, ...props}) => {
     const selectedOption = userTypeRadioButtons.find(
       button => button.id === selectedId,
     );
-    setUserType(selectedOption.value);
+    setUserType(selectedOption.id);
   };
 
-
   // Group State
-  const [group, setGroup] = useState('Apparel');
+  const [group, setGroup] = useState('1');
   const groupRadioButtons = useMemo(
     () => [
       {
@@ -228,11 +341,11 @@ const CreateVendorOrCustomerMasterUI = ({route, navigation, ...props}) => {
     const selectedOption = groupRadioButtons.find(
       button => button.id === selectedId,
     );
-    setGroup(selectedOption.value);
+    setGroup(selectedOption.id);
   };
 
   // Type State
-  const [type, setType] = useState('Overseas');
+  const [type, setType] = useState('1');
   const typeRadioButtons = useMemo(
     () => [
       {
@@ -257,7 +370,7 @@ const CreateVendorOrCustomerMasterUI = ({route, navigation, ...props}) => {
     const selectedOption = typeRadioButtons.find(
       button => button.id === selectedId,
     );
-    setType(selectedOption.value);
+    setType(selectedOption.id);
   };
 
   return (
@@ -287,7 +400,7 @@ const CreateVendorOrCustomerMasterUI = ({route, navigation, ...props}) => {
             marginHorizontal: wp('5%'),
             marginTop: hp('2%'),
           }}>
-            {/* User Type */}
+          {/* User Type */}
           <View style={{marginBottom: 20}}>
             <Text style={{fontWeight: 'bold', color: '#000'}}>User Type</Text>
             <RadioGroup
@@ -301,7 +414,7 @@ const CreateVendorOrCustomerMasterUI = ({route, navigation, ...props}) => {
               onPress={handleUserTypeChange}
               layout="row"
               selectedId={
-                userTypeRadioButtons.find(item => item.value === userType)?.id
+                userTypeRadioButtons.find(item => item.id === userType)?.id
               }
             />
           </View>
@@ -315,7 +428,7 @@ const CreateVendorOrCustomerMasterUI = ({route, navigation, ...props}) => {
               onPress={handleGroupChange}
               layout="row"
               selectedId={
-                groupRadioButtons.find(item => item.value === group)?.id
+                groupRadioButtons.find(item => item.id === group)?.id
               }
             />
           </View>
@@ -329,11 +442,10 @@ const CreateVendorOrCustomerMasterUI = ({route, navigation, ...props}) => {
               onPress={handleTypeChange}
               layout="row"
               selectedId={
-                typeRadioButtons.find(item => item.value === type)?.id
+                typeRadioButtons.find(item => item.id === type)?.id
               }
             />
           </View>
-
 
           <View style={{marginTop: hp('2%')}}>
             <TextInput
@@ -349,7 +461,7 @@ const CreateVendorOrCustomerMasterUI = ({route, navigation, ...props}) => {
               label="Address1 *"
               value={address1}
               mode="outlined"
-              placeholder='Plot no/flat no/shop no'
+              placeholder="Plot no/flat no/shop no"
               numberOfLines={3}
               multiline
               onChangeText={text => setAddress1(text)}
@@ -368,7 +480,7 @@ const CreateVendorOrCustomerMasterUI = ({route, navigation, ...props}) => {
           </View>
           <View style={{marginTop: hp('2%')}}>
             <TextInput
-              label="Address3 *"
+              label="Address3 "
               value={address3}
               mode="outlined"
               placeholder="City/town"
@@ -524,6 +636,28 @@ const CreateVendorOrCustomerMasterUI = ({route, navigation, ...props}) => {
             )}
           </View>
 
+          {showAddCountry && (
+            <View style={{marginTop: hp('2%')}}>
+              <TextInput
+                label="New Country"
+                value={newCountry}
+                mode="outlined"
+                onChangeText={text => setNewCountry(text)}
+              />
+            </View>
+          )}
+
+          {showAddNewState && (
+            <View style={{marginTop: hp('2%')}}>
+              <TextInput
+                label="New State"
+                value={newState}
+                mode="outlined"
+                onChangeText={text => setNewState(text)}
+              />
+            </View>
+          )}
+
           <View style={{marginTop: hp('2%')}}>
             <TextInput
               label="city"
@@ -646,7 +780,6 @@ const CreateVendorOrCustomerMasterUI = ({route, navigation, ...props}) => {
               onChangeText={text => setGst(text)}
             />
           </View>
-
         </View>
       </KeyboardAwareScrollView>
 

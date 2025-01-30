@@ -156,10 +156,10 @@ const VendorOrCustomerMasterList = ({ navigation, route, ...props }) => {
       if(!hasMore || MainLoading || isLoading) return;
       const next =page + 1  ;
       setpage(next);
-    //   getInitialData(next, false);
-    // }else{
+      getInitialData(next, false);
+    }else{
       setpage(0);
-      // getInitialData(0, true);
+      getInitialData(0, true);
       setHasMore(true);
     }
   }

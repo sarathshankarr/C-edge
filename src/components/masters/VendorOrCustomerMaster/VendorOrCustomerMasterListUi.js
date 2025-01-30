@@ -56,7 +56,6 @@ const VendorOrCustomerMasterListUi = ({route, ...props}) => {
       set_filterArray(props.itemsArray);
       set_ItemsArray(props.itemsArray);
     }
-    // console.log("itemsa array ==>  ", props.itemsArray)
     // getRequestBody();
   }, [props.itemsArray]);
 

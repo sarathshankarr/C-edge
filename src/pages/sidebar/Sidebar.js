@@ -20,8 +20,7 @@ import { useFocusEffect } from '@react-navigation/native';
 
 const Sidebar = ({navigation}) => {
 
-  const { colors,menuIds } = useContext(ColorContext);
-  // console.log("reciewved color and menuIDs ==> ", colors.color2,menuIds)
+  const { colors,menuIds,subMenuItemsIds} = useContext(ColorContext);
   const dropdownMenus = {
     style: {
       label: 'Style Management',
@@ -30,11 +29,13 @@ const Sidebar = ({navigation}) => {
       style: [
         {
           label: 'Style',
+          menu_id: 30,
           route: 'StyleManageComponent',
           src: require('../../../assets/images/png/shirt.png'),
         },
         {
           label: 'Design Directory Approval',
+          menu_id: 728,
           route: 'DDAList',
           src: require('../../../assets/images/png/website.png'),
         },
@@ -48,6 +49,7 @@ const Sidebar = ({navigation}) => {
         {
           label: 'PO Approval',
           route: 'POApproveListComponent',
+          menu_id: 713,
           src: require('../../../assets/images/png/stamp.png'),
         },
       ],
@@ -60,51 +62,61 @@ const Sidebar = ({navigation}) => {
         {
           label: 'Fabric',
           route: 'masterFabricList',
+          menu_id: 29,
           src: require('../../../assets/images/png/textile.png'),
         },
         {
           label: 'Raw Materials Master',
           route: 'RawMaterialsMasterList',
+          menu_id: 69,
           src: require('../../../assets/images/png/metal.png'),
         },
         {
           label: 'UOM Master',
           route: 'UomMasterList',
+          menu_id: 123,
           src: require('../../../assets/images/png/measuring-tape.png'),
         },
         {
           label: 'Location Master',
           route: 'LocationMasterList',
+          menu_id: 71,
           src: require('../../../assets/images/png/measuring-tape.png'),
         },
         {
           label: 'Raw Material Type',
           route: 'RawMaterialTypeList',
+          menu_id: 82,
           src: require('../../../assets/images/png/measuring-tape.png'),
         },
         {
           label: 'Season Group Master',
           route: 'SeasonMasterList',
+          menu_id: 73,
           src: require('../../../assets/images/png/measuring-tape.png'),
         },
         {
           label: 'Size Master',
           route: 'SizeMasterList',
+          menu_id: 78,
           src: require('../../../assets/images/png/measuring-tape.png'),
         },
         {
           label: 'Scale/Size group Master',
           route: 'ScaleOrSizeMasterList',
+          menu_id: 81,
           src: require('../../../assets/images/png/measuring-tape.png'),
         },
         {
           label: 'Color  Master',
           route: 'ColorMasterList',
+          menu_id: 74,
           src: require('../../../assets/images/png/measuring-tape.png'),
         },
         {
           label: 'Vendor/Customer Master',
           route: 'VendorOrCustomerMasterList',
+          menu_id: 17,
           src: require('../../../assets/images/png/measuring-tape.png'),
         },
       ],
@@ -117,16 +129,19 @@ const Sidebar = ({navigation}) => {
         {
           label: 'Store Request',
           route: 'StockRequestList',
+          menu_id: 97,
           src: require('../../../assets/images/png/stockRequest.png'),
         },
         {
           label: 'Store Approval',
           route: 'StoreApproveListComponent',
+          menu_id: 98,
           src: require('../../../assets/images/png/stockApproval.png'),
         },
         {
           label: 'Store Receive',
           route: 'StockRecieveList',
+          menu_id: 99,
           src: require('../../../assets/images/png/stockRecieve.png'),
         },
       ],
@@ -139,15 +154,18 @@ const Sidebar = ({navigation}) => {
         {
           label: 'Location Wise Style Inventory',
           route: 'StyleLocationInventory',
+          menu_id: 93,
           src: require('../../../assets/images/png/tracking.png'),
         },
         {
           label: 'Location wise RM/Fabric Inventory',
           route: 'LocationWiseRMFabInv',
+          menu_id: 95,
           src: require('../../../assets/images/png/consignment.png'),
         },
         {
           label: 'Style Wise RM/Fabric Inventory',
+          menu_id: 168,
           route: 'LocationStyleWiseInventory',
           src: require('../../../assets/images/png/inventory.png'),
         },
@@ -161,21 +179,25 @@ const Sidebar = ({navigation}) => {
         {
           label: 'Cutting in',
           route: 'CuttingMainComponent',
+          menu_id: 3,
           src: require('../../../assets/images/png/scissors.png'),
         },
         {
           label: 'Stitching in',
           route: 'StichingInComponent',
+          menu_id: 3,
           src: require('../../../assets/images/png/sewing.png'),
         },
         {
           label: 'Finishing in',
           route: 'FinishingStyleComponent',
+          menu_id: 3,
           src: require('../../../assets/images/png/success.png'),
         },
         {
           label: 'Fabric Process in',
           route: 'FabricProcessInList',
+          menu_id: 568,
           src: require('../../../assets/images/png/fabricProce.png'),
         },
       ],
@@ -188,16 +210,19 @@ const Sidebar = ({navigation}) => {
         {
           label: 'Stitching Out',
           route: 'StichingOutComponent',
+          menu_id: 3,
           src: require('../../../assets/images/png/sewing.png'),
         },
         {
           label: 'Finishing Out',
           route: 'FinishingOutListComponent',
+          menu_id: 3,
           src: require('../../../assets/images/png/success.png'),
         },
         {
           label: 'Gate Pass Acknowledgement',
           route: 'GatePassAckList',
+          menu_id: 759,
           src: require('../../../assets/images/png/acknowledge.png'),
         },
       ],
@@ -210,26 +235,31 @@ const Sidebar = ({navigation}) => {
         {
           label: 'Inventory Consumption Report',
           route: 'InventoryConsumptionReport',
+          menu_id: 118,
           src: require('../../../assets/images/png/report.png'),
         },
         {
           label: 'Sales Order Report',
           route: 'SalesOrderReport',
+          menu_id: 101,
           src: require('../../../assets/images/png/report.png'),
         },
         {
           label: 'Production Process Report',
           route: 'ProductionProcessReport',
+          menu_id: 127,
           src: require('../../../assets/images/png/report.png'),
         },
         {
           label: 'Style Bom Report',
           route: 'StyleBomReport',
+          menu_id: 423,
           src: require('../../../assets/images/png/report.png'),
         },
         {
           label: 'Worker Wages Report',
           route: 'WorkerWagesReport',
+          menu_id: 743,
           src: require('../../../assets/images/png/report.png'),
         },
       ],
@@ -241,6 +271,23 @@ const Sidebar = ({navigation}) => {
       menuIds.includes(menu.menu_id)
     )
   );
+
+  const filteredMenus1 = Object.fromEntries(
+    Object.entries(dropdownMenus)
+      .map(([key, menu]) => {
+        // Filter submenu items based on subMenuItemsIds
+        const filteredStyle = menu.style.filter(item => subMenuItemsIds.includes(item.menu_id));
+        console.log("filtered menus ==> ", filteredStyle)
+        // Include main menu ONLY if it has filtered submenus
+        if (filteredStyle.length > 0) {
+          return [key, { ...menu, style: filteredStyle }];
+        }
+        return null;
+      })
+      .filter(Boolean) 
+  );
+  
+  
   
   const [userName, set_userName] = useState('');
   const [admin, set_admin] = useState('');
@@ -429,28 +476,6 @@ const Sidebar = ({navigation}) => {
   return (
     <View style={styles.container}>
       {/* Header */}
-      {/* <View style={styles.headerContainer}>
-        <View style={styles.header}>
-          <TouchableOpacity>
-            <Image
-              style={[styles.img, {borderRadius: 30, tintColor: '#fff'}]}
-              source={require('../../../assets/images/png/profile.png')}
-            />
-          </TouchableOpacity>
-          <View>
-            <Text style={styles.headerTitle}>Profile</Text>
-            <Text style={styles.headerSubtitle}>{userName}</Text>
-          </View>
-        </View>
-        <View style={{flexDirection:'row', alignItems:'center'}}>
-         <Image
-              style={[styles.img1, {borderRadius: 30, tintColor: '#fff'}]}
-              source={require('../../../assets/images/png/office.png')}
-            />
-          <Text style={styles.headerSubtitle}>{companyName}</Text>
-        </View>
-      </View> */}
-
       <View style={styles.headerContainer}>
      <View style={styles.header}>
     <TouchableOpacity>
@@ -487,18 +512,18 @@ const Sidebar = ({navigation}) => {
         </View> */}
       
 
-        {Object.entries(filteredMenus).map(([key, menu], index) => (
+        {Object.entries(filteredMenus1).map(([key, menu], index) => (
           <View key={menu.menu_id}>
             {renderDropdown(key, menu)}
           </View>
         ))}
 
       <View style={styles.navContainer}>
-        <NavItem
+        {menuIds.includes(392) && <NavItem
             title="Notifications"
             icon={require('../../../assets/images/png/notificationN.png')}
             onPress={() => navigation.navigate('Notifications')}
-          />
+          />}
           <NavItem
             title="Settings"
             icon={require('../../../assets/images/png/gear.png')}

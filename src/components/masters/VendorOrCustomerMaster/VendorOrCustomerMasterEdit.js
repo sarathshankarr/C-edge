@@ -1,15 +1,14 @@
 import React, { useState } from 'react';
-import DDAEditUi from './VendorOrCustomerMasterEditUI';
 import * as APIServiceCall from '../../../utils/apiCalls/apiCallsComponent';
 import * as Constant from "../../../utils/constants/constant";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import { useFocusEffect } from '@react-navigation/native';
 import VendorOrCustomerMasterEditUI from './VendorOrCustomerMasterEditUI';
 
 const VendorOrCustomerMasterEdit = ({ navigation, route, ...props }) => {
 
   const [itemsObj, set_itemsObj] = useState([]);
+  const [statesList, set_statesList] = useState([]);
   const [isLoading, set_isLoading] = useState(false);
   const [isPopUp, set_isPopUp] = useState(false);
   const [popUpMessage, set_popUpMessage] = useState(undefined);
@@ -87,7 +86,8 @@ const VendorOrCustomerMasterEdit = ({ navigation, route, ...props }) => {
 
     
     if (EditDDAAPIObj && EditDDAAPIObj.statusData) {
-      set_itemsObj({...itemsObj, state:EditDDAAPIObj.responseData});
+      // set_itemsObj({...itemsObj, state:EditDDAAPIObj.responseData});
+      set_statesList(EditDDAAPIObj.responseData);
     } else {
       popUpAction(Constant.SERVICE_FAIL_MSG, Constant.DefaultAlert_MSG, 'OK', true, false);
     }
@@ -113,48 +113,30 @@ const VendorOrCustomerMasterEdit = ({ navigation, route, ...props }) => {
   };
 
 
-  const submitAction = async (designId,remarks1, statusId, remarks) => {
+  const submitAction = async (tempObj) => {
 
-    if(statusId===0){
-      popUpAction(Constant.SELECT_STATUS, Constant.DefaultAlert_MSG, 'OK', true, false);
-      return;
-    }
-
-    console.log("saving params ==> ", designId, statusId, remarks?.length);
-
-    if (statusId === 2 && remarks.trim().length === 0) {
-      popUpAction(Constant.PO_Rejected_MSG_WITHOUT_REMARKS, Constant.DefaultAlert_MSG, 'OK', true, false);
-      return;
-    }
-
+    set_isLoading(true);
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
     let companyObj = await AsyncStorage.getItem('companyObj');
-    const obj = {
-      "designId": designId,
-      "menuId": 728,
-      "approvedStatus": statusId,
-      "remarks": remarks,
-      "note": remarks1,
-      "userName": userName,
-      "userPwd": userPsd,
-      "compIds": usercompanyId,
-      "company":JSON.parse(companyObj),
+    let userId = await AsyncStorage.getItem('userId');
 
-    }
-    saveEditObj(obj);
+    tempObj.menuId=17,
+    tempObj.vendorId=vendorId,
+    tempObj.username=userName,
+    tempObj.password=userPsd,
+    tempObj.compIds=usercompanyId,
+    tempObj.userId=userId,
+    tempObj.company=JSON.parse(companyObj)
 
-  };
+    console.log("req body ==> ", tempObj);
 
-  const saveEditObj = async (tempObj) => {
- 
-    set_isLoading(true);
-    let saveEditObj = await APIServiceCall.saveDDA(tempObj);
+    let saveEditObj = await APIServiceCall.saveEditVendorMasters(tempObj);
     set_isLoading(false);
-    console.log("response after approving", saveEditObj?.responseData)
+    console.log("response after approving", saveEditObj?.responseData, typeof saveEditObj?.responseData, saveEditObj?.responseData === true)
 
-    if (saveEditObj && saveEditObj.statusData && saveEditObj.responseData && saveEditObj.responseData.status !== 'false') {
+    if (saveEditObj && saveEditObj.statusData && saveEditObj.responseData && saveEditObj?.responseData === true) {
       console.log("sucess");
       backBtnAction();
     } else {
@@ -170,6 +152,7 @@ const VendorOrCustomerMasterEdit = ({ navigation, route, ...props }) => {
   return (
     <VendorOrCustomerMasterEditUI
       itemsObj={itemsObj}
+      statesList={statesList}
       isLoading={isLoading}
       popUpAlert={popUpAlert}
       popUpMessage={popUpMessage}
