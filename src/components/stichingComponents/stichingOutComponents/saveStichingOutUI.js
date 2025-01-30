@@ -33,7 +33,7 @@ const SaveStichingOutUI = ({ route, ...props }) => {
 
 
     if (props?.itemsObj) {
-      console.log("props =====> ", props?.itemsObj)
+      // console.log("props =====> ", props?.itemsObj)
 
       set_enterSizesArray(props.itemsObj.sizeDetails);
       set_unitPrice(props?.itemsObj?.unitprice);

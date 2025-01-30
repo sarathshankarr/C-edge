@@ -68,9 +68,11 @@ const CreateVendorOrCustomerMasterComponent = ({ route }) => {
             id: key,
             name: LISTAPIOBJ.responseData.countryMap[key]
           }));
+          const prioritized = { id: "ADD_NEW_COUNTRY", name: "Add New Country" }; 
+          const updatedCountryList = [prioritized, ...countryMapList];
           set_lists(prevLists => ({
             ...prevLists,
-            countryMap: countryMapList
+            countryMap: updatedCountryList
           }));
         }
         
@@ -112,9 +114,14 @@ const CreateVendorOrCustomerMasterComponent = ({ route }) => {
           id: key,
           name: EditDDAAPIObj.responseData.stateMap[key]
         }));
+
+        const prioritized = { id: "ADD_NEW_STATE", name: "Add New State" }; 
+          const updatedstateMapList = [prioritized, ...stateMapList];
+
+
         set_lists(prevLists => ({
           ...prevLists,
-          stateMap: stateMapList,
+          stateMap: updatedstateMapList,
           phoneCode: EditDDAAPIObj?.responseData?.ph
         }));
       }
@@ -143,13 +150,28 @@ const CreateVendorOrCustomerMasterComponent = ({ route }) => {
   };
 
   const submitAction = async (tempObj) => {
+
+    const validateVendorName= await ValidateVendorName(tempObj.vendor_name);
+    // console.log("validated value of name ==> ",tempObj.vendor_name, validateVendorName);
+
+    if(validateVendorName==="true"){
+      console.log("pop up")
+      popUpAction(Constant.Fail_Validate_VENDORMASTER_MSG, Constant.DefaultAlert_MSG, 'OK', true, false);
+      return;
+    }
+    // console.log("creating new ");
+
+
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
     let companyObj = await AsyncStorage.getItem('companyObj');
+    let userId = await AsyncStorage.getItem('userId');
 
+    tempObj.menuId = 17;
     tempObj.username = userName;
     tempObj.password = userPsd;
+    tempObj.userId = userId;
     tempObj.compIds = usercompanyId;
     tempObj.company = JSON.parse(companyObj);
 
@@ -176,6 +198,52 @@ const CreateVendorOrCustomerMasterComponent = ({ route }) => {
     }
 
 
+  };
+
+  const ValidateVendorName = async (v_name) => {
+    let userName = await AsyncStorage.getItem('userName');
+    let userPsd = await AsyncStorage.getItem('userPsd');
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
+
+    let Obj={
+    "username": userName,
+    "password": userPsd,
+    "vendor_name": v_name,
+    "compIds" : usercompanyId,
+    "company" :JSON.parse(companyObj),
+    }
+    set_isLoading(true);
+
+    let SAVEAPIObj = await APIServiceCall.validateVendorMastersName(Obj);
+    set_isLoading(false);
+
+    console.log("Sucess before returned obj ", SAVEAPIObj);
+
+    return SAVEAPIObj?.responseData;
+  };
+  const ValidateVendorCode= async () => {
+    let userName = await AsyncStorage.getItem('userName');
+    let userPsd = await AsyncStorage.getItem('userPsd');
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
+
+    let Obj={
+     "vendor_code":82,
+    "username": userName,
+    "password": userPsd,
+    "compIds" : usercompanyId,
+    "company" :JSON.parse(companyObj),
+    }
+
+    set_isLoading(true);
+
+    let SAVEAPIObj = await APIServiceCall.validateVendorMastersCode(Obj);
+    set_isLoading(false);
+
+    console.log("Sucess before returned obj ", SAVEAPIObj);
+
+    return SAVEAPIObj?.responseData;
   };
 
   return (

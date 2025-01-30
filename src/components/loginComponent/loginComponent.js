@@ -14,7 +14,7 @@ import { ColorContext } from '../colorTheme/colorTheme';
 
 const LoginComponent = ({ navigation, route, ...props }) => {
 
-  const { updateMenuIds,clearMenuIds } = useContext(ColorContext);
+  const { updateMenuIds,clearMenuIds,updateSubMenuIds,clearSubMenuIds } = useContext(ColorContext);
 
   const [isHidePassword, set_isHidePassword] = useState(true);
   const [code, set_code] = useState('');
@@ -154,6 +154,13 @@ const LoginComponent = ({ navigation, route, ...props }) => {
           updateMenuIds(MenuListIds);
         }else{
           clearMenuIds();
+        }
+        if (loginAPIObj?.responseData?.listmoduleListName) {
+          const menuSubItems=loginAPIObj?.responseData?.listmoduleListName;
+          const menuSubItemsListIds=menuSubItems.map((item)=> item.menu_id);
+          updateSubMenuIds(menuSubItemsListIds);
+        }else{
+          clearSubMenuIds();
         }
 
         if (isChecked) {

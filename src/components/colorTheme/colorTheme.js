@@ -15,6 +15,7 @@ const ColorProvider = ({children}) => {
   });
 
   const [menuIds, setMenuIDs] = useState([]);
+  const [subMenuItemsIds, setSubMenuItemsIds] = useState([]);
   // [28, 320, 2, 46, 174, 52, 3, 1, 91, 448, 392, 96, 116, 381, 111, 465, 192,100, 497, 341, 616]
   useEffect(() => {
     const getColorfromStorage = async () => {
@@ -52,9 +53,16 @@ const ColorProvider = ({children}) => {
   const clearMenuIds = () => {
     setMenuIDs([]);
   };
+  const updateSubMenuIds = Ids => {
+    setSubMenuItemsIds(Ids);
+  };
+
+  const clearSubMenuIds = () => {
+    setSubMenuItemsIds([]);
+  };
 
   return (
-    <ColorContext.Provider value={{colors, updateColor, updateAllColors, menuIds,updateMenuIds,clearMenuIds}}>
+    <ColorContext.Provider value={{colors, updateColor, updateAllColors, menuIds,updateMenuIds,clearMenuIds,subMenuItemsIds,updateSubMenuIds,clearSubMenuIds}}>
       {children}
     </ColorContext.Provider>
   );

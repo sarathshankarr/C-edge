@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Image,
   ScrollView,
+  Alert,
 } from 'react-native';
 import {
   heightPercentageToDP as hp,
@@ -26,6 +27,10 @@ let downArrowImg = require('./../../../../assets/images/png/dropDownImg.png');
 
 const VendorOrCustomerMasterEditUI = ({route, ...props}) => {
   const {colors} = useContext(ColorContext);
+
+  const [hasFetched, set_hasFetched] = useState(false);
+  const [hasFetchedStateId, set_hasFetchedStateId] = useState(false);
+  const [hasFetchedStateName, set_hasFetchedStateName] = useState(false);
 
   useEffect(() => {
     if (props.itemsObj.updateVendor) {
@@ -56,10 +61,6 @@ const VendorOrCustomerMasterEditUI = ({route, ...props}) => {
           props.itemsObj.countryMap[props.itemsObj.updateVendor.country],
         );
 
-        if(!stateName){
-          props.getStatelist(props.itemsObj.updateVendor.country);
-        }
-
         const countryMapList = Object.keys(props.itemsObj.countryMap).map(
           key => ({
             id: key,
@@ -71,21 +72,6 @@ const VendorOrCustomerMasterEditUI = ({route, ...props}) => {
       }
       if (props.itemsObj.updateVendor.city) {
         setCity(props.itemsObj.updateVendor.city);
-      }
-      if (props.itemsObj.updateVendor.state && props.itemsObj?.state?.stateMap ) {
-        setStateId(props.itemsObj.updateVendor.state);
-        setStateName(
-          props.itemsObj.state.stateMap[props.itemsObj.updateVendor.state],
-        );
-
-        const stateMapList = Object.keys(props.itemsObj.state.stateMap).map(
-          key => ({
-            id: key,
-            name: props.itemsObj.state.stateMap[key],
-          }),
-        );
-        setFilteredState(stateMapList);
-        setStateList(stateMapList);
       }
       if (props.itemsObj.updateVendor.pin_code) {
         setZipPostalCode(props.itemsObj.updateVendor.pin_code);
@@ -115,11 +101,46 @@ const VendorOrCustomerMasterEditUI = ({route, ...props}) => {
         setCurrencyList(currencysList);
       }
       if (props.itemsObj.updateVendor.gst) {
-        set_shiftList(props.itemsObj.updateVendor.gst);
+        setGst(props.itemsObj.updateVendor.gst);
       }
     }
-    console.log('items obj ===> ', props.itemsObj);
+    // console.log('items obj ===> ', props.itemsObj);
   }, [props.itemsObj]);
+
+  useEffect(() => {
+    // console.log('props?.itemsObj  ref ==> ', props?.statesList);
+
+    if (props?.itemsObj?.updateVendor) {
+      if (props?.itemsObj?.updateVendor && !hasFetchedStateId) {
+        setStateId(props.itemsObj.updateVendor.state);
+      }
+
+      if (
+        props?.itemsObj?.updateVendor &&
+        props.statesList.stateMap &&
+        !hasFetchedStateName
+      ) {
+        setStateName(
+          props.statesList.stateMap[props.itemsObj.updateVendor.state],
+        );
+        set_hasFetchedStateName(true);
+      }
+
+      if (props?.itemsObj?.updateVendor.country && !hasFetched) {
+        props.getStatelist(props.itemsObj.updateVendor.country);
+        set_hasFetched(true);
+      }
+    }
+
+    if (props.statesList.stateMap) {
+      const stateMapList = Object.keys(props.statesList.stateMap).map(key => ({
+        id: key,
+        name: props.statesList.stateMap[key],
+      }));
+      setFilteredState(stateMapList);
+      setStateList(stateMapList);
+    }
+  }, [props.itemsObj, props.statesList]);
 
   const [name, setName] = useState('');
   const [address1, setAddress1] = useState('');
@@ -142,6 +163,9 @@ const VendorOrCustomerMasterEditUI = ({route, ...props}) => {
     setCountryId(item.id);
     setCountryName(item.name);
     setShowCountryList(false);
+    props.getStatelist(item.id);
+    setStateId('');
+    setStateName('');
   };
 
   const handleSearchCountry = text => {
@@ -209,18 +233,113 @@ const VendorOrCustomerMasterEditUI = ({route, ...props}) => {
     props.backBtnAction();
   };
 
+  const isValidPhoneNumber = phone => {
+    // const phoneRegex = /^[0-9]{10}$/; // Allows only 10-digit numeric values
+    const phoneRegex = /^[0-9]+$/; // Only numbers
+    return phoneRegex.test(phone);
+  };
+
+  const isValidName = name => {
+    const nameRegex = /^[a-zA-Z0-9 ()&,.-]+$/; // Allows only letters, numbers, spaces, (), &, -, .
+    return nameRegex.test(name);
+  };
+
   const popOkBtnAction = () => {
     props.popOkBtnAction();
   };
 
   const submitAction = async () => {
-    props.submitAction(
-      props?.itemsObj?.designId,
-      remarks1,
-      statusArrayId,
-      remarks2,
-    );
+    if (!name && !address1 && !countryId && !stateId) {
+      Alert.alert('Please fill all mandatory fields !');
+      return;
+    }
+
+    if (phone) {
+      if (!isValidPhoneNumber(phone)) {
+        Alert.alert(
+          'Invalid Mobile Number',
+          'Please enter a valid 10-digit mobile number.',
+        );
+        return;
+      }
+    }
+
+    if (whatsappPhone) {
+      if (!isValidPhoneNumber(whatsappPhone)) {
+        Alert.alert(
+          'Invalid WhatsApp Number',
+          'Please enter a valid 10-digit mobile number.',
+        );
+        return;
+      }
+    }
+
+    if (!name || !isValidName(name)) {
+      Alert.alert(
+        'Invalid Name',
+        'Only ( ) , & - these special characters are allowed in Vendor/Customer Name.',
+      );
+      return;
+    }
+
+    if (type === '1' && !currencyId) {
+      Alert.alert('Please Select Currency');
+      return;
+    }
+
+    if (type === '2' && !gst) {
+      Alert.alert(
+        'Confirm',
+        'Do you want to Continue without GST?',
+        [
+          {
+            text: 'Cancel',
+            style: 'cancel',
+          },
+          {
+            text: 'OK',
+            onPress: () => proceedWithSubmission(),
+          },
+        ],
+        {cancelable: false},
+      );
+      return;
+    }
+
+    proceedWithSubmission();
   };
+  const proceedWithSubmission = async () => {
+    const tempObj = {
+      vendorcontractor: 1,
+      user_type: userType,
+      type_code: type,
+      group_code: group,
+      vendor_code: '',
+      terms_id: '',
+      priceId: '',
+      vendor_name: name,
+      address1: address1,
+      address2: address2,
+      address3: address3,
+      city: city,
+      pin_code: zipPostalCode,
+      mobile: phone,
+      panno: '',
+      gst: gst,
+      whatsapp: whatsappPhone,
+      state: stateId,
+      country: countryId,
+      tax_type: '0',
+      invfrm: '0',
+      ship_mode: '0',
+      region: '0',
+      payment_priority: '',
+      currency: currencyId,
+      location: locationName,
+    };
+    props.submitAction(tempObj);
+  };
+
   // User Type State
   const [userType, setUserType] = useState('Vendor');
   const userTypeRadioButtons = useMemo(
@@ -261,7 +380,7 @@ const VendorOrCustomerMasterEditUI = ({route, ...props}) => {
     const selectedOption = userTypeRadioButtons.find(
       button => button.id === selectedId,
     );
-    setUserType(selectedOption.value);
+    setUserType(selectedOption.id);
   };
 
   // Group State
@@ -290,7 +409,7 @@ const VendorOrCustomerMasterEditUI = ({route, ...props}) => {
     const selectedOption = groupRadioButtons.find(
       button => button.id === selectedId,
     );
-    setGroup(selectedOption.value);
+    setGroup(selectedOption.id);
   };
 
   // Type State
@@ -319,7 +438,7 @@ const VendorOrCustomerMasterEditUI = ({route, ...props}) => {
     const selectedOption = typeRadioButtons.find(
       button => button.id === selectedId,
     );
-    setType(selectedOption.value);
+    setType(selectedOption.id);
   };
 
   return (
@@ -363,7 +482,7 @@ const VendorOrCustomerMasterEditUI = ({route, ...props}) => {
               onPress={handleUserTypeChange}
               layout="row"
               selectedId={
-                userTypeRadioButtons.find(item => item.value === userType)?.id
+                userTypeRadioButtons.find(item => item.id === userType)?.id
               }
             />
           </View>
@@ -376,9 +495,7 @@ const VendorOrCustomerMasterEditUI = ({route, ...props}) => {
               radioButtons={groupRadioButtons}
               onPress={handleGroupChange}
               layout="row"
-              selectedId={
-                groupRadioButtons.find(item => item.value === group)?.id
-              }
+              selectedId={groupRadioButtons.find(item => item.id === group)?.id}
             />
           </View>
 
@@ -390,9 +507,7 @@ const VendorOrCustomerMasterEditUI = ({route, ...props}) => {
               radioButtons={typeRadioButtons}
               onPress={handleTypeChange}
               layout="row"
-              selectedId={
-                typeRadioButtons.find(item => item.value === type)?.id
-              }
+              selectedId={typeRadioButtons.find(item => item.id === type)?.id}
             />
           </View>
 
@@ -607,6 +722,7 @@ const VendorOrCustomerMasterEditUI = ({route, ...props}) => {
             <TextInput
               label="Phone"
               value={phone}
+              keyboardType='numeric'
               mode="outlined"
               onChangeText={text => setPhone(text)}
             />
@@ -614,6 +730,7 @@ const VendorOrCustomerMasterEditUI = ({route, ...props}) => {
           <View style={{marginTop: hp('2%')}}>
             <TextInput
               label="Whatsapp Phone"
+              keyboardType='numeric'
               value={whatsappPhone}
               mode="outlined"
               onChangeText={text => setWhatsappPhone(text)}
@@ -625,7 +742,7 @@ const VendorOrCustomerMasterEditUI = ({route, ...props}) => {
               value={locationName}
               mode="outlined"
               editable={false}
-              style={{backgroundColor:'#e8e8e8'}}
+              style={{backgroundColor: '#e8e8e8'}}
               onChangeText={text => setLocationName(text)}
             />
           </View>

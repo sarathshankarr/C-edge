@@ -37,7 +37,8 @@ const CommonHeader = ({ title, showDrawerButton }) => {
     width: 0,
   });
 
-  const { colors } = useContext(ColorContext);
+  const { colors ,menuIds} = useContext(ColorContext);
+  
   const styles = getStyles(colors);
 
 
@@ -492,7 +493,7 @@ const CommonHeader = ({ title, showDrawerButton }) => {
             style={styles.menuimg2}
           />
         </TouchableOpacity>
-        <TouchableOpacity
+       {menuIds.includes(392)  && <TouchableOpacity
           style={styles.notificationButton}
           onPress={() => navigation.navigate('Notifications')}
         >
@@ -506,7 +507,7 @@ const CommonHeader = ({ title, showDrawerButton }) => {
               <Text style={styles.unreadCountText}>{unreadCount}</Text>
             </View>
           )}
-        </TouchableOpacity>
+        </TouchableOpacity>}
       </View>
 
       <Modal
