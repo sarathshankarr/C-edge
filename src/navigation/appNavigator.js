@@ -97,6 +97,7 @@ import SaveColorMaster from '../components/masters/Color Master/SaveColorMaster'
 import CreateVendorOrCustomerMasterComponent from '../components/masters/VendorOrCustomerMaster/CreateVendorOrCustomerMasterComponent';
 import VendorOrCustomerMasterList from '../components/masters/VendorOrCustomerMaster/VendorOrCustomerMasterList';
 import VendorOrCustomerMasterEdit from '../components/masters/VendorOrCustomerMaster/VendorOrCustomerMasterEdit';
+import StyleCreate from '../components/styleComponents/styleCreateComponents/StyleCreate';
 
 
 const Stack = createNativeStackNavigator();
@@ -197,6 +198,7 @@ const AppStack = () => {
       <Stack.Screen name="CreateVendorOrCustomerMasterComponent" component={CreateVendorOrCustomerMasterComponent} options={{ headerShown: false }} /> 
       <Stack.Screen name="VendorOrCustomerMasterList" component={VendorOrCustomerMasterList} options={{ headerShown: false }} /> 
       <Stack.Screen name="VendorOrCustomerMasterEdit" component={VendorOrCustomerMasterEdit} options={{ headerShown: false }} /> 
+      <Stack.Screen name="StyleCreate" component={StyleCreate} options={{ headerShown: false }} /> 
     </Stack.Navigator>
   );
 };

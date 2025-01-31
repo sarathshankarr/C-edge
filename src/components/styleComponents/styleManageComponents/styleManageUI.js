@@ -22,6 +22,7 @@ import LoaderComponent from '../../../utils/commonComponents/loaderComponent';
 import AlertComponent from '../../../utils/commonComponents/alertComponent';
 import FilterModal from '../../../utils/commonComponents/FilterModal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import AddNewItem from '../../../utils/commonComponents/AddNewItem';
 
 let shirt1 = require('./../../../../assets/images/png/shirt1.png');
 let shirt3 = require('./../../../../assets/images/png/shirt3.jpeg');
@@ -331,7 +332,6 @@ const StyleManageUI = ({route, ...props}) => {
           </View>
         )}
 
-       
 
       <View style={CommonStyles.listStyle}>
         {showFilteredList ?
@@ -368,6 +368,9 @@ const StyleManageUI = ({route, ...props}) => {
         clearFilter={clearFilter}
         reqBody={filterReqBody}
       />
+
+      <AddNewItem navItem='StyleCreate'/>
+
 
       {props.isPopUp ? (
         <View style={CommonStyles.customPopUpStyle}>
