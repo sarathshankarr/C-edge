@@ -4,20 +4,20 @@ import { ColorContext } from '../../../components/colorTheme/colorTheme';
 
 const StoreManagement = ({ navigation }) => {
 
-  const { colors } = useContext(ColorContext);
+  const { colors ,subMenuItemsIds} = useContext(ColorContext);
+  
   const styles = getStyles(colors);
 
 
   const inwardProcess = [
-    { id: 1, name: 'Stock Request ', component: 'StockRequestList', image: require('../../../../assets/images/png/stockRequest.png') },
-    { id: 2, name: 'Stock Approval', component: 'StoreApproveListComponent', image: require('../../../../assets/images/png/stockApproval.png') },
-    { id: 3, name: 'Stock Receive ', component: 'StockRecieveList', image: require('../../../../assets/images/png/stockRecieve.png') },
+    { id: 97, name: 'Stock Request ', component: 'StockRequestList', image: require('../../../../assets/images/png/stockRequest.png') },
+    { id: 98, name: 'Stock Approval', component: 'StoreApproveListComponent', image: require('../../../../assets/images/png/stockApproval.png') },
+    { id: 99, name: 'Stock Receive ', component: 'StockRecieveList', image: require('../../../../assets/images/png/stockRecieve.png') },
   ];
 
-//   const outwardProcess = [
-//     { id: 1, name: 'Design Directory Approval', component: 'DDAList', image: require('../../../../assets/images/png/approve.png') },
-//     // { id: 2, name: 'Finishing Out', component: 'FinishingOutListComponent', image: require('../../../../assets/images/png/storeReq.png') },
-//   ];
+  const filteredinwardProcess = inwardProcess.filter((menu) => 
+    subMenuItemsIds.includes(menu.id)
+);
 
   const handleDemoClick = (component) => {
     navigation.navigate(component);
@@ -31,7 +31,7 @@ const StoreManagement = ({ navigation }) => {
       <View style={styles.section}>
         <Text style={styles.heading}>Store Management </Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.iconsContainer}>
-          {inwardProcess.map((item) => (
+          {filteredinwardProcess.map((item) => (
             <TouchableOpacity key={item.id} style={styles.iconItem} onPress={() => handleDemoClick(item.component)}>
               <View style={styles.navIconContainer}>
               <Image source={item.image} style={styles.icon} />

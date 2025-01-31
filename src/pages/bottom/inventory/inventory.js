@@ -3,16 +3,23 @@ import { View, Text, ScrollView, TouchableOpacity, Image, StyleSheet } from 'rea
 import { ColorContext } from '../../../components/colorTheme/colorTheme';
 
 const Inventory = ({ navigation }) => {
-  const { colors } = useContext(ColorContext);
+  const { colors ,subMenuItemsIds} = useContext(ColorContext);
   const styles = getStyles(colors);
 
   const inwardProcess = [
-    { id: 1, name: 'Location Wise Style Inventory', component: 'StyleLocationInventory', image: require('../../../../assets/images/png/tracking.png') },
+    { id: 93, name: 'Location Wise Style Inventory', component: 'StyleLocationInventory', image: require('../../../../assets/images/png/tracking.png') },
   ];
   const outwardProcess = [
-    { id: 1, name: 'Location wise RM/Fabric Inventory', component: 'LocationWiseRMFabInv', image: require('../../../../assets/images/png/consignment.png') },
-    { id: 2, name: 'Style Wise RM/Fabric Inventory', component: 'LocationStyleWiseInventory', image: require('../../../../assets/images/png/inventory.png') },
+    { id: 95, name: 'Location wise RM/Fabric Inventory', component: 'LocationWiseRMFabInv', image: require('../../../../assets/images/png/consignment.png') },
+    { id: 168, name: 'Style Wise RM/Fabric Inventory', component: 'LocationStyleWiseInventory', image: require('../../../../assets/images/png/inventory.png') },
   ];
+
+  const filteredinwardProcess = inwardProcess.filter((menu) => 
+    subMenuItemsIds.includes(menu.id)
+);
+  const filteredoutwardProcess = outwardProcess.filter((menu) => 
+    subMenuItemsIds.includes(menu.id)
+);
   
   const handleDemoClick = (component) => {
     navigation.navigate(component);
@@ -26,7 +33,7 @@ const Inventory = ({ navigation }) => {
       <View style={styles.section}>
         <Text style={styles.heading}>Style Inventory</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.iconsContainer}>
-          {inwardProcess.map((item) => (
+          {filteredinwardProcess.map((item) => (
             <TouchableOpacity key={item.id} style={styles.iconItem} onPress={() => handleDemoClick(item.component)}>
               <View style={styles.navIconContainer}>
               <Image source={item.image} style={styles.icon} />
@@ -39,7 +46,7 @@ const Inventory = ({ navigation }) => {
       <View style={styles.section}>
         <Text style={styles.heading}>RM/Fabric Inventory</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.iconsContainer}>
-          {outwardProcess.map((item) => (
+          {filteredoutwardProcess.map((item) => (
             <TouchableOpacity key={item.id} style={styles.iconItem} onPress={() => handleDemoClick(item.component)}>
               <View style={styles.navIconContainer}>
               <Image source={item.image} style={styles.icon} />
