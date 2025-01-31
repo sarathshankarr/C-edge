@@ -49,7 +49,7 @@ const Sidebar = ({navigation}) => {
         {
           label: 'PO Approval',
           route: 'POApproveListComponent',
-          menu_id: 713,
+          menu_id: 4,
           src: require('../../../assets/images/png/stamp.png'),
         },
       ],
@@ -179,19 +179,19 @@ const Sidebar = ({navigation}) => {
         {
           label: 'Cutting in',
           route: 'CuttingMainComponent',
-          menu_id: 3,
+          menu_id: 9,
           src: require('../../../assets/images/png/scissors.png'),
         },
         {
           label: 'Stitching in',
           route: 'StichingInComponent',
-          menu_id: 3,
+          menu_id: 11,
           src: require('../../../assets/images/png/sewing.png'),
         },
         {
           label: 'Finishing in',
           route: 'FinishingStyleComponent',
-          menu_id: 3,
+          menu_id: 40,
           src: require('../../../assets/images/png/success.png'),
         },
         {
@@ -210,13 +210,13 @@ const Sidebar = ({navigation}) => {
         {
           label: 'Stitching Out',
           route: 'StichingOutComponent',
-          menu_id: 3,
+          menu_id: 12,
           src: require('../../../assets/images/png/sewing.png'),
         },
         {
           label: 'Finishing Out',
           route: 'FinishingOutListComponent',
-          menu_id: 3,
+          menu_id: 41,
           src: require('../../../assets/images/png/success.png'),
         },
         {
@@ -277,7 +277,7 @@ const Sidebar = ({navigation}) => {
       .map(([key, menu]) => {
         // Filter submenu items based on subMenuItemsIds
         const filteredStyle = menu.style.filter(item => subMenuItemsIds.includes(item.menu_id));
-        console.log("filtered menus ==> ", filteredStyle)
+        // console.log("filtered menus ==> ", filteredStyle)
         // Include main menu ONLY if it has filtered submenus
         if (filteredStyle.length > 0) {
           return [key, { ...menu, style: filteredStyle }];
@@ -286,8 +286,6 @@ const Sidebar = ({navigation}) => {
       })
       .filter(Boolean) 
   );
-  
-  
   
   const [userName, set_userName] = useState('');
   const [admin, set_admin] = useState('');
