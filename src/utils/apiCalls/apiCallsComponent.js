@@ -342,7 +342,7 @@ export async function stylesDetailsAPIByRecord(jsonValue) {
         }
 
     }).catch((error) => {
-        console.log('listStylesAPI1 ', error)
+        console.log('stylesDetailsAPIByRecord ', error)
         returnError = error;
     });
 
@@ -384,7 +384,7 @@ export async function viewProcessFlow(jsonValue) {
         }
 
     }).catch((error) => {
-        console.log('listStylesAPI1 viewProcessFlow ', error)
+        console.log(' viewProcessFlow ', error)
         returnError = error;
     });
 
@@ -426,7 +426,7 @@ export async function vieTimeAction(jsonValue) {
         }
 
     }).catch((error) => {
-        console.log('listStylesAPI1 viewTimeAndAction', error)
+        console.log('viewTimeAndAction ', error)
         returnError = error;
     });
 
@@ -468,7 +468,7 @@ export async function allCuttingStyles(jsonValue) {
         }
 
     }).catch((error) => {
-        console.log('listStylesAPI1 allCuttingStyles', error)
+        console.log(' allCuttingStyles', error)
         returnError = error;
     });
 
@@ -510,7 +510,7 @@ export async function styleSizeDetails(jsonValue) {
         }
 
     }).catch((error) => {
-        console.log('listStylesAPI1 styleSizeDetails ', error)
+        console.log(' styleSizeDetails ', error)
         returnError = error;
     });
 
@@ -550,7 +550,7 @@ export async function getFabricDetails(jsonValue) {
         }
 
     }).catch((error) => {
-        console.log('listStylesAPI1 getFabricDetails', error)
+        console.log(' getFabricDetails', error)
         returnError = error;
     });
 
@@ -634,7 +634,7 @@ export async function addFinishingDetails(jsonValue) {
         }
 
     }).catch((error) => {
-        console.log('listStylesAPI1 addFinishingDetails ', error)
+        console.log(' addFinishingDetails ', error)
         returnError = error;
     });
 
@@ -676,7 +676,7 @@ export async function addFinishingOutDetails(jsonValue) {
         }
 
     }).catch((error) => {
-        console.log('listStylesAPI1 addFinishingOutDetails ', error)
+        console.log(' addFinishingOutDetails ', error)
         returnError = error;
     });
 
@@ -718,7 +718,7 @@ export async function saveFinishingDetails(jsonValue) {
         }
 
     }).catch((error) => {
-        console.log('listStylesAPI1 saveFinishingInDetails', error)
+        console.log(' saveFinishingInDetails', error)
         returnError = error;
     });
 
@@ -1185,7 +1185,7 @@ export async function saveStitchingInDetails(jsonValue) {
         }
 
     }).catch((error) => {
-        console.log('listStylesAPI1 saveFinishingInDetails', error)
+        console.log(' saveFinishingInDetails', error)
         returnError = error;
     });
 
@@ -1732,6 +1732,47 @@ export async function getcolorcode(jsonValue) {
     obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet }
     return obj;
 };
+export async function getColorBasedOnFabric(jsonValue) {
+
+    let returnError = undefined;
+    let statusData = undefined;
+    let responseData = undefined;
+    let logoutData = false;
+    let obj = undefined;
+
+    let internet = await internetCheck();
+    if (!internet) {
+        obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
+        return obj;
+    }
+
+    console.log('url ', 'styleapi/getcolorFabric');
+    await fetch(Environment.uri + "styleapi/getcolorFabric",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            },
+            body: JSON.stringify(jsonValue),
+        }
+    ).then((response) => response.json()).then(async (data) => {
+
+        if (data) {
+            statusData = true;
+            responseData = data
+        } else {
+            statusData = undefined;
+        }
+
+    }).catch((error) => {
+        console.log('loadAllVendorMasterStatesList error ', error)
+        returnError = error;
+    });
+
+    obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet }
+    return obj;
+};
 
 export async function EditDDA(jsonValue) {
 
@@ -1950,6 +1991,48 @@ export async function saveFabricEdit(jsonValue) {
     }
     console.log('saveFabricEdit  ', Environment.uri + "fabricmaster/editSaveFabric")
     await fetch(Environment.uri + "fabricmaster/editSaveFabric",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            },
+            body: JSON.stringify(jsonValue),
+        }
+    ).then((response) => response.json()).then(async (data) => {
+        console.log('saveFabricEdit ', data)
+
+        if (data) {
+            statusData = true;
+            responseData = data
+        } else {
+            statusData = undefined;
+        }
+
+    }).catch((error) => {
+        console.log('saveDDA', error)
+        returnError = error;
+    });
+
+    obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet }
+    return obj;
+};
+
+export async function saveEditStleDetails(jsonValue) {
+
+    let returnError = undefined;
+    let statusData = undefined;
+    let responseData = undefined;
+    let logoutData = false;
+    let obj = undefined;
+
+    let internet = await internetCheck();
+    if (!internet) {
+        obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
+        return obj;
+    }
+    console.log('saveFabricEdit  ', Environment.uri + "styleapi/editSaveStyle")
+    await fetch(Environment.uri + "styleapi/editSaveStyle",
         {
             method: "POST",
             headers: {

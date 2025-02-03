@@ -200,6 +200,12 @@ const Sidebar = ({navigation}) => {
           menu_id: 568,
           src: require('../../../assets/images/png/fabricProce.png'),
         },
+        {
+          label: 'Parts Processing',
+          route: 'PartProcessingList',
+          menu_id: 787,
+          src: require('../../../assets/images/png/fabricProce.png'),
+        },
       ],
     },
     outwardProcess: {

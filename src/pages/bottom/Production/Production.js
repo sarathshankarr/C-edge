@@ -38,6 +38,12 @@ const Production = ({navigation}) => {
       component: 'FabricProcessInList',
       image: require('../../../../assets/images/png/fabricProce.png'),
     },
+    {
+      id: 787,
+      name: 'Parts Processing',
+      component: 'PartProcessingList',
+      image: require('../../../../assets/images/png/fabricProce.png'),
+    },
   ];
 
   const outwardProcess = [

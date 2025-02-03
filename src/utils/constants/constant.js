@@ -22,6 +22,7 @@ export const DefaultAlert_MSG = 'Alert';
 export const Fail_Save_Dtls_MSG = 'Unable to save the details at this moment! Please try after sometime.';
 export const Fail_Validate_RMT_MSG = 'Entered RM Type  already exist !!';
 export const Fail_Validate_VENDORMASTER_MSG = 'Entered Vendor Name already exist !!';
+export const Fail_Validate_CREATE_STYLE_MSG = 'Entered Style  already exist !!';
 export const SuccessAlert_MSG = 'Success';
 export const PO_Approve_MSG = 'Purchase order approved successfully';
 export const PO_Rejected_MSG = 'Purchase order Rejected';

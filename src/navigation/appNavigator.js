@@ -98,6 +98,9 @@ import CreateVendorOrCustomerMasterComponent from '../components/masters/VendorO
 import VendorOrCustomerMasterList from '../components/masters/VendorOrCustomerMaster/VendorOrCustomerMasterList';
 import VendorOrCustomerMasterEdit from '../components/masters/VendorOrCustomerMaster/VendorOrCustomerMasterEdit';
 import StyleCreate from '../components/styleComponents/styleCreateComponents/StyleCreate';
+import PartProcessingList from '../components/Part Processing/PartProcessingList';
+import SavePartProcessing from '../components/Part Processing/SavePartProcessing';
+import CreatePartProcessing from '../components/Part Processing/CreatePartProcessing';
 
 
 const Stack = createNativeStackNavigator();
@@ -199,6 +202,9 @@ const AppStack = () => {
       <Stack.Screen name="VendorOrCustomerMasterList" component={VendorOrCustomerMasterList} options={{ headerShown: false }} /> 
       <Stack.Screen name="VendorOrCustomerMasterEdit" component={VendorOrCustomerMasterEdit} options={{ headerShown: false }} /> 
       <Stack.Screen name="StyleCreate" component={StyleCreate} options={{ headerShown: false }} /> 
+      <Stack.Screen name="PartProcessingList" component={PartProcessingList} options={{ headerShown: false }} /> 
+      <Stack.Screen name="SavePartProcessing" component={SavePartProcessing} options={{ headerShown: false }} /> 
+      <Stack.Screen name="CreatePartProcessing" component={CreatePartProcessing} options={{ headerShown: false }} /> 
     </Stack.Navigator>
   );
 };
