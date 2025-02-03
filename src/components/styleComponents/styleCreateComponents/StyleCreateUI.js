@@ -79,6 +79,20 @@ const StyleCreateUI = ({route, navigation, ...props}) => {
     }
   }, [props.sizeMap]);
 
+  useEffect(() => {
+    if (props.colorObj) {
+      console.log("color Obj", props.colorObj);
+      
+      if(props.colorObj.colorId){
+        console.log("color id", props.colorObj.colorId, colorList);
+
+        setSelectedIndices([props.colorObj.colorId]);
+        setEditColor(false);
+      }
+
+    }
+  }, [props.colorObj]);
+
   const [name, setName] = useState('');
   const [scaleTable, set_scaleTable] = useState([]);
   const [showScaleTable, set_showScaleTable] = useState(false);
@@ -126,6 +140,7 @@ const StyleCreateUI = ({route, navigation, ...props}) => {
     setFabricId(item.id);
     setFabricName(item.name);
     setShowFabricList(false);
+    props.getColorBasedOnFabric(item.name);
   };
 
   const handleSearchFabric = text => {
@@ -143,8 +158,9 @@ const StyleCreateUI = ({route, navigation, ...props}) => {
   const [colorList, setColorList] = useState([]);
   const [filteredColor, setFilteredColor] = useState([]);
   const [showColorList, setShowColorList] = useState(false);
+  const [editColor, setEditColor] = useState(true);
   const [colorName, setColorName] = useState([]);
-  const [colorId, setColorId] = useState('');
+  const [colorId, setColorId] = useState('0');
   const [selectedIndices, setSelectedIndices] = useState([]);
 
   const actionOnColor = id => {
@@ -296,34 +312,52 @@ const StyleCreateUI = ({route, navigation, ...props}) => {
       return;
     }
 
+    const consumptionObj = {};
+    const invLimitObj = {};
+    const emptyObj1 = {};
+    const emptyObj2 = {};
+
+    scaleTable.forEach(item => {
+      consumptionObj[item.id] = item.consumption;
+      invLimitObj[item.id] = item.invLimit;
+      emptyObj1[item.id] = '';
+      emptyObj2[item.id] = '0';
+    });
+
+    const colorStr = selectedIndices.join(',') + ',';
+    const colorStr1 = selectedIndices.join(',');
+
     const tempObj = {
       styleNo: styleNo,
-      customerStyle: styleDescription,
+      styleDesc: styleDescription,
+      customerStyle: customerStyleNo,
       locationId: locationId,
-      multi_loc: '0',
       fabricId: fabricId,
-      colorId: colorId,
+      colorIDStr: colorStr,
+      fabric: fabricName,
+      multi_loc: locationId,
+      colorId: selectedIndices.length === 1 ? colorStr1 : '0',
       brandId: brandId,
       poQty: buyerPOQty,
       sizeGroupId: seasonId,
       sizeRangeId: scaleOrSizeId,
       hsn: hsn,
-      configurationId: '',
-      price: '0',
+      configurationId: processWorkFlowId,
+      price: stylePriceFOB,
       mrp: mrpTagPrice,
       newBrand: '',
-      styleDesc: styleDescription,
       gst: '0',
-      gsCodesMap: {1: '0', 2: '0', 3: '0'},
-      gsCodesPriceMap: {1: '50', 2: '25', 3: '25'},
-      articleNumberMap: {1: '', '2=': '', 3: ''},
-      gscodesizeprice: {1: '', 2: '', 3: ''},
-      sizeWiseEAN: {1: '', 2: '', 3: ''},
-      sizeCons: {1: '10.0000', 2: '10.0000', 3: '10.0000'},
-      weightMap: {1: '0', 2: '0', 3: '0'},
-      sizeWiseInvLimit: {1: '', 2: '', 3: ''},
+      appConsumption: approvedConsumption,
+      gsCodesMap: emptyObj2,
+      gsCodesPriceMap: emptyObj1,
+      articleNumberMap: emptyObj1,
+      gscodesizeprice: emptyObj1,
+      sizeWiseEAN: emptyObj1,
+      sizeCons: consumptionObj,
+      weightMap: emptyObj2,
+      sizeWiseInvLimit: invLimitObj,
     };
-    // props.submitAction(tempObj);
+    props.submitAction(tempObj);
   };
 
   const backAction = async () => {
@@ -354,7 +388,7 @@ const StyleCreateUI = ({route, navigation, ...props}) => {
           style={{
             marginBottom: hp('5%'),
             width: '90%',
-            marginHorizontal: wp('5%'),
+            marginHorizontal: 10,
             marginTop: hp('2%'),
           }}>
           <View style={{marginTop: hp('2%')}}>
@@ -362,7 +396,10 @@ const StyleCreateUI = ({route, navigation, ...props}) => {
               label="Style No *"
               value={styleNo}
               mode="outlined"
-              onChangeText={text => setStyleNo(text)}
+              onChangeText={text => {
+                setStyleNo(text);
+                setCustomerStyleNo(text);
+              }}
             />
           </View>
           <View style={{marginTop: hp('2%')}}>
@@ -533,7 +570,7 @@ const StyleCreateUI = ({route, navigation, ...props}) => {
             style={{
               alignItems: 'center',
               justifyContent: 'center',
-              backgroundColor: '#fff',
+              backgroundColor: editColor ?  '#fff' : '#D8D8D8',
               marginTop: hp('2%'),
             }}>
             <TouchableOpacity
@@ -575,7 +612,7 @@ const StyleCreateUI = ({route, navigation, ...props}) => {
               </View>
             </TouchableOpacity>
 
-            {showColorList && (
+            {showColorList && editColor && (
               <View style={styles.dropdownContent1}>
                 <TextInput
                   style={styles.searchInput}

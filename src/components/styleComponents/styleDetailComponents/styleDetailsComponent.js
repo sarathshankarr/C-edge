@@ -42,11 +42,16 @@ const StyleDetailsComponent = ({ navigation, route, ...props }) => {
 
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
+
     set_isLoading(true);
     let obj = {
       "styleId": id,
       "username": userName,
-      "password" : userPsd
+      "password" : userPsd,
+      "compIds": usercompanyId,
+      "company":JSON.parse(companyObj),
     }
     // console.log('Style ',obj)
     let styleDetailsAPIObj = await APIServiceCall.stylesDetailsAPIByRecord(obj);
@@ -73,10 +78,14 @@ const StyleDetailsComponent = ({ navigation, route, ...props }) => {
     set_isLoading(true);
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
     let obj = {
       "styleId":id,
       "username": userName,
-      "password" : userPsd
+      "password" : userPsd,
+      "compIds": usercompanyId,
+      "company":JSON.parse(companyObj),
     }
 
     let styleSDdetailsAPIObj = await APIServiceCall.styleSizeDetails(obj);
@@ -173,16 +182,6 @@ const StyleDetailsComponent = ({ navigation, route, ...props }) => {
 
   };
 
-  const backBtnAction = () => {
-    navigation.navigate('StyleManageComponent');
-  };
-
-  const rgtBtnAction = () => {
-    navigation.navigate('ViewTimeSummaryComponent',{sId : styleId});
-  };
-
-  const lftBtnAction = () => {
-  };
 
   const popUpAction = (popMsg, popAlert,rBtnTitle,isPopup,isPopLeft) => {
     set_popUpMessage(popMsg);
@@ -204,6 +203,47 @@ const StyleDetailsComponent = ({ navigation, route, ...props }) => {
     navigation.navigate('ViewProcessFlowComponent',{sId:styleId});
   };
 
+  const submitAction = async (tempObj) => {
+
+    set_isLoading(true);
+    let userName = await AsyncStorage.getItem('userName');
+    let userPsd = await AsyncStorage.getItem('userPsd');
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
+    let userId = await AsyncStorage.getItem('userId');
+
+    tempObj.menuId=17,
+    tempObj.vendorId=vendorId,
+    tempObj.username=userName,
+    tempObj.password=userPsd,
+    tempObj.compIds=usercompanyId,
+    tempObj.userId=userId,
+    tempObj.company=JSON.parse(companyObj)
+
+    console.log("req body ==> ", tempObj);
+
+    let saveEditObj = await APIServiceCall.saveEditStleDetails(tempObj);
+    set_isLoading(false);
+    console.log("response after approving", saveEditObj?.responseData, typeof saveEditObj?.responseData, saveEditObj?.responseData === true)
+
+    if (saveEditObj && saveEditObj.statusData && saveEditObj.responseData && saveEditObj?.responseData === true) {
+      console.log("sucess");
+      backBtnAction();
+    } else {
+      popUpAction(Constant.Fail_Save_Dtls_MSG, Constant.DefaultAlert_MSG, 'OK', true, false);
+    }
+
+    if (saveEditObj && saveEditObj.error) {
+      popUpAction(Constant.SERVICE_FAIL_MSG, Constant.DefaultAlert_MSG, 'OK', true, false)
+    }
+
+  };
+  
+  const backBtnAction = () => {
+    navigation.goBack();
+  };
+
+
   return (
 
     <StyleDetailsUI
@@ -218,9 +258,9 @@ const StyleDetailsComponent = ({ navigation, route, ...props }) => {
       backBtnAction = {backBtnAction}
       rgtBtnAction = {rgtBtnAction}
       popOkBtnAction = {popOkBtnAction}
-      sizeDetailsAction = {sizeDetailsAction}
       viewProcessFlowAction = {viewProcessFlowAction}
       listItems = {listItems}
+      submitAction = {submitAction}
     />
 
   );

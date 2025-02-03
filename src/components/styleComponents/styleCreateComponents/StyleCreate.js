@@ -15,6 +15,7 @@ const StyleCreate = ({ route }) => {
   const [popUpAlert, set_popUpAlert] = useState(undefined);
   const [popUpRBtnTitle, set_popUpRBtnTitle] = useState(undefined);
   const [isPopupLeft, set_isPopupLeft] = useState(false);
+  const [colorObj, set_colorObj] = useState([]);
   
   const [lists, set_lists] = useState({
     colorsMap: [],
@@ -171,6 +172,43 @@ const StyleCreate = ({ route }) => {
     }
 
   };
+  const getColorBasedOnFabric = async (fabricName) => {
+
+    let userName = await AsyncStorage.getItem('userName');
+    let userPsd = await AsyncStorage.getItem('userPsd');
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
+
+    set_isLoading(true);
+    let obj = {
+      "username": userName,
+      "password": userPsd,
+      "compIds": usercompanyId,
+      "company":JSON.parse(companyObj),
+      "menuId":30,
+      "fabric":fabricName,
+  
+    }
+    let EditDDAAPIObj = await APIServiceCall.getColorBasedOnFabric(obj);
+    set_isLoading(false);
+
+    
+    if (EditDDAAPIObj && EditDDAAPIObj.statusData) {
+
+      if (EditDDAAPIObj?.responseData) {
+        set_colorObj(EditDDAAPIObj?.responseData);
+      }
+      
+      
+    } else {
+      popUpAction(Constant.SERVICE_FAIL_MSG, Constant.DefaultAlert_MSG, 'OK', true, false);
+    }
+
+    if (EditDDAAPIObj && EditDDAAPIObj.error) {
+      popUpAction(Constant.SERVICE_FAIL_MSG, Constant.DefaultAlert_MSG, 'OK', true, false)
+    }
+
+  };
 
   const getSizesBasedOnScale = async (seasonId, scaleOrSizeId) => {
 
@@ -279,15 +317,14 @@ const StyleCreate = ({ route }) => {
 
   const submitAction = async (tempObj) => {
 
-    // const validateVendorName= await ValidateVendorName(tempObj.vendor_name);
-    // // console.log("validated value of name ==> ",tempObj.vendor_name, validateVendorName);
+    const validateCreate= await ValidateCreateStyle(tempObj);
 
-    // if(validateVendorName==="true"){
-    //   console.log("pop up")
-    //   popUpAction(Constant.Fail_Validate_VENDORMASTER_MSG, Constant.DefaultAlert_MSG, 'OK', true, false);
-    //   return;
-    // }
-    // console.log("creating new ");
+    if(validateCreate==="true"){
+      console.log("pop up")
+      popUpAction(Constant.Fail_Validate_CREATE_STYLE_MSG, Constant.DefaultAlert_MSG, 'OK', true, false);
+      return;
+    }
+    console.log("creating new ");
 
 
     let userName = await AsyncStorage.getItem('userName');
@@ -296,7 +333,6 @@ const StyleCreate = ({ route }) => {
     let companyObj = await AsyncStorage.getItem('companyObj');
     let userId = await AsyncStorage.getItem('userId');
 
-    tempObj.menuId = 17;
     tempObj.username = userName;
     tempObj.password = userPsd;
     tempObj.userId = userId;
@@ -311,7 +347,6 @@ const StyleCreate = ({ route }) => {
     let SAVEAPIObj = await APIServiceCall.saveCreateStyle(tempObj);
     set_isLoading(false);
 
-    console.log("Sucess before returned obj ", SAVEAPIObj);
 
     if (SAVEAPIObj && SAVEAPIObj?.statusData && SAVEAPIObj?.responseData !== 0) {
       console.log("Sucessfully saved ===> ");
@@ -328,18 +363,21 @@ const StyleCreate = ({ route }) => {
 
   };
 
-  const ValidateCreateStyle = async () => {
+  const ValidateCreateStyle = async (tempObj) => {
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
     let companyObj = await AsyncStorage.getItem('companyObj');
+    let userId = await AsyncStorage.getItem('userId');
 
-    let Obj={
-    "username": userName,
-    "password": userPsd,
-    "compIds" : usercompanyId,
-    "company" :JSON.parse(companyObj),
-    }
+    const Obj=tempObj;
+
+    Obj.username = userName;
+    Obj.password = userPsd;
+    Obj.userId = userId;
+    Obj.compIds = usercompanyId;
+    Obj.company = JSON.parse(companyObj);
+
     set_isLoading(true);
 
     let SAVEAPIObj = await APIServiceCall.validateCreateStyle(Obj);
@@ -369,6 +407,8 @@ const StyleCreate = ({ route }) => {
       sizeMap={sizeMap}
       sizeRangesMap={sizeRangesMap}
       popOkBtnAction={popOkBtnAction}
+      getColorBasedOnFabric={getColorBasedOnFabric}
+      colorObj={colorObj}
     />
 
   );
