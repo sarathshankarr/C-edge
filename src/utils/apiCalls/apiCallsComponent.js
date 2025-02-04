@@ -342,7 +342,7 @@ export async function stylesDetailsAPIByRecord(jsonValue) {
         }
 
     }).catch((error) => {
-        console.log('stylesDetailsAPIByRecord ', error)
+        console.log('styleDetails ', error)
         returnError = error;
     });
 

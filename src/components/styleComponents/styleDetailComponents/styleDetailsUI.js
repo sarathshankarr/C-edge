@@ -38,7 +38,7 @@ const StyleDetailsUI = ({route, ...props}) => {
   const styles = getStyles(colors);
 
   useEffect(() => {
-    // console.log('item obj1 ==> ', props.itemObj);
+    console.log('item obj1 ==> ', props.itemObj);
     if (props.itemObj) {
       if (props.itemObj.styleName) {
         setStyleNo(props.itemObj.styleName);
@@ -46,33 +46,61 @@ const StyleDetailsUI = ({route, ...props}) => {
       if (props.itemObj.styleDesc) {
         setStyleDescription(props.itemObj.styleDesc);
       }
+      if (props.itemObj.colorsMap) {
+        const colorsMapList = Object.keys(props.itemObj.colorsMap).map(key => ({
+          id: key,
+          name: props.itemObj.colorsMap[key]
+        }));
+        setColorList(colorsMapList);
+        setFilteredColor(colorsMapList);
+        set_editColor(false);
+      }
+      if (props.itemObj.loadFabricStyles) {
+        const loadFabricStylesList = Object.keys(props.itemObj.loadFabricStyles).map(key => ({
+          id: props.itemObj.loadFabricStyles[key],
+          name: key
+        }));
+        setFilteredFabric(loadFabricStylesList);
+        setFabricList(loadFabricStylesList);
+      }
+      if (props.itemObj.brandsMap) {
+        const brandsMapList = Object.keys(props.itemObj.brandsMap).map(key => ({
+          id: key,
+          name: props.itemObj.brandsMap[key]
+        }));
+        setBrandList(brandsMapList);
+        setFilteredBrand(brandsMapList);
+      }
       if (props.itemObj.customerStyle) {
         setCustomerStyleNo(props.itemObj.customerStyle);
       }
-      if (props.itemObj.fabricName) {
-        setFabricName(props.itemObj.fabricName);
-      }
       if (props.itemObj.season) {
         setSeasonName(props.itemObj.season);
+        set_editSeason(false)
       }
       if (props.itemObj.locationId) {
         setLocationId(props.itemObj.locationId);
-        setLocationName(props.itemObj.season[props.itemObj.locationId]);
+        setLocationName(props.itemObj.locationsMap[props.itemObj.locationId]);
+        set_editLocation(false)
       }
       if (props.itemObj.fabricId) {
         setFabricId(props.itemObj.fabricId);
-        setFabricName(props.itemObj.season[props.itemObj.fabricId]);
+        if (props.itemObj.fabricName) {
+          setFabricName(props.itemObj.fabricName);
+        }
+        set_editFabric(false);
       }
-      if (props.itemObj.colorIDStr) {
-        setFabricId(props.itemObj.colorIDStr);
-        
+      if (props.itemObj.colorId) {
+        setSelectedIndices([props.itemObj.colorId.toString()]);
+        set_editColor(false);
+        console.log("setted color ", props.itemObj.colorId.toString())
       }
       if (props.itemObj.brandId) {
         setBrandId(props.itemObj.brandId);
-        setBrandName(props.itemObj.season[props.itemObj.brandId]);
+        setBrandName(props.itemObj.brandsMap[props.itemObj.brandId]);
       }
       if (props.itemObj.poQty) {
-        setBuyerPOQty(props.itemObj.poQty);
+        setBuyerPOQty(props.itemObj.poQty.toString());
       }
       if (props.itemObj.hsn) {
         setHSN(props.itemObj.hsn);
@@ -82,26 +110,39 @@ const StyleDetailsUI = ({route, ...props}) => {
       }
       if (props.itemObj.configurationId) {
         setProcessWorkFlowId(props.itemObj.configurationId);
-        setProcessWorkFlowName(props.itemObj.season[props.itemObj.configurationId]);
+        setProcessWorkFlowName(props.itemObj.confMap[props.itemObj.configurationId]);
+        set_editeditProcessWF(false);
       }
-      if (props.itemObj.price) {
-        setStylePriceFOB(props.itemObj.price);
+      if (props.itemObj.fob) {
+        setStylePriceFOB(props.itemObj.fob);
       }
-      if (props.itemObj.mrpTagPrice) {
-        setMRPTagPrice(props.itemObj.mrpTagPrice);
-      }
-      if (props.itemObj.sizeGroupId) {
-        setSeasonId(props.itemObj.sizeGroupId);
-        setSeasonName(props.itemObj.season[props.itemObj.sizeGroupId]);
+      if (props.itemObj.mrp) {
+        setMRPTagPrice(props.itemObj.mrp);
       }
       if (props.itemObj.sizeRangeId) {
         setScaleOrSizeId(props.itemObj.sizeRangeId);
-        setScaleOrSizeName(props.itemObj.season[props.itemObj.sizeRangeId]);
+        setScaleOrSizeName(props.itemObj.sizeRangesMap[props.itemObj.sizeRangeId]);
+        set_editScaleOrSize(false);
+      }
+      if (props.itemObj.sizesGSCodesList) {
+
+        console.log("table   ==> ", props.itemObj.sizesGSCodesList);
+        const ScaleTable = props.itemObj?.sizesGSCodesList?.map((item, index) => ({
+          id: item.size_id,
+          name: item.sizeCode,
+          consumption: item.size_cons,
+          invLimit: item.sizeInvLimit
+        }));
+        set_scaleTable(ScaleTable);
+      
+        set_showScaleTable(true);
       }
     }
   }, [props.itemObj]);
 
   useEffect(() => {
+    // console.log('item obj1 ==> ',props.listItems);
+
     if (props.listItems) {
       if (props.listItems.styleDetailsList) {
         // console.log('item obj2 ==> ', props.listItems.styleDetailsList);
@@ -122,6 +163,13 @@ const StyleDetailsUI = ({route, ...props}) => {
   const [stylePriceFOB, setStylePriceFOB] = useState('');
   const [mrpTagPrice, setMRPTagPrice] = useState('');
   const [approvedConsumption, setApprovedConsumption] = useState('');
+
+  const [editFabric, set_editFabric] = useState(true);
+  const [editColor, set_editColor] = useState(true);
+  const [editSeason, set_editSeason] = useState(true);
+  const [editScaleOrSize, set_editScaleOrSize] = useState(true);
+  const [editProcessWF, set_editeditProcessWF] = useState(true);
+  const [editLocation, set_editLocation] = useState(true);
 
   // Location
   const [locationList, setLocationList] = useState([]);
@@ -369,7 +417,8 @@ const StyleDetailsUI = ({route, ...props}) => {
           weightMap: emptyObj2,
           sizeWiseInvLimit: invLimitObj,
         };
-    // props.submitAction(tempObj);
+        // console.log("Temp obj ===> ", tempObj)
+    props.submitAction(tempObj);
   };
 
   const lftBtnAction = () => {
@@ -461,13 +510,15 @@ const StyleDetailsUI = ({route, ...props}) => {
               marginBottom: hp('5%'),
               // width: '100%',
               marginTop: hp('2%'),
-              marginHorizontal: 10,
+              marginHorizontal: wp('5%'),
             }}>
             <View style={{marginTop: hp('2%')}}>
               <TextInput
                 label="Style No *"
                 value={styleNo}
                 mode="outlined"
+                editable={props?.itemObj?.styleName ? false : true}
+                style={{backgroundColor : props?.itemObj?.styleName ? '#f8f8f8': '#fff'}}
                 onChangeText={text => {
                   setStyleNo(text);
                   setCustomerStyleNo(text);
@@ -496,7 +547,7 @@ const StyleDetailsUI = ({route, ...props}) => {
               style={{
                 alignItems: 'center',
                 justifyContent: 'center',
-                backgroundColor: '#fff',
+                backgroundColor: editLocation ? '#e8e8e8':'#fff',
                 marginTop: hp('2%'),
               }}>
               <TouchableOpacity
@@ -535,7 +586,7 @@ const StyleDetailsUI = ({route, ...props}) => {
                 </View>
               </TouchableOpacity>
 
-              {showLocationList && (
+              {showLocationList && editLocation && (
                 <View style={styles.dropdownContent1}>
                   <TextInput
                     style={styles.searchInput}
@@ -569,7 +620,7 @@ const StyleDetailsUI = ({route, ...props}) => {
               style={{
                 alignItems: 'center',
                 justifyContent: 'center',
-                backgroundColor: '#fff',
+                backgroundColor: editFabric ? '#e8e8e8':'#fff',
                 marginTop: hp('2%'),
               }}>
               <TouchableOpacity
@@ -608,7 +659,7 @@ const StyleDetailsUI = ({route, ...props}) => {
                 </View>
               </TouchableOpacity>
 
-              {showFabricList && (
+              {showFabricList && editFabric && (
                 <View style={styles.dropdownContent1}>
                   <TextInput
                     style={styles.searchInput}
@@ -642,7 +693,7 @@ const StyleDetailsUI = ({route, ...props}) => {
               style={{
                 alignItems: 'center',
                 justifyContent: 'center',
-                backgroundColor: '#fff',
+                backgroundColor: editColor ? '#e8e8e8':'#fff',
                 marginTop: hp('2%'),
               }}>
               <TouchableOpacity
@@ -684,7 +735,7 @@ const StyleDetailsUI = ({route, ...props}) => {
                 </View>
               </TouchableOpacity>
 
-              {showColorList && (
+              {showColorList && editColor && (
                 <View style={styles.dropdownContent1}>
                   <TextInput
                     style={styles.searchInput}
@@ -722,7 +773,7 @@ const StyleDetailsUI = ({route, ...props}) => {
               style={{
                 alignItems: 'center',
                 justifyContent: 'center',
-                backgroundColor: '#fff',
+                backgroundColor: editSeason ? '#e8e8e8':'#fff',
                 marginTop: hp('2%'),
               }}>
               <TouchableOpacity
@@ -741,13 +792,13 @@ const StyleDetailsUI = ({route, ...props}) => {
                     <View style={{flexDirection: 'column'}}>
                       <Text
                         style={
-                          seasonId
+                          seasonName
                             ? [styles.dropTextLightStyle]
                             : [styles.dropTextInputStyle]
                         }>
                         {'Season  *'}
                       </Text>
-                      {seasonId ? (
+                      {seasonName ? (
                         <Text style={[styles.dropTextInputStyle]}>
                           {seasonName}
                         </Text>
@@ -761,7 +812,7 @@ const StyleDetailsUI = ({route, ...props}) => {
                 </View>
               </TouchableOpacity>
 
-              {showSeasonList && (
+              {showSeasonList && editSeason && (
                 <View style={styles.dropdownContent1}>
                   <TextInput
                     style={styles.searchInput}
@@ -895,7 +946,7 @@ const StyleDetailsUI = ({route, ...props}) => {
               style={{
                 alignItems: 'center',
                 justifyContent: 'center',
-                backgroundColor: '#fff',
+                backgroundColor: editScaleOrSize ? '#e8e8e8':'#fff',
                 marginTop: hp('2%'),
               }}>
               <TouchableOpacity
@@ -934,7 +985,7 @@ const StyleDetailsUI = ({route, ...props}) => {
                 </View>
               </TouchableOpacity>
 
-              {showScaleOrSizeList && (
+              {showScaleOrSizeList && editScaleOrSize && (
                 <View style={styles.dropdownContent1}>
                   <TextInput
                     style={styles.searchInput}
@@ -1042,7 +1093,7 @@ const StyleDetailsUI = ({route, ...props}) => {
               style={{
                 alignItems: 'center',
                 justifyContent: 'center',
-                backgroundColor: '#fff',
+                backgroundColor: editProcessWF ? '#e8e8e8':'#fff',
                 marginTop: hp('2%'),
               }}>
               <TouchableOpacity
@@ -1081,7 +1132,7 @@ const StyleDetailsUI = ({route, ...props}) => {
                 </View>
               </TouchableOpacity>
 
-              {showProcessWorkFlowList && (
+              {showProcessWorkFlowList && editProcessWF && (
                 <View style={styles.dropdownContent1}>
                   <TextInput
                     style={styles.searchInput}

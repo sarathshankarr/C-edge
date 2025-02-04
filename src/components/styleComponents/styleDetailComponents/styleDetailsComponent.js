@@ -14,7 +14,7 @@ const StyleDetailsComponent = ({ navigation, route, ...props }) => {
   const [popUpAlert, set_popUpAlert] = useState(undefined);
   const [popUpRBtnTitle, set_popUpRBtnTitle] = useState(undefined);
   const [isPopupLeft, set_isPopupLeft] = useState(false);
-  const [styleId, set_styleId] = useState(undefined);
+  const [styleId, set_styleId] = useState('');
   const [img, set_img]=useState('');
   const [listItems, set_listItems]=useState({
     productionSummary:[],
@@ -26,6 +26,7 @@ const StyleDetailsComponent = ({ navigation, route, ...props }) => {
   React.useEffect(() => {
 
     if(route.params?.sId){
+      console.log("id ==> ", route.params?.sId)
       set_styleId(route.params?.sId);
       set_img(route.params?.image);
       getInitialData(route.params?.sId);
@@ -53,7 +54,7 @@ const StyleDetailsComponent = ({ navigation, route, ...props }) => {
       "compIds": usercompanyId,
       "company":JSON.parse(companyObj),
     }
-    // console.log('Style ',obj)
+    // console.log('reqqqqqqqqqqqq  ======>  ',obj)
     let styleDetailsAPIObj = await APIServiceCall.stylesDetailsAPIByRecord(obj);
     set_isLoading(false);
     
@@ -61,6 +62,7 @@ const StyleDetailsComponent = ({ navigation, route, ...props }) => {
 
       if(styleDetailsAPIObj && styleDetailsAPIObj.responseData){
         set_itemObj(styleDetailsAPIObj.responseData);
+        console.log('Style  response 1 ============> ',styleDetailsAPIObj.responseData)
       } 
 
     } else {
@@ -94,7 +96,7 @@ const StyleDetailsComponent = ({ navigation, route, ...props }) => {
     if(styleSDdetailsAPIObj && styleSDdetailsAPIObj.statusData){
 
       if(styleSDdetailsAPIObj && styleSDdetailsAPIObj.responseData){
-        // set_styleDetailsList(styleSDdetailsAPIObj.responseData);
+        console.log('Style  response 2 ============> ',styleSDdetailsAPIObj.responseData)
         set_listItems(prevState => ({
           ...prevState,
           styleDetailsList: styleSDdetailsAPIObj.responseData
@@ -212,8 +214,7 @@ const StyleDetailsComponent = ({ navigation, route, ...props }) => {
     let companyObj = await AsyncStorage.getItem('companyObj');
     let userId = await AsyncStorage.getItem('userId');
 
-    tempObj.menuId=17,
-    tempObj.vendorId=vendorId,
+    tempObj.styleId=styleId,
     tempObj.username=userName,
     tempObj.password=userPsd,
     tempObj.compIds=usercompanyId,
@@ -226,7 +227,7 @@ const StyleDetailsComponent = ({ navigation, route, ...props }) => {
     set_isLoading(false);
     console.log("response after approving", saveEditObj?.responseData, typeof saveEditObj?.responseData, saveEditObj?.responseData === true)
 
-    if (saveEditObj && saveEditObj.statusData && saveEditObj.responseData && saveEditObj?.responseData === true) {
+    if (saveEditObj && saveEditObj.statusData && saveEditObj.responseData && saveEditObj?.responseData !== 0) {
       console.log("sucess");
       backBtnAction();
     } else {
@@ -256,7 +257,6 @@ const StyleDetailsComponent = ({ navigation, route, ...props }) => {
       isPopupLeft = {isPopupLeft}
       isPopUp = {isPopUp}
       backBtnAction = {backBtnAction}
-      rgtBtnAction = {rgtBtnAction}
       popOkBtnAction = {popOkBtnAction}
       viewProcessFlowAction = {viewProcessFlowAction}
       listItems = {listItems}

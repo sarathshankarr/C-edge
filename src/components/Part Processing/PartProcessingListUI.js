@@ -299,22 +299,34 @@ const PartProcessingListUI = ({route, navigation, ...props}) => {
         {filterArray && filterArray.length > 0 ? (
           <View style={CommonStyles.listCommonHeader}>
            
-            {/* <Text style={[CommonStyles.tylesHeaderTextStyle, { flex: 1, textAlign: 'center', }]}>{'Brand Name'}</Text> */}
             <Text
               style={[
                 CommonStyles.tylesHeaderTextStyle,
                 {flex: 1, textAlign: 'center'},
               ]}>
-              {'UOM Type'}
+              {'Style No (Color)'}
             </Text>
             <Text
               style={[
                 CommonStyles.tylesHeaderTextStyle,
                 {flex: 1, textAlign: 'center'},
               ]}>
-              {'UOM Desc'}
+              {'Process'}
             </Text>
-            {/* <Text style={[CommonStyles.tylesHeaderTextStyle, { flex: 0.4, textAlign: 'center', }]}>{'PDF'}</Text> */}
+            <Text
+              style={[
+                CommonStyles.tylesHeaderTextStyle,
+                {flex: 1, textAlign: 'center'},
+              ]}>
+              {'Part'}
+            </Text>
+            <Text
+              style={[
+                CommonStyles.tylesHeaderTextStyle,
+                {flex: 1, textAlign: 'center'},
+              ]}>
+              {'Total Scanned Barcodes'}
+            </Text>
           </View>
         ) : (
           <View style={CommonStyles.noRecordsFoundStyle}>
@@ -356,7 +368,6 @@ const PartProcessingListUI = ({route, navigation, ...props}) => {
         </View>
       </View>
 
-      {/* <Button title="Open Filter"  /> */}
       <FilterModal
         isVisible={isFilterVisible}
         categoriesList={categories}
