@@ -34,6 +34,7 @@ let downArrowImg = require('./../../../assets/images/png/dropDownImg.png');
 const CreatePartProcessingUI = ({route, navigation, ...props}) => {
   const [employeeBarcode, setEmployeeBarcode] = useState('');
   const [barcode, setBarcode] = useState('');
+  const [rows, setRows] = React.useState([]);
 
   const backBtnAction = () => {
     props.backBtnAction();
@@ -197,6 +198,102 @@ const CreatePartProcessingUI = ({route, navigation, ...props}) => {
               </View>
             )}
           </View>
+
+          <View style={styles.wrapper}>
+            <ScrollView nestedScrollEnabled={true} horizontal>
+              <View style={styles.table}>
+                {/* Table Head */}
+                <View style={styles.table_head}>
+                  <View style={{width: 60}}>
+                    <Text style={styles.table_head_captions}>Action</Text>
+                  </View>
+                  <View style={{width: 120}}>
+                    <Text style={styles.table_head_captions}>Style No</Text>
+                  </View>
+                  <View style={{width: 60}}>
+                    <Text style={styles.table_head_captions}>Size</Text>
+                  </View>
+                  <View style={{width: 60}}>
+                    <Text style={styles.table_head_captions}>Qty</Text>
+                  </View>
+                  <View style={{width: 100}}>
+                    <Text style={styles.table_head_captions}>
+                      Damage Qty
+                    </Text>
+                  </View>
+                  <View style={{width: 100}}>
+                    <Text style={styles.table_head_captions}>
+                      Process
+                    </Text>
+                  </View>
+                  <View style={{width: 100}}>
+                    <Text style={styles.table_head_captions}>Part</Text>
+                  </View>
+                  <View style={{width: 100}}>
+                    <Text style={styles.table_head_captions}>Barcode</Text>
+                  </View>
+                  <View style={{width: 100}}>
+                    <Text style={styles.table_head_captions}>Employee Name</Text>
+                  </View>
+                  <View style={{width: 100}}>
+                    <Text style={styles.table_head_captions}>Remarks</Text>
+                  </View>
+                </View>
+
+                {/* Table Body - Rows */}
+                {rows.map(row => (
+                  <View key={row.id} style={styles.table_body_single_row}>
+                    <View style={{width: 60}}>
+                      <TouchableOpacity
+                        style={{alignItems: '', justifyContent: ''}}
+                        onPress={() => RemoveRow(row.id)}>
+                        <Image source={closeImg} style={styles.imageStyle1} />
+                      </TouchableOpacity>
+                    </View>
+
+                    <View style={{width: 120}}>
+                      <Text style={styles.table_data}>{row.size}</Text>
+                    </View>
+                    <View style={{width: 60}}>
+                      <Text style={styles.table_data}>{row.size}</Text>
+                    </View>
+
+                    <View style={{width: 60}}>
+                      <Text style={styles.table_data}>{row.size}</Text>
+                    </View>
+                    <View style={{width: 100}}>
+                      <Text style={styles.table_data}>{row.availableQty}</Text>
+                    </View>
+                    <View style={{width: 100}}>
+                      <TextInput
+                        style={styles.table_data_input}
+                        value={row.inputQty}
+                        onChangeText={text => {
+                          setRows(
+                            rows.map(r =>
+                              r.id === row.id ? {...r, remarks: text} : r,
+                            ),
+                          );
+                        }}
+                      />
+                    </View>
+                    <View style={{width: 100}}>
+                      <Text style={styles.table_data}>{row.availableQty}</Text>
+                    </View>
+                    <View style={{width: 100}}>
+                      <Text style={styles.table_data}>{row.availableQty}</Text>
+                    </View>
+                    <View style={{width: 100}}>
+                      <Text style={styles.table_data}>{row.availableQty}</Text>
+                    </View>
+                    <View style={{width: 100}}>
+                      <Text style={styles.table_data}>{row.availableQty}</Text>
+                    </View>
+                  </View>
+                ))}
+              </View>
+            </ScrollView>
+          </View>
         </View>
       </KeyboardAwareScrollView>
 
@@ -318,11 +415,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     flex: 1,
-    marginTop: hp('2%'),
+    marginTop: hp('5%'),
     width: '100%',
   },
   table: {
-    width: '95%', // Reduces extra space on the sides
+    width: '100%', // Reduces extra space on the sides
     backgroundColor: '#fff',
     elevation: 1,
     borderRadius: 5,
