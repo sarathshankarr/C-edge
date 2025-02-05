@@ -40,6 +40,11 @@ const LocationWiseRMFabInv = ({ navigation, route, ...props }) => {
 
   const getInitialData = async (page = 0, reload = false) => {
 
+    if (reload) {
+      setpage(0);  
+      setHasMore(true);
+  }
+
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
 
@@ -171,8 +176,8 @@ const LocationWiseRMFabInv = ({ navigation, route, ...props }) => {
       getInitialData(next, false);
     }else{
       getInitialData(0, true);
-      setpage(0);
-      setHasMore(true);
+      // setpage(0);
+      // setHasMore(true);
     }
   }
 
