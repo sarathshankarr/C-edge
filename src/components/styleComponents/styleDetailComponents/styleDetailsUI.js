@@ -49,16 +49,18 @@ const StyleDetailsUI = ({route, ...props}) => {
       if (props.itemObj.colorsMap) {
         const colorsMapList = Object.keys(props.itemObj.colorsMap).map(key => ({
           id: key,
-          name: props.itemObj.colorsMap[key]
+          name: props.itemObj.colorsMap[key],
         }));
         setColorList(colorsMapList);
         setFilteredColor(colorsMapList);
         set_editColor(false);
       }
       if (props.itemObj.loadFabricStyles) {
-        const loadFabricStylesList = Object.keys(props.itemObj.loadFabricStyles).map(key => ({
+        const loadFabricStylesList = Object.keys(
+          props.itemObj.loadFabricStyles,
+        ).map(key => ({
           id: props.itemObj.loadFabricStyles[key],
-          name: key
+          name: key,
         }));
         setFilteredFabric(loadFabricStylesList);
         setFabricList(loadFabricStylesList);
@@ -66,7 +68,7 @@ const StyleDetailsUI = ({route, ...props}) => {
       if (props.itemObj.brandsMap) {
         const brandsMapList = Object.keys(props.itemObj.brandsMap).map(key => ({
           id: key,
-          name: props.itemObj.brandsMap[key]
+          name: props.itemObj.brandsMap[key],
         }));
         setBrandList(brandsMapList);
         setFilteredBrand(brandsMapList);
@@ -76,24 +78,42 @@ const StyleDetailsUI = ({route, ...props}) => {
       }
       if (props.itemObj.season) {
         setSeasonName(props.itemObj.season);
-        set_editSeason(false)
+      }
+      if (props.itemObj.sizeGroupId) {
+        setSeasonId(props.itemObj.sizeGroupId);
+        set_editSeason(false);
       }
       if (props.itemObj.locationId) {
         setLocationId(props.itemObj.locationId);
         setLocationName(props.itemObj.locationsMap[props.itemObj.locationId]);
-        set_editLocation(false)
+        set_editLocation(false);
       }
       if (props.itemObj.fabricId) {
         setFabricId(props.itemObj.fabricId);
-        if (props.itemObj.fabricName) {
-          setFabricName(props.itemObj.fabricName);
+
+        if (props.itemObj.loadFabricStyles) {
+          const loadFabricStylesList = Object.keys(
+            props.itemObj.loadFabricStyles,
+          ).map(key => ({
+            id: props.itemObj.loadFabricStyles[key],
+            name: key,
+          }));
+
+          const found = loadFabricStylesList.filter(
+            item => item.id === props.itemObj.fabricId,
+          );
+          console.log('found  ===> ', found, fabricId);
+          if(found && found?.length >0){
+            setFabricName(found[0]?.name || '');
+          }
+
         }
         set_editFabric(false);
       }
       if (props.itemObj.colorId) {
         setSelectedIndices([props.itemObj.colorId.toString()]);
         set_editColor(false);
-        console.log("setted color ", props.itemObj.colorId.toString())
+        console.log('setted color ', props.itemObj.colorId.toString());
       }
       if (props.itemObj.brandId) {
         setBrandId(props.itemObj.brandId);
@@ -110,7 +130,9 @@ const StyleDetailsUI = ({route, ...props}) => {
       }
       if (props.itemObj.configurationId) {
         setProcessWorkFlowId(props.itemObj.configurationId);
-        setProcessWorkFlowName(props.itemObj.confMap[props.itemObj.configurationId]);
+        setProcessWorkFlowName(
+          props.itemObj.confMap[props.itemObj.configurationId],
+        );
         set_editeditProcessWF(false);
       }
       if (props.itemObj.fob) {
@@ -121,28 +143,29 @@ const StyleDetailsUI = ({route, ...props}) => {
       }
       if (props.itemObj.sizeRangeId) {
         setScaleOrSizeId(props.itemObj.sizeRangeId);
-        setScaleOrSizeName(props.itemObj.sizeRangesMap[props.itemObj.sizeRangeId]);
+        setScaleOrSizeName(
+          props.itemObj.sizeRangesMap[props.itemObj.sizeRangeId],
+        );
         set_editScaleOrSize(false);
       }
       if (props.itemObj.sizesGSCodesList) {
-
-        console.log("table   ==> ", props.itemObj.sizesGSCodesList);
-        const ScaleTable = props.itemObj?.sizesGSCodesList?.map((item, index) => ({
-          id: item.size_id,
-          name: item.sizeCode,
-          consumption: item.size_cons,
-          invLimit: item.sizeInvLimit
-        }));
+        // console.log("table   ==> ", props.itemObj.sizesGSCodesList);
+        const ScaleTable = props.itemObj?.sizesGSCodesList?.map(
+          (item, index) => ({
+            id: item.size_id,
+            name: item.sizeCode,
+            consumption: item.size_cons,
+            invLimit: item.sizeInvLimit,
+          }),
+        );
         set_scaleTable(ScaleTable);
-      
+
         set_showScaleTable(true);
       }
     }
   }, [props.itemObj]);
 
   useEffect(() => {
-    // console.log('item obj1 ==> ',props.listItems);
-
     if (props.listItems) {
       if (props.listItems.styleDetailsList) {
         // console.log('item obj2 ==> ', props.listItems.styleDetailsList);
@@ -358,66 +381,87 @@ const StyleDetailsUI = ({route, ...props}) => {
 
   const rgtBtnAction = () => {
     if (
-          !styleNo &&
-          !customerStyleNo &&
-          !locationId &&
-          selectedIndices.length > 0 &&
-          !seasonId &&
-          buyerPOQty &&
-          !scaleOrSizeId &&
-          !hsn &&
-          !processWorkFlowId
-        ) {
-          Alert.alert('Please fill all mandatory fields !');
-          return;
-        }
-    
-        const consumptionObj = {};
-        const invLimitObj = {};
-        const emptyObj1 = {};
-        const emptyObj2 = {};
-    
-        scaleTable.forEach(item => {
-          consumptionObj[item.id] = item.consumption;
-          invLimitObj[item.id] = item.invLimit;
-          emptyObj1[item.id] = '';
-          emptyObj2[item.id] = '0';
-        });
-    
-        const colorStr = selectedIndices.join(',') + ',';
-        const colorStr1 = selectedIndices.join(',');
-    
-        const tempObj = {
-          styleNo: styleNo,
-          styleDesc: styleDescription,
-          customerStyle: customerStyleNo,
-          locationId: locationId,
-          fabricId: fabricId,
-          colorIDStr: colorStr,
-          fabric: fabricName,
-          multi_loc: locationId,
-          colorId: selectedIndices.length === 1 ? colorStr1 : '0',
-          brandId: brandId,
-          poQty: buyerPOQty,
-          sizeGroupId: seasonId,
-          sizeRangeId: scaleOrSizeId,
-          hsn: hsn,
-          configurationId: processWorkFlowId,
-          price: stylePriceFOB,
-          mrp: mrpTagPrice,
-          newBrand: '',
-          gst: '0',
-          appConsumption: approvedConsumption,
-          gsCodesMap: emptyObj2,
-          gsCodesPriceMap: emptyObj1,
-          articleNumberMap: emptyObj1,
-          gscodesizeprice: emptyObj1,
-          sizeWiseEAN: emptyObj1,
-          sizeCons: consumptionObj,
-          weightMap: emptyObj2,
-          sizeWiseInvLimit: invLimitObj,
-        };
-        // console.log("Temp obj ===> ", tempObj)
+      !styleNo &&
+      !customerStyleNo &&
+      !locationId &&
+      selectedIndices.length > 0 &&
+      !seasonId &&
+      buyerPOQty &&
+      !scaleOrSizeId &&
+      !hsn &&
+      !processWorkFlowId
+    ) {
+      Alert.alert('Please fill all mandatory fields !');
+      return;
+    }
+
+    if (!brandId) {
+      Alert.alert(
+        'Confirm',
+        'Do you want to Continue without Brand?',
+        [
+          {
+            text: 'Cancel',
+            style: 'cancel',
+          },
+          {
+            text: 'OK',
+            onPress: () => proceedWithSubmission(),
+          },
+        ],
+        {cancelable: false},
+      );
+      return;
+    }
+    proceedWithSubmission();
+  };
+  const proceedWithSubmission = () => {
+    const consumptionObj = {};
+    const invLimitObj = {};
+    const emptyObj1 = {};
+    const emptyObj2 = {};
+
+    scaleTable.forEach(item => {
+      consumptionObj[item.id] = item.consumption;
+      invLimitObj[item.id] = item.invLimit;
+      emptyObj1[item.id] = '';
+      emptyObj2[item.id] = '0';
+    });
+
+    const colorStr = selectedIndices.join(',') + ',';
+    const colorStr1 = selectedIndices.join(',');
+
+    const tempObj = {
+      styleNo: styleNo,
+      styleDesc: styleDescription,
+      customerStyle: customerStyleNo,
+      locationId: locationId,
+      fabricId: fabricId,
+      colorIDStr: colorStr,
+      fabric: fabricName,
+      multi_loc: locationId,
+      colorId: selectedIndices.length === 1 ? colorStr1 : '0',
+      brandId: brandId,
+      poQty: buyerPOQty,
+      sizeGroupId: seasonId,
+      sizeRangeId: scaleOrSizeId,
+      hsn: hsn,
+      configurationId: processWorkFlowId,
+      price: stylePriceFOB,
+      mrp: mrpTagPrice,
+      newBrand: '',
+      gst: '0',
+      appConsumption: approvedConsumption,
+      gsCodesMap: emptyObj2,
+      gsCodesPriceMap: emptyObj1,
+      articleNumberMap: emptyObj1,
+      gscodesizeprice: emptyObj1,
+      sizeWiseEAN: emptyObj1,
+      sizeCons: consumptionObj,
+      weightMap: emptyObj2,
+      sizeWiseInvLimit: invLimitObj,
+    };
+    // console.log("Temp obj ===> ", tempObj)
     props.submitAction(tempObj);
   };
 
@@ -428,7 +472,6 @@ const StyleDetailsUI = ({route, ...props}) => {
   const popOkBtnAction = () => {
     props.popOkBtnAction();
   };
-
 
   const renderItem = ({item, index}) => {
     return (
@@ -518,7 +561,11 @@ const StyleDetailsUI = ({route, ...props}) => {
                 value={styleNo}
                 mode="outlined"
                 editable={props?.itemObj?.styleName ? false : true}
-                style={{backgroundColor : props?.itemObj?.styleName ? '#f8f8f8': '#fff'}}
+                style={{
+                  backgroundColor: props?.itemObj?.styleName
+                    ? '#f8f8f8'
+                    : '#fff',
+                }}
                 onChangeText={text => {
                   setStyleNo(text);
                   setCustomerStyleNo(text);
@@ -547,7 +594,7 @@ const StyleDetailsUI = ({route, ...props}) => {
               style={{
                 alignItems: 'center',
                 justifyContent: 'center',
-                backgroundColor: editLocation ? '#e8e8e8':'#fff',
+                backgroundColor: editLocation ? '#e8e8e8' : '#fff',
                 marginTop: hp('2%'),
               }}>
               <TouchableOpacity
@@ -620,7 +667,7 @@ const StyleDetailsUI = ({route, ...props}) => {
               style={{
                 alignItems: 'center',
                 justifyContent: 'center',
-                backgroundColor: editFabric ? '#e8e8e8':'#fff',
+                backgroundColor: editFabric ? '#e8e8e8' : '#fff',
                 marginTop: hp('2%'),
               }}>
               <TouchableOpacity
@@ -693,7 +740,7 @@ const StyleDetailsUI = ({route, ...props}) => {
               style={{
                 alignItems: 'center',
                 justifyContent: 'center',
-                backgroundColor: editColor ? '#e8e8e8':'#fff',
+                backgroundColor: editColor ? '#e8e8e8' : '#fff',
                 marginTop: hp('2%'),
               }}>
               <TouchableOpacity
@@ -773,7 +820,7 @@ const StyleDetailsUI = ({route, ...props}) => {
               style={{
                 alignItems: 'center',
                 justifyContent: 'center',
-                backgroundColor: editSeason ? '#e8e8e8':'#fff',
+                backgroundColor: editSeason ? '#e8e8e8' : '#fff',
                 marginTop: hp('2%'),
               }}>
               <TouchableOpacity
@@ -946,7 +993,7 @@ const StyleDetailsUI = ({route, ...props}) => {
               style={{
                 alignItems: 'center',
                 justifyContent: 'center',
-                backgroundColor: editScaleOrSize ? '#e8e8e8':'#fff',
+                backgroundColor: editScaleOrSize ? '#e8e8e8' : '#fff',
                 marginTop: hp('2%'),
               }}>
               <TouchableOpacity
@@ -1093,7 +1140,7 @@ const StyleDetailsUI = ({route, ...props}) => {
               style={{
                 alignItems: 'center',
                 justifyContent: 'center',
-                backgroundColor: editProcessWF ? '#e8e8e8':'#fff',
+                backgroundColor: editProcessWF ? '#e8e8e8' : '#fff',
                 marginTop: hp('2%'),
               }}>
               <TouchableOpacity

@@ -83,10 +83,8 @@ const StyleCreateUI = ({route, navigation, ...props}) => {
     if (props.colorObj) {
       console.log("color Obj", props.colorObj);
       
-      if(props.colorObj.colorId){
-        console.log("color id", props.colorObj.colorId, colorList);
-
-        setSelectedIndices([props.colorObj.colorId]);
+      if(props?.colorObj?.color){
+        setSelectedIndices([props.colorObj.color]);
         setEditColor(false);
       }
 
@@ -296,6 +294,7 @@ const StyleCreateUI = ({route, navigation, ...props}) => {
     props.popOkBtnAction();
   };
 
+
   const submitAction = async () => {
     if (
       !styleNo &&
@@ -311,6 +310,30 @@ const StyleCreateUI = ({route, navigation, ...props}) => {
       Alert.alert('Please fill all mandatory fields !');
       return;
     }
+
+    if (!brandId) {
+      Alert.alert(
+        'Confirm',
+        'Do you want to Continue without Brand?',
+        [
+          {
+            text: 'Cancel',
+            style: 'cancel',
+          },
+          {
+            text: 'OK',
+            onPress: () => proceedWithSubmission(),
+          },
+        ],
+        {cancelable: false},
+      );
+      return;
+    }
+
+    proceedWithSubmission();
+  }
+
+const proceedWithSubmission=()=>{
 
     const consumptionObj = {};
     const invLimitObj = {};
@@ -332,19 +355,19 @@ const StyleCreateUI = ({route, navigation, ...props}) => {
       styleDesc: styleDescription,
       customerStyle: customerStyleNo,
       locationId: locationId,
-      fabricId: fabricId,
+      fabricId: fabricId ? fabricId : '0',
       colorIDStr: colorStr,
       fabric: fabricName,
       multi_loc: locationId,
       colorId: selectedIndices.length === 1 ? colorStr1 : '0',
-      brandId: brandId,
+      brandId: brandId ? brandId : '0',
       poQty: buyerPOQty,
       sizeGroupId: seasonId,
       sizeRangeId: scaleOrSizeId,
       hsn: hsn,
       configurationId: processWorkFlowId,
       price: stylePriceFOB,
-      mrp: mrpTagPrice,
+      mrp: mrpTagPrice ? mrpTagPrice : '0',
       newBrand: '',
       gst: '0',
       appConsumption: approvedConsumption,

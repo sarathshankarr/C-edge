@@ -1093,9 +1093,10 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
                         {item?.poft_order_mtr?.toString()}
                       </Text>
                     </View>
-                    <View style={{width: '20%', alignItems: 'center'}}>
-                      <View style={{width:'100%', flexDirection:'column', alignItems:'center', justifyContent:'center'}}>
+                    <View style={{width: '20%'}}>
+                      <View style={{flexDirection:'column'}}>
                         <TextInput
+                          style={styles.table_data_input}
                           value={table_ip}
                           mode="outlined"
                           onChangeText={text => set_table_ip(text)}
@@ -1107,6 +1108,7 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
                             padding: 2,
                             paddingHorizontal: 10,
                             borderRadius: 30,
+                            textAlign:'center'
                           }}>
                           {props?.itemsObj?.fpt_fabricProcessed}
                         </Text>
@@ -1130,7 +1132,7 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
             </View>
           </View>}
 
-          <View style={{height: 100}} />
+          <View style={{height: 150}} />
         </View>
       </KeyboardAwareScrollView>
 
@@ -1329,5 +1331,13 @@ const getStyles = (colors) => StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: '#000000',
+  },
+  table_data_input: {
+    fontSize: 16,
+    color: '#000',
+    borderBottomWidth: 1,
+    borderColor: '#ccc',
+    paddingHorizontal: 5,
+    textAlign: 'center',
   },
 });

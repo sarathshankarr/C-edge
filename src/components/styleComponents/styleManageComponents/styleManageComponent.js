@@ -39,6 +39,11 @@ const StyleManageComponent = ({ navigation, route, ...props }) => {
 
   const getInitialData = async (page = 0, reload = false) => {
 
+    if (reload) {
+      setpage(0);  // Reset page on reload
+      setHasMore(true);
+  }
+
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
     let locIds = await AsyncStorage.getItem('CurrentCompanyLocations');
@@ -159,13 +164,13 @@ const StyleManageComponent = ({ navigation, route, ...props }) => {
     
     if(more){
       if(!hasMore || MainLoading || isLoading) return;
-      const next =page + 1  ;
+      const next = page + 1  ;
       setpage(next);
       getInitialData(next, false);
     }else{
-      setpage(0);
+      // setpage(0);
+      // setHasMore(true);
       getInitialData(0, true);
-      setHasMore(true);
     }
   }
 
