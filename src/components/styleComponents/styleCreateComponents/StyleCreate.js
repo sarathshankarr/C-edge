@@ -187,8 +187,10 @@ const StyleCreate = ({ route }) => {
       "company":JSON.parse(companyObj),
       "menuId":30,
       "fabric":fabricName,
+      "colorId":0,
   
     }
+    console.log("req for color ==> ", obj)
     let EditDDAAPIObj = await APIServiceCall.getColorBasedOnFabric(obj);
     set_isLoading(false);
 
@@ -197,6 +199,7 @@ const StyleCreate = ({ route }) => {
 
       if (EditDDAAPIObj?.responseData) {
         set_colorObj(EditDDAAPIObj?.responseData);
+        // console.log("response for color ==> > ", EditDDAAPIObj?.responseData)
       }
       
       
@@ -341,7 +344,7 @@ const StyleCreate = ({ route }) => {
 
     console.log("saving obj ==>", tempObj);
 
-
+// return;
     set_isLoading(true);
 
     let SAVEAPIObj = await APIServiceCall.saveCreateStyle(tempObj);

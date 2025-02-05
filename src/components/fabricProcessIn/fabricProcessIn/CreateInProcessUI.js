@@ -256,6 +256,7 @@ const CreateInProcessUI = ({ route, navigation, ...props }) => {
         return;
       }
     }
+    console.log("fab issued ", fabricIssued, "fabricIssuedLimit ", fabricIssuedLimit);
       if (Number(fabricIssued) > Number(fabricIssuedLimit)) {
         Alert.alert("Qty Should Not Be More than ", fabricIssuedLimit);
         return;
