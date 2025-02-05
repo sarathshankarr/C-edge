@@ -40,7 +40,7 @@ const StyleManageComponent = ({ navigation, route, ...props }) => {
   const getInitialData = async (page = 0, reload = false) => {
 
     if (reload) {
-      setpage(0);  // Reset page on reload
+      setpage(0);  
       setHasMore(true);
   }
 

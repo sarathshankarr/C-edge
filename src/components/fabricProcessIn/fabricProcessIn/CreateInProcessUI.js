@@ -547,7 +547,7 @@ const CreateInProcessUI = ({ route, navigation, ...props }) => {
       "matchingName": matchingNoId ? matchingNoId : 0
     }
 
-    console.log("req  body after selecting batch id ", obj);
+    console.log("req  body after selecting batch id  setting 2 ==> ", obj);
 
     let STOREDETAILSAPIObj = await APIServiceCall.getBatchDetailsByBatchId(obj);
     props.set_isLoading(false);
@@ -878,6 +878,7 @@ const CreateInProcessUI = ({ route, navigation, ...props }) => {
       "company":JSON.parse(companyObj),
 
     }
+    console.log("req body for only fab iss ", obj)
     
     let STOREDETAILSAPIObj = await APIServiceCall.getfabIssuedafterPrinting(obj);
     props.set_isLoading(false);
@@ -890,11 +891,13 @@ const CreateInProcessUI = ({ route, navigation, ...props }) => {
           if(Number(processId)===608 || Number(processId)===609){
           
               set_fabricIssued(STOREDETAILSAPIObj.responseData?.poft_printend_mtr)
+              set_fabricIssuedLimit(STOREDETAILSAPIObj.responseData?.poft_printend_mtr)
               set_previousQty(STOREDETAILSAPIObj.responseData?.poft_printend_mtr)
               set_printingId(STOREDETAILSAPIObj.responseData?.poft_id)
               
           }else{
             set_fabricIssued(STOREDETAILSAPIObj.responseData?.poft_printend_mtr)
+            set_fabricIssuedLimit(STOREDETAILSAPIObj.responseData?.poft_printend_mtr)
             set_previousQty(STOREDETAILSAPIObj.responseData?.poft_printend_mtr)
             set_printingId(STOREDETAILSAPIObj.responseData?.poft_id)
           }
@@ -1303,7 +1306,7 @@ const CreateInProcessUI = ({ route, navigation, ...props }) => {
             />
           </View>
 
-          {processId && <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: hp('2%') }} >
+          {processId && <View style={{ alignItems: 'center',backgroundColor:"#fff", justifyContent: 'center', marginTop: hp('2%') }} >
 
             <TouchableOpacity style={{ flexDirection: 'row', borderWidth: 0.5, borderColor: "#D8D8D8", borderRadius: hp("0.5%"), width: wp("90%"), }} onPress={() => { set_showOrderNoList(!showOrderNoList) }}>
 
@@ -1354,7 +1357,7 @@ const CreateInProcessUI = ({ route, navigation, ...props }) => {
 
           </View>}
 
-          {processId && <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: hp('2%') }} >
+          {processId && <View style={{ alignItems: 'center',backgroundColor:"#fff", justifyContent: 'center', marginTop: hp('2%') }} >
 
             <TouchableOpacity style={{ flexDirection: 'row', borderWidth: 0.5, borderColor: "#D8D8D8", borderRadius: hp("0.5%"), width: wp("90%"), }} onPress={() => { set_showDesignNoList(!showDesignNoList) }}>
 
@@ -1405,7 +1408,7 @@ const CreateInProcessUI = ({ route, navigation, ...props }) => {
 
           </View>}
 
-          {processId &&  processId !== "591"  && <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: hp('2%') }} >
+          {processId &&  processId !== "591"  && <View style={{ alignItems: 'center',backgroundColor:"#fff", justifyContent: 'center', marginTop: hp('2%') }} >
 
             <TouchableOpacity style={{ flexDirection: 'row', borderWidth: 0.5, borderColor: "#D8D8D8", borderRadius: hp("0.5%"), width: wp("90%"), }} onPress={() => { set_showMatchingNoList(!showMatchingNoList) }}>
 

@@ -38,6 +38,11 @@ const LocationMasterList = ({ navigation, route, ...props }) => {
 
   const getInitialData = async (page = 0, reload = false) => {
 
+    if (reload) {
+      setpage(0);  
+      setHasMore(true);
+  }
+
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
@@ -158,11 +163,11 @@ const LocationMasterList = ({ navigation, route, ...props }) => {
       if(!hasMore || MainLoading || isLoading) return;
       const next =page + 1  ;
       setpage(next);
-    //   getInitialData(next, false);
-    // }else{
-      setpage(0);
-      // getInitialData(0, true);
-      setHasMore(true);
+      getInitialData(next, false);
+    }else{
+      getInitialData(0, true);
+      // setpage(0);
+      // setHasMore(true);
     }
   }
 

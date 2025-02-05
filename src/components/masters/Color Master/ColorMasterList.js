@@ -50,15 +50,20 @@ const ColorMasterList = ({ route }) => {
       setpage(next);
       getInitialData(next, false);
     }else{
-      setpage(0);
       getInitialData(0, true);
-      setHasMore(true);
+      // setpage(0);
+      // setHasMore(true);
     }
   }
 
 
 
   const getInitialData = async (page = 0, reload = false) => {
+
+    if (reload) {
+      setpage(0);  
+      setHasMore(true);
+  }
     
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
