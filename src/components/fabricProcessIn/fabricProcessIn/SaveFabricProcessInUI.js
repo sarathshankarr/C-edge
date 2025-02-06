@@ -22,25 +22,23 @@ import BottomComponent from '../../../utils/commonComponents/bottomComponent';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import {formatDateIntoDMY} from '../../../utils/constants/constant';
 import {RadioButton, TextInput} from 'react-native-paper';
-import { ColorContext } from '../../colorTheme/colorTheme';
+import {ColorContext} from '../../colorTheme/colorTheme';
 
 let downArrowImg = require('./../../../../assets/images/png/dropDownImg.png');
 const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
-
-  const { colors } = useContext(ColorContext);
+  const {colors} = useContext(ColorContext);
   const styles = getStyles(colors);
-
 
   useEffect(() => {
     if (props.itemsObj) {
       // console.log("Props from data =========> ", props.itemsObj.processMap);
       if (props.itemsObj.processMap) {
         const menuID = props.itemsObj.fpt_menuOut_id.toString();
-        console.log("menuID =========> ", menuID);
+        console.log('menuID =========> ', menuID);
         set_processName(props?.itemsObj?.processMap[menuID]);
-        if(menuID==="590"){
+        if (menuID === '590') {
           set_editFabricIssued(false);
-          console.log("setted false")
+          console.log('setted false');
         }
       }
       if (props.itemsObj.datestr) {
@@ -53,7 +51,11 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
         set_inTime(props.itemsObj.fpt_intime);
       }
       if (props.itemsObj.fpt_shift_id) {
-        console.log("Shiift id ====> ", menuID, props?.itemsObj?.shiftMap[menuID]);
+        console.log(
+          'Shiift id ====> ',
+          menuID,
+          props?.itemsObj?.shiftMap[menuID],
+        );
         const menuID = props.itemsObj.fpt_shift_id.toString();
         set_shift(props?.itemsObj?.shiftMap[menuID]);
       }
@@ -109,19 +111,20 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
       }
       if (props.itemsObj.fpt_menuOut_id) {
         // console.log("entering menuout id ", props.itemsObj.fpt_menuOut_id === 608, props.itemsObj.fpt_menuOut_id)
-       if(props.itemsObj.fpt_menuOut_id === 608){
-        set_edit6fields(true);
-       }
+        if (props.itemsObj.fpt_menuOut_id === 608) {
+          set_edit6fields(true);
+        }
       }
-      console.log('priting id   ', 
+      console.log(
+        'priting id   ',
         props.itemsObj.printingId,
-      //   props.itemsObj.fpt_fabricProcessed, 
-      //   props.itemsObj.fpt_fabric_rejected, 
-      //   props.itemsObj.fpt_issued, 
-      //   props.itemsObj.fpt_fabricProcessed + props.itemsObj.fpt_fabric_rejected,  
-      //   props.itemsObj.fpt_fabricProcessed + props.itemsObj.fpt_fabric_rejected !== props.itemsObj.fpt_issued
+        //   props.itemsObj.fpt_fabricProcessed,
+        //   props.itemsObj.fpt_fabric_rejected,
+        //   props.itemsObj.fpt_issued,
+        //   props.itemsObj.fpt_fabricProcessed + props.itemsObj.fpt_fabric_rejected,
+        //   props.itemsObj.fpt_fabricProcessed + props.itemsObj.fpt_fabric_rejected !== props.itemsObj.fpt_issued
       );
-      }
+    }
   }, [props.itemsObj]);
 
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
@@ -192,33 +195,33 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
   const [fabricType, setFabricType] = useState('');
   const [fresh, setFresh] = useState('0');
 
-
-  const [editFabricIssued, set_editFabricIssued]=useState(true);
-  const [edit6fields, set_edit6fields]=useState(false);
+  const [editFabricIssued, set_editFabricIssued] = useState(true);
+  const [edit6fields, set_edit6fields] = useState(false);
 
   const popOkBtnAction = () => {
     props.popOkBtnAction();
   };
 
   const submitAction = async () => {
-
     if (!outTime) {
-      Alert.alert("Please Enter outTime  !");
+      Alert.alert('Please Enter outTime  !');
       return;
     }
     if (props.itemsObj.fpt_menuOut_id === 608 && !fabricType) {
-      Alert.alert("Please Enter  Fabric type");
+      Alert.alert('Please Enter  Fabric type');
       return;
     }
 
-    let  obj1 = {
-    "printedMtr" : table_ip,
-    "printedmtrId" : table[0]?.poft_id,
-    "totalPrintedMtr": (Number(table[0]?.poft_tot_printed_mtr) + Number(table_ip ? table_ip : '0' )),
-    "remainingPrint":table[0]?.poft_remaining_print,
-    "matchingId" : table[0]?.poft_matcing_id,
+    let obj1 = {
+      printedMtr: table_ip,
+      printedmtrId: table[0]?.poft_id,
+      totalPrintedMtr:
+        Number(table[0]?.poft_tot_printed_mtr) +
+        Number(table_ip ? table_ip : '0'),
+      remainingPrint: table[0]?.poft_remaining_print,
+      matchingId: table[0]?.poft_matcing_id,
     };
-    const formatted_date=formatDateForSave(date);
+    const formatted_date = formatDateForSave(date);
     // let Obj=props?.itemsObj;
     // Obj.fpt_entry_date=formatted_date,
     // Obj.fpt_intime=inTime,
@@ -241,60 +244,62 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
     // Obj.remainingPrint = obj1?.remainingPrint;
     // Obj.matchingId = obj1?.matchingId;
     // console.log("saving, table Obj ==> ", Obj.printedMtr,Obj.printedmtrId , Obj.remainingPrint,  Obj.totalPrintedMtr, Obj.matchingId);
-    
 
-// console.log("condn for proccc ================> ", props?.itemsObj?.fpt_menuIn_id,Number(obj1?.printedMtr), props?.itemsObj?.fpt_menuIn_id===591  )
-    let obj2={  
-  "fpt_entry_date": formatted_date,
-  "fpt_machine_id": MachineNoId,
-  "fpt_attendby_id":attendedById,
-  "fpt_intime":inTime ? inTime : '',
-  "fpt_outtime":outTime ? outTime : '',
-  "Fpt_temparature": props.itemsObj.fpt_temparature,
-  "fpt_mcspeed":props.itemsObj.fpt_mcspeed,
-  "fpt_qty":props.itemsObj.fpt_qty,
-  "fpt_afterprocessedwidth":props?.itemsObj?.fpt_afterprocessedwidth,
-  "fpt_fabricProcessed":props?.itemsObj?.fpt_menuIn_id === 591 ? Number(obj1?.printedMtr) : fabricProcessed,
-  "fpt_fabric_rejected": props?.itemsObj?.fpt_fabric_rejected,
-  "fpt_ph":props?.itemsObj?.fpt_ph,
-  "fpt_roll_trolley":props?.itemsObj?.fpt_roll_trolley,
-  "fpt_partyno":props?.itemsObj?.fpt_partyno,
-  "previousqty":props?.itemsObj?.fpt_issued,
-  "inmenuId": props?.itemsObj?.fpt_menuIn_id,
-  "fpt_menuOut_id":props?.itemsObj?.fpt_menuOut_id,
-  "printingId": props?.itemsObj?.printingId,
-  "fpt_printing_id":obj1?.printedmtrId,
-  "fpt_matching_id":obj1?.matchingId,
-  "fpt_order_id":  props?.itemsObj?.fpt_order_id,
-  "fpt_desing_id":props?.itemsObj?.fpt_desing_id,
-  "fpt_batchNo_id":props?.itemsObj?.fpt_batchNo_id,
-  "fpt_pound":props?.itemsObj?.fpt_pound,
-  "fpt_shrinkage":props?.itemsObj?.fpt_shrinkage,
-  "fabricType":fabricType,
-  "fpt_freshPcs":Number(fresh),
-  "fpt_twoPcs":Number(twoPieces),
-  "fpt_printDamgePcs":Number(printDamagePieces),
-  "fpt_bgradePcs":Number(bGradePieces),
-  "fpt_fent":Number(fent),
-  "fpt_chindi":Number(chindi),
-  "fpt_steam":props?.itemsObj?.fpt_steam,
-  "fpt_speed":props?.itemsObj?.fpt_speed,
-  "fpt_weight":props?.itemsObj?.fpt_weight,
-  "fpt_yard":props?.itemsObj?.fpt_yard,
-  "fpt_glm":props?.itemsObj?.fpt_glm,
-  "fpt_shift_id":props?.itemsObj?.fpt_shift_id,
-  "printedMtr" : Number(obj1?.printedMtr),
-  "printedmtrId" : obj1?.printedmtrId,
-  "totalPrintedMtr": obj1?.totalPrintedMtr,
-  "remainingPrint":obj1?.remainingPrint,
-  "matchingId" : obj1?.matchingId,
-  "templist":  props?.itemsObj?.templist,
-  "applilist":  props?.itemsObj?.applilist,
-  "niplist":  props?.itemsObj?.niplist,
-  "stlist": props?.itemsObj?.stlist
-}
-// console.log("REQ OBJ ========> ", obj2);
-    props.submitAction(obj2)
+    // console.log("condn for proccc ================> ", props?.itemsObj?.fpt_menuIn_id,Number(obj1?.printedMtr), props?.itemsObj?.fpt_menuIn_id===591  )
+    let obj2 = {
+      fpt_entry_date: formatted_date,
+      fpt_machine_id: MachineNoId,
+      fpt_attendby_id: attendedById,
+      fpt_intime: inTime ? inTime : '',
+      fpt_outtime: outTime ? outTime : '',
+      Fpt_temparature: props.itemsObj.fpt_temparature,
+      fpt_mcspeed: props.itemsObj.fpt_mcspeed,
+      fpt_qty: props.itemsObj.fpt_qty,
+      fpt_afterprocessedwidth: props?.itemsObj?.fpt_afterprocessedwidth,
+      fpt_fabricProcessed:
+        props?.itemsObj?.fpt_menuIn_id === 591
+          ? Number(obj1?.printedMtr)
+          : fabricProcessed,
+      fpt_fabric_rejected: props?.itemsObj?.fpt_fabric_rejected,
+      fpt_ph: props?.itemsObj?.fpt_ph,
+      fpt_roll_trolley: props?.itemsObj?.fpt_roll_trolley,
+      fpt_partyno: props?.itemsObj?.fpt_partyno,
+      previousqty: props?.itemsObj?.fpt_issued,
+      inmenuId: props?.itemsObj?.fpt_menuIn_id,
+      fpt_menuOut_id: props?.itemsObj?.fpt_menuOut_id,
+      printingId: props?.itemsObj?.printingId,
+      fpt_printing_id: obj1?.printedmtrId,
+      fpt_matching_id: obj1?.matchingId,
+      fpt_order_id: props?.itemsObj?.fpt_order_id,
+      fpt_desing_id: props?.itemsObj?.fpt_desing_id,
+      fpt_batchNo_id: props?.itemsObj?.fpt_batchNo_id,
+      fpt_pound: props?.itemsObj?.fpt_pound,
+      fpt_shrinkage: props?.itemsObj?.fpt_shrinkage,
+      fabricType: fabricType,
+      fpt_freshPcs: Number(fresh),
+      fpt_twoPcs: Number(twoPieces),
+      fpt_printDamgePcs: Number(printDamagePieces),
+      fpt_bgradePcs: Number(bGradePieces),
+      fpt_fent: Number(fent),
+      fpt_chindi: Number(chindi),
+      fpt_steam: props?.itemsObj?.fpt_steam,
+      fpt_speed: props?.itemsObj?.fpt_speed,
+      fpt_weight: props?.itemsObj?.fpt_weight,
+      fpt_yard: props?.itemsObj?.fpt_yard,
+      fpt_glm: props?.itemsObj?.fpt_glm,
+      fpt_shift_id: props?.itemsObj?.fpt_shift_id,
+      printedMtr: Number(obj1?.printedMtr),
+      printedmtrId: obj1?.printedmtrId,
+      totalPrintedMtr: obj1?.totalPrintedMtr,
+      remainingPrint: obj1?.remainingPrint,
+      matchingId: obj1?.matchingId,
+      templist: props?.itemsObj?.templist,
+      applilist: props?.itemsObj?.applilist,
+      niplist: props?.itemsObj?.niplist,
+      stlist: props?.itemsObj?.stlist,
+    };
+    // console.log("REQ OBJ ========> ", obj2);
+    props.submitAction(obj2);
   };
 
   const backAction = async () => {
@@ -345,12 +350,11 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
   const handleSearchMachineNo = text => {
     if (text.trim().length > 0) {
       const filtered = Object.keys(machineNoList).filter(locationId =>
-        machineNoList[locationId].toLowerCase().includes(text.toLowerCase())
+        machineNoList[locationId].toLowerCase().includes(text.toLowerCase()),
       );
       set_filteredmachineNo(filtered);
     } else {
       set_filteredmachineNo(Object.keys(machineNoList));
-
     }
   };
   const handleSearchAttendedBy = text => {
@@ -359,13 +363,12 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
       //   user.name.toLowerCase().includes(text.toLowerCase()),
       // );
       const filtered = Object.keys(attendedByList).filter(locationId =>
-        attendedByList[locationId].toLowerCase().includes(text.toLowerCase())
+        attendedByList[locationId].toLowerCase().includes(text.toLowerCase()),
       );
       set_filteredattendedBy(filtered);
     } else {
       // set_filteredattendedBy(attendedByList);
       set_filteredattendedBy(Object.keys(attendedByList));
-
     }
   };
 
@@ -392,11 +395,11 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
   };
 
   function formatDateForSave(inp) {
-    const[d, m, y]=inp.split('/');
-    let ans=[y, m, d];
-    ans=ans.join('-');
+    const [d, m, y] = inp.split('/');
+    let ans = [y, m, d];
+    ans = ans.join('-');
     return ans;
-}
+  }
 
   return (
     <View style={[CommonStyles.mainComponentViewStyle]}>
@@ -428,8 +431,8 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
               alignItems: 'center',
               justifyContent: 'center',
               marginTop: hp('2%'),
-              backgroundColor:'#fff',
-              borderRadius:10
+              backgroundColor: '#fff',
+              borderRadius: 10,
             }}>
             <TouchableOpacity
               style={{
@@ -534,8 +537,8 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
               alignItems: 'center',
               justifyContent: 'center',
               marginTop: hp('2%'),
-              backgroundColor:'#fff',
-              borderRadius:10
+              backgroundColor: '#fff',
+              borderRadius: 10,
             }}>
             <TouchableOpacity
               style={{
@@ -662,12 +665,15 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
                   color: 'white',
                   padding: 3,
                   paddingHorizontal: 10,
-                  borderRadius: 30,
+                  borderRadius: Platform.OS === 'ios' ? 12 : 30,
+                  overflow: 'hidden',
                   position: 'absolute',
                   left: -10,
                   bottom: 15,
                 }}>
-                {props?.itemsObj?.fpt_fabricProcessed?  props?.itemsObj?.fpt_fabricProcessed.toString() :'0'}
+                {props?.itemsObj?.fpt_fabricProcessed
+                  ? props?.itemsObj?.fpt_fabricProcessed.toString()
+                  : '0'}
               </Text>
             </View>
           </View>
@@ -687,8 +693,8 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
               alignItems: 'center',
               justifyContent: 'center',
               marginTop: hp('2%'),
-              backgroundColor:'#fff',
-              borderRadius:10
+              backgroundColor: '#fff',
+              borderRadius: 10,
             }}>
             <TouchableOpacity
               style={{
@@ -746,8 +752,12 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
                       <TouchableOpacity
                         key={index}
                         style={styles.dropdownOption}
-                        onPress={() => actionOnMachineNo(item ,machineNoList[item])}>
-                        <Text style={{color:'#000'}}>{machineNoList[item]}</Text>
+                        onPress={() =>
+                          actionOnMachineNo(item, machineNoList[item])
+                        }>
+                        <Text style={{color: '#000'}}>
+                          {machineNoList[item]}
+                        </Text>
                       </TouchableOpacity>
                     ))
                   )}
@@ -761,8 +771,8 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
               alignItems: 'center',
               justifyContent: 'center',
               marginTop: hp('2%'),
-              backgroundColor:'#fff',
-              borderRadius:10
+              backgroundColor: '#fff',
+              borderRadius: 10,
             }}>
             <TouchableOpacity
               style={{
@@ -820,8 +830,12 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
                       <TouchableOpacity
                         key={index}
                         style={styles.dropdownOption}
-                        onPress={() => actionOnAttendedBy(item, attendedByList[item])}>
-                        <Text style={{color:'#000'}} >{attendedByList[item]}</Text>
+                        onPress={() =>
+                          actionOnAttendedBy(item, attendedByList[item])
+                        }>
+                        <Text style={{color: '#000'}}>
+                          {attendedByList[item]}
+                        </Text>
                       </TouchableOpacity>
                     ))
                   )}
@@ -901,12 +915,15 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
                   color: 'white',
                   padding: 3,
                   paddingHorizontal: 10,
-                  borderRadius: 30,
                   position: 'absolute',
+                  borderRadius: Platform.OS === 'ios' ? 12 : 30,
+                  overflow: 'hidden',
                   left: -10,
                   bottom: 15,
                 }}>
-                {props?.itemsObj?.fpt_freshPcs?  props?.itemsObj?.fpt_freshPcs.toString() :'0'}
+                {props?.itemsObj?.fpt_freshPcs
+                  ? props?.itemsObj?.fpt_freshPcs.toString()
+                  : '0'}
               </Text>
             </View>
           </View>
@@ -928,12 +945,15 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
                   color: 'white',
                   padding: 3,
                   paddingHorizontal: 10,
-                  borderRadius: 30,
                   position: 'absolute',
+                  borderRadius: Platform.OS === 'ios' ? 12 : 30,
+                  overflow: 'hidden',
                   left: -10,
                   bottom: 15,
                 }}>
-                {props?.itemsObj?.fpt_twoPcs?  props?.itemsObj?.fpt_twoPcs.toString() :'0'}
+                {props?.itemsObj?.fpt_twoPcs
+                  ? props?.itemsObj?.fpt_twoPcs.toString()
+                  : '0'}
               </Text>
             </View>
           </View>
@@ -955,12 +975,15 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
                   color: 'white',
                   padding: 3,
                   paddingHorizontal: 10,
-                  borderRadius: 30,
+                  borderRadius: Platform.OS === 'ios' ? 12 : 30,
+                  overflow: 'hidden',
                   position: 'absolute',
                   left: -10,
                   bottom: 15,
                 }}>
-                {props?.itemsObj?.fpt_printDamgePcs?  props?.itemsObj?.fpt_printDamgePcs.toString() :'0'}
+                {props?.itemsObj?.fpt_printDamgePcs
+                  ? props?.itemsObj?.fpt_printDamgePcs.toString()
+                  : '0'}
               </Text>
             </View>
           </View>
@@ -982,12 +1005,15 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
                   color: 'white',
                   padding: 3,
                   paddingHorizontal: 10,
-                  borderRadius: 30,
+                  borderRadius: Platform.OS === 'ios' ? 12 : 30,
+                  overflow: 'hidden',
                   position: 'absolute',
                   left: -10,
                   bottom: 15,
                 }}>
-                {props?.itemsObj?.fpt_bgradePcs?  props?.itemsObj?.fpt_bgradePcs.toString() :'0'}
+                {props?.itemsObj?.fpt_bgradePcs
+                  ? props?.itemsObj?.fpt_bgradePcs.toString()
+                  : '0'}
               </Text>
             </View>
           </View>
@@ -1009,12 +1035,15 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
                   color: 'white',
                   padding: 3,
                   paddingHorizontal: 10,
-                  borderRadius: 30,
+                  borderRadius: Platform.OS === 'ios' ? 12 : 30,
+                  overflow: 'hidden',
                   position: 'absolute',
                   left: -10,
                   bottom: 15,
                 }}>
-                {props?.itemsObj?.fpt_fent?  props?.itemsObj?.fpt_fent.toString() :'0'}
+                {props?.itemsObj?.fpt_fent
+                  ? props?.itemsObj?.fpt_fent.toString()
+                  : '0'}
               </Text>
             </View>
           </View>
@@ -1036,101 +1065,109 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
                   color: 'white',
                   padding: 3,
                   paddingHorizontal: 10,
-                  borderRadius: 30,
+                  borderRadius: Platform.OS === 'ios' ? 12 : 30,
+                  overflow: 'hidden',
                   position: 'absolute',
                   left: -10,
                   bottom: 15,
                 }}>
-                {props?.itemsObj?.fpt_chindi?  props?.itemsObj?.fpt_chindi.toString() :'0'}
+                {props?.itemsObj?.fpt_chindi
+                  ? props?.itemsObj?.fpt_chindi.toString()
+                  : '0'}
               </Text>
             </View>
           </View>
 
-
-
-
-          {props.itemsObj.fpt_menuOut_id === 590 && <View style={styles.wrapper}>
-            <View style={styles.table}>
-              {/* Table Head */}
-             { table &&
-                table?.length > 0 && <View style={styles.table_head}>
-                
-                <View style={{width: '10%', alignItems: 'center'}}>
-                  <Text style={styles.table_head_captions}>Matching</Text>
-                </View>
-                <View style={{width: '22%', alignItems: 'flex-end'}}>
-                  <Text style={styles.table_head_captions}>Order Mtr</Text>
-                </View>
-                <View style={{width: '20%', alignItems: 'center'}}>
-                  <Text style={styles.table_head_captions}>Printed Mtr</Text>
-                </View>
-                <View style={{width: '2%'}} />
-                <View style={{width: '22%', alignItems: 'flex-end'}}>
-                  <Text style={styles.table_head_captions}>
-                    Total Printed Mtr
-                  </Text>
-                </View>
-                <View style={{width: '2%'}} />
-                <View style={{width: '22%', alignItems: 'flex-end'}}>
-                  <Text style={styles.table_head_captions}>
-                    Remaining to Print
-                  </Text>
-                </View>
-              </View>}
-
-              {/* Table Body */}
-              {table &&
-                table?.length > 0 &&
-                table.map((item, index) => (
-                  <View key={index} style={styles.table_body_single_row}>
-                
+          {props.itemsObj.fpt_menuOut_id === 590 && (
+            <View style={styles.wrapper}>
+              <View style={styles.table}>
+                {/* Table Head */}
+                {table && table?.length > 0 && (
+                  <View style={styles.table_head}>
                     <View style={{width: '10%', alignItems: 'center'}}>
-                      <Text style={styles.table_data}>{item.matchingName}</Text>
+                      <Text style={styles.table_head_captions}>Matching</Text>
                     </View>
-                   
-                    <View style={{width: '22%', alignItems: 'center'}}>
-                      <Text style={styles.table_data}>
-                        {item?.poft_order_mtr?.toString()}
-                      </Text>
+                    <View style={{width: '22%', alignItems: 'flex-end'}}>
+                      <Text style={styles.table_head_captions}>Order Mtr</Text>
                     </View>
-                    <View style={{width: '20%'}}>
-                      <View style={{flexDirection:'column'}}>
-                        <TextInput
-                          style={styles.table_data_input}
-                          value={table_ip}
-                          mode="outlined"
-                          onChangeText={text => set_table_ip(text)}
-                        />
-                         <Text
-                          style={{
-                            backgroundColor: colors.color2,
-                            color: '#000',
-                            padding: 2,
-                            paddingHorizontal: 10,
-                            borderRadius: 30,
-                            textAlign:'center'
-                          }}>
-                          {props?.itemsObj?.fpt_fabricProcessed}
-                        </Text>
-
-                      </View>
-                    </View>
-                    <View style={{width: '2%'}} />
-                    <View style={{width: '22%', alignItems: 'center'}}>
-                      <Text style={styles.table_data}>
-                        {(Number(item?.poft_tot_printed_mtr) + Number(table_ip ? table_ip : '0' ))?.toString()}
+                    <View style={{width: '20%', alignItems: 'center'}}>
+                      <Text style={styles.table_head_captions}>
+                        Printed Mtr
                       </Text>
                     </View>
                     <View style={{width: '2%'}} />
-                    <View style={{width: '22%', alignItems: 'center'}}>
-                      <Text style={styles.table_data}>
-                        {item?.poft_remaining_print?.toString()}
+                    <View style={{width: '22%', alignItems: 'flex-end'}}>
+                      <Text style={styles.table_head_captions}>
+                        Total Printed Mtr
+                      </Text>
+                    </View>
+                    <View style={{width: '2%'}} />
+                    <View style={{width: '22%', alignItems: 'flex-end'}}>
+                      <Text style={styles.table_head_captions}>
+                        Remaining to Print
                       </Text>
                     </View>
                   </View>
-                ))}
+                )}
+
+                {/* Table Body */}
+                {table &&
+                  table?.length > 0 &&
+                  table.map((item, index) => (
+                    <View key={index} style={styles.table_body_single_row}>
+                      <View style={{width: '10%', alignItems: 'center'}}>
+                        <Text style={styles.table_data}>
+                          {item.matchingName}
+                        </Text>
+                      </View>
+
+                      <View style={{width: '22%', alignItems: 'center'}}>
+                        <Text style={styles.table_data}>
+                          {item?.poft_order_mtr?.toString()}
+                        </Text>
+                      </View>
+                      <View style={{width: '20%'}}>
+                        <View style={{flexDirection: 'column'}}>
+                          <TextInput
+                            style={styles.table_data_input}
+                            value={table_ip}
+                            mode="outlined"
+                            onChangeText={text => set_table_ip(text)}
+                          />
+                          <Text
+                            style={{
+                              backgroundColor: colors.color2,
+                              color: '#fff',
+                              padding: 2,
+                              paddingHorizontal: 10,
+                              borderRadius: Platform.OS === 'ios' ? 12 : 30,
+                              overflow: 'hidden',
+                              textAlign: 'center',
+                            }}>
+                            {props?.itemsObj?.fpt_fabricProcessed}
+                          </Text>
+                        </View>
+                      </View>
+                      <View style={{width: '2%'}} />
+                      <View style={{width: '22%', alignItems: 'center'}}>
+                        <Text style={styles.table_data}>
+                          {(
+                            Number(item?.poft_tot_printed_mtr) +
+                            Number(table_ip ? table_ip : '0')
+                          )?.toString()}
+                        </Text>
+                      </View>
+                      <View style={{width: '2%'}} />
+                      <View style={{width: '22%', alignItems: 'center'}}>
+                        <Text style={styles.table_data}>
+                          {item?.poft_remaining_print?.toString()}
+                        </Text>
+                      </View>
+                    </View>
+                  ))}
+              </View>
             </View>
-          </View>}
+          )}
 
           <View style={{height: 150}} />
         </View>
@@ -1142,7 +1179,11 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
           leftBtnTitle={'Back'}
           isLeftBtnEnable={true}
           rigthBtnState={true}
-          isRightBtnEnable={ props.itemsObj.fpt_fabricProcessed + props.itemsObj.fpt_fabric_rejected !== props.itemsObj.fpt_issued}
+          isRightBtnEnable={
+            props.itemsObj.fpt_fabricProcessed +
+              props.itemsObj.fpt_fabric_rejected !==
+            props.itemsObj.fpt_issued
+          }
           rightButtonAction={async () => submitAction()}
           leftButtonAction={async () => backAction()}
         />
@@ -1176,168 +1217,168 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
 
 export default SaveFabricProcessInUI;
 
-const getStyles = (colors) => StyleSheet.create({
-  popSearchViewStyle: {
-    height: hp('40%'),
-    width: wp('90%'),
-    backgroundColor: '#f0f0f0',
-    // bottom: 220,
-    // position: 'absolute',
-    // flex:1,
-    alignSelf: 'center',
-    // borderTopRightRadius: 15,
-    // borderTopLeftRadius: 15,
-    alignItems: 'center',
-  },
-  popSearchViewStyle1: {
-    width: wp('90%'),
-    backgroundColor: '#f0f0f0',
-    // bottom: 220,
-    // position: 'absolute',
-    // flex:1,
-    alignSelf: 'center',
-    alignItems: 'center',
-  },
+const getStyles = colors =>
+  StyleSheet.create({
+    popSearchViewStyle: {
+      height: hp('40%'),
+      width: wp('90%'),
+      backgroundColor: '#f0f0f0',
+      // bottom: 220,
+      // position: 'absolute',
+      // flex:1,
+      alignSelf: 'center',
+      // borderTopRightRadius: 15,
+      // borderTopLeftRadius: 15,
+      alignItems: 'center',
+    },
+    popSearchViewStyle1: {
+      width: wp('90%'),
+      backgroundColor: '#f0f0f0',
+      // bottom: 220,
+      // position: 'absolute',
+      // flex:1,
+      alignSelf: 'center',
+      alignItems: 'center',
+    },
 
-  flatcontainer: {
-    flex: 1,
-  },
+    flatcontainer: {
+      flex: 1,
+    },
 
-  flatview: {
-    height: hp('8%'),
-    marginBottom: hp('0.3%'),
-    alignContent: 'center',
-    justifyContent: 'center',
-    borderBottomColor: 'black',
-    borderBottomWidth: wp('0.1%'),
-    width: wp('80%'),
-    alignItems: 'center',
-  },
+    flatview: {
+      height: hp('8%'),
+      marginBottom: hp('0.3%'),
+      alignContent: 'center',
+      justifyContent: 'center',
+      borderBottomColor: 'black',
+      borderBottomWidth: wp('0.1%'),
+      width: wp('80%'),
+      alignItems: 'center',
+    },
 
-  SectionStyle1: {
-    flexDirection: 'row',
-    // justifyContent: "center",
-    alignItems: 'center',
-    height: hp('7%'),
-    width: wp('75%'),
-    borderRadius: hp('0.5%'),
-    // alignSelf: "center",
-    // backgroundColor: "grey",
-  },
+    SectionStyle1: {
+      flexDirection: 'row',
+      // justifyContent: "center",
+      alignItems: 'center',
+      height: hp('7%'),
+      width: wp('75%'),
+      borderRadius: hp('0.5%'),
+      // alignSelf: "center",
+      // backgroundColor: "grey",
+    },
 
-  imageStyle: {
-    // margin: "4%",
-    height: wp('12%'),
-    aspectRatio: 1,
-    marginRight: wp('8%'),
-    resizeMode: 'stretch',
-  },
+    imageStyle: {
+      // margin: "4%",
+      height: wp('12%'),
+      aspectRatio: 1,
+      marginRight: wp('8%'),
+      resizeMode: 'stretch',
+    },
 
-  dropTextInputStyle: {
-    fontWeight: 'normal',
-    fontSize: 18,
-    marginLeft: wp('4%'),
-    color: 'black',
-    width: wp('80%'),
-  },
+    dropTextInputStyle: {
+      fontWeight: 'normal',
+      fontSize: 18,
+      marginLeft: wp('4%'),
+      color: 'black',
+      width: wp('80%'),
+    },
 
-  dropTextLightStyle: {
-    fontWeight: 300,
-    fontSize: 12,
-    width: wp('60%'),
-    alignSelf: 'flex-start',
-    marginTop: hp('1%'),
-    marginLeft: wp('4%'),
-    color: '#000',
-  },
-  wrapper: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    // flex: 1,
-    marginTop: hp('2%'),
-    width: '100%',
-    // paddingHorizontal: 10,
-  },
-  table_head: {
-    flexDirection: 'row',
-    borderBottomWidth: 1,
-    borderColor: '#ddd',
-    padding: 7,
-    backgroundColor: colors.color2,
-    alignItems: 'center',
-  },
-  table_head_captions: {
-    fontSize: 15,
-    color: 'white',
-    alignItems: 'center',
-  },
+    dropTextLightStyle: {
+      fontWeight: 300,
+      fontSize: 12,
+      width: wp('60%'),
+      alignSelf: 'flex-start',
+      marginTop: hp('1%'),
+      marginLeft: wp('4%'),
+      color: '#000',
+    },
+    wrapper: {
+      justifyContent: 'center',
+      alignItems: 'center',
+      // flex: 1,
+      marginTop: hp('2%'),
+      width: '100%',
+      // paddingHorizontal: 10,
+    },
+    table_head: {
+      flexDirection: 'row',
+      borderBottomWidth: 1,
+      borderColor: '#ddd',
+      padding: 7,
+      backgroundColor: colors.color2,
+      alignItems: 'center',
+    },
+    table_head_captions: {
+      fontSize: 15,
+      color: 'white',
+      alignItems: 'center',
+    },
 
-  table_body_single_row: {
-    backgroundColor: '#fff',
-    flexDirection: 'row',
-    borderBottomWidth: 1,
-    borderColor: '#ddd',
-    padding: 7,
-  },
-  table_data: {
-    fontSize: 11,
-    color:'#000',
-    alignItems:'center',
-
-  },
-  table: {
-    // margin: 15,
-    width:'100%',
-    justifyContent: 'center',
-    alignItems: 'center',
-    elevation: 1,
-    backgroundColor: '#fff',
-  },
-  searchInput: {
-    marginTop: 10,
-    borderRadius: 10,
-    height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
-    marginHorizontal: 10,
-    paddingLeft: 10,
-    marginBottom: 10,
-    color: '#000000',
-  },
-  scrollView: {
-    maxHeight: 150,
-  },
-  dropdownOption: {
-    paddingHorizontal: 10,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-  },
-  dropdownContent1: {
-    elevation: 5,
-    // height: 220,
-    maxHeight: 220,
-    alignSelf: 'center',
-    width: '98%',
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    borderColor: 'lightgray', // Optional: Adds subtle border (for effect)
-    borderWidth: 1,
-    marginTop:3
-  },
-  noCategoriesText: {
-    textAlign: 'center',
-    marginTop: 20,
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#000000',
-  },
-  table_data_input: {
-    fontSize: 16,
-    color: '#000',
-    borderBottomWidth: 1,
-    borderColor: '#ccc',
-    paddingHorizontal: 5,
-    textAlign: 'center',
-  },
-});
+    table_body_single_row: {
+      backgroundColor: '#fff',
+      flexDirection: 'row',
+      borderBottomWidth: 1,
+      borderColor: '#ddd',
+      padding: 7,
+    },
+    table_data: {
+      fontSize: 11,
+      color: '#000',
+      alignItems: 'center',
+    },
+    table: {
+      // margin: 15,
+      width: '100%',
+      justifyContent: 'center',
+      alignItems: 'center',
+      elevation: 1,
+      backgroundColor: '#fff',
+    },
+    searchInput: {
+      marginTop: 10,
+      borderRadius: 10,
+      height: 40,
+      borderColor: 'gray',
+      borderWidth: 1,
+      marginHorizontal: 10,
+      paddingLeft: 10,
+      marginBottom: 10,
+      color: '#000000',
+    },
+    scrollView: {
+      maxHeight: 150,
+    },
+    dropdownOption: {
+      paddingHorizontal: 10,
+      paddingVertical: 12,
+      borderBottomWidth: 1,
+      borderBottomColor: '#ccc',
+    },
+    dropdownContent1: {
+      elevation: 5,
+      // height: 220,
+      maxHeight: 220,
+      alignSelf: 'center',
+      width: '98%',
+      backgroundColor: '#fff',
+      borderRadius: 10,
+      borderColor: 'lightgray', // Optional: Adds subtle border (for effect)
+      borderWidth: 1,
+      marginTop: 3,
+    },
+    noCategoriesText: {
+      textAlign: 'center',
+      marginTop: 20,
+      fontSize: 16,
+      fontWeight: '600',
+      color: '#000000',
+    },
+    table_data_input: {
+      fontSize: 16,
+      color: '#000',
+      borderBottomWidth: 1,
+      borderColor: '#ccc',
+      paddingHorizontal: 5,
+      textAlign: 'center',
+    },
+  });
