@@ -64,18 +64,28 @@ const ProductionProcessReportUI = ({route, ...props}) => {
   const [endDate, set_endDate] = useState('');
   const [activeField, setActiveField] = useState(null);
 
-  //   useEffect(() => {
-  //     if (props?.lists) {
-  //       if (props.lists.getStockStyles) {
-  //         set_filteredStockStyles(props.lists.getStockStyles);
-  //       }
-  //       if (props.lists.getStockFabrics) {
-  //         set_filteredStockFabrics(props.lists.getStockFabrics);
-  //       }
-  //     }
-  //   }, [props]);
+  const [processNameList1, setProcessNameList1] = useState([]);
 
 
+    useEffect(() => {
+      if (props?.lists) {
+        if (props.lists.productionlist1) {
+          setProcessNameList1(props.lists.productionlist1);
+        }
+        if (props.lists.companyLocationsMap) {
+          set_filteredLocation(props.lists.companyLocationsMap);
+          setLocationList(props.lists.companyLocationsMap);
+        }
+        if (props.lists.brandsMap) {
+          set_filteredBrand(props.lists.brandsMap);
+          setBrandList(props.lists.brandsMap);
+        }
+        if (props.lists.productionlist) {
+          set_filteredProcessName(props.lists.productionlist);
+          setProcessNameList(props.lists.productionlist);
+        }
+      }
+    }, [props.lists]);
 
   const backBtnAction = () => {
     props.backBtnAction();
@@ -111,6 +121,7 @@ const ProductionProcessReportUI = ({route, ...props}) => {
     set_processName(name);
     set_showProcessNameList(false);
   };
+  
   const actionOnBrand = (id, name) => {
     set_brandId(id);
     set_brandName(name);
@@ -179,7 +190,6 @@ const ProductionProcessReportUI = ({route, ...props}) => {
     return ans;
   }
 
-  // Define radio buttons for Fabric, RM, and Style
   const categoryRadioButtons = useMemo(
     () => [
       {
@@ -188,7 +198,6 @@ const ProductionProcessReportUI = ({route, ...props}) => {
         value: 'Total',
         selected: total === 'Yes',
         labelStyle: {color: '#000'},
-
       },
       {
         id: '2',
@@ -196,16 +205,13 @@ const ProductionProcessReportUI = ({route, ...props}) => {
         value: 'Daywise',
         selected: dayWise === 'Yes',
         labelStyle: {color: '#000'},
-
       },
-
       {
         id: '3',
-        label: ' Pending Quantity  ',
+        label: 'Pending Qty',
         value: 'pendingQuantity',
         selected: pendingQuantity === 'Yes',
         labelStyle: {color: '#000'},
-
       },
     ],
     [total, dayWise, pendingQuantity],
@@ -227,6 +233,8 @@ const ProductionProcessReportUI = ({route, ...props}) => {
       setTotal('No');
       setDayWise('No');
       setPendingQuantity('Yes');
+      setProcessNameList(processNameList1);
+      set_filteredProcessName(processNameList1);
     }
   };
 
@@ -570,9 +578,9 @@ const ProductionProcessReportUI = ({route, ...props}) => {
 
       <View style={CommonStyles.bottomViewComponentStyle}>
         <BottomComponent
-          rightBtnTitle={'Search'}
+          rightBtnTitle={'Download'}
           leftBtnTitle={'View'}
-          isLeftBtnEnable={true}
+          isLeftBtnEnable={false}
           rigthBtnState={true}
           isRightBtnEnable={true}
           leftButtonAction={() => backBtnAction()}
