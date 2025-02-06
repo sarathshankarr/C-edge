@@ -221,7 +221,7 @@ const StyleDetailsComponent = ({ navigation, route, ...props }) => {
     tempObj.userId=userId,
     tempObj.company=JSON.parse(companyObj)
 
-    console.log("req body ==> ", tempObj);
+    console.log("save req body ==> ", tempObj);
 
     let saveEditObj = await APIServiceCall.saveEditStleDetails(tempObj);
     set_isLoading(false);
