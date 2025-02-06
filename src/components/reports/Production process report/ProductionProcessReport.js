@@ -15,10 +15,16 @@ const ProductionProcessReport = ({navigation, route, ...props}) => {
   const [popUpAlert, set_popUpAlert] = useState(undefined);
   const [popUpRBtnTitle, set_popUpRBtnTitle] = useState(undefined);
   const [isPopupLeft, set_isPopupLeft] = useState(false);
+  const [lists, set_lists]=useState({
+    productionlist:[],
+    brandsMap:[],
+    companyLocationsMap:[],
+    productionlist1:[],
+  })
 
-  // React.useEffect(() => {
-  //   getInitialData();
-  // }, []);
+  React.useEffect(() => {
+    getInitialData();
+  }, []);
 
   const backBtnAction = () => {
     navigation.goBack();
@@ -38,15 +44,53 @@ const ProductionProcessReport = ({navigation, route, ...props}) => {
       company: JSON.parse(companyObj),
     };
 
-    let STOREDETAILSAPIObj = await APIServiceCall.getStockFabrics(obj);
-    // console.log('STOREDETAILSAPIObj,', STOREDETAILSAPIObj,'\nSTOREDETAILSAPIObj,',  STOREDETAILSAPIObj.responseData.sizeDetails)
+    let STOREDETAILSAPIObj = await APIServiceCall.LoadProductionProcessReport(obj);
+    console.log('lists ==> ',STOREDETAILSAPIObj.responseData)
     set_isLoading(false);
 
     if (STOREDETAILSAPIObj && STOREDETAILSAPIObj.statusData) {
-      set_lists(prevLists => ({
-        ...prevLists,
-        getStockFabrics: STOREDETAILSAPIObj.responseData,
-      }));
+
+      if (STOREDETAILSAPIObj?.responseData?.brandsMap) {
+        const brandsMapList = Object.keys(STOREDETAILSAPIObj.responseData.brandsMap).map(key => ({
+          id: key,
+          name: STOREDETAILSAPIObj.responseData.brandsMap[key]
+        }));
+        set_lists(prevLists => ({
+          ...prevLists,
+          brandsMap: brandsMapList
+        }));
+      }
+      if (STOREDETAILSAPIObj?.responseData?.companyLocationsMap) {
+        const companyLocationsMapList = Object.keys(STOREDETAILSAPIObj.responseData.companyLocationsMap).map(key => ({
+          id: key,
+          name: STOREDETAILSAPIObj.responseData.companyLocationsMap[key]
+        }));
+        set_lists(prevLists => ({
+          ...prevLists,
+          companyLocationsMap: companyLocationsMapList
+        }));
+      }
+      if (STOREDETAILSAPIObj?.responseData?.productionlist) {
+        const productionlistList = Object.keys(STOREDETAILSAPIObj.responseData.productionlist).map(key => ({
+          id: key,
+          name: STOREDETAILSAPIObj.responseData.productionlist[key]
+        }));
+        set_lists(prevLists => ({
+          ...prevLists,
+          productionlist: productionlistList
+        }));
+      }
+      if (STOREDETAILSAPIObj?.responseData?.productionlist1) {
+        const productionlist1 = Object.keys(STOREDETAILSAPIObj.responseData.productionlist1).map(key => ({
+          id: key,
+          name: STOREDETAILSAPIObj.responseData.productionlist1[key]
+        }));
+        set_lists(prevLists => ({
+          ...prevLists,
+          productionlist1: productionlist1
+        }));
+      }
+     
     } else {
       popUpAction(
         Constant.SERVICE_FAIL_MSG,
@@ -136,72 +180,6 @@ const ProductionProcessReport = ({navigation, route, ...props}) => {
       }
     };
 
-  const submitAction1 = async (tempObj) => {
-
-    let userName = await AsyncStorage.getItem('userName');
-    let userPsd = await AsyncStorage.getItem('userPsd');
-    let usercompanyId = await AsyncStorage.getItem('companyId');
-    let companyObj = await AsyncStorage.getItem('companyObj');
-    set_isLoading(true);
-  
-    let obj = {
-      username: userName,
-      password: userPsd,
-      compIds: usercompanyId,
-      company: JSON.parse(companyObj),
-      startDate: tempObj.startDate,
-      endDate: tempObj.startDate,
-    };
-  
-    const apiUrl = APIServiceCall.downloadProductionProcessReport();
-  
-    try {
-        const response = await axios.post(
-            apiUrl,
-            obj,
-            {
-                headers: {
-                    'Content-Type': 'application/json', 
-                },
-                responseType: 'arraybuffer', 
-            }
-        );
-  
-        console.log("Response for excel API ==> ",typeof response?.request?._response);
-  
-        let base64Data = response?.request?._response;
-  
-        if (Platform.OS === 'android') {
-            const hasPermission = await requestStoragePermission();
-            if (!hasPermission) {
-                Alert.alert(
-                    'Permission Denied',
-                    'Storage permission is required to save the PDF.'
-                );
-                return;
-            }
-        }
-  
-        const downloadFolder = Platform.OS === 'android' ? ReactNativeBlobUtil.fs.dirs.DownloadDir : ''; 
-        // const pdfPath = `${downloadFolder}/${item.so_style_id}.pdf`;
-        const pdfPath = `/storage/emulated/0/Download/${tempObj.startDate}_${Date.now()}.pdf`;
-  
-        
-        await ReactNativeBlobUtil.fs.writeFile(pdfPath, base64Data, 'base64');
-  
-        // Alert.alert('PDF Downloaded', `PDF saved successfully at ${pdfPath}`);
-        popUpAction(`PDF saved successfully at ${pdfPath}`,Constant.DefaultAlert_MSG,'OK', true,false)
-  
-    } catch (error) {
-        console.error('Error generating or saving PDF:', error);
-        // Alert.alert('Error', `Failed to generate or save PDF: ${error.message}`);
-        popUpAction(Constant.SERVICE_FAIL_PDF_MSG,Constant.DefaultAlert_MSG,'OK', true,false)
-  
-    }finally {
-      set_isLoading(false);
-    }
-  };
-
 
   const submitAction = async (tempObj) => {
     try {
@@ -271,6 +249,7 @@ const ProductionProcessReport = ({navigation, route, ...props}) => {
 
   return (
     <ProductionProcessReportUI
+      lists={lists}
       isLoading={isLoading}
       setLoad={setLoad}
       popUpAlert={popUpAlert}
