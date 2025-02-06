@@ -34,13 +34,7 @@ const ProductionProcessReportUI = ({route, ...props}) => {
   const {colors} = useContext(ColorContext);
   const styles = getStyles(colors);
 
-  const [data, setData] = useState([]);
-  const [checkbox, set_checkbox] = useState(false);
-  const [remarks, set_remarks] = useState('');
 
-  const [fabric, setFabric] = useState('Yes');
-  const [style, setStyle] = useState('No');
-  const [rm, setRm] = useState('No');
 
   const [total, setTotal] = useState('Yes');
   const [dayWise, setDayWise] = useState('No');
@@ -81,11 +75,7 @@ const ProductionProcessReportUI = ({route, ...props}) => {
   //     }
   //   }, [props]);
 
-  //   useEffect(() => {
-  //     if (props?.lists) {
-  //       setData(props?.lists);
-  //     }
-  //   }, [props?.lists]);
+
 
   const backBtnAction = () => {
     props.backBtnAction();
@@ -97,30 +87,9 @@ const ProductionProcessReportUI = ({route, ...props}) => {
 
   const ApproveAction = () => {
     console.log('Approved');
-
-    const requestDetails = rows.map(detail => ({
-      stockType: detail.stockTypeId,
-      stockTypeName: detail.stockType,
-      stock: detail.stockId,
-      stock_rm_lot: 0,
-      stockLocationId: 1,
-      styleRmSizeId: detail.size,
-      inputQty: detail.inputQty,
-      uomstock: detail.uom,
-    }));
-
     let tempObj = {
-      processId: processId,
-      woStyleId: stylesId,
-      trimId: fabricId,
-      locationId: locationId,
-      unitMasterId: unitMasterId,
-      comments: remarks,
-      general: generalRadio === 'Yes' ? '1' : '0',
-      styleWise: displayStyleRadio === 'Yes' ? '1' : '0',
-      fabricQty: enteredFabQty,
-      uom: itemsObj?.uomfabric,
-      rmDetails: requestDetails,
+      startDate:formatDateIntoDMY(startDate),
+      endDate:formatDateIntoDMY(endDate)     
     };
 
     // console.log("SAVING OBJ=====>   ", tempObj);

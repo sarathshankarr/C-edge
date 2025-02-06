@@ -2437,6 +2437,7 @@ export async function saveStockRequest(jsonValue) {
     obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet }
     return obj;
 };
+
 export async function saveEditStockRequest(jsonValue) {
 
     let returnError = undefined;
@@ -4775,6 +4776,10 @@ export const downloadPdf =()=>{
 } 
 export const downloadQrPdf =()=>{
     const URL=Environment.uri + "fabricprocessinapi/apiFabricprocessinBarcode";
+    return URL;
+} 
+export const downloadProductionProcessReport =()=>{
+    const URL=Environment.uri + "productionprocessreport/ppreport";
     return URL;
 } 
 
