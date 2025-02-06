@@ -89,8 +89,6 @@ const StyleDetailsUI = ({route, ...props}) => {
         set_editLocation(false);
       }
       if (props.itemObj.fabricId) {
-        setFabricId(props.itemObj.fabricId);
-
         if (props.itemObj.loadFabricStyles) {
           const loadFabricStylesList = Object.keys(
             props.itemObj.loadFabricStyles,
@@ -102,14 +100,19 @@ const StyleDetailsUI = ({route, ...props}) => {
           const found = loadFabricStylesList.filter(
             item => item.id === props.itemObj.fabricId,
           );
+
+          
           console.log('found  ===> ', found, fabricId);
           if(found && found?.length >0){
+            setFabricId(props.itemObj.fabricId);
             setFabricName(found[0]?.name || '');
+          }else{
+            setFabricId(0);
+            setFabricName('');
           }
-
         }
-        set_editFabric(false);
       }
+      set_editFabric(false);
       if (props.itemObj.colorId) {
         setSelectedIndices([props.itemObj.colorId.toString()]);
         set_editColor(false);
