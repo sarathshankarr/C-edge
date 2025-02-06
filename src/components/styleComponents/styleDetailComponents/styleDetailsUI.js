@@ -1226,13 +1226,13 @@ const StyleDetailsUI = ({route, ...props}) => {
                 {/* Table Head */}
                 <View style={styles.table_head}>
                   <View style={{width: '55%'}}>
-                    <Text style={styles.table_head_captions1}>
+                    <Text style={styles.table_head_captions}>
                       Production Name
                     </Text>
                   </View>
                   <View style={{width: '2%'}} />
                   <View style={{width: '20%'}}>
-                    <Text style={styles.table_head_captions1}>Total Qty</Text>
+                    <Text style={styles.table_head_captions}>Total Qty</Text>
                   </View>
                   <View style={{width: '2%'}} />
                   <View style={{width: '20%'}}>
@@ -1293,11 +1293,11 @@ const StyleDetailsUI = ({route, ...props}) => {
               {/* Table Head */}
               <View style={styles.table_head}>
                 <View style={{width: '35%'}}>
-                  <Text style={styles.table_head_captions1}>Process</Text>
+                  <Text style={styles.table_head_captions}>Process</Text>
                 </View>
                 <View style={{width: '1%'}} />
                 <View style={{width: '15%'}}>
-                  <Text style={styles.table_head_captions1}>Start Date</Text>
+                  <Text style={styles.table_head_captions}>Start Date</Text>
                 </View>
                 <View style={{width: '1%'}} />
                 <View style={{width: '15%'}}>
