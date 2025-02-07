@@ -6,6 +6,7 @@ import ProductionProcessReportUI from './ProductionProcessReportUI';
 import axios from 'axios';
 import { Alert, PermissionsAndroid, Platform } from 'react-native';
 import ReactNativeBlobUtil from 'react-native-blob-util';
+import XLSX from 'xlsx';
 
 const ProductionProcessReport = ({navigation, route, ...props}) => {
   const [itemsObj, set_itemsObj] = useState([]);
@@ -45,7 +46,7 @@ const ProductionProcessReport = ({navigation, route, ...props}) => {
     };
 
     let STOREDETAILSAPIObj = await APIServiceCall.LoadProductionProcessReport(obj);
-    console.log('lists ==> ',STOREDETAILSAPIObj.responseData)
+    // console.log('lists ==> ',STOREDETAILSAPIObj.responseData)
     set_isLoading(false);
 
     if (STOREDETAILSAPIObj && STOREDETAILSAPIObj.statusData) {
@@ -181,7 +182,7 @@ const ProductionProcessReport = ({navigation, route, ...props}) => {
     };
 
 
-  const submitAction = async (tempObj) => {
+  const submitAction1 = async (tempObj) => {
     try {
         let userName = await AsyncStorage.getItem('userName');
         let userPsd = await AsyncStorage.getItem('userPsd');
@@ -241,6 +242,65 @@ const ProductionProcessReport = ({navigation, route, ...props}) => {
         set_isLoading(false);
     }
 };
+
+const submitAction = async (tempObj) => {
+  try {
+      let userName = await AsyncStorage.getItem('userName');
+      let userPsd = await AsyncStorage.getItem('userPsd');
+      let usercompanyId = await AsyncStorage.getItem('companyId');
+      let companyObj = await AsyncStorage.getItem('companyObj');
+      set_isLoading(true);
+
+      let obj = {
+          username: userName,
+          password: userPsd,
+          compIds: usercompanyId,
+          company: JSON.parse(companyObj),
+          startDate: tempObj.startDate,
+          endDate: tempObj.startDate,
+      };
+
+      const apiUrl = APIServiceCall.downloadProductionProcessReport();
+      console.log("API URL:", apiUrl);
+
+      const response = await axios.post(apiUrl, obj, {
+          headers: {
+              'Content-Type': 'application/json',
+          },
+          responseType: 'arraybuffer', 
+      });
+
+      console.log("Response received, processing file...");
+      
+      // Convert the received binary data into a readable format
+      let workbook = XLSX.read(response.data, { type: 'array' });
+      let excelData = XLSX.write(workbook, { bookType: 'xlsx', type: 'base64' });
+
+      // Request storage permission on Android
+      if (Platform.OS === 'android') {
+          const hasPermission = await requestStoragePermission();
+          if (!hasPermission) {
+              Alert.alert('Permission Denied', 'Storage permission is required to save the XLSX file.');
+              return;
+          }
+      }
+
+      // Define the file path for saving the Excel file
+      const filePath = `/storage/emulated/0/Download/${Date.now()}.xlsx`;
+      
+      // Save the file using ReactNativeBlobUtil
+      await ReactNativeBlobUtil.fs.writeFile(filePath, excelData, 'base64');
+
+      // Show success message
+      popUpAction(`Excel file saved successfully at ${filePath}`, Constant.DefaultAlert_MSG, 'OK', true, false);
+  } catch (error) {
+      console.error('Error generating or saving Excel file:', error);
+      popUpAction(Constant.SERVICE_FAIL_PDF_MSG, Constant.DefaultAlert_MSG, 'OK', true, false);
+  } finally {
+      set_isLoading(false);
+  }
+};
+
 
 
   const setLoad = val => {
