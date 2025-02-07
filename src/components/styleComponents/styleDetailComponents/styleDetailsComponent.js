@@ -62,7 +62,6 @@ const StyleDetailsComponent = ({ navigation, route, ...props }) => {
 
       if(styleDetailsAPIObj && styleDetailsAPIObj.responseData){
         set_itemObj(styleDetailsAPIObj.responseData);
-        console.log('Style  response 1 ============> ',styleDetailsAPIObj.responseData)
       } 
 
     } else {
@@ -96,7 +95,7 @@ const StyleDetailsComponent = ({ navigation, route, ...props }) => {
     if(styleSDdetailsAPIObj && styleSDdetailsAPIObj.statusData){
 
       if(styleSDdetailsAPIObj && styleSDdetailsAPIObj.responseData){
-        console.log('Style  response 2 ============> ',styleSDdetailsAPIObj.responseData)
+        // console.log('Style  response 2 ============> ',styleSDdetailsAPIObj.responseData)
         set_listItems(prevState => ({
           ...prevState,
           styleDetailsList: styleSDdetailsAPIObj.responseData

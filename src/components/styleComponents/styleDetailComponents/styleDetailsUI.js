@@ -38,7 +38,7 @@ const StyleDetailsUI = ({route, ...props}) => {
   const styles = getStyles(colors);
 
   useEffect(() => {
-    console.log('item obj1 ==> ', props.itemObj);
+    // console.log('item obj1 ==> ', props.itemObj);
     if (props.itemObj) {
       if (props.itemObj.styleName) {
         setStyleNo(props.itemObj.styleName);
@@ -101,12 +101,11 @@ const StyleDetailsUI = ({route, ...props}) => {
             item => item.id === props.itemObj.fabricId,
           );
 
-          
-          console.log('found  ===> ', found, fabricId);
-          if(found && found?.length >0){
+          // console.log('found  ===> ', found, fabricId);
+          if (found && found?.length > 0) {
             setFabricId(props.itemObj.fabricId);
             setFabricName(found[0]?.name || '');
-          }else{
+          } else {
             setFabricId(0);
             setFabricName('');
           }
@@ -116,7 +115,7 @@ const StyleDetailsUI = ({route, ...props}) => {
       if (props.itemObj.colorId) {
         setSelectedIndices([props.itemObj.colorId.toString()]);
         set_editColor(false);
-        console.log('setted color ', props.itemObj.colorId.toString());
+        // console.log('setted color ', props.itemObj.colorId.toString());
       }
       if (props.itemObj.brandId) {
         setBrandId(props.itemObj.brandId);
@@ -165,6 +164,27 @@ const StyleDetailsUI = ({route, ...props}) => {
 
         set_showScaleTable(true);
       }
+      if (props.itemObj.styleTrimCodeMappingList) {
+        const ary = props.itemObj.styleTrimCodeMappingList;
+        
+        const table = ary.map((item) => ({
+          rmType: item.trimTypeName,
+          List: Object.entries(item.trimWiseTrimNamesMap).map(([id, name]) => ({ id, name }))
+        }));
+
+        const table1 = ary.map((item, index) => ({
+          idx:index+1,
+          rmType: item.trimTypeName ?? 'Unknown',  
+          showList:false ,
+          List: item.trimWiseTrimNamesMap
+            ? Object.entries(item.trimWiseTrimNamesMap).map(([id, name]) => ({ id, name }))
+            : [] 
+        }));
+
+   
+        // console.log("table ==> ",table1[0].List , typeof table, table?.length);
+        setRmAllocationBomList(table1);
+      }
     }
   }, [props.itemObj]);
 
@@ -203,6 +223,8 @@ const StyleDetailsUI = ({route, ...props}) => {
   const [showLocationList, setShowLocationList] = useState(false);
   const [locationName, setLocationName] = useState('');
   const [locationId, setLocationId] = useState('');
+
+  const [RmAllocationBomList, setRmAllocationBomList] = useState([]);
 
   const actionOnLocation = item => {
     setLocationId(item.id);
@@ -500,6 +522,10 @@ const StyleDetailsUI = ({route, ...props}) => {
       </TouchableOpacity>
     );
   };
+
+  const updateShowList=(index)=>{
+
+  }
 
   return (
     <View style={[CommonStyles.mainComponentViewStyle]}>
@@ -1367,6 +1393,137 @@ const StyleDetailsUI = ({route, ...props}) => {
             </View>
           </View>
         )}
+        {selectedTab == 4 && (
+          <View style={styles.wrapper}>
+            <View style={styles.table}>
+              {/* Table Head */}
+              <View style={styles.table_head}>
+                <View style={{width: '25%'}}>
+                  <Text style={styles.table_head_captions}>Raw Material Type</Text>
+                </View>
+                <View style={{width: '1%'}} />
+                <View style={{width: '43%'}}>
+                  <Text style={styles.table_head_captions}>Raw Material Name</Text>
+                </View>
+                <View style={{width: '1%'}} />
+                <View style={{width: '15%'}}>
+                  <Text style={styles.table_head_captions}>consumption</Text>
+                </View>
+                <View style={{width: '1%'}} />
+                <View style={{width: '15%'}}>
+                  <Text style={styles.table_head_captions}>
+                    Req Qty
+                  </Text>
+                </View>
+              </View>
+
+              {/* Table Body */}
+              {RmAllocationBomList &&
+                RmAllocationBomList?.map((item, index) => (
+                  <View key={index} style={[styles.table_body_single_row]}>
+                    <View style={{width: '25%'}}>
+                      <Text style={styles.table_data}>{item?.rmType}</Text>
+                    </View>
+                    <View style={{width: '1%'}} />
+                    <View style={{width: '42%'}}>
+                      <View
+                        style={{
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          marginTop: hp('1%'),
+                          backgroundColor:'#ffffff'
+                        }}>
+                        <TouchableOpacity
+                          style={{
+                            flexDirection: 'row',
+                            borderWidth: 0.5,
+                            borderColor: '#D8D8D8',
+                            borderRadius: hp('0.5%'),
+                            width: '100%',
+                            overflow: 'hidden',
+                          }}
+                          onPress={() => {
+                            setRmAllocationBomList(
+                              RmAllocationBomList.map(r =>
+                                r.idx === item.idx
+                                  ? {
+                                      ...r,
+                                      showList: !r.showList,
+                                    }
+                                  : {...r, showList: false},
+                              ),
+                            );
+                          }}>
+                          <View style={[styles.SectionStyle1]}>
+                            <View style={{flexDirection: 'column'}}>
+                              <Text
+                                style={
+                                  item.idx
+                                    ? styles.dropTextLightStyle
+                                    : styles.dropTextInputStyle
+                                }>
+                                {'Stock '}
+                              </Text>
+                              <Text style={styles.dropTextInputStyle}>
+                                {'Select '}
+                              </Text>
+                            </View>
+                          </View>
+                          <View style={{justifyContent: 'center'}}>
+                          <Image source={downArrowImg} style={styles.imageStyle} />
+                          </View>
+                        </TouchableOpacity>
+                        {item?.showList && (
+                          <View style={styles.dropdownContent2}>
+                            <TextInput
+                              style={styles.searchInput}
+                              placeholder="Search Stock"
+                              onChangeText={text =>console.log("text, row.id")}
+                              placeholderTextColor="#000"
+                            />
+                            <ScrollView nestedScrollEnabled={true}>
+                              {item?.List?.length === 0 ? (
+                                <Text style={styles.noCategoriesText}>
+                                  Sorry, no results found!
+                                </Text>
+                              ) : (
+                                item?.List?.map(item1 => (
+                                  <TouchableOpacity
+                                    key={item1?.id}
+                                    onPress={() =>
+                                     console.log("item1, row.id")
+                                    }>
+                                    <View style={styles.dropdownOption}>
+                                      <Text style={{color: '#000'}}>
+                                        {item1?.name}
+                                      </Text>
+                                    </View>
+                                  </TouchableOpacity>
+                                ))
+                              )}
+                            </ScrollView>
+                          </View>
+                        )}
+                      </View>
+                    </View>
+                    <View style={{width: '1%'}} />
+                    <View style={{width: '15%'}}>
+                      <Text style={styles.table_data}>
+                        {'0'}
+                      </Text>
+                    </View>
+                    <View style={{width: '1%'}} />
+                    <View style={{width: '15%'}}>
+                      <Text style={styles.table_data}>
+                        {'0'}
+                      </Text>
+                    </View>
+                  </View>
+                ))}
+ 
+            </View>
+          </View>
+        )}
 
         <View style={{height: 200}}></View>
       </KeyboardAwareScrollView>
@@ -1530,7 +1687,7 @@ const getStyles = colors =>
     },
 
     dropTextInputStyle: {
-      fontWeight: 'normal',
+      fontWeight: '300',
       fontSize: 18,
       marginLeft: wp('4%'),
       color: 'black',
@@ -1538,7 +1695,7 @@ const getStyles = colors =>
     },
 
     dropTextLightStyle: {
-      fontWeight: 300,
+      fontWeight: '300',
       fontSize: 12,
       width: wp('60%'),
       alignSelf: 'flex-start',
@@ -1587,6 +1744,7 @@ const getStyles = colors =>
     table_data: {
       fontSize: 13,
       color: '#333',
+      textAlign:'center'
     },
     searchInput: {
       marginTop: 10,
@@ -1611,6 +1769,17 @@ const getStyles = colors =>
       maxHeight: 220,
       alignSelf: 'center',
       width: '98%',
+      backgroundColor: '#fff',
+      borderRadius: 10,
+      borderColor: 'lightgray', // Optional: Adds subtle border (for effect)
+      borderWidth: 1,
+      marginTop: 3,
+    },
+    dropdownContent2: {
+      elevation: 5,
+      height: 220,
+      alignSelf: 'center',
+      width: '90%',
       backgroundColor: '#fff',
       borderRadius: 10,
       borderColor: 'lightgray', // Optional: Adds subtle border (for effect)

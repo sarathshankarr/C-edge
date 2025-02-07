@@ -68,11 +68,11 @@ const StoreApproveEditUi = ({route, ...props}) => {
         set_checkboxT1(
           props?.itemsObj?.fabricApprovalStatus !== 3 ? false : true,
         );
-        // set_checkboxT2(
-        //   props?.itemsObj?.fabricApprovalStatus !== 3 ? false : true,
-        // );
+        set_checkboxT2(
+          props?.itemsObj?.fabricApprovalStatus === 3 ? false : true,
+        );
+        console.log('props from before edit ===> ',  props?.itemsObj?.fabricApprovalStatus, typeof props?.itemsObj?.fabricApprovalStatus);
       }
-      console.log('props from before edit ===> ', props?.itemsObj);
     }
   }, [props?.itemsObj]);
 
@@ -157,6 +157,13 @@ const StoreApproveEditUi = ({route, ...props}) => {
 
   const hideDatePicker = () => {
     setDatePickerVisibility(false);
+  };
+
+  const handleCheckBoxToggle = (index) => {
+
+    const updatedCheckboxes = [...fabricCheckboxes];
+    updatedCheckboxes[index] = !updatedCheckboxes[index]; 
+    setFabricCheckboxes(updatedCheckboxes);
   };
 
   return (
