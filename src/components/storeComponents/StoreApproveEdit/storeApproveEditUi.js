@@ -432,7 +432,7 @@ const StoreApproveEditUi = ({route, ...props}) => {
                 onChangeText={text => set_remarks(text)}
                 style={[
                   styles.input,
-                  Platform.OS === 'ios' && {paddingVertical: 10}, // Apply padding only for iOS
+                  Platform.OS === 'ios' && {paddingVertical: 20}, // Apply padding only for iOS
                 ]}
               />
             </View>
