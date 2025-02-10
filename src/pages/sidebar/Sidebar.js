@@ -77,42 +77,42 @@ const Sidebar = ({navigation}) => {
           menu_id: 123,
           src: require('../../../assets/images/png/measuring-tape.png'),
         },
-        {
-          label: 'Location Master',
-          route: 'LocationMasterList',
-          menu_id: 71,
-          src: require('../../../assets/images/png/locationicon.png'),
-        },
+        // {
+        //   label: 'Location Master',
+        //   route: 'LocationMasterList',
+        //   menu_id: 71,
+        //   src: require('../../../assets/images/png/locationicon.png'),
+        // },
         {
           label: 'Raw Material Type',
           route: 'RawMaterialTypeList',
           menu_id: 82,
           src: require('../../../assets/images/png/metal.png'),
         },
-        {
-          label: 'Season Group Master',
-          route: 'SeasonMasterList',
-          menu_id: 73,
-          src: require('../../../assets/images/png/big-sale.png'),
-        },
-        {
-          label: 'Size Master',
-          route: 'SizeMasterList',
-          menu_id: 78,
-          src: require('../../../assets/images/png/measuring-tape.png'),
-        },
-        {
-          label: 'Scale/Size group Master',
-          route: 'ScaleOrSizeMasterList',
-          menu_id: 81,
-          src: require('../../../assets/images/png/angle.png'),
-        },
-        {
-          label: 'Color  Master',
-          route: 'ColorMasterList',
-          menu_id: 74,
-          src: require('../../../assets/images/png/color-palette.png'),
-        },
+        // {
+        //   label: 'Season Group Master',
+        //   route: 'SeasonMasterList',
+        //   menu_id: 73,
+        //   src: require('../../../assets/images/png/big-sale.png'),
+        // },
+        // {
+        //   label: 'Size Master',
+        //   route: 'SizeMasterList',
+        //   menu_id: 78,
+        //   src: require('../../../assets/images/png/measuring-tape.png'),
+        // },
+        // {
+        //   label: 'Scale/Size group Master',
+        //   route: 'ScaleOrSizeMasterList',
+        //   menu_id: 81,
+        //   src: require('../../../assets/images/png/angle.png'),
+        // },
+        // {
+        //   label: 'Color  Master',
+        //   route: 'ColorMasterList',
+        //   menu_id: 74,
+        //   src: require('../../../assets/images/png/color-palette.png'),
+        // },
         {
           label: 'Vendor/Customer Master',
           route: 'VendorOrCustomerMasterList',
@@ -200,12 +200,12 @@ const Sidebar = ({navigation}) => {
           menu_id: 568,
           src: require('../../../assets/images/png/fabricProce.png'),
         },
-        {
-          label: 'Parts Processing',
-          route: 'PartProcessingList',
-          menu_id: 787,
-          src: require('../../../assets/images/png/fabricProce.png'),
-        },
+        // {
+        //   label: 'Parts Processing',
+        //   route: 'PartProcessingList',
+        //   menu_id: 787,
+        //   src: require('../../../assets/images/png/fabricProce.png'),
+        // },
       ],
     },
     outwardProcess: {
@@ -233,43 +233,43 @@ const Sidebar = ({navigation}) => {
         },
       ],
     },
-    reports: {
-      label: 'Reports',
-      menu_id: 100,
-      icon: require('../../../assets/images/png/sales.png'),
-      style: [
-        {
-          label: 'Inventory Consumption Report',
-          route: 'InventoryConsumptionReport',
-          menu_id: 118,
-          src: require('../../../assets/images/png/report.png'),
-        },
-        {
-          label: 'Sales Order Report',
-          route: 'SalesOrderReport',
-          menu_id: 101,
-          src: require('../../../assets/images/png/report.png'),
-        },
-        {
-          label: 'Production Process Report',
-          route: 'ProductionProcessReport',
-          menu_id: 127,
-          src: require('../../../assets/images/png/report.png'),
-        },
-        {
-          label: 'Style Bom Report',
-          route: 'StyleBomReport',
-          menu_id: 423,
-          src: require('../../../assets/images/png/report.png'),
-        },
-        {
-          label: 'Worker Wages Report',
-          route: 'WorkerWagesReport',
-          menu_id: 743,
-          src: require('../../../assets/images/png/report.png'),
-        },
-      ],
-    },
+    // reports: {
+    //   label: 'Reports',
+    //   menu_id: 100,
+    //   icon: require('../../../assets/images/png/sales.png'),
+    //   style: [
+    //     {
+    //       label: 'Inventory Consumption Report',
+    //       route: 'InventoryConsumptionReport',
+    //       menu_id: 118,
+    //       src: require('../../../assets/images/png/report.png'),
+    //     },
+    //     {
+    //       label: 'Sales Order Report',
+    //       route: 'SalesOrderReport',
+    //       menu_id: 101,
+    //       src: require('../../../assets/images/png/report.png'),
+    //     },
+    //     {
+    //       label: 'Production Process Report',
+    //       route: 'ProductionProcessReport',
+    //       menu_id: 127,
+    //       src: require('../../../assets/images/png/report.png'),
+    //     },
+    //     {
+    //       label: 'Style Bom Report',
+    //       route: 'StyleBomReport',
+    //       menu_id: 423,
+    //       src: require('../../../assets/images/png/report.png'),
+    //     },
+    //     {
+    //       label: 'Worker Wages Report',
+    //       route: 'WorkerWagesReport',
+    //       menu_id: 743,
+    //       src: require('../../../assets/images/png/report.png'),
+    //     },
+    //   ],
+    // },
   };
 
   const filteredMenus = Object.fromEntries(
