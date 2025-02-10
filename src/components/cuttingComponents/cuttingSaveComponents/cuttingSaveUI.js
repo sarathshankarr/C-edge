@@ -523,10 +523,11 @@ const CuttingSaveUI = ({ route, ...props }) => {
                               color: 'white',
                               padding: 3,
                               paddingHorizontal: 10,
-                              borderRadius: 30,
+                              borderRadius: Platform.OS === 'ios' ? 12 : 30,
                               position: 'absolute',
                               left: -10,
                               bottom: 15,
+                              overflow: 'hidden',
                             }}>
                             {(item.sizeQty - item.remQty).toString()}
                           </Text>

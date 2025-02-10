@@ -1583,7 +1583,7 @@ const CreateRequestUi = ({route, ...props}) => {
               <TextInput
                 style={[
                   styles.input,
-                  Platform.OS === 'ios' && {paddingVertical: 10}, // Apply padding only for iOS
+                  Platform.OS === 'ios' && {paddingVertical: 20}, // Apply padding only for iOS
                 ]}
                 placeholder=""
                 autoCapitalize="none"

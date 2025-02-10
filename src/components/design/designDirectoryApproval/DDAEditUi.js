@@ -809,7 +809,10 @@ const DDAEditUi = ({ route, ...props }) => {
                 numberOfLines={3}
                 value={remarks1}
                 onChangeText={(text) => set_remarks1(text)}
-                style={{ color: 'black' }}
+                style={[
+                  {color: '#000' },
+                  Platform.OS === 'ios' && {paddingVertical:20}, // Apply padding only for iOS
+                ]}
               />
             </View>
           </View>
@@ -1045,7 +1048,10 @@ const DDAEditUi = ({ route, ...props }) => {
                 value={remarks2}
                 editable={editStatus}
                 onChangeText={(text) => set_remarks2(text)}
-                style={{ color: 'black' }}
+                style={[
+                  {color: '#000' },
+                  Platform.OS === 'ios' && {paddingVertical:20}, // Apply padding only for iOS
+                ]}
               />
             </View>
           </View>

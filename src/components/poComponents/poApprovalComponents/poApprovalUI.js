@@ -305,7 +305,7 @@ const POApprovalUI = ({route, ...props}) => {
               onChangeText={text => setRemarks(text)}
               style={[
                 styles.input,
-                Platform.OS === 'ios' && {paddingVertical: 10}, // Apply padding only for iOS
+                Platform.OS === 'ios' && {paddingVertical: 20}, // Apply padding only for iOS
               ]}
             />
           </View>
