@@ -15,14 +15,12 @@ const CreatePartProcessing = ({ route }) => {
   const [popUpAlert, set_popUpAlert] = useState(undefined);
   const [popUpRBtnTitle, set_popUpRBtnTitle] = useState(undefined);
   const [isPopupLeft, set_isPopupLeft] = useState(false);
+  const [lists, set_lists] = useState([]);
   
-
 
   const backBtnAction = () => {
     navigation.goBack();
   };
-
-
 
   const popUpAction = (popMsg, popAlert, rBtnTitle, isPopup, isPopLeft) => {
     set_popUpMessage(popMsg);
@@ -34,6 +32,43 @@ const CreatePartProcessing = ({ route }) => {
 
   const popOkBtnAction = () => {
     popUpAction(undefined, undefined, '', false, false)
+  };
+
+  const getData = async (tempObj) => {
+
+    let userName = await AsyncStorage.getItem('userName');
+    let userPsd = await AsyncStorage.getItem('userPsd');
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
+    
+    set_isLoading(true);
+    let obj = {
+      "username": userName,
+      "password": userPsd,
+      "menuId": 787,
+      "compIds": usercompanyId,
+      "company":JSON.parse(companyObj),
+      "assemblyProcess":0,
+      "barCode":tempObj.barCode,
+      "empBarcode":tempObj.empBarcode,
+      "processId":tempObj.processId,
+    }
+    let LISTAPIOBJ = await APIServiceCall.getPartsProcessingCreateList(obj);
+    set_isLoading(false);
+
+    if (LISTAPIOBJ && LISTAPIOBJ.statusData) {
+      if (LISTAPIOBJ && LISTAPIOBJ.responseData) {
+       set_lists(LISTAPIOBJ.responseData);
+      }
+    }
+    else {
+      popUpAction(Constant.SERVICE_FAIL_MSG, Constant.DefaultAlert_MSG, 'OK', true, false);
+    }
+
+    if (LISTAPIOBJ && LISTAPIOBJ.error) {
+      popUpAction(Constant.SERVICE_FAIL_MSG, Constant.DefaultAlert_MSG, 'OK', true, false)
+    }
+
   };
 
   const submitAction = async (tempObj) => {
@@ -84,6 +119,7 @@ const CreatePartProcessing = ({ route }) => {
       popUpRBtnTitle={popUpRBtnTitle}
       isPopupLeft={isPopupLeft}
       isPopUp={isPopUp}
+      lists={lists}
       submitAction={submitAction}
       backBtnAction={backBtnAction}
       popOkBtnAction={popOkBtnAction}

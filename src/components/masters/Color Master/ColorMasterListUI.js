@@ -64,7 +64,6 @@ const ColorMasterListUI = ({route, navigation, ...props}) => {
     if (props.itemsArray) {
       set_filterArray(props.itemsArray);
       set_ItemsArray(props.itemsArray);
-      console.log('props lis ===> ', props.itemsArray);
     }
     // getRequestBody();
   }, [props?.itemsArray]);
