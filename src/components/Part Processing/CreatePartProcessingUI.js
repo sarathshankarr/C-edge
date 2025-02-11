@@ -27,8 +27,6 @@ import {formatDateIntoDMY} from '../../utils/constants/constant';
 import {RadioButton, TextInput} from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import CustomCheckBox from '../../utils/commonComponents/CustomCheckBox';
-
-// let downArrowImg = require('./../../../../assets/images/png/dropDownImg.png');
 let downArrowImg = require('./../../../assets/images/png/dropDownImg.png');
 
 const CreatePartProcessingUI = ({route, navigation, ...props}) => {
@@ -66,17 +64,6 @@ const CreatePartProcessingUI = ({route, navigation, ...props}) => {
     } else {
       setFilteredProcess(processList);
     }
-  };
-
-  const submitAction = async () => {
-    let obj = {
-      umoType: uomType,
-      umoDescription: uomDescription,
-      fabuomvalue: fabricUom ? 1 : 0,
-      workorderuom: workOrderUom,
-    };
-
-    props.submitAction(obj);
   };
 
   const backAction = async () => {
@@ -207,6 +194,9 @@ const CreatePartProcessingUI = ({route, navigation, ...props}) => {
                   <View style={{width: 60}}>
                     <Text style={styles.table_head_captions}>Action</Text>
                   </View>
+                  <View style={{width: 60}}>
+                    <Text style={styles.table_head_captions}>Date</Text>
+                  </View>
                   <View style={{width: 120}}>
                     <Text style={styles.table_head_captions}>Style No</Text>
                   </View>
@@ -217,14 +207,10 @@ const CreatePartProcessingUI = ({route, navigation, ...props}) => {
                     <Text style={styles.table_head_captions}>Qty</Text>
                   </View>
                   <View style={{width: 100}}>
-                    <Text style={styles.table_head_captions}>
-                      Damage Qty
-                    </Text>
+                    <Text style={styles.table_head_captions}>Damage Qty</Text>
                   </View>
                   <View style={{width: 100}}>
-                    <Text style={styles.table_head_captions}>
-                      Process
-                    </Text>
+                    <Text style={styles.table_head_captions}>Process</Text>
                   </View>
                   <View style={{width: 100}}>
                     <Text style={styles.table_head_captions}>Part</Text>
@@ -233,7 +219,9 @@ const CreatePartProcessingUI = ({route, navigation, ...props}) => {
                     <Text style={styles.table_head_captions}>Barcode</Text>
                   </View>
                   <View style={{width: 100}}>
-                    <Text style={styles.table_head_captions}>Employee Name</Text>
+                    <Text style={styles.table_head_captions}>
+                      Employee Name
+                    </Text>
                   </View>
                   <View style={{width: 100}}>
                     <Text style={styles.table_head_captions}>Remarks</Text>
@@ -251,18 +239,18 @@ const CreatePartProcessingUI = ({route, navigation, ...props}) => {
                       </TouchableOpacity>
                     </View>
 
-                    <View style={{width: 120}}>
-                      <Text style={styles.table_data}>{row.size}</Text>
-                    </View>
                     <View style={{width: 60}}>
-                      <Text style={styles.table_data}>{row.size}</Text>
+                      <Text style={styles.table_data}>{row.enterDate}</Text>
+                    </View>
+                    <View style={{width: 120}}>
+                      <Text style={styles.table_data}>{row.styleNo}</Text>
                     </View>
 
                     <View style={{width: 60}}>
                       <Text style={styles.table_data}>{row.size}</Text>
                     </View>
                     <View style={{width: 100}}>
-                      <Text style={styles.table_data}>{row.availableQty}</Text>
+                      <Text style={styles.table_data}>{row.enterQty}</Text>
                     </View>
                     <View style={{width: 100}}>
                       <TextInput
@@ -278,16 +266,16 @@ const CreatePartProcessingUI = ({route, navigation, ...props}) => {
                       />
                     </View>
                     <View style={{width: 100}}>
-                      <Text style={styles.table_data}>{row.availableQty}</Text>
+                      <Text style={styles.table_data}>{row.process}</Text>
                     </View>
                     <View style={{width: 100}}>
-                      <Text style={styles.table_data}>{row.availableQty}</Text>
+                      <Text style={styles.table_data}>{row.partsName}</Text>
                     </View>
                     <View style={{width: 100}}>
-                      <Text style={styles.table_data}>{row.availableQty}</Text>
+                      <Text style={styles.table_data}>{row.barCode}</Text>
                     </View>
                     <View style={{width: 100}}>
-                      <Text style={styles.table_data}>{row.availableQty}</Text>
+                      <Text style={styles.table_data}>{row.username}</Text>
                     </View>
                   </View>
                 ))}
@@ -304,7 +292,7 @@ const CreatePartProcessingUI = ({route, navigation, ...props}) => {
           isLeftBtnEnable={true}
           rigthBtnState={true}
           isRightBtnEnable={true}
-          rightButtonAction={async () => submitAction()}
+          rightButtonAction={async () => console.log('HI')}
           leftButtonAction={async () => backAction()}
         />
       </View>

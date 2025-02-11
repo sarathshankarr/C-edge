@@ -11,6 +11,7 @@ import { setUrlInGlobal } from '../../config/environment/environmentConfig';
 import axios from 'axios';
 import useOnlineStatus from '../../utils/Hooks/useOnlineStatus';
 import { ColorContext } from '../colorTheme/colorTheme';
+import NetInfo from "@react-native-community/netinfo";
 
 const LoginComponent = ({ navigation, route, ...props }) => {
 
@@ -28,7 +29,8 @@ const LoginComponent = ({ navigation, route, ...props }) => {
   const [isPopupLeft, set_isPopupLeft] = useState(false);
   const [errorMsg, setErrorMsg] = useState([]);
   const [isChecked, setIsChecked] = useState(false);
-  const onlineStatus = useOnlineStatus();
+
+  const { onlineStatus, refreshStatus } = useOnlineStatus();
 
 
   const validatePassword = (psdValue) => {
@@ -194,10 +196,9 @@ const LoginComponent = ({ navigation, route, ...props }) => {
     set_isHidePassword(value);
   };
 
-  const signInAction = () => {
-    console.log("online status ===> ", onlineStatus)
-
-    if (onlineStatus === false) {
+  const signInAction = async () => {
+  await refreshStatus(); 
+    if (!onlineStatus) {
       popUpAction(Constant.ONLINE_STATUS, Constant.DefaultAlert_MSG, 'OK', true, false);
       console.log("online status false ===> ", onlineStatus)
       return;

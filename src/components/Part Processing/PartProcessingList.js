@@ -81,15 +81,19 @@ const PartProcessingList = ({ route }) => {
       let obj = {  
         "username": userName,
         "password" : userPsd,
-        "menuId": 587,
+        "menuId": 787,
         "fromRecord": fromRecord,
         "toRecord": toRecord,
-        "searchKeyValue": "",
-        "styleSearchDropdown": "-1",
+        "searchValue": "",
+        "searchDropdown": "-1",
         "compIds": usercompanyId,
         "company":JSON.parse(companyObj),
+        "days1":"0",
+        "locIds":"0",
+        "brandIds":"0",
+        "isAssmeblyIn":0,
     }
-      let LISTAPIOBJ = await APIServiceCall.loadAllUomMastersList(obj);
+      let LISTAPIOBJ = await APIServiceCall.LoadAllPartsProcessingList(obj);
       set_isLoading(false);
       
       if(LISTAPIOBJ && LISTAPIOBJ.statusData){

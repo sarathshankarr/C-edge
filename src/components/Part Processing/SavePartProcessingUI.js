@@ -25,20 +25,38 @@ import {RadioButton, TextInput} from 'react-native-paper';
 import {ColorContext} from '../colorTheme/colorTheme';
 import CustomCheckBox from '../../utils/commonComponents/CustomCheckBox';
 let downArrowImg = require('./../../../assets/images/png/dropDownImg.png');
+let closeImg = require('./../../../assets/images/png/close1.png');
 
 const SavePartProcessingUI = ({route, navigation, ...props}) => {
-  const [employeeBarcode, setEmployeeBarcode] = useState('');
-  const [barcode, setBarcode] = useState('');
+  const [styleNo, setstyleNo] = useState('');
+  const [parts, setParts] = useState('');
+  const [price, setPrice] = useState('');
+  const [process, setProcess] = useState('');
   const [rows, setRows] = React.useState([]);
-
 
   const {colors} = useContext(ColorContext);
   const styles = getStyles(colors);
 
   useEffect(() => {
     if (props.itemsObj) {
-      console.log('props for edit save ', props.itemsObj);
-    
+      console.log('props for child  ', props.itemsObj[0]?.childDetails);
+      if (props.itemsObj[0]) {
+        if (props.itemsObj[0]?.childDetails) {
+          setRows(props.itemsObj[0]?.childDetails);
+        }
+        if (props.itemsObj[0]?.styleName) {
+          setstyleNo(props.itemsObj[0]?.styleName);
+        }
+        if (props.itemsObj[0]?.partsName) {
+          setParts(props.itemsObj[0]?.partsName);
+        }
+        if (props.itemsObj[0]?.process) {
+          setProcess(props.itemsObj[0]?.process);
+        }
+        if (props.itemsObj[0]?.price) {
+          setPrice(props.itemsObj[0]?.price);
+        }
+      }
     }
   }, [props.itemsObj]);
 
@@ -112,92 +130,35 @@ const SavePartProcessingUI = ({route, navigation, ...props}) => {
           }}>
           <View style={{marginTop: hp('2%')}}>
             <TextInput
-              label="Employee Barcode *"
-              value={employeeBarcode}
+              label="Style No(Color)"
+              value={styleNo}
               mode="outlined"
-              onChangeText={text => setEmployeeBarcode(text)}
+              onChangeText={text => console.log(text)}
             />
           </View>
           <View style={{marginTop: hp('2%')}}>
             <TextInput
-              label="Barcode *"
-              value={barcode}
+              label="Parts "
+              value={parts}
               mode="outlined"
-              onChangeText={text => setBarcode(text)}
+              onChangeText={text => console.log(text)}
             />
           </View>
-
-          <View
-            style={{
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: '#fff',
-              marginTop: hp('2%'),
-            }}>
-            <TouchableOpacity
-              style={{
-                flexDirection: 'row',
-                borderWidth: 0.5,
-                borderColor: '#D8D8D8',
-                borderRadius: hp('0.5%'),
-                width: wp('90%'),
-              }}
-              onPress={() => {
-                setShowProcessList(!showProcessList);
-              }}>
-              <View>
-                <View style={[styles.SectionStyle1, {}]}>
-                  <View style={{flexDirection: 'column'}}>
-                    <Text
-                      style={
-                        processId
-                          ? [styles.dropTextLightStyle]
-                          : [styles.dropTextInputStyle]
-                      }>
-                      {'Process *'}
-                    </Text>
-                    {processId ? (
-                      <Text style={[styles.dropTextInputStyle]}>
-                        {processName}
-                      </Text>
-                    ) : null}
-                  </View>
-                </View>
-              </View>
-
-              <View style={{justifyContent: 'center'}}>
-                <Image source={downArrowImg} style={styles.imageStyle} />
-              </View>
-            </TouchableOpacity>
-
-            {showProcessList && (
-              <View style={styles.dropdownContent1}>
-                <TextInput
-                  style={styles.searchInput}
-                  placeholder="Search "
-                  onChangeText={handleSearchProcess}
-                  placeholderTextColor="#000"
-                />
-                <ScrollView
-                  style={styles.scrollView}
-                  nestedScrollEnabled={true}>
-                  {filteredProcess.length === 0 ? (
-                    <Text style={styles.noCategoriesText}>
-                      Sorry, no results found!
-                    </Text>
-                  ) : (
-                    filteredProcess.map((item, index) => (
-                      <TouchableOpacity
-                        key={index}
-                        style={styles.dropdownOption}
-                        onPress={() => actionOnProcess(item)}>
-                        <Text style={{color: '#000'}}>{item.name}</Text>
-                      </TouchableOpacity>
-                    ))
-                  )}
-                </ScrollView>
-              </View>
-            )}
+          <View style={{marginTop: hp('2%')}}>
+            <TextInput
+              label="Process  "
+              value={process}
+              mode="outlined"
+              onChangeText={text => console.log(text)}
+            />
+          </View>
+          <View style={{marginTop: hp('2%')}}>
+            <TextInput
+              label="Price   "
+              value={price}
+              mode="outlined"
+              onChangeText={text => console.log(text)}
+            />
           </View>
 
           <View style={styles.wrapper}>
@@ -206,92 +167,94 @@ const SavePartProcessingUI = ({route, navigation, ...props}) => {
                 {/* Table Head */}
                 <View style={styles.table_head}>
                   <View style={{width: 60}}>
-                    <Text style={styles.table_head_captions}>Action</Text>
+                    <Text style={styles.table_head_captions}>Date</Text>
                   </View>
+                  <View style={{width: 15}}></View>
                   <View style={{width: 120}}>
-                    <Text style={styles.table_head_captions}>Style No</Text>
+                    <Text style={styles.table_head_captions}>Barcode No</Text>
                   </View>
                   <View style={{width: 60}}>
                     <Text style={styles.table_head_captions}>Size</Text>
                   </View>
-                  <View style={{width: 60}}>
+                  <View style={{width: 100}}>
                     <Text style={styles.table_head_captions}>Qty</Text>
                   </View>
                   <View style={{width: 100}}>
-                    <Text style={styles.table_head_captions}>
-                      Damage Qty
-                    </Text>
+                    <Text style={styles.table_head_captions}>Lot No</Text>
+                  </View>
+                  <View style={{width: 100}}>
+                    <Text style={styles.table_head_captions}>Bundle No</Text>
                   </View>
                   <View style={{width: 100}}>
                     <Text style={styles.table_head_captions}>
-                      Process
+                      Employee Name
                     </Text>
-                  </View>
-                  <View style={{width: 100}}>
-                    <Text style={styles.table_head_captions}>Part</Text>
-                  </View>
-                  <View style={{width: 100}}>
-                    <Text style={styles.table_head_captions}>Barcode</Text>
-                  </View>
-                  <View style={{width: 100}}>
-                    <Text style={styles.table_head_captions}>Employee Name</Text>
                   </View>
                   <View style={{width: 100}}>
                     <Text style={styles.table_head_captions}>Remarks</Text>
                   </View>
                 </View>
-
                 {/* Table Body - Rows */}
-                {rows.map(row => (
-                  <View key={row.id} style={styles.table_body_single_row}>
+                {rows.map((row, index) => (
+                  <View key={index} style={styles.table_body_single_row}>
                     <View style={{width: 60}}>
-                      <TouchableOpacity
-                        style={{alignItems: '', justifyContent: ''}}
-                        onPress={() => RemoveRow(row.id)}>
-                        <Image source={closeImg} style={styles.imageStyle1} />
-                      </TouchableOpacity>
+                      <Text style={styles.table_data}>{row.enterDate}</Text>
                     </View>
-
+                    <View style={{width: 15}}></View>
                     <View style={{width: 120}}>
-                      <Text style={styles.table_data}>{row.size}</Text>
+                      <Text style={styles.table_data}>{row.barCode}</Text>
                     </View>
                     <View style={{width: 60}}>
                       <Text style={styles.table_data}>{row.size}</Text>
                     </View>
-
-                    <View style={{width: 60}}>
-                      <Text style={styles.table_data}>{row.size}</Text>
+                    <View style={{width: 100}}>
+                      <Text style={styles.table_data}>{row.enterQty}</Text>
                     </View>
                     <View style={{width: 100}}>
-                      <Text style={styles.table_data}>{row.availableQty}</Text>
+                      <Text style={styles.table_data}>{row.lotno}</Text>
                     </View>
                     <View style={{width: 100}}>
-                      <TextInput
-                        style={styles.table_data_input}
-                        value={row.inputQty}
-                        onChangeText={text => {
-                          setRows(
-                            rows.map(r =>
-                              r.id === row.id ? {...r, remarks: text} : r,
-                            ),
-                          );
-                        }}
-                      />
+                      <Text style={styles.table_data}>{row.bundleno}</Text>
                     </View>
                     <View style={{width: 100}}>
-                      <Text style={styles.table_data}>{row.availableQty}</Text>
+                      <Text style={styles.table_data}>{row.username}</Text>
                     </View>
                     <View style={{width: 100}}>
-                      <Text style={styles.table_data}>{row.availableQty}</Text>
-                    </View>
-                    <View style={{width: 100}}>
-                      <Text style={styles.table_data}>{row.availableQty}</Text>
-                    </View>
-                    <View style={{width: 100}}>
-                      <Text style={styles.table_data}>{row.availableQty}</Text>
+                      <Text style={styles.table_data}>
+                        {row.remarksDamaged}
+                      </Text>
                     </View>
                   </View>
                 ))}
+                <View style={styles.table_body_single_row}>
+                  <View style={{width: 60}}>
+                    <Text
+                      style={{
+                        fontSize: 15,
+                        color: 'black',
+                        alignItems: 'center',
+                      }}>
+                      {'Total'}
+                    </Text>
+                  </View>
+                  <View style={{width: 15}}></View>
+                  <View style={{width: 120}}>
+                    <Text
+                      style={{
+                        fontSize: 15,
+                        color: 'black',
+                        alignItems: 'center',
+                      }}>
+                      {rows.length}
+                    </Text>
+                  </View>
+                  <View style={{width: 60}}></View>
+                  <View style={{width: 100}}></View>
+                  <View style={{width: 100}}></View>
+                  <View style={{width: 100}}></View>
+                  <View style={{width: 100}}></View>
+                  <View style={{width: 100}}></View>
+                </View>
               </View>
             </ScrollView>
           </View>
@@ -303,12 +266,8 @@ const SavePartProcessingUI = ({route, navigation, ...props}) => {
           rightBtnTitle={'Save'}
           leftBtnTitle={'Back'}
           isLeftBtnEnable={true}
-          rigthBtnState={true}
-          isRightBtnEnable={
-            props.itemsObj.fpt_fabricProcessed +
-              props.itemsObj.fpt_fabric_rejected !==
-            props.itemsObj.fpt_issued
-          }
+          rigthBtnState={false}
+          isRightBtnEnable={false}
           rightButtonAction={async () => submitAction()}
           leftButtonAction={async () => backAction()}
         />
@@ -445,6 +404,7 @@ const getStyles = colors =>
       borderBottomWidth: 1,
       borderColor: '#ddd',
       padding: 7,
+      alignItems: 'center',
     },
     table_data: {
       fontSize: 11,
@@ -509,5 +469,12 @@ const getStyles = colors =>
       marginLeft: 8,
       fontSize: 14,
       color: '#000',
+    },
+    imageStyle1: {
+      height: 30,
+      aspectRatio: 1,
+      resizeMode: 'contain',
+      tintColor: 'red',
+      alignSelf: 'center',
     },
   });

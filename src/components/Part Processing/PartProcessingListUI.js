@@ -65,7 +65,6 @@ const PartProcessingListUI = ({route, navigation, ...props}) => {
     if (props.itemsArray) {
       set_filterArray(props.itemsArray);
       set_ItemsArray(props.itemsArray);
-    console.log("props lis ===> ",  props.itemsArray);
     }
     // getRequestBody();
 
@@ -115,10 +114,12 @@ const PartProcessingListUI = ({route, navigation, ...props}) => {
 
     const styleArray = ItemsArray.filter(item => {
       return (
-        (item?.umoType !== '' &&
-          item?.umoType?.toLowerCase().includes(searchTerm)) ||
-        (item?.umoDescription !== '' &&
-          item?.umoDescription?.toLowerCase().includes(searchTerm)) 
+        (item?.producttype !== '' &&
+          item?.producttype?.toLowerCase().includes(searchTerm)) ||
+        (item?.styleCode !== '' &&
+          item?.styleCode?.toLowerCase().includes(searchTerm)) ||
+        (item?.processName !== '' &&
+          item?.processName?.toLowerCase().includes(searchTerm)) 
       )
     });
 
@@ -161,13 +162,25 @@ const PartProcessingListUI = ({route, navigation, ...props}) => {
           <View
             style={{flex: 1, justifyContent: 'center'}}>
             <Text style={[CommonStyles.tylesTextStyle, {textAlign: 'center'}]}>
-              {item.umoType}
+              {item.styleCode}
             </Text>
           </View>
           <View
-            style={{flex: 1, justifyContent: 'center'}}>
+            style={{flex: 0.7, justifyContent: 'center'}}>
             <Text style={[CommonStyles.tylesTextStyle, {textAlign: 'center'}]}>
-              {item.umoDescription}
+              {item.processName}
+            </Text>
+          </View>
+          <View
+            style={{flex: 0.5, justifyContent: 'center'}}>
+            <Text style={[CommonStyles.tylesTextStyle, {textAlign: 'center'}]}>
+              {item.producttype}
+            </Text>
+          </View>
+          <View
+            style={{flex: 0.7, justifyContent: 'center'}}>
+            <Text style={[CommonStyles.tylesTextStyle, {textAlign: 'center'}]}>
+              {item.totalQty}
             </Text>
           </View>
         </View>
@@ -309,21 +322,21 @@ const PartProcessingListUI = ({route, navigation, ...props}) => {
             <Text
               style={[
                 CommonStyles.tylesHeaderTextStyle,
-                {flex: 1, textAlign: 'center'},
+                {flex: 0.7, textAlign: 'center'},
               ]}>
               {'Process'}
             </Text>
             <Text
               style={[
                 CommonStyles.tylesHeaderTextStyle,
-                {flex: 1, textAlign: 'center'},
+                {flex: 0.5, textAlign: 'center'},
               ]}>
               {'Part'}
             </Text>
             <Text
               style={[
                 CommonStyles.tylesHeaderTextStyle,
-                {flex: 1, textAlign: 'center'},
+                {flex: 0.7, textAlign: 'center'},
               ]}>
               {'Total Scanned Barcodes'}
             </Text>

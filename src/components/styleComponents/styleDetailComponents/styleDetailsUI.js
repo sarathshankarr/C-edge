@@ -8,6 +8,7 @@ import {
   ImageBackground,
   FlatList,
   ScrollView,
+  Alert,
 } from 'react-native';
 import {
   heightPercentageToDP as hp,
@@ -21,7 +22,7 @@ import LoaderComponent from '../../../utils/commonComponents/loaderComponent';
 import AlertComponent from '../../../utils/commonComponents/alertComponent';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {ColorContext} from '../../colorTheme/colorTheme';
-import {TextInput} from 'react-native-paper';
+import {List, TextInput} from 'react-native-paper';
 
 let arrowImg = require('./../../../../assets/images/png/arrowImg.png');
 let closeImg = require('./../../../../assets/images/png/close1.png');
@@ -179,10 +180,19 @@ const StyleDetailsUI = ({route, ...props}) => {
 
         const table1 = ary.map((item, index) => ({
           idx: index + 1,
-          rmType: item.trimTypeName ?? 'Unknown',
+          rmType: item.trimTypeName ?? '',
+          selectedRmName: '',
+          selectedRmId: '',
           showList: false,
           showRmRow: false,
+          childList: [],
           List: item.trimWiseTrimNamesMap
+            ? Object.entries(item.trimWiseTrimNamesMap).map(([id, name]) => ({
+                id,
+                name,
+              }))
+            : [],
+          filteredList: item.trimWiseTrimNamesMap
             ? Object.entries(item.trimWiseTrimNamesMap).map(([id, name]) => ({
                 id,
                 name,
@@ -190,8 +200,8 @@ const StyleDetailsUI = ({route, ...props}) => {
             : [],
         }));
 
-        // console.log("table ==> ",table1[0].List , typeof table, table?.length);
         setRmAllocationBomList(table1);
+        // console.log("table ==> ",table1[0].List , typeof table, table?.length);
       }
     }
   }, [props.itemObj]);
@@ -231,6 +241,7 @@ const StyleDetailsUI = ({route, ...props}) => {
   const [showLocationList, setShowLocationList] = useState(false);
   const [locationName, setLocationName] = useState('');
   const [locationId, setLocationId] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
 
   const [RmAllocationBomList, setRmAllocationBomList] = useState([]);
 
@@ -551,6 +562,105 @@ const StyleDetailsUI = ({route, ...props}) => {
     setRmAllocationBomList(filtered);
   };
 
+  const handleAdd = selectedId => {
+    const selectedItem = RmAllocationBomList.find(r => r.idx === selectedId);
+
+    if (!selectedItem) return;
+    if (!selectedItem.selectedRmId) {
+      Alert.alert('Please select RM Name');
+      return;
+    }
+
+    const alreadyExists = selectedItem.childList.some(
+      child => child.id === selectedItem.selectedRmId,
+    );
+
+    if (alreadyExists) {
+      Alert.alert('This RM is already selected');
+      return;
+    }
+
+    const newObj = {
+      id: selectedItem.selectedRmId,
+      name: selectedItem.selectedRmName,
+      consumption: '',
+      requiredQty: '',
+    };
+
+    const updatedList = RmAllocationBomList.map(r =>
+      r.idx === selectedId
+        ? {...r, childList: [...r.childList, newObj], showRmRow: true}
+        : r,
+    );
+
+    setRmAllocationBomList(updatedList);
+  };
+
+  const ToggleChildRow = (childIdx, selectedId) => {
+    const updatedList = RmAllocationBomList.map(r =>
+      r.idx === selectedId
+        ? {
+            ...r,
+            childList: r.childList.filter((_, index) => index !== childIdx),
+          }
+        : r,
+    );
+
+    setRmAllocationBomList(updatedList);
+  };
+
+  const actionOnRMList = (item, selectedId) => {
+    const updatedList = RmAllocationBomList.map(r =>
+      r.idx === selectedId
+        ? {
+            ...r,
+            selectedRmName: item?.name,
+            selectedRmId: item?.id,
+            showList: false,
+          }
+        : r,
+    );
+
+    setRmAllocationBomList(updatedList);
+  };
+
+  const handleChangeChildItems = (text, type, childIdx, selectedId) => {
+    // console.log('handleChangeChildItems ===> ', text, type, childIdx, selectedId)
+    const updatedList = RmAllocationBomList.map(r =>
+      r.idx === selectedId
+        ? {
+            ...r,
+            childList: r.childList.map((item, index) =>
+              index === childIdx
+                ? {
+                    ...item,
+                    [type === 'cons' ? 'consumption' : 'requiredQty']: text,
+                  }
+                : item,
+            ),
+          }
+        : r,
+    );
+
+    setRmAllocationBomList(updatedList);
+  };
+
+  const handleChangeSearchQuery = (text, selectedId) => {
+    const filtered = RmAllocationBomList.map(item =>
+      item.idx === selectedId
+        ? {
+            ...item,
+            filteredList: item.List.filter(item1 =>
+              item1.name.toLowerCase().includes(text.toLowerCase()),
+            ),
+          }
+        : item,
+    );
+
+    setSearchQuery(text);
+    setRmAllocationBomList(filtered);
+  };
+
   return (
     <View style={[CommonStyles.mainComponentViewStyle]}>
       <View style={[CommonStyles.headerView]}>
@@ -576,7 +686,7 @@ const StyleDetailsUI = ({route, ...props}) => {
             marginHorizontal: 10,
             marginTop: hp('2%'),
           }}>
-          {/* <ScrollView
+          <ScrollView
             // horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.tabsContainer}>
@@ -597,7 +707,7 @@ const StyleDetailsUI = ({route, ...props}) => {
                 </Text>
               </TouchableOpacity>
             ))}
-          </ScrollView> */}
+          </ScrollView>
         </View>
 
         {selectedTab == 1 && (
@@ -1264,7 +1374,7 @@ const StyleDetailsUI = ({route, ...props}) => {
           </View>
         )}
 
-        {/* {selectedTab == 2 && (
+        {selectedTab == 2 && (
           <View
             style={{
               marginBottom: hp('5%'),
@@ -1295,11 +1405,7 @@ const StyleDetailsUI = ({route, ...props}) => {
                   props.listItems.productionSummary.styleresponselist &&
                   props.listItems.productionSummary.styleresponselist.map(
                     (item, index) => (
-                      <View
-                        key={index}
-                        style={[
-                          styles.table_body_single_row,
-                        ]}>
+                      <View key={index} style={[styles.table_body_single_row]}>
                         <View style={{width: '55%'}}>
                           <Text style={styles.table_data}>
                             {item.processName}
@@ -1322,9 +1428,9 @@ const StyleDetailsUI = ({route, ...props}) => {
               </View>
             </View>
           </View>
-        )} */}
+        )}
 
-        {/* {selectedTab == 3 && (
+        {selectedTab == 3 && (
           <View style={styles.wrapper}>
             <View style={styles.table}>
               <View style={styles.table_head}>
@@ -1354,11 +1460,7 @@ const StyleDetailsUI = ({route, ...props}) => {
               </View>
               {props.listItems.timeAndAction &&
                 props.listItems.timeAndAction.map((item, index) => (
-                  <View
-                    key={index}
-                    style={[
-                      styles.table_body_single_row,
-                    ]}>
+                  <View key={index} style={[styles.table_body_single_row]}>
                     <View style={{width: '35%'}}>
                       <Text style={styles.table_data}>{item.processName}</Text>
                     </View>
@@ -1390,28 +1492,28 @@ const StyleDetailsUI = ({route, ...props}) => {
                 ))}
             </View>
           </View>
-        )} */}
-        {/* {selectedTab == 4 && (
+        )}
+        {selectedTab == 4 && (
           <View style={styles.wrapper}>
             <View style={styles.table}>
               <View style={styles.table_head}>
-                <View style={{width: '25%'}}>
+                <View style={{width: '15%'}}>
                   <Text style={styles.table_head_captions}>
                     Raw Material Type
                   </Text>
                 </View>
                 <View style={{width: '1%'}} />
-                <View style={{width: '43%'}}>
+                <View style={{width: '50%'}}>
                   <Text style={styles.table_head_captions}>
                     Raw Material Name
                   </Text>
                 </View>
                 <View style={{width: '1%'}} />
-                <View style={{width: '15%'}}>
+                <View style={{width: '16%'}}>
                   <Text style={styles.table_head_captions}>consumption</Text>
                 </View>
-                <View style={{width: '1%'}} />
-                <View style={{width: '15%'}}>
+                <View style={{width: '2%'}} />
+                <View style={{width: '16%'}}>
                   <Text style={styles.table_head_captions}>Req Qty</Text>
                 </View>
               </View>
@@ -1420,11 +1522,11 @@ const StyleDetailsUI = ({route, ...props}) => {
                 RmAllocationBomList?.map((item, index) => (
                   <View key={index}>
                     <View style={[styles.table_body_single_row]}>
-                      <View style={{width: '25%'}}>
+                      <View style={{width: '15%'}}>
                         <Text style={styles.table_data}>{item?.rmType}</Text>
                       </View>
                       <View style={{width: '1%'}} />
-                      <View style={{width: '42%'}}>
+                      <View style={{width: '50%'}}>
                         <View
                           style={{
                             alignItems: 'center',
@@ -1448,8 +1550,13 @@ const StyleDetailsUI = ({route, ...props}) => {
                                     ? {
                                         ...r,
                                         showList: !r.showList,
+                                        filteredList: r.List,
                                       }
-                                    : {...r, showList: false},
+                                    : {
+                                        ...r,
+                                        showList: false,
+                                        filteredList: r.List,
+                                      },
                                 ),
                               );
                             }}>
@@ -1457,14 +1564,16 @@ const StyleDetailsUI = ({route, ...props}) => {
                               <View style={{flexDirection: 'column'}}>
                                 <Text
                                   style={
-                                    item.idx
+                                    item.selectedRmId
                                       ? styles.dropTextLightStyle
                                       : styles.dropTextInputStyle
                                   }>
-                                  {'Stock '}
+                                  {'RM Name '}
                                 </Text>
                                 <Text style={styles.dropTextInputStyle}>
-                                  {'Select '}
+                                  {item.selectedRmId
+                                    ? item.selectedRmName
+                                    : 'Select '}
                                 </Text>
                               </View>
                             </View>
@@ -1479,26 +1588,40 @@ const StyleDetailsUI = ({route, ...props}) => {
                             <View style={styles.dropdownContent2}>
                               <TextInput
                                 style={styles.searchInput}
-                                placeholder="Search Stock"
+                                placeholder="Search"
                                 onChangeText={text =>
-                                  console.log('text, row.id')
+                                  handleChangeSearchQuery(text, item.idx)
                                 }
                                 placeholderTextColor="#000"
                               />
                               <ScrollView nestedScrollEnabled={true}>
-                                {item?.List?.length === 0 ? (
+                                {item?.filteredList?.length === 0 ? (
                                   <Text style={styles.noCategoriesText}>
                                     Sorry, no results found!
                                   </Text>
                                 ) : (
-                                  item?.List?.map(item1 => (
+                                  item?.filteredList?.map(item1 => (
                                     <TouchableOpacity
                                       key={item1?.id}
+                                      style={{
+                                        backgroundColor: item.childList.some(
+                                          child => child.id === item1.id,
+                                        )
+                                          ? '#f3f3f3'
+                                          : '#fff',
+                                      }}
                                       onPress={() =>
-                                        console.log('item1, row.id')
+                                        actionOnRMList(item1, item.idx)
                                       }>
                                       <View style={styles.dropdownOption}>
-                                        <Text style={{color: '#000'}}>
+                                        {/* <Text style={{color: '#000'}}> */}
+                                        <Text
+                                          style={{
+                                            color: '#000',
+                                            flexWrap: 'wrap',
+                                            width: '100%',
+                                          }}
+                                          numberOfLines={2}>
                                           {item1?.name}
                                         </Text>
                                       </View>
@@ -1511,133 +1634,157 @@ const StyleDetailsUI = ({route, ...props}) => {
                         </View>
                       </View>
                       <View style={{width: '1%'}} />
-                      <View style={{width: '15%'}}>
-                        <Text style={styles.table_data}>{'0'}</Text>
-                      </View>
-                      <View style={{width: '1%'}} />
-                      <View style={{width: '15%'}}>
-                        <Text style={styles.table_data}>{'0'}</Text>
+                      <View style={{width: '30%'}}>
+                        <TouchableOpacity
+                          onPress={() => handleAdd(item.idx)}
+                          style={{
+                            backgroundColor: '#f3f3f3',
+                            padding: 5,
+                            borderRadius: 15,
+                            alignItems: 'center',
+                            marginHorizontal: 20,
+                          }}>
+                          <Text style={{color: 'black'}}>ADD</Text>
+                        </TouchableOpacity>
                       </View>
                     </View>
-                    {!item.showRmRow && (
-                      <View style={[styles.table_body_single_row]}>
-                        <View style={{width: '25%'}}>
-                          <TouchableOpacity
-                            style={{alignItems: '', justifyContent: ''}}
-                            onPress={() => ToggleRow(item.id)}>
-                            <Image
-                              source={closeImg}
-                              style={styles.imageStyle1}
-                            />
-                          </TouchableOpacity>
-                        </View>
-                        <View style={{width: '1%'}} />
-                        <View style={{width: '42%'}}>
-                          <View
-                            style={{
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              marginTop: hp('1%'),
-                              backgroundColor: '#ffffff',
-                            }}>
+                    {item.showRmRow &&
+                      item.childList.map((child, index) => (
+                        <View
+                          key={index}
+                          style={[styles.table_body_single_row]}>
+                          <View style={{width: '15%'}}>
                             <TouchableOpacity
-                              style={{
-                                flexDirection: 'row',
-                                borderWidth: 0.5,
-                                borderColor: '#D8D8D8',
-                                borderRadius: hp('0.5%'),
-                                width: '100%',
-                                overflow: 'hidden',
-                              }}
-                              onPress={() => {
-                                setRmAllocationBomList(
-                                  RmAllocationBomList.map(r =>
-                                    r.idx === item.idx
-                                      ? {
-                                          ...r,
-                                          showList: !r.showList,
-                                        }
-                                      : {...r, showList: false},
-                                  ),
-                                );
-                              }}>
-                              <View style={[styles.SectionStyle1]}>
-                                <View style={{flexDirection: 'column'}}>
-                                  <Text
-                                    style={
-                                      item.idx
-                                        ? styles.dropTextLightStyle
-                                        : styles.dropTextInputStyle
-                                    }>
-                                    {'Stock '}
-                                  </Text>
-                                  <Text style={styles.dropTextInputStyle}>
-                                    {'Select '}
-                                  </Text>
-                                </View>
-                              </View>
-                              <View style={{justifyContent: 'center'}}>
-                                <Image
-                                  source={downArrowImg}
-                                  style={styles.imageStyle}
-                                />
-                              </View>
+                              style={{alignItems: '', justifyContent: ''}}
+                              onPress={() => ToggleChildRow(index, item.idx)}>
+                              <Image
+                                source={closeImg}
+                                style={styles.imageStyle1}
+                              />
                             </TouchableOpacity>
-                            {item?.showList && (
-                              <View style={styles.dropdownContent2}>
-                                <TextInput
-                                  style={styles.searchInput}
-                                  placeholder="Search Stock"
-                                  onChangeText={text =>
-                                    console.log('text, row.id')
-                                  }
-                                  placeholderTextColor="#000"
-                                />
-                                <ScrollView nestedScrollEnabled={true}>
-                                  {item?.List?.length === 0 ? (
-                                    <Text style={styles.noCategoriesText}>
-                                      Sorry, no results found!
+                          </View>
+                          <View style={{width: '1%'}} />
+                          <View style={{width: '50%'}}>
+                            <View
+                              style={{
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                marginTop: hp('1%'),
+                                backgroundColor: child.id
+                                  ? '#f3f3f3'
+                                  : '#ffffff',
+                              }}>
+                              <TouchableOpacity
+                                style={{
+                                  flexDirection: 'row',
+                                  borderWidth: 0.5,
+                                  borderColor: '#D8D8D8',
+                                  borderRadius: hp('0.5%'),
+                                  width: '100%',
+                                  overflow: 'hidden',
+                                }}
+                                onPress={() => console.log('hi')}>
+                                <View style={[styles.SectionStyle1]}>
+                                  <View style={{flexDirection: 'column'}}>
+                                    <Text
+                                      style={
+                                        item.idx
+                                          ? styles.dropTextLightStyle
+                                          : styles.dropTextInputStyle
+                                      }>
+                                      {'Rm Name '}
                                     </Text>
-                                  ) : (
-                                    item?.List?.map(item1 => (
-                                      <TouchableOpacity
-                                        key={item1?.id}
-                                        onPress={() =>
-                                          console.log('item1, row.id')
-                                        }>
-                                        <View style={styles.dropdownOption}>
-                                          <Text style={{color: '#000'}}>
-                                            {item1?.name}
-                                          </Text>
-                                        </View>
-                                      </TouchableOpacity>
-                                    ))
-                                  )}
-                                </ScrollView>
-                              </View>
-                            )}
+                                    <Text style={styles.dropTextInputStyle}>
+                                      {child.id ? child.name : 'Select '}
+                                    </Text>
+                                  </View>
+                                </View>
+                                <View style={{justifyContent: 'center'}}>
+                                  <Image
+                                    source={downArrowImg}
+                                    style={styles.imageStyle}
+                                  />
+                                </View>
+                              </TouchableOpacity>
+                              {false && (
+                                <View style={styles.dropdownContent2}>
+                                  <TextInput
+                                    style={styles.searchInput}
+                                    placeholder="Search Stock"
+                                    onChangeText={text =>
+                                      console.log('text, row.id')
+                                    }
+                                    placeholderTextColor="#000"
+                                  />
+                                  <ScrollView nestedScrollEnabled={true}>
+                                    {item?.List?.length === 0 ? (
+                                      <Text style={styles.noCategoriesText}>
+                                        Sorry, no results found!
+                                      </Text>
+                                    ) : (
+                                      item?.List?.map(item1 => (
+                                        <TouchableOpacity
+                                          key={item1?.id}
+                                          onPress={() =>
+                                            console.log('item1, row.id')
+                                          }>
+                                          <View style={styles.dropdownOption}>
+                                            <Text style={{color: '#000'}}>
+                                              {item1?.name}
+                                            </Text>
+                                          </View>
+                                        </TouchableOpacity>
+                                      ))
+                                    )}
+                                  </ScrollView>
+                                </View>
+                              )}
+                            </View>
+                          </View>
+                          <View style={{width: '1%'}} />
+                          <View style={{width: '16%'}}>
+                            <TextInput
+                              style={styles.table_data_input}
+                              value={child.consumption}
+                              onChangeText={text =>
+                                handleChangeChildItems(
+                                  text,
+                                  'cons',
+                                  index,
+                                  item.idx,
+                                )
+                              }
+                              keyboardType="numeric"
+                            />
+                          </View>
+                          <View style={{width: '2%'}} />
+                          <View style={{width: '16%'}}>
+                            <TextInput
+                              style={styles.table_data_input}
+                              value={child.requiredQty}
+                              onChangeText={text =>
+                                handleChangeChildItems(
+                                  text,
+                                  'req',
+                                  index,
+                                  item.idx,
+                                )
+                              }
+                              keyboardType="numeric"
+                            />
                           </View>
                         </View>
-                        <View style={{width: '1%'}} />
-                        <View style={{width: '15%'}}>
-                          <Text style={styles.table_data}>{'0'}</Text>
-                        </View>
-                        <View style={{width: '1%'}} />
-                        <View style={{width: '15%'}}>
-                          <Text style={styles.table_data}>{'0'}</Text>
-                        </View>
-                      </View>
-                    )}
+                      ))}
                   </View>
                 ))}
             </View>
           </View>
-        )} */}
+        )}
 
         <View style={{height: 200}}></View>
       </KeyboardAwareScrollView>
 
-      {selectedTab == 1 && (
+      {(selectedTab == 1 || selectedTab == 4) && (
         <View style={CommonStyles.bottomViewComponentStyle}>
           <BottomComponent
             rightBtnTitle={'Update'}
