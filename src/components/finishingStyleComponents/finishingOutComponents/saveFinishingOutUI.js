@@ -1,36 +1,46 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { View, FlatList, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
-import { heightPercentageToDP as hp, widthPercentageToDP as wp, } from "react-native-responsive-screen";
-import * as Constant from "./../../../utils/constants/constant";
-import CommonStyles from "./../../../utils/commonStyles/commonStyles";
+import React, {useState, useRef, useEffect} from 'react';
+import {
+  View,
+  FlatList,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  ScrollView,
+} from 'react-native';
+import {
+  heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
+} from 'react-native-responsive-screen';
+import * as Constant from './../../../utils/constants/constant';
+import CommonStyles from './../../../utils/commonStyles/commonStyles';
 import HeaderComponent from '../../../utils/commonComponents/headerComponent';
 import LoaderComponent from './../../../utils/commonComponents/loaderComponent';
 import AlertComponent from './../../../utils/commonComponents/alertComponent';
 import TextInputComponent from './../../../utils/commonComponents/textInputComponent';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import BottomComponent from './../../../utils/commonComponents/bottomComponent';
 let downArrowImg = require('./../../../../assets/images/png/dropDownImg.png');
 
-const SaveFinishingOutUI = ({ route, ...props }) => {
-
-
-  const [enterSizesArray, set_enterSizesArray] = useState(undefined)
+const SaveFinishingOutUI = ({route, ...props}) => {
+  const [enterSizesArray, set_enterSizesArray] = useState(undefined);
   const [locationsList, set_locationsList] = useState([]);
   const [showLocationList, set_showLocationList] = useState(false);
   const [locationId, set_locationId] = useState(0);
   const [locationName, set_locationName] = useState('');
   const [unitPrice, set_unitPrice] = useState('0');
-  const [editLocation, set_editLocation]=useState(true);
-
+  const [editLocation, set_editLocation] = useState(true);
 
   useEffect(() => {
     if (props.itemsObj) {
       set_enterSizesArray(props.itemsObj.sizeDetails);
-      if(props?.itemsObj?.companyLocation){
+      if (props?.itemsObj?.companyLocation) {
         set_locationId(props?.itemsObj?.companyLocation || 0);
         set_editLocation(false);
-        set_locationName(props?.itemsObj?.locationMap[props?.itemsObj?.companyLocation])
-      }else{
+        set_locationName(
+          props?.itemsObj?.locationMap[props?.itemsObj?.companyLocation],
+        );
+      } else {
         set_locationsList(props?.itemsObj?.locationMap);
       }
     }
@@ -46,29 +56,25 @@ const SaveFinishingOutUI = ({ route, ...props }) => {
 
   const submitAction = async () => {
     props.submitAction(enterSizesArray, locationId, unitPrice);
-
   };
 
   const untiPriceValue = (value, index) => {
-
     let tempArray = enterSizesArray;
     tempArray[index].enterQty = value;
     set_enterSizesArray(tempArray);
-    console.log('--------', tempArray)
+    console.log('--------', tempArray);
   };
 
   const actionOnLocation = (locationId, locationName) => {
     set_locationName(locationName);
     set_locationId(locationId);
     set_showLocationList(false);
-  }
+  };
 
   // console.log("selcted location details", locationId, selectedLocation)
 
   return (
-
     <View style={[CommonStyles.mainComponentViewStyle]}>
-
       <View style={[CommonStyles.headerView]}>
         <HeaderComponent
           isBackBtnEnable={true}
@@ -81,120 +87,166 @@ const SaveFinishingOutUI = ({ route, ...props }) => {
         />
       </View>
 
-
       {/* <View style={{ marginTop: hp('3%'), flexDirection: 'row', width: '90%' }}>
         <Text style={[CommonStyles.tylesHeaderTextStyle, { textAlign: 'left' }]}>{'Style - '}</Text>
         <Text style={[CommonStyles.tylesHeaderTextStyle, { textAlign: 'left' }]}>{props.itemsObj ? props.itemsObj.styleName : null}</Text>
       </View> */}
 
-
-      <View style={{ marginBottom: hp('5%') }}>
-        <KeyboardAwareScrollView enableOnAndroid={true} extraHeight={130} extraScrollHeight={130} showsVerticalScrollIndicator={false}>
-
-          <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: hp('1%') }} >
-
+      <View style={{marginBottom: hp('5%')}}>
+        <KeyboardAwareScrollView
+          enableOnAndroid={true}
+          extraHeight={130}
+          extraScrollHeight={130}
+          showsVerticalScrollIndicator={false}>
+          <View
+            style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginTop: hp('1%'),
+            }}>
             <TextInputComponent
               inputText={props.itemsObj ? props.itemsObj.styleName : undefined}
               labelText={'Style Name'}
               isEditable={false}
               maxLengthVal={200}
               multiline={true} // Allow multiline input
-              autoCapitalize={"none"}
+              autoCapitalize={'none'}
               isBackground={'#dedede'}
-              setValue={(textAnswer) => { untiPriceValue(textAnswer) }}
+              setValue={textAnswer => {
+                untiPriceValue(textAnswer);
+              }}
             />
-
           </View>
 
-          <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: hp('1%') }} >
-
+          <View
+            style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginTop: hp('1%'),
+            }}>
             <TextInputComponent
               inputText={props.itemsObj ? props.itemsObj.color : undefined}
               labelText={'Color'}
               isEditable={false}
               maxLengthVal={2000}
-              autoCapitalize={"none"}
+              autoCapitalize={'none'}
               isBackground={'#dedede'}
-              setValue={(textAnswer) => { untiPriceValue(textAnswer) }}
+              setValue={textAnswer => {
+                untiPriceValue(textAnswer);
+              }}
             />
-
           </View>
-          <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: hp('1%') }} >
-
+          <View
+            style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginTop: hp('1%'),
+            }}>
             <TextInputComponent
               inputText={unitPrice}
               labelText={'Unit Price'}
               isEditable={true}
               maxLengthVal={2000}
-              autoCapitalize={"none"}
+              autoCapitalize={'none'}
               isBackground={'#dedede'}
-              setValue={(textAnswer) => { set_unitPrice(textAnswer) }}
+              setValue={textAnswer => {
+                set_unitPrice(textAnswer);
+              }}
             />
-
           </View>
 
-          <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: hp('1%'), backgroundColor:editLocation ? '#ffffff':'#dedede' }} >
-
-            <TouchableOpacity style={{ flexDirection: 'row', borderWidth: 0.5, borderColor: "#D8D8D8", borderRadius: hp("0.5%"), width: wp("90%"), }} onPress={() => { set_showLocationList(!showLocationList) }}>
-
+          <View
+            style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginTop: hp('1%'),
+              backgroundColor: editLocation ? '#ffffff' : '#dedede',
+              width: '90%',
+              alignSelf: 'center',
+            }}>
+            <TouchableOpacity
+              style={{
+                flexDirection: 'row',
+                borderWidth: 0.5,
+                borderColor: '#D8D8D8',
+                borderRadius: hp('0.5%'),
+                width: '100%',
+                justifyContent: 'space-between',
+              }}
+              onPress={() => {
+                set_showLocationList(!showLocationList);
+              }}>
               <View>
                 <View style={[styles.SectionStyle1, {}]}>
-
-                  <View style={{ flexDirection: 'column', }}>
-                    <Text style={locationName ? [styles.dropTextLightStyle] : [styles.dropTextInputStyle]}>{'Select Location '}</Text>
-                    {locationName ? <Text style={[styles.dropTextInputStyle]}>{locationName}</Text> : null}
+                  <View style={{flexDirection: 'column'}}>
+                    <Text
+                      style={
+                        locationName
+                          ? [styles.dropTextLightStyle]
+                          : [styles.dropTextInputStyle]
+                      }>
+                      {'Select Location '}
+                    </Text>
+                    {locationName ? (
+                      <Text style={[styles.dropTextInputStyle]}>
+                        {locationName}
+                      </Text>
+                    ) : null}
                   </View>
-
                 </View>
               </View>
 
-              <View style={{ justifyContent: 'center' }}>
+              <View style={{justifyContent: 'center'}}>
                 <Image source={downArrowImg} style={styles.imageStyle} />
               </View>
-
             </TouchableOpacity>
 
-            {showLocationList  && editLocation ? (
+            {showLocationList && editLocation ? (
               <View style={styles.popSearchViewStyle}>
                 <ScrollView nestedScrollEnabled={true}>
-                  {Object.keys(locationsList).map((locationId) => (
-                    <TouchableOpacity key={locationId} onPress={() => actionOnLocation(locationId, locationsList[locationId])}>
+                  {Object.keys(locationsList).map(locationId => (
+                    <TouchableOpacity
+                      key={locationId}
+                      onPress={() =>
+                        actionOnLocation(locationId, locationsList[locationId])
+                      }>
                       <View style={styles.flatview}>
-                        <Text style={styles.dropTextInputStyle}>{locationsList[locationId]}</Text>
+                        <Text style={styles.dropTextInputStyle}>
+                          {locationsList[locationId]}
+                        </Text>
                       </View>
                     </TouchableOpacity>
                   ))}
                 </ScrollView>
               </View>
             ) : null}
-
-
           </View>
 
           <View style={CommonStyles.listStyle}>
             {enterSizesArray &&
               enterSizesArray.map((item, index) => (
-                <View key={index} style={{ marginTop: hp('1%') }}>
-                  <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+                <View key={index} style={{marginTop: hp('1%')}}>
+                  <View
+                    style={{alignItems: 'center', justifyContent: 'center'}}>
                     <TextInputComponent
                       labelText={item.size}
                       isEditable={true}
                       maxLengthVal={200}
-                      autoCapitalize={"none"}
+                      autoCapitalize={'none'}
                       keyboardType={'numeric'}
-                      setValue={(textAnswer) => { untiPriceValue(textAnswer, index) }}
+                      setValue={textAnswer => {
+                        untiPriceValue(textAnswer, index);
+                      }}
                     />
                   </View>
                 </View>
               ))}
+            <View style={{height: 180}} />
           </View>
-
         </KeyboardAwareScrollView>
       </View>
 
-
       <View style={CommonStyles.bottomViewComponentStyle}>
-
         <BottomComponent
           rightBtnTitle={'Submit'}
           isLeftBtnEnable={false}
@@ -204,32 +256,38 @@ const SaveFinishingOutUI = ({ route, ...props }) => {
         />
       </View>
 
-      {props.isPopUp ? <View style={CommonStyles.customPopUpStyle}>
-        <AlertComponent
-          header={props.popUpAlert}
-          message={props.popUpMessage}
-          isLeftBtnEnable={props.isPopLeft}
-          isRightBtnEnable={true}
-          leftBtnTilte={'NO'}
-          rightBtnTilte={props.popUpRBtnTitle}
-          popUpRightBtnAction={() => popOkBtnAction()}
-          popUpLeftBtnAction={() => popCancelBtnAction()}
+      {props.isPopUp ? (
+        <View style={CommonStyles.customPopUpStyle}>
+          <AlertComponent
+            header={props.popUpAlert}
+            message={props.popUpMessage}
+            isLeftBtnEnable={props.isPopLeft}
+            isRightBtnEnable={true}
+            leftBtnTilte={'NO'}
+            rightBtnTilte={props.popUpRBtnTitle}
+            popUpRightBtnAction={() => popOkBtnAction()}
+            popUpLeftBtnAction={() => popCancelBtnAction()}
+          />
+        </View>
+      ) : null}
+
+      {props.isLoading === true ? (
+        <LoaderComponent
+          isLoader={true}
+          loaderText={Constant.LOADER_MESSAGE}
+          isButtonEnable={false}
         />
-      </View> : null}
-
-      {props.isLoading === true ? <LoaderComponent isLoader={true} loaderText={Constant.LOADER_MESSAGE} isButtonEnable={false} /> : null}
-
+      ) : null}
     </View>
   );
-}
+};
 
 export default SaveFinishingOutUI;
 
 const styles = StyleSheet.create({
-
   popSearchViewStyle: {
-    height: hp("40%"),
-    width: wp("90%"),
+    height: hp('40%'),
+    width: wp('90%'),
     backgroundColor: '#E5E4E2',
     // bottom: 220,
     // position: 'absolute',
@@ -237,7 +295,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     borderTopRightRadius: 15,
     borderTopLeftRadius: 15,
-    alignItems: "center",
+    alignItems: 'center',
   },
 
   flatcontainer: {
@@ -245,37 +303,37 @@ const styles = StyleSheet.create({
   },
 
   flatview: {
-    height: hp("8%"),
-    marginBottom: hp("0.3%"),
-    alignContent: "center",
-    justifyContent: "center",
-    borderBottomColor: "black",
-    borderBottomWidth: wp("0.1%"),
+    height: hp('8%'),
+    marginBottom: hp('0.3%'),
+    alignContent: 'center',
+    justifyContent: 'center',
+    borderBottomColor: 'black',
+    borderBottomWidth: wp('0.1%'),
     width: wp('80%'),
-    alignItems: "center",
+    alignItems: 'center',
   },
 
   SectionStyle1: {
-    flexDirection: "row",
+    flexDirection: 'row',
     // justifyContent: "center",
-    alignItems: "center",
-    height: hp("7%"),
-    width: wp("75%"),
-    borderRadius: hp("0.5%"),
+    alignItems: 'center',
+    height: hp('7%'),
+    width: '75%',
+    borderRadius: hp('0.5%'),
     // alignSelf: "center",
     // backgroundColor: "grey",
   },
 
   imageStyle: {
     // margin: "4%",
-    height: wp("12%"),
+    height: wp('12%'),
     aspectRatio: 1,
     marginRight: wp('8%'),
     resizeMode: 'stretch',
   },
 
   dropTextInputStyle: {
-    fontWeight: "normal",
+    fontWeight: 'normal',
     fontSize: 18,
     marginLeft: wp('4%'),
     color: 'black',
@@ -285,11 +343,10 @@ const styles = StyleSheet.create({
   dropTextLightStyle: {
     fontWeight: 300,
     fontSize: 12,
-    width: wp("60%"),
+    width: wp('60%'),
     alignSelf: 'flex-start',
-    marginTop: hp("1%"),
+    marginTop: hp('1%'),
     marginLeft: wp('4%'),
-    color:'#000'
+    color: '#000',
   },
-
-})
+});

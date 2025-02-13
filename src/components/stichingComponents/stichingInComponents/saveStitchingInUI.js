@@ -92,15 +92,6 @@ const SaveStichingInUI = ({route, ...props}) => {
         />
       </View>
 
-      {/* <View style={{ marginTop: hp('3%') }}>
-
-        <View style={{ flexDirection: 'row' }}>
-          <Text style={[CommonStyles.tylesHeaderTextStyle, { textAlign: 'left' }]}>{'Style - '}</Text>
-          <Text style={[CommonStyles.tylesHeaderTextStyle, { textAlign: 'left' }]}>{props.itemObj ? props.itemObj.styleName : null}</Text>
-        </View>
-
-      </View> */}
-
       <View style={{marginBottom: hp('5%')}}>
         <KeyboardAwareScrollView
           enableOnAndroid={true}
@@ -170,6 +161,8 @@ const SaveStichingInUI = ({route, ...props}) => {
               justifyContent: 'center',
               marginTop: hp('1%'),
               backgroundColor: editLocation ? '#ffffff' : '#dedede',
+              width: '90%',
+              alignSelf: 'center',
             }}>
             <TouchableOpacity
               style={{
@@ -177,13 +170,15 @@ const SaveStichingInUI = ({route, ...props}) => {
                 borderWidth: 0.5,
                 borderColor: '#D8D8D8',
                 borderRadius: hp('0.5%'),
-                width: wp('90%'),
+                width: '100%',
+                alignItems: 'center',
+                justifyContent: 'space-between',
               }}
               onPress={() => {
                 set_showLocationList(!showLocationList);
               }}>
               <View>
-                <View style={[styles.SectionStyle1, {}]}>
+                <View style={[styles.SectionStyle1]}>
                   <View style={{flexDirection: 'column'}}>
                     <Text
                       style={
@@ -209,15 +204,6 @@ const SaveStichingInUI = ({route, ...props}) => {
 
             {showLocationList && editLocation ? (
               <View style={styles.popSearchViewStyle}>
-                {/* <ScrollView nestedScrollEnabled={true}>
-                  {locationsList.map((item, index) => (
-                    <TouchableOpacity key={item.id} onPress={() => actionOnLocation(item)}>
-                      <View style={styles.flatview}>
-                        <Text style={styles.dropTextInputStyle}>{item.name}</Text>
-                      </View>
-                    </TouchableOpacity>
-                  ))}
-                </ScrollView> */}
                 <ScrollView nestedScrollEnabled={true}>
                   {Object.keys(locationsList).map(locationId => (
                     <TouchableOpacity
@@ -257,6 +243,7 @@ const SaveStichingInUI = ({route, ...props}) => {
                 </View>
               ))}
           </View>
+          <View style={{height: 180}} />
         </KeyboardAwareScrollView>
       </View>
 
@@ -301,7 +288,7 @@ export default SaveStichingInUI;
 const styles = StyleSheet.create({
   popSearchViewStyle: {
     height: hp('40%'),
-    width: wp('90%'),
+    width: '100%',
     backgroundColor: '#E5E4E2',
     // bottom: 220,
     // position: 'absolute',
@@ -323,7 +310,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderBottomColor: 'black',
     borderBottomWidth: wp('0.1%'),
-    width: wp('80%'),
+    width: '80%',
     alignItems: 'center',
   },
 
@@ -332,7 +319,7 @@ const styles = StyleSheet.create({
     // justifyContent: "center",
     alignItems: 'center',
     height: hp('7%'),
-    width: wp('75%'),
+    width: '80%',
     borderRadius: hp('0.5%'),
     // alignSelf: "center",
     // backgroundColor: "grey",
@@ -343,7 +330,7 @@ const styles = StyleSheet.create({
     height: wp('12%'),
     aspectRatio: 1,
     marginRight: wp('8%'),
-    resizeMode: 'stretch',
+    resizeMode: 'contain',
   },
 
   dropTextInputStyle: {

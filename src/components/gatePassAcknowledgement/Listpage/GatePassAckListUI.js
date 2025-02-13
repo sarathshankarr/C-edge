@@ -328,8 +328,7 @@ const GatePassAckListUI = ({route, ...props }) => {
         </View>
       </View>  
 
-      <View style={styles.container}>
-      {/* <Button title="Open Filter"  /> */}
+
       
       <FilterModal
         isVisible={isFilterVisible}
@@ -341,7 +340,7 @@ const GatePassAckListUI = ({route, ...props }) => {
         reqBody={filterReqBody}
 
       />
-    </View>
+ 
 
       {props.isPopUp ? <View style={CommonStyles.customPopUpStyle}>
         <AlertComponent
@@ -364,12 +363,3 @@ const GatePassAckListUI = ({route, ...props }) => {
   
   export default GatePassAckListUI;
 
-
-  const styles = StyleSheet.create({
-
-    container: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-  })

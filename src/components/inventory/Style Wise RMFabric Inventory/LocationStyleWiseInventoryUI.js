@@ -350,8 +350,6 @@ const LocationStyleWiseInventoryUI = ({route, ...props }) => {
         </View>
       </View>  
 
-      <View style={styles.container}>
-      {/* <Button title="Open Filter"  /> */}
       <FilterModal
         isVisible={isFilterVisible}
         categoriesList={categories}
@@ -362,7 +360,7 @@ const LocationStyleWiseInventoryUI = ({route, ...props }) => {
         reqBody={filterReqBody}
 
       />
-    </View>
+
 
       {props.isPopUp ? <View style={CommonStyles.customPopUpStyle}>
         <AlertComponent
@@ -385,11 +383,4 @@ const LocationStyleWiseInventoryUI = ({route, ...props }) => {
   
   export default LocationStyleWiseInventoryUI;
 
-  const styles = StyleSheet.create({
-
-    container: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-  })
+  

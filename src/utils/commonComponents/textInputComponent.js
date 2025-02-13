@@ -21,7 +21,7 @@ const TextInputComponent = ({
   isBackground,
   ...props
 }) => {
-  const [widthTextInput, set_widthTextInput] = useState(wp('90%'));
+  const [widthTextInput, set_widthTextInput] = useState('90%');
   const [isSecureText, set_isSecureText] = useState(undefined);
   const [backgroundColor, set_backgroundColor] = useState('transparent');
   const [autoCapitalizeValue, set_autoCapitalizeValue] = useState('none');

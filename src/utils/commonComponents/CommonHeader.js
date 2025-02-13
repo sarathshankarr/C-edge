@@ -1,5 +1,5 @@
 import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
-import { View, TouchableOpacity, Image, Text, StyleSheet, Modal, ScrollView, TextInput, ActivityIndicator, Alert, FlatList, TouchableWithoutFeedback, Platform } from 'react-native';
+import { View, TouchableOpacity, Image, Text, StyleSheet, Modal, ScrollView, TextInput, ActivityIndicator, Alert, FlatList, TouchableWithoutFeedback, Platform, useWindowDimensions } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as APIServiceCall from './../apiCalls/apiCallsComponent'
@@ -10,6 +10,9 @@ import { ColorContext } from '../../components/colorTheme/colorTheme';
 
 
 const CommonHeader = ({ title, showDrawerButton }) => {
+  const {height, width} = useWindowDimensions();
+  const landscape=height<width;
+
   const navigation = useNavigation();
   const [unreadCount, setUnreadCount] = useState(0);
   const [modalVisible, setModalVisible] = useState(false);
@@ -39,7 +42,7 @@ const CommonHeader = ({ title, showDrawerButton }) => {
 
   const { colors ,menuIds} = useContext(ColorContext);
   
-  const styles = getStyles(colors);
+  const styles = getStyles(colors,landscape);
 
 
 
@@ -762,7 +765,7 @@ const CommonHeader = ({ title, showDrawerButton }) => {
   );
 };
 
-const getStyles = (colors) => StyleSheet.create({
+const getStyles = (colors,landscape) => StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -899,7 +902,7 @@ const getStyles = (colors) => StyleSheet.create({
     justifyContent: 'flex-start',
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     width: '100%',
-    marginTop: '20%',
+    marginTop: landscape ? '1%' : '20%',
     // backgroundColor:'transparent'
   },
   modalContent: {
@@ -954,7 +957,7 @@ const getStyles = (colors) => StyleSheet.create({
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    width: wp("90%"),
+    width: "100%",
     marginTop: hp('5%'),
     paddingHorizontal: wp('5%'),
     backgroundColor: '#ffffff',

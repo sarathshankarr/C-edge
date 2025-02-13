@@ -20,13 +20,8 @@ import HeaderComponent from '../../utils/commonComponents/headerComponent';
 import LoaderComponent from '../../utils/commonComponents/loaderComponent';
 import AlertComponent from '../../utils/commonComponents/alertComponent';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-import * as APIServiceCall from '../../utils/apiCalls/apiCallsComponent';
 import BottomComponent from '../../utils/commonComponents/bottomComponent';
-import DateTimePickerModal from 'react-native-modal-datetime-picker';
-import {formatDateIntoDMY} from '../../utils/constants/constant';
-import {RadioButton, TextInput} from 'react-native-paper';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import CustomCheckBox from '../../utils/commonComponents/CustomCheckBox';
+import {TextInput} from 'react-native-paper';
 let downArrowImg = require('./../../../assets/images/png/dropDownImg.png');
 
 const CreatePartProcessingUI = ({route, navigation, ...props}) => {
@@ -68,6 +63,13 @@ const CreatePartProcessingUI = ({route, navigation, ...props}) => {
 
   const backAction = async () => {
     props.backBtnAction();
+  };
+
+  const submitAction = async () => {
+    const tempObj = {
+      styleNo: styleNo,
+    };
+    props.submitAction(tempObj);
   };
 
   return (
@@ -126,7 +128,8 @@ const CreatePartProcessingUI = ({route, navigation, ...props}) => {
                 borderWidth: 0.5,
                 borderColor: '#D8D8D8',
                 borderRadius: hp('0.5%'),
-                width: wp('90%'),
+                width: '100%',
+                justifyContent:"space-between"
               }}
               onPress={() => {
                 setShowProcessList(!showProcessList);
