@@ -211,22 +211,6 @@ const renderItem = ({ item, index }) => {
 
       <View style={CommonStyles.headerStyle}>
 
-        {/* {props.itemsArray &&   <View style={CommonStyles.searchBarStyle}>
-                              
-          <View style={[CommonStyles.searchInputContainerStyle]}>
-            <Image source={searchImg} style={CommonStyles.searchImageStyle} />
-              <TextInput style={CommonStyles.searchTextInputStyle}
-                underlineColorAndroid="transparent"
-                placeholder="Search"
-                placeholderTextColor="#7F7F81"
-                autoCapitalize="none"
-                value = {recName}
-                onFocus={ () => isKeyboard.current = true }
-                onChangeText={(name) => {filterPets(name)}}
-              />
-          </View> 
-          
-        </View>} */}
          {filterArray ? (
                 <View style={{ flexDirection: 'row', width: '100%', marginBottom: 10, alignItems: 'center' }}>
           {/* Search Bar */}
@@ -303,11 +287,9 @@ const renderItem = ({ item, index }) => {
             }
             
             
-          </TouchableOpacity>
-        
+          </TouchableOpacity>      
         </View>
-        
-        
+               
           ) : null}
 
         {filterArray && filterArray.length > 0 ? <View style={CommonStyles.listCommonHeader1}>

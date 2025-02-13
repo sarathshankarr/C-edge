@@ -1,10 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect} from 'react';
 import {StyleSheet,View, ActivityIndicator,Text} from 'react-native';
 import {heightPercentageToDP as hp, widthPercentageToDP as wp,} from "react-native-responsive-screen";
 import CommonStyles from '../commonStyles/commonStyles';
 import Fonts from '../../utils/commonStyles/fonts';
+import { useWindowDimensions } from 'react-native';
 
 const LoaderComponent = ({navigation, route,loaderText,isButtonEnable,heightLoader,isLoader,showLoderBox,loaderText2,...props }) => {
+const {width, height}=useWindowDimensions();
+const landScape=width>height;
+
+const styles = getStyles(landScape);
+
 
     const [heightL, set_heightL] = useState('100%');
     const [showLoaderBox1, set_showLoaderBox1] = useState('show');
@@ -29,12 +35,12 @@ const LoaderComponent = ({navigation, route,loaderText,isButtonEnable,heightLoad
 
     return (
 
-        <View style={[styles.mainActivity,{height:hp(heightL)}]}>
+        <View style={[styles.mainActivity]}>
 
             <View style = {styles.loaderBckViewStyle}>
-                <View style={{marginTop:hp('2%')}}>                        
+                {/* <View style={{marginTop:hp('50%')}}>                         */}
                     <ActivityIndicator  size="large" color="gray"></ActivityIndicator>
-                </View>
+                {/* </View> */}
                 <Text style={[styles.textStyle]}>{lMsg}<Text style={styles.textStyle}>{loaderText}</Text></Text>
             </View>       
             
@@ -45,15 +51,16 @@ const LoaderComponent = ({navigation, route,loaderText,isButtonEnable,heightLoad
 
 export default LoaderComponent;
 
-const styles = StyleSheet.create({
+// const styles = StyleSheet.create({
+    const getStyles = (landScape) => StyleSheet.create({
 
     mainActivity : {
         position: 'absolute',
         justifyContent: "center",
         alignItems: "center",
         backgroundColor: 'transparent',
-        width:wp('100%'),
-        height:hp('100%'),
+        width:'100%',
+        height:'100%',
     },
 
     textStyle : {
@@ -68,8 +75,8 @@ const styles = StyleSheet.create({
     },
 
     loaderBckViewStyle : {
-        width : wp('70%'),
-        minHeight : hp('20%'),
+        width : landScape ? '30%' : '70%',
+        minHeight : landScape ? '40%' : '20%',
         justifyContent: "center",
         alignItems: "center",
         // borderWidth:0.1,
@@ -79,7 +86,7 @@ const styles = StyleSheet.create({
     },
 
     dogStyle: {
-        width: wp('25'),
+        width: '25%',
         height: hp('12%'),
         alignSelf: 'center',
         resizeMode:'contain'

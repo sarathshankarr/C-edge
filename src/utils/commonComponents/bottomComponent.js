@@ -39,8 +39,8 @@ export default BottomComponent;
 const getStyles = (colors) => StyleSheet.create({
 
     mainComponentStyle : {
-        width:wp('100%'),
-        height:hp('100%'),
+        width:'100%',
+        height:'100%',
         backgroundColor:'white',
         position:"absolute",
         padding:20,

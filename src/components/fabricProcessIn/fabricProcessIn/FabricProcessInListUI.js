@@ -400,8 +400,7 @@ const FabricProcessInListUI = ({route, navigation, ...props}) => {
         </View>
       </View>
 
-      {/* <View style={styles.container}> */}
-      {/* <Button title="Open Filter"  /> */}
+
       <FilterModal
         isVisible={isFilterVisible}
         categoriesList={categories}
@@ -411,7 +410,7 @@ const FabricProcessInListUI = ({route, navigation, ...props}) => {
         clearFilter={clearFilter}
         reqBody={filterReqBody}
       />
-    {/* </View> */}
+
 
     <AddNewItem navItem={'CreateInProcess'}/>
 
@@ -444,12 +443,6 @@ const FabricProcessInListUI = ({route, navigation, ...props}) => {
 export default FabricProcessInListUI;
 
 const styles = StyleSheet.create({
-
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   input:{
    color:"black"
   },

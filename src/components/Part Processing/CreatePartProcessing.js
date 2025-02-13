@@ -77,7 +77,7 @@ const CreatePartProcessing = ({ route }) => {
     let usercompanyId = await AsyncStorage.getItem('companyId');
     let companyObj = await AsyncStorage.getItem('companyObj');
 
-    tempObj.menuid = 123;
+    tempObj.menuId = 787;
     tempObj.username = userName;
     tempObj.password = userPsd;
     tempObj.compIds = usercompanyId;
@@ -88,7 +88,7 @@ const CreatePartProcessing = ({ route }) => {
 
     set_isLoading(true);
 
-    let SAVEAPIObj = await APIServiceCall.saveCreateUomMasters(tempObj);
+    let SAVEAPIObj = await APIServiceCall.saveCreatePartsProcessing(tempObj);
     set_isLoading(false);
 
     console.log("Sucess before returned obj ", SAVEAPIObj);

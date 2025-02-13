@@ -1173,7 +1173,7 @@ const CreateRequestUi = ({route, ...props}) => {
                 borderWidth: 0.5,
                 borderColor: '#D8D8D8',
                 borderRadius: hp('0.5%'),
-                width: wp('90%'),
+                width: '90%',
                 backgroundColor: '#fff',
               }}
               onPress={() => {

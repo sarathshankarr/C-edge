@@ -65,7 +65,7 @@ const CommonStyles = StyleSheet.create({
     },
     bottomViewComponentStyle : {
         height:hp('12%'),
-        width:wp('100%'),
+        width:'100%',
         backgroundColor:'white',
         position:"absolute",
         bottom:0,
@@ -78,8 +78,8 @@ const CommonStyles = StyleSheet.create({
 
     headerView : {
         backgroundColor:'red',
-        width:wp('100%'),
-        height:hp('8%'),
+        width:'100%',
+        height:'8%',
         justifyContent:'center',
         
     },
@@ -114,15 +114,15 @@ const CommonStyles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#f0f0f0',
         alignItems: 'center',
-        width: '100%',  // Make sure it takes the full width of the screen
-        justifyContent: 'flex-start',  // Ensure it starts from the top if needed
+        width: '100%',  
+        justifyContent: 'flex-start', 
       },
       
     headerStyle : {
         flex:1,
-        minHeight:hp('10%'),
-        width:wp('90%'),
-        marginTop:hp('2%'),
+        minHeight:'10%',
+        width:'90%',
+        marginTop:'2%',
         
     },
 
@@ -132,25 +132,37 @@ const CommonStyles = StyleSheet.create({
     },
   
     listStyle : {
-        width:wp('90%'),
-        height:hp('75%'),
+        width:'100%',
+        height:'80%',
         // backgroundColor:'#fff',
         // backgroundColor: '#f0f0f0',
         // backgroundColor: 'transparent', 
+        marginTop: hp("2%"),
+        // marginBottom:"5%",
+         
+    },
+    listStyle3 : {
+        width:'100%',
+        // height:'75%',
+        // backgroundColor:'#fff',
+        // backgroundColor: '#f0f0f0',
+        // backgroundColor: 'transparent', 
+        justifyContent:'center',
+        alignItems:'center',
         marginTop: hp("2%"),
         marginBottom: hp("5%"),
          
     },
     listStyle1 : {
-        width:wp('90%'),
-        maxHeight:hp('40%'),
+        width:'90%',
+        maxHeight:'40%',
         backgroundColor:'white',
-        marginTop: hp("2%"),
-        marginBottom: hp("5%"), 
+        marginTop: "2%",
+        marginBottom: "5%", 
     },
     listStyle2 : {
-        width:wp('90%'),
-        maxHeight:hp('50%'),
+        width:'90%',
+        maxHeight:'50%',
         backgroundColor:'white',
         marginTop: hp("2%"),
         marginBottom: hp("5%"), 
