@@ -371,7 +371,7 @@ const StoreApproveEditUi = ({route, ...props}) => {
               backgroundColor: '#fff',
               marginTop: hp('2%'),
               flexDirection: 'row',
-              // width: '90%',
+              width: '90%',
               marginHorizontal:20
             }}>
             <View style={{width: '85%', paddingHorizontal: 10}}>
@@ -487,33 +487,6 @@ export default StoreApproveEditUi;
 
 const getStyles = colors =>
   StyleSheet.create({
-    popSearchViewStyle: {
-      height: hp('40%'),
-      width: wp('90%'),
-      backgroundColor: '#E5E4E2',
-      // bottom: 220,
-      // position: 'absolute',
-      // flex:1,
-      alignSelf: 'center',
-      borderTopRightRadius: 15,
-      borderTopLeftRadius: 15,
-      alignItems: 'center',
-    },
-
-    flatcontainer: {
-      flex: 1,
-    },
-
-    flatview: {
-      height: hp('8%'),
-      marginBottom: hp('0.3%'),
-      alignContent: 'center',
-      justifyContent: 'center',
-      borderBottomColor: 'black',
-      borderBottomWidth: wp('0.1%'),
-      width: wp('80%'),
-      alignItems: 'center',
-    },
 
     SectionStyle1: {
       flexDirection: 'row',
@@ -552,13 +525,13 @@ const getStyles = colors =>
       color: '#000',
     },
     wrapper: {
-      justifyContent: 'center',
-      alignItems: 'center',
-      flex: 1,
-      marginTop: hp('2%'),
-      width: '95%',
-      marginBottom: 10,
-      marginHorizontal: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    flex: 1,
+    marginTop: hp('2%'),
+    width: '95%',
+    marginBottom: 10,
+    marginHorizontal: 10
     },
     table_head: {
       flexDirection: 'row',
@@ -594,10 +567,10 @@ const getStyles = colors =>
       textAlign: 'center',
     },
     table: {
-      margin: 15,
-      // width:'100%',
-      justifyContent: 'center',
+      marginTop: 15,
+      width:'90%',
       alignItems: 'center',
+      justifyContent:"center",
       elevation: 1,
       backgroundColor: '#fff',
     },

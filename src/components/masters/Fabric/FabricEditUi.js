@@ -398,9 +398,10 @@ const FabricEditUi = ({route, ...props}) => {
           style={{
             marginBottom: hp('5%'),
             width: '90%',
-            marginHorizontal: wp('5%'),
+            marginHorizontal: '5%',
           }}>
-          <View style={{marginTop: hp('2%')}}>
+
+          <View style={{marginTop: hp('2%'),width: '95%'}}>
             <TextInput
               label="Fabric No *"
               value={fabricNo}
@@ -417,6 +418,7 @@ const FabricEditUi = ({route, ...props}) => {
               justifyContent: 'center',
               backgroundColor: uomId ? '#E8E8E8' : '#fff',
               marginTop: hp('2%'),
+              width: '95%',
             }}>
             <TouchableOpacity
               style={{
@@ -424,7 +426,8 @@ const FabricEditUi = ({route, ...props}) => {
                 borderWidth: 0.5,
                 borderColor: '#D8D8D8',
                 borderRadius: hp('0.5%'),
-                width: wp('90%'),
+                width: '100%',
+                justifyContent:'space-between'
               }}
               onPress={() => {
                 set_showColorList(!showColorList);
@@ -485,7 +488,7 @@ const FabricEditUi = ({route, ...props}) => {
           </View>
 
           {showAddColor && (
-            <View style={{marginTop: hp('2%')}}>
+            <View style={{marginTop: hp('2%'),width: '95%'}}>
               <TextInput
                 label="New Color "
                 value={newColor}
@@ -496,7 +499,7 @@ const FabricEditUi = ({route, ...props}) => {
           )}
 
           {showAddColor && (
-            <View style={{marginTop: hp('2%')}}>
+            <View style={{marginTop: hp('2%'),width: '95%'}}>
               <TextInput
                 label="Color Code "
                 value={colorCode}
@@ -506,7 +509,7 @@ const FabricEditUi = ({route, ...props}) => {
             </View>
           )}
 
-          <View style={{marginTop: hp('2%')}}>
+          <View style={{marginTop: hp('2%'),width: '95%'}}>
             <TextInput
               label="Fabric Code"
               value={fabricCode}
@@ -523,6 +526,7 @@ const FabricEditUi = ({route, ...props}) => {
               justifyContent: 'center',
               backgroundColor: '#fff',
               marginTop: hp('2%'),
+              width: '95%'
             }}>
             <TouchableOpacity
               style={{
@@ -530,7 +534,8 @@ const FabricEditUi = ({route, ...props}) => {
                 borderWidth: 0.5,
                 borderColor: '#D8D8D8',
                 borderRadius: hp('0.5%'),
-                width: wp('90%'),
+                width: '100%',
+                justifyContent:'space-between'
               }}
               onPress={() => {
                 set_showLocationList(!showLocationList);
@@ -596,6 +601,7 @@ const FabricEditUi = ({route, ...props}) => {
               justifyContent: 'center',
               backgroundColor: uomId ? '#E8E8E8' : '#fff',
               marginTop: hp('2%'),
+               width: '95%'
             }}>
             <TouchableOpacity
               style={{
@@ -603,7 +609,8 @@ const FabricEditUi = ({route, ...props}) => {
                 borderWidth: 0.5,
                 borderColor: '#D8D8D8',
                 borderRadius: hp('0.5%'),
-                width: wp('90%'),
+                width: '100%',
+                justifyContent:'space-between'
               }}
               onPress={() => {
                 set_showUOMList(!showUOMList);
@@ -662,7 +669,7 @@ const FabricEditUi = ({route, ...props}) => {
           </View>
 
           {showAddUom && (
-            <View style={{marginTop: hp('2%')}}>
+            <View style={{marginTop: hp('2%'),width: '95%'}}>
               <TextInput
                 label="UOM Type * "
                 value={uomType}
@@ -673,7 +680,7 @@ const FabricEditUi = ({route, ...props}) => {
           )}
 
           {showAddUom && (
-            <View style={{marginTop: hp('2%')}}>
+            <View style={{marginTop: hp('2%'),width: '95%'}}>
               <TextInput
                 label="UOM Description "
                 value={uomDescription}
@@ -689,6 +696,7 @@ const FabricEditUi = ({route, ...props}) => {
               justifyContent: 'center',
               backgroundColor: '#fff',
               marginTop: hp('2%'),
+               width: '95%'
             }}>
             <TouchableOpacity
               style={{
@@ -696,7 +704,8 @@ const FabricEditUi = ({route, ...props}) => {
                 borderWidth: 0.5,
                 borderColor: '#D8D8D8',
                 borderRadius: hp('0.5%'),
-                width: wp('90%'),
+                width: '100%',
+                justifyContent:'space-between'
               }}
               onPress={() => {
                 set_showFabricTypeList(!showFabricTypeList);
@@ -757,7 +766,7 @@ const FabricEditUi = ({route, ...props}) => {
           </View>
 
           {showAddFabricType && (
-            <View style={{marginTop: hp('2%')}}>
+            <View style={{marginTop: hp('2%'),width: '95%'}}>
               <TextInput
                 label="New Fabric Type "
                 value={addNewFabricType}
@@ -768,7 +777,7 @@ const FabricEditUi = ({route, ...props}) => {
           )}
 
           {showAddFabricType && (
-            <View style={{marginTop: hp('2%')}}>
+            <View style={{marginTop: hp('2%'),width: '95%'}}>
               <TextInput
                 label="Fabric Type Description "
                 value={addFabricTypeDescription}
@@ -778,7 +787,7 @@ const FabricEditUi = ({route, ...props}) => {
             </View>
           )}
 
-          <View style={{marginTop: hp('2%')}}>
+          <View style={{marginTop: hp('2%'),width: '95%'}}>
             <TextInput
               label="HSN *"
               value={hsn}
@@ -786,7 +795,7 @@ const FabricEditUi = ({route, ...props}) => {
               onChangeText={text => setHsn(text)}
             />
           </View>
-          <View style={{marginTop: hp('2%')}}>
+          <View style={{marginTop: hp('2%'),width: '95%'}}>
             <TextInput
               label="GST Rate(%) *"
               value={gstRate.toString()}
@@ -794,7 +803,7 @@ const FabricEditUi = ({route, ...props}) => {
               onChangeText={text => setGstRate(text)}
             />
           </View>
-          <View style={{marginTop: hp('2%')}}>
+          <View style={{marginTop: hp('2%'),width: '95%'}}>
             <TextInput
               label="Rate "
               value={rate.toString()}
@@ -809,6 +818,7 @@ const FabricEditUi = ({route, ...props}) => {
               justifyContent: 'center',
               backgroundColor: '#fff',
               marginTop: hp('2%'),
+              width: '95%'
             }}>
             <TouchableOpacity
               style={{
@@ -816,7 +826,8 @@ const FabricEditUi = ({route, ...props}) => {
                 borderWidth: 0.5,
                 borderColor: '#D8D8D8',
                 borderRadius: hp('0.5%'),
-                width: wp('90%'),
+                width: '100%',
+                justifyContent:'space-between'
               }}
               onPress={() => {
                 setShowBrandOrProjectList(!showBrandOrProjectList);
@@ -877,7 +888,7 @@ const FabricEditUi = ({route, ...props}) => {
           </View>
 
           {showAddBrandOrProject && (
-            <View style={{marginTop: hp('2%')}}>
+            <View style={{marginTop: hp('2%'),width: '95%'}}>
               <TextInput
                 label="Brand/Project Name "
                 value={addBrandProjectName}
@@ -888,7 +899,7 @@ const FabricEditUi = ({route, ...props}) => {
           )}
 
           {showAddBrandOrProject && (
-            <View style={{marginTop: hp('2%')}}>
+            <View style={{marginTop: hp('2%'),width: '95%'}}>
               <TextInput
                 label="Brand/Project Description "
                 value={addBrandProjectDescription}
@@ -898,7 +909,7 @@ const FabricEditUi = ({route, ...props}) => {
             </View>
           )}
 
-          <View style={{marginTop: hp('2%')}}>
+          <View style={{marginTop: hp('2%'),width: '95%'}}>
             <TextInput
               label="Fabric Width  "
               value={fabricWidth}
@@ -908,7 +919,7 @@ const FabricEditUi = ({route, ...props}) => {
               onChangeText={text => setFabricWidth(text)}
             />
           </View>
-          <View style={{marginTop: hp('2%')}}>
+          <View style={{marginTop: hp('2%'),width: '95%'}}>
             <TextInput
               label="GSM "
               value={gsm}
@@ -917,7 +928,7 @@ const FabricEditUi = ({route, ...props}) => {
             />
           </View>
 
-          <View style={{marginTop: hp('2%')}}>
+          <View style={{marginTop: hp('2%'),width: '95%'}}>
             <TextInput
               label="Inventory Limit "
               value={inventoryLimit.toString()}
@@ -932,6 +943,7 @@ const FabricEditUi = ({route, ...props}) => {
               alignItems: 'center',
               justifyContent: 'space-between',
               marginTop: hp('4%'),
+               width: '95%'
             }}>
             <Text style={{width: '50%', fontWeight: 'bold', color: '#000'}}>
               Trim Fabric
@@ -956,6 +968,7 @@ const FabricEditUi = ({route, ...props}) => {
               alignItems: 'center',
               justifyContent: 'space-between',
               marginTop: hp('4%'),
+               width: '95%'
             }}>
             <Text style={{width: '50%', fontWeight: 'bold', color: '#000'}}>
               Update Roll Wise Qty

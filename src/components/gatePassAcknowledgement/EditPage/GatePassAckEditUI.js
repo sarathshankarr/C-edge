@@ -396,7 +396,7 @@ function formatDateIntoDMY(inp) {
           style={{
             marginBottom: hp('5%'),
             width: '90%',
-            marginHorizontal: wp('5%'),
+            marginHorizontal:'5%',
           }}>
          
 
@@ -430,7 +430,7 @@ function formatDateIntoDMY(inp) {
                   flexDirection: 'column',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  width: '25%',
+                  width: '20%',
                   padding: hp('1%'),
                   borderColor: '#dcdcdc',
                   borderRadius: 8,
@@ -458,7 +458,7 @@ function formatDateIntoDMY(inp) {
                 </View>
         </View>}
 
-          <View style={{marginTop: hp('2%')}}>
+          <View style={{marginTop: hp('2%'), width:'95%'}}>
             <TextInput
               label="Document No *"
               value={documentNo}
@@ -468,7 +468,7 @@ function formatDateIntoDMY(inp) {
             />
           </View>
 
-          <View style={{marginTop: hp('2%')}}>
+          <View style={{marginTop: hp('2%'), width:'95%'}}>
             <TextInput
               label="Invoice/Challan No"
               value={invoiceChallanNo}
@@ -478,7 +478,7 @@ function formatDateIntoDMY(inp) {
             />
           </View>
 
-          <View style={{marginTop: hp('2%')}}>
+          <View style={{marginTop: hp('2%'), width:'95%'}}>
             <TextInput
               label="Docket No"
               value={docketNo}
@@ -488,7 +488,7 @@ function formatDateIntoDMY(inp) {
             />
           </View>
 
-          <View style={{marginTop: hp('2%')}}>
+          <View style={{marginTop: hp('2%'), width:'95%'}}>
             <TextInput
               label="Register SL. No"
               value={registerSLNo}
@@ -498,7 +498,7 @@ function formatDateIntoDMY(inp) {
             />
           </View>
 
-          <View style={{marginTop: hp('2%')}}>
+          <View style={{marginTop: hp('2%'), width:'95%'}}>
             <TextInput
               label="Type of Goods"
               value={typeOfGoods}
@@ -509,7 +509,7 @@ function formatDateIntoDMY(inp) {
           </View>
 
 
-          <View style={{marginTop: hp('2%')}}>
+          <View style={{marginTop: hp('2%'), width:'95%'}}>
             <TextInput
               label="Quantity"
               value={quantity}
@@ -521,9 +521,8 @@ function formatDateIntoDMY(inp) {
 
           <View
             style={{
-              alignItems: 'center',
-              justifyContent: 'center',
               marginTop: hp('2%'),
+              width:'95%',
             }}>
             <TouchableOpacity
               style={{
@@ -531,8 +530,9 @@ function formatDateIntoDMY(inp) {
                 borderWidth: 0.5,
                 borderColor: '#D8D8D8',
                 borderRadius: hp('0.5%'),
-                width: wp('90%'),
-                backgroundColor:'#f8f8f8'
+                width: '100%',
+                backgroundColor:'#f8f8f8',
+                justifyContent:"space-between"
               }}
               onPress={() => {
                 set_showUserList(!showUserList);
@@ -594,9 +594,9 @@ function formatDateIntoDMY(inp) {
 
           <View
             style={{
-              alignItems: 'center',
-              justifyContent: 'center',
               marginTop: hp('2%'),
+              width: '95%',
+
             }}>
             <TouchableOpacity
               style={{
@@ -604,8 +604,9 @@ function formatDateIntoDMY(inp) {
                 borderWidth: 0.5,
                 borderColor: '#D8D8D8',
                 borderRadius: hp('0.5%'),
-                width: wp('90%'),
-                backgroundColor:'#f8f8f8'
+                width: '100%',
+                backgroundColor:'#f8f8f8',
+                justifyContent:'space-between'
 
               }}
               onPress={() => {
@@ -665,9 +666,6 @@ function formatDateIntoDMY(inp) {
               </View>
             )}
           </View>
-
-       
-
 
           <View
             style={{
@@ -747,8 +745,7 @@ function formatDateIntoDMY(inp) {
 
           <View
             style={{
-              alignItems: 'center',
-              justifyContent: 'center',
+              width: '95%',
               marginTop: hp('2%'),
             }}>
             <TouchableOpacity
@@ -757,7 +754,8 @@ function formatDateIntoDMY(inp) {
                 borderWidth: 0.5,
                 borderColor: '#D8D8D8',
                 borderRadius: hp('0.5%'),
-                width: wp('90%'),
+                width: '100%',
+                justifyContent:"space-between"
               }}
               onPress={() => {
                 set_showTransporterList(!showTransporterList);
@@ -819,9 +817,8 @@ function formatDateIntoDMY(inp) {
           
           <View
             style={{
-              alignItems: 'center',
-              justifyContent: 'center',
               marginTop: hp('2%'),
+              width: '95%',
             }}>
             <TouchableOpacity
               style={{
@@ -829,8 +826,9 @@ function formatDateIntoDMY(inp) {
                 borderWidth: 0.5,
                 borderColor: '#D8D8D8',
                 borderRadius: hp('0.5%'),
-                width: wp('90%'),
-                backgroundColor:'#f8f8f8'
+                width: '100%',
+                backgroundColor:'#f8f8f8',
+                justifyContent:'space-between'
               }}
               onPress={() => {
                 set_showVendorList(!showVendorList);
@@ -890,7 +888,7 @@ function formatDateIntoDMY(inp) {
             )}
           </View>
 
-        <View style={{marginTop: hp('2%')}}>
+        <View style={{marginTop: hp('2%'), width:'95%'}}>
             <TextInput
               label="UOM"
               value={uom}
@@ -900,7 +898,7 @@ function formatDateIntoDMY(inp) {
             />
           </View>
 
-        <View style={{marginTop: hp('2%')}}>
+        <View style={{marginTop: hp('2%'), width:'95%'}}>
             <TextInput
               label="Vehicle No"
               value={vehicleNo}
@@ -910,7 +908,7 @@ function formatDateIntoDMY(inp) {
             />
           </View>
 
-          <View style={{ marginTop: 20, marginBottom: 30 }}>
+          <View style={{ marginTop: 20, marginBottom: 30, width:'95%' }}>
           <Text style={[CommonStyles.tylesHeaderTextStyle, { }]}>{'Remarks  '}</Text>
           <View style={{ marginTop: 15}}>
             <TextInput
@@ -926,7 +924,7 @@ function formatDateIntoDMY(inp) {
           </View>
         </View>
 
-          <View style={{ marginTop: 10, marginBottom: 30 }}>
+          <View style={{ marginTop: 10, marginBottom: 30 , width:'95%'}}>
           <Text style={[CommonStyles.tylesHeaderTextStyle, { }]}>{'Acknowledgement Remarks  '}</Text>
           <View style={{ marginTop: 15 }}>
             <TextInput
@@ -946,7 +944,7 @@ function formatDateIntoDMY(inp) {
         </View>
       </KeyboardAwareScrollView>
 
-      <View style={CommonStyles.bottomViewComponentStyle}>
+      <View style={CommonStyles.bottomViewComponentStyle1}>
          <View style={[styles.mainComponentStyle]}>
             {ackBtnEnable ? <TouchableOpacity style={styles.leftButtonstyle1} onPress={() =>  submitAction(1)}>
 

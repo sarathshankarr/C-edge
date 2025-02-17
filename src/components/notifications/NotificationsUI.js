@@ -92,25 +92,20 @@ const NotificationsUI = ({ route, ...props }) => {
 
     <View style={[CommonStyles.mainComponentViewStyle]}>
 
-      <View style={[CommonStyles.headerView]}>
-        <View style={{ flex: 1, backgroundColor: colors.color2 }}>
-          <View style={[styles.headerView]}>
-            <View style={{ flexDirection: 'row', position: 'absolute' }}>
-              <View style={{ justifyContent: 'center' }}>
-                <TouchableOpacity onPress={() => backBtnAction()} style={{ flexDirection: 'row', alignItems: 'center', width: wp('16%') }} disabled={false}>
+            <View style={{ flexDirection: 'row', justifyContent:'space-around',backgroundColor: colors.color2,alignItems:'center' }}>
+              {/* <View style={{ justifyContent: 'center' }}> */}
+                <TouchableOpacity onPress={() => backBtnAction()} style={{ flexDirection: 'row', alignItems: 'center', width: '16%' }} disabled={false}>
                   <Image source={require("./../../../assets/images/png/backButtonImg.png")} style={styles.backBtnEnableStyle} />
                 </TouchableOpacity>
-              </View>
+              {/* </View> */}
               <View style={[styles.headerSelectionView]}><Text style={[styles.titleStyle]}>{"Notifications"}</Text></View>
-              <View style={{marginRight:10}}>
+              <View style={{}}>
                 <TouchableOpacity onPress={() => handleClear()} style={styles.clearAllButton}>
                   <Text style={styles.clearAllButtonText}>Clear All</Text>
                 </TouchableOpacity>
               </View>
             </View>
-          </View>
-        </View>
-      </View>
+         
 
       <View style={CommonStyles.headerStyle}>
 
@@ -180,7 +175,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#ff0000',
   },
   listStyle1: {
-    width: wp('90%'),
+    width: '90%',
     // backgroundColor: 'white',
     marginTop: hp("2%"),
     marginBottom: hp("5%"),
@@ -204,7 +199,7 @@ const styles = StyleSheet.create({
   backBtnEnableStyle: {
     marginLeft: wp("2%"),
     width: wp('6%'),
-    height: wp('6%'),
+    height: hp('6%'),
     resizeMode: 'contain',
     tintColor: "#ffffff"
   },

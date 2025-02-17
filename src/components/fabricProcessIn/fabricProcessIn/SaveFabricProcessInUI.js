@@ -433,6 +433,7 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
               marginTop: hp('2%'),
               backgroundColor: '#fff',
               borderRadius: 10,
+              width: '95%',
             }}>
             <TouchableOpacity
               style={{
@@ -440,7 +441,8 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
                 borderWidth: 0.5,
                 borderColor: '#D8D8D8',
                 borderRadius: hp('0.5%'),
-                width: wp('90%'),
+                width: '100%',
+                justifyContent: 'space-between',
               }}
               onPress={() => {
                 set_showProcessList(!showProcessList);
@@ -539,6 +541,7 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
               marginTop: hp('2%'),
               backgroundColor: '#fff',
               borderRadius: 10,
+              width: '95%',
             }}>
             <TouchableOpacity
               style={{
@@ -546,7 +549,8 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
                 borderWidth: 0.5,
                 borderColor: '#D8D8D8',
                 borderRadius: hp('0.5%'),
-                width: wp('90%'),
+                width: '100%',
+                justifyContent:"space-between"
               }}
               onPress={() => {
                 set_showShiftList(!showShiftList);
@@ -588,7 +592,7 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
             ) : null}
           </View>
 
-          <View style={{marginTop: hp('2%'), flexDirection: 'row'}}>
+          <View style={{marginTop: hp('2%'), flexDirection: 'row',width: '95%',}}>
             <View style={{width: '45%', marginRight: '9%'}}>
               <TextInput
                 label="Out Time"
@@ -607,7 +611,7 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
             </View>
           </View>
 
-          <View style={{marginTop: hp('2%')}}>
+          <View style={{marginTop: hp('2%'),width: '95%',}}>
             <TextInput
               label="Batch No *"
               value={batchNoName}
@@ -617,7 +621,7 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
             />
           </View>
 
-          <View style={{marginTop: hp('2%'), flexDirection: 'row'}}>
+          <View style={{marginTop: hp('2%'), flexDirection: 'row',width: '95%',}}>
             <View style={{width: '45%', marginRight: '9%'}}>
               <TextInput
                 label="Lot No"
@@ -638,7 +642,7 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
             </View>
           </View>
 
-          <View style={{marginTop: hp('2%')}}>
+          <View style={{marginTop: hp('2%'),width: '95%'}}>
             <TextInput
               label="Fabric Issued"
               value={fabricIssued.toString()}
@@ -648,7 +652,7 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
             />
           </View>
 
-          <View style={{marginTop: hp('2%'), flexDirection: 'row'}}>
+          <View style={{marginTop: hp('2%'), flexDirection: 'row',width: '95%'}}>
             <View style={{width: '80%'}}>
               <TextInput
                 label="Fabric Processed "
@@ -678,7 +682,7 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
             </View>
           </View>
 
-          <View style={{marginTop: hp('2%')}}>
+          <View style={{marginTop: hp('2%'),width: '95%'}}>
             <TextInput
               label="Batch *"
               value={batch.toString()}
@@ -695,6 +699,7 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
               marginTop: hp('2%'),
               backgroundColor: '#fff',
               borderRadius: 10,
+              width: '95%',
             }}>
             <TouchableOpacity
               style={{
@@ -702,7 +707,8 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
                 borderWidth: 0.5,
                 borderColor: '#D8D8D8',
                 borderRadius: hp('0.5%'),
-                width: wp('90%'),
+                width: '100%',
+                justifyContent:"space-between"
               }}
               onPress={() => {
                 set_showMachineNoList(!showMachineNoList);
@@ -773,6 +779,7 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
               marginTop: hp('2%'),
               backgroundColor: '#fff',
               borderRadius: 10,
+              width: '95%',
             }}>
             <TouchableOpacity
               style={{
@@ -780,7 +787,8 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
                 borderWidth: 0.5,
                 borderColor: '#D8D8D8',
                 borderRadius: hp('0.5%'),
-                width: wp('90%'),
+                width: '100%',
+                justifyContent:"space-between"
               }}
               onPress={() => {
                 set_showattendedByList(!showattendedByList);
@@ -844,7 +852,7 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
             )}
           </View>
 
-          <View style={{marginTop: hp('2%')}}>
+          <View style={{marginTop: hp('2%'),width: '95%'}}>
             <TextInput
               label="Fabric no"
               value={fabricNo}
@@ -853,7 +861,7 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
               onChangeText={text => set_fabricNo(text)}
             />
           </View>
-          <View style={{marginTop: hp('2%')}}>
+          <View style={{marginTop: hp('2%'),width: '95%'}}>
             <TextInput
               label="Quality"
               value={quality}
@@ -862,7 +870,7 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
               onChangeText={text => set_quality(text)}
             />
           </View>
-          <View style={{marginTop: hp('2%')}}>
+          <View style={{marginTop: hp('2%'),width: '95%'}}>
             <TextInput
               label="OrderNo"
               value={orderNO}
@@ -871,7 +879,7 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
               onChangeText={text => set_OrderNo(text)}
             />
           </View>
-          <View style={{marginTop: hp('2%')}}>
+          <View style={{marginTop: hp('2%'),width: '95%'}}>
             <TextInput
               label="Design"
               value={designNO}
@@ -880,7 +888,7 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
               onChangeText={text => set_designNO(text)}
             />
           </View>
-          <View style={{marginTop: hp('2%')}}>
+          <View style={{marginTop: hp('2%'),width: '95%'}}>
             <TextInput
               label="MatchingName"
               value={machineNo}
@@ -889,7 +897,7 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
               onChangeText={text => set_machineNo(text)}
             />
           </View>
-          <View style={{marginTop: hp('2%')}}>
+          <View style={{marginTop: hp('2%'),width: '95%'}}>
             <TextInput
               label="Fabric Type"
               value={fabricType}

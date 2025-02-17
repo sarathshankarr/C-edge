@@ -683,7 +683,7 @@ const StyleDetailsUI = ({route, ...props}) => {
         <View
           style={{
             width: '90%',
-            marginHorizontal: 10,
+            marginHorizontal: 15,
             marginTop: hp('2%'),
           }}>
           <ScrollView
@@ -708,15 +708,14 @@ const StyleDetailsUI = ({route, ...props}) => {
               </TouchableOpacity>
             ))}
           </ScrollView>
-        </View>
+       
 
         {selectedTab == 1 && (
           <View
             style={{
               marginBottom: hp('5%'),
-              // width: '100%',
+              width: '100%',
               marginTop: hp('2%'),
-              marginHorizontal: wp('5%'),
             }}>
             <View style={{marginTop: hp('2%')}}>
               <TextInput
@@ -763,10 +762,11 @@ const StyleDetailsUI = ({route, ...props}) => {
               <TouchableOpacity
                 style={{
                   flexDirection: 'row',
-                  borderWidth: 0.5,
-                  borderColor: '#D8D8D8',
+                  // borderWidth: 0.5,
+                  // borderColor: '#D8D8D8',
                   borderRadius: hp('0.5%'),
-                  width: wp('90%'),
+                  width: '90%',
+                  justifyContent:'space-between'
                 }}
                 onPress={() => {
                   setShowLocationList(!showLocationList);
@@ -836,10 +836,11 @@ const StyleDetailsUI = ({route, ...props}) => {
               <TouchableOpacity
                 style={{
                   flexDirection: 'row',
-                  borderWidth: 0.5,
-                  borderColor: '#D8D8D8',
+                 // borderWidth: 0.5,
+                  // borderColor: '#D8D8D8',
                   borderRadius: hp('0.5%'),
-                  width: wp('90%'),
+                  width: '90%',
+                  justifyContent:'space-between'
                 }}
                 onPress={() => {
                   setShowFabricList(!showFabricList);
@@ -909,10 +910,11 @@ const StyleDetailsUI = ({route, ...props}) => {
               <TouchableOpacity
                 style={{
                   flexDirection: 'row',
-                  borderWidth: 0.5,
-                  borderColor: '#D8D8D8',
+                // borderWidth: 0.5,
+                  // borderColor: '#D8D8D8',
                   borderRadius: hp('0.5%'),
-                  width: wp('90%'),
+                  width: '90%',
+                  justifyContent:'space-between'
                 }}
                 onPress={() => {
                   setShowColorList(!showColorList);
@@ -989,10 +991,11 @@ const StyleDetailsUI = ({route, ...props}) => {
               <TouchableOpacity
                 style={{
                   flexDirection: 'row',
-                  borderWidth: 0.5,
-                  borderColor: '#D8D8D8',
+               // borderWidth: 0.5,
+                  // borderColor: '#D8D8D8',
                   borderRadius: hp('0.5%'),
-                  width: wp('90%'),
+                  width: '90%',
+                  justifyContent:'space-between'
                 }}
                 onPress={() => {
                   setShowSeasonList(!showSeasonList);
@@ -1071,10 +1074,11 @@ const StyleDetailsUI = ({route, ...props}) => {
               <TouchableOpacity
                 style={{
                   flexDirection: 'row',
-                  borderWidth: 0.5,
-                  borderColor: '#D8D8D8',
+              // borderWidth: 0.5,
+                  // borderColor: '#D8D8D8',
                   borderRadius: hp('0.5%'),
-                  width: wp('90%'),
+                  width: '90%',
+                  justifyContent:'space-between'
                 }}
                 onPress={() => {
                   setShowBrandList(!showBrandList);
@@ -1162,10 +1166,11 @@ const StyleDetailsUI = ({route, ...props}) => {
               <TouchableOpacity
                 style={{
                   flexDirection: 'row',
-                  borderWidth: 0.5,
-                  borderColor: '#D8D8D8',
+                  // borderWidth: 0.5,
+                  // borderColor: '#D8D8D8',
                   borderRadius: hp('0.5%'),
-                  width: wp('90%'),
+                  width: '90%',
+                  justifyContent:'space-between'
                 }}
                 onPress={() => {
                   setShowScaleOrSizeList(!showScaleOrSizeList);
@@ -1309,10 +1314,11 @@ const StyleDetailsUI = ({route, ...props}) => {
               <TouchableOpacity
                 style={{
                   flexDirection: 'row',
-                  borderWidth: 0.5,
-                  borderColor: '#D8D8D8',
+                  // borderWidth: 0.5,
+                  // borderColor: '#D8D8D8',
                   borderRadius: hp('0.5%'),
-                  width: wp('90%'),
+                  width: '90%',
+                  justifyContent:'space-between'
                 }}
                 onPress={() => {
                   setShowProcessWorkFlowList(!showProcessWorkFlowList);
@@ -1379,6 +1385,7 @@ const StyleDetailsUI = ({route, ...props}) => {
             style={{
               marginBottom: hp('5%'),
               marginTop: hp('2%'),
+              width:'100%'
             }}>
             <View style={styles.wrapper}>
               <View style={styles.table}>
@@ -1780,6 +1787,7 @@ const StyleDetailsUI = ({route, ...props}) => {
             </View>
           </View>
         )}
+         </View>
 
         <View style={{height: 200}}></View>
       </KeyboardAwareScrollView>
@@ -1967,7 +1975,7 @@ const getStyles = colors =>
       width: '100%',
     },
     table: {
-      width: '95%', // Reduces extra space on the sides
+      width: '100%', 
       backgroundColor: '#fff',
       elevation: 1,
       borderRadius: 5,

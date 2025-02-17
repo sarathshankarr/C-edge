@@ -157,8 +157,6 @@ const SaveStichingInUI = ({route, ...props}) => {
 
           <View
             style={{
-              alignItems: 'center',
-              justifyContent: 'center',
               marginTop: hp('1%'),
               backgroundColor: editLocation ? '#ffffff' : '#dedede',
               width: '90%',
@@ -171,13 +169,11 @@ const SaveStichingInUI = ({route, ...props}) => {
                 borderColor: '#D8D8D8',
                 borderRadius: hp('0.5%'),
                 width: '100%',
-                alignItems: 'center',
                 justifyContent: 'space-between',
               }}
               onPress={() => {
                 set_showLocationList(!showLocationList);
               }}>
-              <View>
                 <View style={[styles.SectionStyle1]}>
                   <View style={{flexDirection: 'column'}}>
                     <Text
@@ -195,7 +191,6 @@ const SaveStichingInUI = ({route, ...props}) => {
                     ) : null}
                   </View>
                 </View>
-              </View>
 
               <View style={{justifyContent: 'center'}}>
                 <Image source={downArrowImg} style={styles.imageStyle} />

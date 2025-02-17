@@ -75,6 +75,19 @@ const CommonStyles = StyleSheet.create({
         shadowRadius: 10,
         elevation: 25,
     },
+    bottomViewComponentStyle1 : {
+        height:hp('12%'),
+        width:'100%',
+        backgroundColor:'white',
+        position:"absolute",
+        bottom:0,
+        shadowColor: 'black',
+        shadowOffset: { width: 10, height: 10 },
+        shadowOpacity: 0.5,
+        shadowRadius: 10,
+        elevation: 25,
+        alignItems:'center'
+    },
 
     headerView : {
         backgroundColor:'red',

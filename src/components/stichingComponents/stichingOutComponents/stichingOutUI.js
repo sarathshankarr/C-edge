@@ -292,7 +292,7 @@ const StichingOutUI = ({route, ...props }) => {
     
   </TouchableOpacity>
 
-</View>
+       </View>
 
 
         ) : null}

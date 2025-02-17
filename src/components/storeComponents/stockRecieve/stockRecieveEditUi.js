@@ -239,7 +239,6 @@ const StockRecieveEditUi = ({ route, ...props }) => {
             </View>
           </View>}
 
-          {/* { data && console.log("data==>",data?.fabric?.length)} */}
           {data && data?.fabric?.length > 0 && <View style={styles.wrapper}>
             <View style={styles.table}>
               {/* Table Head */}
@@ -292,7 +291,7 @@ const StockRecieveEditUi = ({ route, ...props }) => {
                backgroundColor: '#fff',
                marginTop: hp('2%'),
                flexDirection: 'row',
-               // width: '90%',
+               width: '90%',
                marginHorizontal:20
              }}>
              <View style={{width: '85%', paddingHorizontal: 10}}>
@@ -449,13 +448,13 @@ const getStyles = (colors) => StyleSheet.create({
 
   },
   wrapper: {
-    justifyContent: 'center',
-    alignItems: 'center',
+    // justifyContent: 'center',
+    alignSelf: 'center',
     flex: 1,
     marginTop: hp('2%'),
-    width: '95%',
+    width: '90%',
     marginBottom: 10,
-    marginHorizontal: 10
+    // marginHorizontal: 10
   },
   table_head: {
     flexDirection: 'row',
@@ -492,8 +491,8 @@ const getStyles = (colors) => StyleSheet.create({
     textAlign: 'center'
   },
   table: {
-    margin: 15,
-    // width:'100%',
+    marginTop: 15,
+    width:'100%',
     justifyContent: 'center',
     alignItems: 'center',
     elevation: 1,
