@@ -288,10 +288,8 @@ const FinishingOutListUI = ({route, ...props }) => {
         ) : null}
 
         {props.itemsArray && props.itemsArray.length > 0 ? <View style={CommonStyles.listCommonHeader1}>
-          <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:1.5,textAlign:'left'}]}>{'Style Details'}</Text>
-          {/* <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:1,textAlign:'center',}]}>{'Color'}</Text>
-          <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:1,textAlign:'center',}]}>{'WO'}</Text> */}
-          <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:1.2,textAlign:'right',marginRight:wp('2%'),}]}>{'TQty/Fin.Qty'}</Text>
+          <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:3,textAlign:'left'}]}>{'Style Details'}</Text>
+          <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:1}]}>{'TQty/Fin.Qty'}</Text>
         </View> : <View style = {CommonStyles.noRecordsFoundStyle}>
             {!props.MainLoading ? <Text style={[CommonStyles.tylesHeaderTextStyle, {fontSize: 18}]}>{Constant.noRecFound}</Text> : null}
         </View>}

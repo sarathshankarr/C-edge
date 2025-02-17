@@ -453,8 +453,8 @@ const proceedWithSubmission=()=>{
             <TouchableOpacity
               style={{
                 flexDirection: 'row',
-                borderWidth: 0.5,
-                borderColor: '#D8D8D8',
+                // borderWidth: 0.5,
+                // borderColor: '#D8D8D8',
                 borderRadius: hp('0.5%'),
                 width: wp('90%'),
               }}
@@ -526,8 +526,8 @@ const proceedWithSubmission=()=>{
             <TouchableOpacity
               style={{
                 flexDirection: 'row',
-                borderWidth: 0.5,
-                borderColor: '#D8D8D8',
+                // borderWidth: 0.5,
+                // borderColor: '#D8D8D8',
                 borderRadius: hp('0.5%'),
                 width: wp('90%'),
               }}
@@ -599,8 +599,8 @@ const proceedWithSubmission=()=>{
             <TouchableOpacity
               style={{
                 flexDirection: 'row',
-                borderWidth: 0.5,
-                borderColor: '#D8D8D8',
+                // borderWidth: 0.5,
+                // borderColor: '#D8D8D8',
                 borderRadius: hp('0.5%'),
                 width: wp('90%'),
               }}
@@ -679,8 +679,8 @@ const proceedWithSubmission=()=>{
             <TouchableOpacity
               style={{
                 flexDirection: 'row',
-                borderWidth: 0.5,
-                borderColor: '#D8D8D8',
+                // borderWidth: 0.5,
+                // borderColor: '#D8D8D8',
                 borderRadius: hp('0.5%'),
                 width: wp('90%'),
               }}
@@ -761,8 +761,8 @@ const proceedWithSubmission=()=>{
             <TouchableOpacity
               style={{
                 flexDirection: 'row',
-                borderWidth: 0.5,
-                borderColor: '#D8D8D8',
+                // borderWidth: 0.5,
+                // borderColor: '#D8D8D8',
                 borderRadius: hp('0.5%'),
                 width: wp('90%'),
               }}
@@ -852,8 +852,8 @@ const proceedWithSubmission=()=>{
             <TouchableOpacity
               style={{
                 flexDirection: 'row',
-                borderWidth: 0.5,
-                borderColor: '#D8D8D8',
+                // borderWidth: 0.5,
+                // borderColor: '#D8D8D8',
                 borderRadius: hp('0.5%'),
                 width: wp('90%'),
               }}
@@ -999,8 +999,8 @@ const proceedWithSubmission=()=>{
             <TouchableOpacity
               style={{
                 flexDirection: 'row',
-                borderWidth: 0.5,
-                borderColor: '#D8D8D8',
+                // borderWidth: 0.5,
+                // borderColor: '#D8D8D8',
                 borderRadius: hp('0.5%'),
                 width: wp('90%'),
               }}
@@ -1106,42 +1106,6 @@ export default StyleCreateUI;
 
 const getStyles = colors =>
   StyleSheet.create({
-    popSearchViewStyle: {
-      height: hp('40%'),
-      width: wp('90%'),
-      backgroundColor: '#f0f0f0',
-      // bottom: 220,
-      // position: 'absolute',
-      // flex:1,
-      alignSelf: 'center',
-      // borderTopRightRadius: 15,
-      // borderTopLeftRadius: 15,
-      alignItems: 'center',
-    },
-    popSearchViewStyle1: {
-      width: wp('90%'),
-      backgroundColor: '#f0f0f0',
-      // bottom: 220,
-      // position: 'absolute',
-      // flex:1,
-      alignSelf: 'center',
-      alignItems: 'center',
-    },
-
-    flatcontainer: {
-      flex: 1,
-    },
-
-    flatview: {
-      height: hp('8%'),
-      marginBottom: hp('0.3%'),
-      alignContent: 'center',
-      justifyContent: 'center',
-      borderBottomColor: 'black',
-      borderBottomWidth: wp('0.1%'),
-      width: wp('80%'),
-      alignItems: 'center',
-    },
 
     SectionStyle1: {
       flexDirection: 'row',

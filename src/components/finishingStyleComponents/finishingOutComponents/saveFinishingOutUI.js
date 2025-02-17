@@ -176,7 +176,6 @@ const SaveFinishingOutUI = ({route, ...props}) => {
               onPress={() => {
                 set_showLocationList(!showLocationList);
               }}>
-              <View>
                 <View style={[styles.SectionStyle1, {}]}>
                   <View style={{flexDirection: 'column'}}>
                     <Text
@@ -194,7 +193,6 @@ const SaveFinishingOutUI = ({route, ...props}) => {
                     ) : null}
                   </View>
                 </View>
-              </View>
 
               <View style={{justifyContent: 'center'}}>
                 <Image source={downArrowImg} style={styles.imageStyle} />

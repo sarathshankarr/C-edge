@@ -111,7 +111,9 @@ const POApprovalUI = ({route, ...props}) => {
     //   style={{backgroundColor:'red'}}
     // >
 
-    <View style={{backgroundColor: 'white', alignItems: 'center', flex: 1}}>
+    <View style={{backgroundColor: 'white', alignItems: 'center', flex: 1, width: '100%'}}>
+
+
       <View style={[CommonStyles.headerView]}>
         <HeaderComponent
           isBackBtnEnable={true}

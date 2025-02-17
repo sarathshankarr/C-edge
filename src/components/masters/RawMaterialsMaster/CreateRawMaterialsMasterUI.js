@@ -404,7 +404,7 @@ const CreateRawMaterialsMasterUI = ({route, navigation, ...props}) => {
               style={{
                 flexDirection: 'row',
                 borderWidth: 0.5,
-                borderColor: '#D8D8D8',
+                borderColor: '#fff',
                 borderRadius: hp('0.5%'),
                 width: wp('90%'),
               }}
@@ -531,7 +531,7 @@ const CreateRawMaterialsMasterUI = ({route, navigation, ...props}) => {
               style={{
                 flexDirection: 'row',
                 borderWidth: 0.5,
-                borderColor: '#D8D8D8',
+                borderColor: '#fff',
                 borderRadius: hp('0.5%'),
                 width: wp('90%'),
               }}
@@ -604,7 +604,7 @@ const CreateRawMaterialsMasterUI = ({route, navigation, ...props}) => {
               style={{
                 flexDirection: 'row',
                 borderWidth: 0.5,
-                borderColor: '#D8D8D8',
+                borderColor: '#fff',
                 borderRadius: hp('0.5%'),
                 width: wp('90%'),
               }}
@@ -731,7 +731,7 @@ const CreateRawMaterialsMasterUI = ({route, navigation, ...props}) => {
               style={{
                 flexDirection: 'row',
                 borderWidth: 0.5,
-                borderColor: '#D8D8D8',
+                borderColor: '#fff',
                 borderRadius: hp('0.5%'),
                 width: wp('90%'),
               }}
@@ -867,7 +867,7 @@ const CreateRawMaterialsMasterUI = ({route, navigation, ...props}) => {
               style={{
                 flexDirection: 'row',
                 borderWidth: 0.5,
-                borderColor: '#D8D8D8',
+                borderColor: '#fff',
                 borderRadius: hp('0.5%'),
                 width: wp('90%'),
               }}

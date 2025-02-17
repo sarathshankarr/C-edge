@@ -330,17 +330,18 @@ const StockRequestEditUi = ({route, ...props}) => {
 
           <View
             style={{
-              width: '90%',
+              alignItems: 'center',
+                justifyContent: 'center',
               marginTop: 10,
               marginBottom: 30,
-              marginHorizontal: 15,
+              // marginHorizontal: 15,
             }}>
             <Text
               style={[
                 CommonStyles.tylesHeaderTextStyle,
                 {alignItems: 'center', marginLeft: 10},
               ]}>
-              {'Comments  :'}
+              {'Comments  '}
             </Text>
             <View
               style={{
@@ -349,11 +350,9 @@ const StockRequestEditUi = ({route, ...props}) => {
                 marginTop: 15,
                 borderRadius: 10,
                 backgroundColor: 'white',
-                width: '100%',
+                width: '90%',
               }}>
-              {/* <View style={{ marginTop: 20, marginBottom: 30 }}>
-            <Text style={[CommonStyles.tylesHeaderTextStyle, { alignItems: 'center', marginLeft: 10, backgroundColor: 'white' }]}>{'Remarks  :'}</Text>
-            <View style={{ borderWidth: 1, borderColor: 'black',  marginTop: 15, borderRadius: 10, backgroundColor: 'white' }}> */}
+              
               <TextInput
                 placeholder=""
                 autoCapitalize="none"
@@ -368,6 +367,7 @@ const StockRequestEditUi = ({route, ...props}) => {
               />
             </View>
           </View>
+
           <View style={styles.wrapper}>
             <View style={styles.table}>
               {/* Table Head */}
@@ -400,9 +400,6 @@ const StockRequestEditUi = ({route, ...props}) => {
               <View style={styles.table}>
                 {/* Table Head */}
                 <View style={styles.table_head}>
-                  {/* <View style={styles.checkbox_container}>
-                  <CustomCheckBox isChecked={checkbox} onToggle={handleCheckBoxToggle} />
-                </View> */}
 
                   <View style={{width: '10%'}}>
                     <Text style={styles.table_head_captions1}>Action</Text>
@@ -431,12 +428,9 @@ const StockRequestEditUi = ({route, ...props}) => {
 
                 {stockTable?.map((item, index) => (
                   <View key={index} style={styles.table_body_single_row}>
-                    {/* <View style={styles.checkbox_container}>
-                    <CustomCheckBox isChecked={item.isChecked || checkbox} onToggle={() => console.log("checked")} />
-                  </View> */}
-                    <View style={{width: 60}}>
+                    <View style={styles.checkbox_container}>
                       <TouchableOpacity
-                        style={{alignItems: '', justifyContent: ''}}
+                        style={{}}
                         onPress={() => RemoveRow(item.id)}>
                         <Image source={closeImg} style={styles.imageStyle1} />
                       </TouchableOpacity>
@@ -524,40 +518,14 @@ export default StockRequestEditUi;
 
 const getStyles = colors =>
   StyleSheet.create({
-    popSearchViewStyle: {
-      height: hp('40%'),
-      width: wp('90%'),
-      backgroundColor: '#E5E4E2',
-      // bottom: 220,
-      // position: 'absolute',
-      // flex:1,
-      alignSelf: 'center',
-      borderTopRightRadius: 15,
-      borderTopLeftRadius: 15,
-      alignItems: 'center',
-    },
-
-    flatcontainer: {
-      flex: 1,
-    },
-
-    flatview: {
-      height: hp('8%'),
-      marginBottom: hp('0.3%'),
-      alignContent: 'center',
-      justifyContent: 'center',
-      borderBottomColor: 'black',
-      borderBottomWidth: wp('0.1%'),
-      width: wp('80%'),
-      alignItems: 'center',
-    },
+    
 
     SectionStyle1: {
       flexDirection: 'row',
       // justifyContent: "center",
       alignItems: 'center',
       height: hp('7%'),
-      width: wp('75%'),
+      width: '75%',
       borderRadius: hp('0.5%'),
       // alignSelf: "center",
       // backgroundColor: "grey",
@@ -576,7 +544,7 @@ const getStyles = colors =>
       fontSize: 18,
       marginLeft: wp('4%'),
       color: 'black',
-      width: wp('80%'),
+      width: '80%',
     },
 
     dropTextLightStyle: {
@@ -593,9 +561,9 @@ const getStyles = colors =>
       alignItems: 'center',
       flex: 1,
       marginTop: hp('2%'),
-      width: '95%',
+      // width: '95%',
       marginBottom: 10,
-      marginHorizontal: 10,
+      marginHorizontal: 15,
     },
     table_head: {
       flexDirection: 'row',
@@ -650,8 +618,8 @@ const getStyles = colors =>
       alignSelf: 'center',
     },
     table: {
-      margin: 15,
-      // width:'100%',
+      marginTop: 15,
+      width:'90%',
       justifyContent: 'center',
       alignItems: 'center',
       elevation: 1,

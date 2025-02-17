@@ -500,8 +500,8 @@ const CreateVendorOrCustomerMasterUI = ({route, navigation, ...props}) => {
             <TouchableOpacity
               style={{
                 flexDirection: 'row',
-                borderWidth: 0.5,
-                borderColor: '#D8D8D8',
+                // borderWidth: 0.5,
+                // borderColor: '#D8D8D8',
                 borderRadius: hp('0.5%'),
                 width: wp('90%'),
               }}
@@ -573,8 +573,8 @@ const CreateVendorOrCustomerMasterUI = ({route, navigation, ...props}) => {
             <TouchableOpacity
               style={{
                 flexDirection: 'row',
-                borderWidth: 0.5,
-                borderColor: '#D8D8D8',
+                // borderWidth: 0.5,
+                // borderColor: '#D8D8D8',
                 borderRadius: hp('0.5%'),
                 width: wp('90%'),
               }}
@@ -709,8 +709,8 @@ const CreateVendorOrCustomerMasterUI = ({route, navigation, ...props}) => {
             <TouchableOpacity
               style={{
                 flexDirection: 'row',
-                borderWidth: 0.5,
-                borderColor: '#D8D8D8',
+                // borderWidth: 0.5,
+                // borderColor: '#D8D8D8',
                 borderRadius: hp('0.5%'),
                 width: wp('90%'),
               }}

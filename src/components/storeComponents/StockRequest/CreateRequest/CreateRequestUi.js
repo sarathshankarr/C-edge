@@ -1095,6 +1095,7 @@ const CreateRequestUi = ({route, ...props}) => {
                 justifyContent: 'center',
                 marginTop: hp('2%'),
                 // backgroundColor: '#f8f8f8',
+           
               }}>
               <TouchableOpacity
                 style={{
@@ -1102,7 +1103,8 @@ const CreateRequestUi = ({route, ...props}) => {
                   borderWidth: 0.5,
                   borderColor: '#D8D8D8',
                   borderRadius: hp('0.5%'),
-                  width: wp('90%'),
+                  width: '90%',
+                  justifyContent:'space-between',
                   backgroundColor: '#fff',
                 }}
                 onPress={() => {
@@ -1174,6 +1176,7 @@ const CreateRequestUi = ({route, ...props}) => {
                 borderColor: '#D8D8D8',
                 borderRadius: hp('0.5%'),
                 width: '90%',
+                justifyContent:"space-between",
                 backgroundColor: '#fff',
               }}
               onPress={() => {
@@ -1243,7 +1246,8 @@ const CreateRequestUi = ({route, ...props}) => {
                   borderWidth: 0.5,
                   borderColor: '#D8D8D8',
                   borderRadius: hp('0.5%'),
-                  width: wp('90%'),
+                  width: '90%',
+                  justifyContent:'space-between',
                   backgroundColor: '#fff',
                 }}
                 onPress={() => {
@@ -1438,7 +1442,8 @@ const CreateRequestUi = ({route, ...props}) => {
                 borderWidth: 0.5,
                 borderColor: '#D8D8D8',
                 borderRadius: hp('0.5%'),
-                width: wp('90%'),
+                width: '90%',
+                justifyContent:'space-between',
                 backgroundColor: '#ffffff',
               }}
               onPress={() => {
@@ -1495,7 +1500,8 @@ const CreateRequestUi = ({route, ...props}) => {
                 borderWidth: 0.5,
                 borderColor: '#D8D8D8',
                 borderRadius: hp('0.5%'),
-                width: wp('90%'),
+                width: '90%',
+                justifyContent:'space-between',
                 backgroundColor: '#ffffff',
               }}
               onPress={() => {
@@ -1555,7 +1561,8 @@ const CreateRequestUi = ({route, ...props}) => {
 
           <View
             style={{
-              width: '90%',
+              alignItems: 'center',
+              justifyContent: 'center',
               marginTop: 20,
               marginBottom: 20,
               marginHorizontal: 15,
@@ -1565,11 +1572,10 @@ const CreateRequestUi = ({route, ...props}) => {
                 CommonStyles.tylesHeaderTextStyle,
                 {
                   alignItems: 'center',
-                  marginLeft: 10,
                   // backgroundColor: 'white',
                 },
               ]}>
-              {'Comments  :'}
+              {'Comments  '}
             </Text>
             <View
               style={{
@@ -1578,7 +1584,7 @@ const CreateRequestUi = ({route, ...props}) => {
                 marginTop: 15,
                 borderRadius: 10,
                 backgroundColor: 'white',
-                width: '100%',
+                width: '95%',
               }}>
               <TextInput
                 style={[
