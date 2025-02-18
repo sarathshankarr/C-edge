@@ -80,7 +80,7 @@ const POApproveListComponent = ({ navigation, route, ...props }) => {
       "company":JSON.parse(companyObj),
   }
 
-  console.log("list po req obj ===> ", obj);
+  // console.log("list po req obj ===> ", obj);
 
     let poEditAPIObj = await APIServiceCall.allPOAPIService(obj);
     set_isLoading(false);

@@ -167,11 +167,11 @@ const CommonStyles = StyleSheet.create({
          
     },
     listStyle1 : {
-        width:'90%',
-        maxHeight:'40%',
+        width:'100%',
+        maxHeight:'70%',
         backgroundColor:'white',
         marginTop: "2%",
-        marginBottom: "5%", 
+        // marginBottom: "5%", 
     },
     listStyle2 : {
         width:'90%',
