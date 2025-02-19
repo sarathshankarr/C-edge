@@ -22,7 +22,10 @@ import AlertComponent from '../../utils/commonComponents/alertComponent';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import BottomComponent from '../../utils/commonComponents/bottomComponent';
 import {TextInput} from 'react-native-paper';
+
 let downArrowImg = require('./../../../assets/images/png/dropDownImg.png');
+let closeImg = require('./../../../assets/images/png/close1.png');
+
 
 const CreatePartProcessingUI = ({route, navigation, ...props}) => {
   const [employeeBarcode, setEmployeeBarcode] = useState('');
@@ -36,6 +39,28 @@ const CreatePartProcessingUI = ({route, navigation, ...props}) => {
   const popOkBtnAction = () => {
     props.popOkBtnAction();
   };
+
+  useEffect(()=>{
+    if(props.lists){
+      console.log("data need to set ==> ", props.lists)
+     const tempObj ={
+      enterDate:props.lists.enterDate ? props.lists.enterDate :"",
+      styleNo:props.lists.styleName ? props.lists.styleName :"",
+      size:props.lists.size ? props.lists.size :"",
+      enterQty:props.lists.enterDate ? props.lists.enterDate :"",
+      inputQty:props.lists.scanQty ? props.lists.scanQty :"",
+      process:props.lists.processName ? props.lists.processName :"",
+      partsName:props.lists.part ? props.lists.part :"",
+      barCode:props.lists.enterDate ? props.lists.enterDate :"",
+      username:props.lists.userName ? props.lists.userName :"",
+     }
+
+    //  if(processId){
+      setRows(prev => [...prev, tempObj]);
+    //  }
+
+    }
+  },[props.lists])
 
   // Process
   const [processList, setProcessList] = useState([]);
@@ -251,9 +276,11 @@ const CreatePartProcessingUI = ({route, navigation, ...props}) => {
                   </View>
                 </View>
 
+                {console.log("rows ==> ", rows)}
+
                 {/* Table Body - Rows */}
-                {rows.map(row => (
-                  <View key={row.id} style={styles.table_body_single_row}>
+                {rows.map((row,index)=> (
+                  <View key={index} style={styles.table_body_single_row}>
                     <View style={{width: 60}}>
                       <TouchableOpacity
                         style={{alignItems: '', justifyContent: ''}}
@@ -513,5 +540,12 @@ const styles = StyleSheet.create({
     marginLeft: 8,
     fontSize: 14,
     color: '#000',
+  },
+  imageStyle1: {
+    height: 30,
+    aspectRatio: 1,
+    resizeMode: 'contain',
+    tintColor: 'red',
+    alignSelf: 'center',
   },
 });
