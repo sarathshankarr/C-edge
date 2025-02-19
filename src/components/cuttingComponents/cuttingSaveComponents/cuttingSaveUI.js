@@ -107,7 +107,9 @@ const CuttingSaveUI = ({route, ...props}) => {
 
     for (let i = 0; i < enterSizesArray.length; i++) {
       if (enterSizesArray[i].enterQty && enterSizesArray[i].enterQty !== '') {
-        temValid = true;
+        if(Number(enterSizesArray[i].enterQty)>0){
+          temValid = true;
+        }
       } else {
         enterSizesArray[i].enterQty = 0;
       }
@@ -166,33 +168,61 @@ const CuttingSaveUI = ({route, ...props}) => {
     props.submitAction(obj);
   };
 
-  const untiPriceValue = (value, index) => {
-    let tempArray = enterSizesArray;
-    tempArray[index].enterQty = value;
-    set_enterSizesArray(tempArray);
-    // console.log('-------->', tempArray);
+  // const untiPriceValue = (value, index) => {
+  //   let tempArray = enterSizesArray;
+  //   tempArray[index].enterQty = value ? value : '';
+  //   set_enterSizesArray(tempArray);
+  //   console.log(index , '-------->', tempArray[index].enterQty);
 
-    let tempDaily = 0;
-    let totalSum = 0;
-    const approvedQty =
-      props.routeParams.fabricType == 'Main Fabric'
-        ? approvedConsumption?.toString()
-        : props?.itemsObj?.trimApprovedconsumption?.toString();
-    for (let i = 0; i < enterSizesArray.length; i++) {
-      tempDaily += Number(enterSizesArray[i].enterQty) * Number(approvedQty);
-      totalSum += Number(enterSizesArray[i].enterQty);
-    }
-    set_dailyConsumption(tempDaily);
-    let v = tempDaily / totalSum;
-    set_actualConsumption(v);
-    // console.log("actual Consumption  ", tempDaily, totalSum, actualConsumption);
-  };
+  //   let tempDaily = 0;
+  //   let totalSum = 0;
+  //   const approvedQty =
+  //     props.routeParams.fabricType == 'Main Fabric'
+  //       ? approvedConsumption?.toString()
+  //       : props?.itemsObj?.trimApprovedconsumption?.toString();
+  //   for (let i = 0; i < enterSizesArray.length; i++) {
+  //     tempDaily += Number(enterSizesArray[i].enterQty) * Number(approvedQty);
+  //     totalSum += Number(enterSizesArray[i].enterQty);
+  //   }
+  //   set_dailyConsumption(tempDaily);
+  //   let v = tempDaily / totalSum;
+  //   set_actualConsumption(v);
+  //   // console.log("actual Consumption  ", tempDaily, totalSum, actualConsumption);
+  // };
 
   // const actionOnBatchtype = (id, name) => {
   //   set_batchText(name);
   //   set_batchId(id);
   //   set_isBatchType(false)
   // }
+  const untiPriceValue = (value, index) => {
+    set_enterSizesArray(prevArray => {
+      // Create a new array instead of modifying state directly
+      const updatedArray = prevArray.map((item, i) => 
+        i === index ? { ...item, enterQty: value ? value : '' } : item
+      );
+  
+      console.log(index, '-------->', updatedArray[index].enterQty);
+  
+      let tempDaily = 0;
+      let totalSum = 0;
+      const approvedQty =
+        props.routeParams.fabricType == 'Main Fabric'
+          ? approvedConsumption?.toString()
+          : props?.itemsObj?.trimApprovedconsumption?.toString();
+          
+      for (let i = 0; i < updatedArray.length; i++) {
+        tempDaily += Number(updatedArray[i].enterQty) * Number(approvedQty);
+        totalSum += Number(updatedArray[i].enterQty);
+      }
+  
+      set_dailyConsumption(tempDaily);
+      set_actualConsumption(totalSum ? tempDaily / totalSum : 0);
+  
+      return updatedArray; 
+    });
+  };
+  
 
   const actionOnLocation = (locationId, locationName) => {
     set_locationId(locationId);
@@ -650,7 +680,9 @@ const CuttingSaveUI = ({route, ...props}) => {
                           value={item.enterQty}
                           mode="outlined"
                           editable={true}
-                          onChangeText={textAnswer => {
+                           keyboardType="numeric"
+                           onChangeText={textAnswer => {
+                            console.log("text answer ", textAnswer, index)
                             untiPriceValue(textAnswer, index);
                           }}
                         />
