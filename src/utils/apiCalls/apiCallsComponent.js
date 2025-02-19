@@ -3662,7 +3662,7 @@ export async function getBatchNoListByProcessId(jsonValue) {
         }
 
     }).catch((error) => {
-        console.log('apiBatchNosByBatchId error ', error)
+        console.log('getBatchNoListByProcessId error ', error)
         returnError = error;
     });
 
@@ -3701,7 +3701,7 @@ export async function getBatchDetailsByBatchId(jsonValue) {
         }
 
     }).catch((error) => {
-        console.log('apiBatchNosByBatchId error ', error)
+        console.log('getBatchDetailsByBatchId error ', error)
         returnError = error;
     });
 
@@ -3779,7 +3779,7 @@ export async function getDesignNoListIfPrinting(jsonValue) {
         }
 
     }).catch((error) => {
-        console.log('apiBatchNosByBatchId error ', error)
+        console.log('getDesignNoListIfPrinting error ', error)
         returnError = error;
     });
 
@@ -3818,7 +3818,7 @@ export async function getApiItemDetails(jsonValue) {
         }
 
     }).catch((error) => {
-        console.log('apiBatchNosByBatchId error ', error)
+        console.log('getApiItemDetails error ', error)
         returnError = error;
     });
 
@@ -3896,7 +3896,7 @@ export async function getMatchingNoList(jsonValue) {
         }
 
     }).catch((error) => {
-        console.log('apiBatchNosByBatchId error ', error)
+        console.log('getMatchingNoList error ', error)
         returnError = error;
     });
 
@@ -3935,7 +3935,7 @@ export async function getPartsProcessingCreateList(jsonValue) {
         }
 
     }).catch((error) => {
-        console.log('apiBatchNosByBatchId error ', error)
+        console.log('getPartsProcessingCreateList error ', error)
         returnError = error;
     });
 
@@ -5013,7 +5013,7 @@ export async function getBatchListAfterPriniting(jsonValue) {
         }
 
     }).catch((error) => {
-        console.log('apiBatchNosByBatchId error ', error)
+        console.log('getBatchListAfterPriniting error ', error)
         returnError = error;
     });
 
@@ -5052,7 +5052,7 @@ export async function getfabIssuedafterPrinting(jsonValue) {
         }
 
     }).catch((error) => {
-        console.log('apiBatchNosByBatchId error ', error)
+        console.log('getfabIssuedafterPrinting error ', error)
         returnError = error;
     });
 

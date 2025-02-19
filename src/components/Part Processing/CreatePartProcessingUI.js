@@ -48,6 +48,13 @@ const CreatePartProcessingUI = ({route, navigation, ...props}) => {
     setProcessId(item.id);
     setProcessName(item.name);
     setShowProcessList(false);
+
+    const tempObj={
+      empBarcode:employeeBarcode,
+      barCode:barcode,
+      processId:item.id, 
+    }
+      props.getData(tempObj);
   };
 
   const handleSearchProcess = text => {
@@ -70,6 +77,19 @@ const CreatePartProcessingUI = ({route, navigation, ...props}) => {
       styleNo: styleNo,
     };
     props.submitAction(tempObj);
+  };
+
+  const handleBarcode = async (text) => {
+    setBarcode(text);
+    const tempObj={
+      empBarcode:employeeBarcode,
+      barCode:text,
+      processId:"80", 
+    }
+    if(text.length===7 && employeeBarcode){
+          // console.log("create OBj ===> ", tempObj);
+      props.getData(tempObj);
+    }
   };
 
   return (
@@ -111,7 +131,7 @@ const CreatePartProcessingUI = ({route, navigation, ...props}) => {
               label="Barcode *"
               value={barcode}
               mode="outlined"
-              onChangeText={text => setBarcode(text)}
+              onChangeText={handleBarcode}
             />
           </View>
 

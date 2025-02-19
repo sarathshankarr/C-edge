@@ -49,9 +49,9 @@ const LoginComponent = ({ navigation, route, ...props }) => {
         const storedCode = await AsyncStorage.getItem('save_code');
 
         if (storedUsername && storedPassword && storedCode) {
-          set_userName(storedUsername);
-          set_userPswd(storedPassword);
-          set_code(storedCode);
+          set_userName(storedUsername.trim());
+          set_userPswd(storedPassword.trim());
+          set_code(storedCode.trim());
           setIsChecked(true);
         }
       } catch (error) {
@@ -66,7 +66,8 @@ const LoginComponent = ({ navigation, route, ...props }) => {
     set_isLoading(true);
     handleEmptyInputs();
     try {
-      const response = await axios.get(CUSTOMER_URL + code);
+      const trimmedCode=code.trim();
+      const response = await axios.get(CUSTOMER_URL + trimmedCode);
       set_isLoading(false);
       console.log('API Response:', response?.data?.response?.url);
       if (isValidUrl(response?.data?.response?.url)) {
@@ -112,8 +113,8 @@ const LoginComponent = ({ navigation, route, ...props }) => {
 
     try {
       let obj1 = {
-        "username": userName,
-        "password": userPswd,
+        "username":userName ?  userName.trim() : "",
+        "password": userPswd ? userPswd.trim() : "",
       };
 
       let loginAPIObj = await APIServiceCall.loginUserAPIService(obj1);

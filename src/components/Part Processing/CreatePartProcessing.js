@@ -53,12 +53,14 @@ const CreatePartProcessing = ({ route }) => {
       "empBarcode":tempObj.empBarcode,
       "processId":tempObj.processId,
     }
+    console.log("getData ==> " , obj)
     let LISTAPIOBJ = await APIServiceCall.getPartsProcessingCreateList(obj);
     set_isLoading(false);
 
     if (LISTAPIOBJ && LISTAPIOBJ.statusData) {
       if (LISTAPIOBJ && LISTAPIOBJ.responseData) {
-       set_lists(LISTAPIOBJ.responseData);
+      //  set_lists(LISTAPIOBJ.responseData);
+      console.log("getData response ===> ", LISTAPIOBJ.responseData)
       }
     }
     else {
@@ -121,6 +123,7 @@ const CreatePartProcessing = ({ route }) => {
       isPopUp={isPopUp}
       lists={lists}
       submitAction={submitAction}
+      getData={getData}
       backBtnAction={backBtnAction}
       popOkBtnAction={popOkBtnAction}
     />
