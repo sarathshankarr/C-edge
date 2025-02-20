@@ -101,6 +101,8 @@ import StyleCreate from '../components/styleComponents/styleCreateComponents/Sty
 import PartProcessingList from '../components/Part Processing/PartProcessingList';
 import SavePartProcessing from '../components/Part Processing/SavePartProcessing';
 import CreatePartProcessing from '../components/Part Processing/CreatePartProcessing';
+import CuttingReport from '../components/reports/CuttingReport/CuttingReport';
+import BatchWiseReport from '../components/reports/Batch Wise Production Process Report/BatchWiseReport';
 
 
 const Stack = createNativeStackNavigator();
@@ -205,6 +207,8 @@ const AppStack = () => {
       <Stack.Screen name="PartProcessingList" component={PartProcessingList} options={{ headerShown: false }} /> 
       <Stack.Screen name="SavePartProcessing" component={SavePartProcessing} options={{ headerShown: false }} /> 
       <Stack.Screen name="CreatePartProcessing" component={CreatePartProcessing} options={{ headerShown: false }} /> 
+      <Stack.Screen name="CuttingReport" component={CuttingReport} options={{ headerShown: false }} /> 
+      <Stack.Screen name="BatchWiseReport" component={BatchWiseReport} options={{ headerShown: false }} /> 
     </Stack.Navigator>
   );
 };
