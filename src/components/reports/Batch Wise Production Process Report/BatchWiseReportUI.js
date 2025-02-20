@@ -30,22 +30,13 @@ import CustomCheckBox from '../../../utils/commonComponents/CustomCheckBox';
 let downArrowImg = require('./../../../../assets/images/png/dropDownImg.png');
 let closeImg = require('./../../../../assets/images/png/close1.png');
 
-const StyleBomReportUI = ({route, ...props}) => {
+const BatchWiseReportUI = ({route, ...props}) => {
   const {colors} = useContext(ColorContext);
   const styles = getStyles(colors);
 
-  const [data, setData] = useState([]);
   const [checkbox, set_checkbox] = useState(false);
 
-  const [reportType, setReportType] = useState('PDF');
-  const [selection, setSelection] = useState('Style');
-  const [balanceQty, setBalanceQty] = useState(false);
-
-  const [buyerPOList, setBuyerPOList] = useState([]);
-  const [filteredBuyerPO, set_filteredBuyerPO] = useState([]);
-  const [showBuyerPOList, set_showBuyerPOList] = useState(false);
-  const [buyerPOName, set_buyerPOName] = useState('');
-  const [buyerPOId, set_buyerPOId] = useState('');
+  const [reportType, setReportType] = useState('BatchWise');
 
   const [stylesList, setStylesList] = useState([]);
   const [filteredStyles, set_filteredStyles] = useState([]);
@@ -53,17 +44,11 @@ const StyleBomReportUI = ({route, ...props}) => {
   const [stylesName, set_stylesName] = useState('');
   const [stylesId, set_stylesId] = useState('');
 
-  const [rmNameList, setRMNameList] = useState([]);
-  const [filteredRMName, set_filteredRMName] = useState([]);
-  const [showRMNameList, set_showRMNameList] = useState(false);
-  const [rmName, set_rmName] = useState('');
-  const [rmId, set_rmId] = useState('');
-
-  const [fabricOrTrimsList, setFabricOrTrimsList] = useState([]);
-  const [filteredFabricOrTrims, setFilteredFabricOrTrims] = useState([]);
-  const [showFabricOrTrimsList, setShowFabricOrTrimsList] = useState(false);
-  const [fabricOrTrimsName, setFabricOrTrimsName] = useState('');
-  const [fabricOrTrimsId, setFabricOrTrimsId] = useState('');
+    const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+    const [startDate, set_startDate] = useState('');
+    const [endDate, set_endDate] = useState('');
+    const [activeField, setActiveField] = useState(null);
+    const [data, setData] = useState([]);
 
   //   useEffect(() => {
   //     if (props?.lists) {
@@ -126,47 +111,10 @@ const StyleBomReportUI = ({route, ...props}) => {
     console.log('Rejected');
   };
 
-  const actionOnBuyerPO = (id, name) => {
-    set_buyerPOId(id);
-    set_buyerPOName(name);
-    set_showBuyerPOList(false);
-  };
   const actionOnStyles = (id, name) => {
     set_stylesId(id);
     set_stylesName(name);
     set_showStylesList(false);
-  };
-  const actionOnRMName = (id, name) => {
-    set_rmId(id);
-    set_rmName(name);
-    set_showRMNameList(false);
-  };
-  const actionOnFabricOrTrims = (id, name) => {
-    setFabricOrTrimsId(id);
-    setFabricOrTrimsName(name);
-    setShowFabricOrTrimsList(false);
-  };
-
-  const handleSearchCustomer = text => {
-    if (text.trim().length > 0) {
-      const filtered = props.lists.getStockCustomers.filter(customer =>
-        customer.name.toLowerCase().includes(text.toLowerCase()),
-      );
-      set_filteredCustomer(filtered);
-    } else {
-      set_filteredCustomer(props.lists.getStockCustomers);
-    }
-  };
-
-  const handleSearchBuyerPO = text => {
-    if (text.trim().length > 0) {
-      const filtered = props.lists.getStockBuyerPOs.filter(buyerPO =>
-        buyerPO.name.toLowerCase().includes(text.toLowerCase()),
-      );
-      set_filteredBuyerPO(filtered);
-    } else {
-      set_filteredBuyerPO(props.lists.getStockBuyerPOs);
-    }
   };
 
   const handleSearchStyles = text => {
@@ -180,42 +128,20 @@ const StyleBomReportUI = ({route, ...props}) => {
     }
   };
 
-  const handleSearchFabricOrTrims = text => {
-    if (text.trim().length > 0) {
-      const filtered = props.lists.getStockFabricOrTrims.filter(item =>
-        item.name.toLowerCase().includes(text.toLowerCase()),
-      );
-      setFilteredFabricOrTrims(filtered);
-    } else {
-      setFilteredFabricOrTrims(props.lists.getStockFabricOrTrims);
-    }
-  };
-
-  const handleSearchRMName = text => {
-    if (text.trim().length > 0) {
-      const filtered = props.lists.getStockRMNames.filter(rmName =>
-        rmName.name.toLowerCase().includes(text.toLowerCase()),
-      );
-      set_filteredRMName(filtered);
-    } else {
-      set_filteredRMName(props.lists.getStockRMNames);
-    }
-  };
-
   const reportRadioButtons = useMemo(
     () => [
       {
         id: '1',
-        label: 'PDF',
-        value: 'PDF',
-        selected: reportType === 'PDF',
+        label: 'BatchWise',
+        value: 'BatchWise',
+        selected: reportType === 'BatchWise',
         labelStyle: {color: '#000'},
       },
       {
         id: '2',
-        label: 'Consolidated Report',
-        value: 'Consolidated Report',
-        selected: reportType === 'Consolidated Report',
+        label: 'Summary',
+        value: 'Summary',
+        selected: reportType === 'Summary',
         labelStyle: {color: '#000'},
       },
     ],
@@ -231,34 +157,34 @@ const StyleBomReportUI = ({route, ...props}) => {
     }
   };
 
-  const selectionRadioButtons = useMemo(
-    () => [
-      {
-        id: '1',
-        label: 'Style',
-        value: 'Style',
-        selected: selection === 'Style',
-        labelStyle: {color: '#000'},
-      },
-      {
-        id: '2',
-        label: 'Buyer Po',
-        value: 'Buyer Po',
-        selected: selection === 'Buyer Po',
-        labelStyle: {color: '#000'},
-      },
-    ],
-    [selection],
-  );
+  const handleConfirm = date => {
+    const extractedDate = date.toISOString().split('T')[0];
+    const formattedDate = formatDateIntoDMY(extractedDate);
 
-  const handleSelectionChange = selectedId => {
-    const selectedOption = selectionRadioButtons.find(
-      button => button.id === selectedId,
-    );
-    if (selectedOption) {
-      setSelection(selectedOption.value);
+    if (activeField === 'endDate') {
+      set_endDate(formattedDate);
+    } else if (activeField === 'startDate') {
+      set_startDate(formattedDate);
     }
+    hideDatePicker();
   };
+
+  const showDatePicker = field => {
+    setActiveField(field);
+    setDatePickerVisibility(true);
+  };
+
+  const hideDatePicker = () => {
+    setDatePickerVisibility(false);
+    setActiveField(null);
+  };
+
+  function formatDateIntoDMY(inp) {
+    const [y, m, d] = inp.split('-');
+    let ans = [d, m, y];
+    ans = ans.join('-');
+    return ans;
+  }
 
   return (
     <View style={[CommonStyles.mainComponentViewStyle]}>
@@ -269,7 +195,7 @@ const StyleBomReportUI = ({route, ...props}) => {
           isChatEnable={false}
           isTImerEnable={false}
           isTitleHeaderEnable={true}
-          title={'Style Bom Report'}
+          title={'Batch Wise Production Process Report'}
           backBtnAction={() => backBtnAction()}
         />
       </View>
@@ -296,258 +222,76 @@ const StyleBomReportUI = ({route, ...props}) => {
             }
           />
 
-          {reportType === 'Consolidated Report' && (
-            <View
-              style={[
-                styles.checkboxItem,
-                {marginTop: hp('2%'), marginBottom: hp('2%')},
-              ]}>
-              <CustomCheckBox
-                isChecked={balanceQty}
-                onToggle={() => setBalanceQty(!balanceQty)}
-              />
-              <Text style={styles.checkboxLabel}>{'Balance Qty'}</Text>
-            </View>
-          )}
+          <DateTimePickerModal
+            isVisible={isDatePickerVisible}
+            mode="date"
+            onConfirm={handleConfirm}
+            onCancel={hideDatePicker}
+          />
 
-          {reportType === 'Consolidated Report' && (
-            <RadioGroup
-              style={{flexDirection: 'row'}}
-              radioButtons={selectionRadioButtons}
-              onPress={handleSelectionChange}
-              layout="row"
-              selectedId={
-                selectionRadioButtons.find(item => item.value === selection)?.id
-              }
-            />
-          )}
-
-          {/* drop down lists */}
-
-          {reportType === 'Consolidated Report' && selection === 'Buyer Po' && (
-            <View
-              style={{
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundColor: '#fff',
-                marginTop: hp('2%'),
-              }}>
-              <TouchableOpacity
-                style={{
-                  flexDirection: 'row',
-                  borderWidth: 0.5,
-                  borderColor: '#D8D8D8',
-                  borderRadius: hp('0.5%'),
-                  width: wp('90%'),
-                }}
-                onPress={() => {
-                  set_showBuyerPOList(!showBuyerPOList);
-                }}>
-                <View>
-                  <View style={[styles.SectionStyle1, {}]}>
-                    <View style={{flexDirection: 'column'}}>
-                      <Text
-                        style={
-                          buyerPOId
-                            ? [styles.dropTextLightStyle]
-                            : [styles.dropTextInputStyle]
-                        }>
-                        {'Buyer PO'}
-                      </Text>
-                      {buyerPOId ? (
-                        <Text style={[styles.dropTextInputStyle]}>
-                          {buyerPOName}
-                        </Text>
-                      ) : null}
-                    </View>
-                  </View>
-                </View>
-
-                <View style={{justifyContent: 'center'}}>
-                  <Image source={downArrowImg} style={styles.imageStyle} />
-                </View>
-              </TouchableOpacity>
-
-              {showBuyerPOList && (
-                <View style={styles.dropdownContent1}>
-                  <TextInput
-                    style={styles.searchInput}
-                    placeholder="Search "
-                    onChangeText={handleSearchBuyerPO}
-                    placeholderTextColor="#000"
-                  />
-                  <ScrollView
-                    style={styles.scrollView}
-                    nestedScrollEnabled={true}>
-                    {filteredBuyerPO.length === 0 ? (
-                      <Text style={styles.noCategoriesText}>
-                        Sorry, no results found!
-                      </Text>
-                    ) : (
-                      filteredBuyerPO.map((item, index) => (
-                        <TouchableOpacity
-                          key={index}
-                          style={styles.dropdownOption}
-                          onPress={() => actionOnBuyerPO(item)}>
-                          <Text style={{color: '#000'}}>{item.name}</Text>
-                        </TouchableOpacity>
-                      ))
-                    )}
-                  </ScrollView>
-                </View>
-              )}
-            </View>
-          )}
-
-          <View
+          {reportType === 'BatchWise' && <View
             style={{
               alignItems: 'center',
               justifyContent: 'center',
               backgroundColor: '#fff',
               marginTop: hp('2%'),
+              flexDirection: 'row',
             }}>
-            <TouchableOpacity
-              style={{
-                flexDirection: 'row',
-                borderWidth: 0.5,
-                borderColor: '#D8D8D8',
-                borderRadius: hp('0.5%'),
-                width: wp('90%'),
-              }}
-              onPress={() => {
-                set_showStylesList(!showStylesList);
-              }}>
-              <View>
-                <View style={[styles.SectionStyle1, {}]}>
-                  <View style={{flexDirection: 'column'}}>
-                    <Text
-                      style={
-                        stylesId
-                          ? [styles.dropTextLightStyle]
-                          : [styles.dropTextInputStyle]
-                      }>
-                      {'Styles'}
-                    </Text>
-                    {stylesId ? (
-                      <Text style={[styles.dropTextInputStyle]}>
-                        {stylesName}
-                      </Text>
-                    ) : null}
-                  </View>
-                </View>
-              </View>
-
-              <View style={{justifyContent: 'center'}}>
-                <Image source={downArrowImg} style={styles.imageStyle} />
-              </View>
-            </TouchableOpacity>
-
-            {showStylesList && (
-              <View style={styles.dropdownContent1}>
-                <TextInput
-                  style={styles.searchInput}
-                  placeholder="Search "
-                  onChangeText={handleSearchStyles}
-                  placeholderTextColor="#000"
-                />
-                <ScrollView
-                  style={styles.scrollView}
-                  nestedScrollEnabled={true}>
-                  {filteredStyles.length === 0 ? (
-                    <Text style={styles.noCategoriesText}>
-                      Sorry, no results found!
-                    </Text>
-                  ) : (
-                    filteredStyles.map((item, index) => (
-                      <TouchableOpacity
-                        key={index}
-                        style={styles.dropdownOption}
-                        onPress={() => actionOnStyles(item)}>
-                        <Text style={{color: '#000'}}>{item.name}</Text>
-                      </TouchableOpacity>
-                    ))
-                  )}
-                </ScrollView>
-              </View>
-            )}
-          </View>
-
-          {reportType === 'PDF' && (
-            <View
-              style={{
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundColor: '#fff',
-                marginTop: hp('2%'),
-              }}>
-              <TouchableOpacity
-                style={{
-                  flexDirection: 'row',
-                  borderWidth: 0.5,
-                  borderColor: '#D8D8D8',
-                  borderRadius: hp('0.5%'),
-                  width: wp('90%'),
-                }}
-                onPress={() => {
-                  setShowFabricOrTrimsList(!showFabricOrTrimsList);
-                }}>
-                <View>
-                  <View style={[styles.SectionStyle1, {}]}>
-                    <View style={{flexDirection: 'column'}}>
-                      <Text
-                        style={
-                          fabricOrTrimsId
-                            ? [styles.dropTextLightStyle]
-                            : [styles.dropTextInputStyle]
-                        }>
-                        {'Fabric/Trims'}
-                      </Text>
-                      {fabricOrTrimsId ? (
-                        <Text style={[styles.dropTextInputStyle]}>
-                          {fabricOrTrimsName}
-                        </Text>
-                      ) : null}
-                    </View>
-                  </View>
-                </View>
-
-                <View style={{justifyContent: 'center'}}>
-                  <Image source={downArrowImg} style={styles.imageStyle} />
-                </View>
-              </TouchableOpacity>
-
-              {showFabricOrTrimsList && (
-                <View style={styles.dropdownContent1}>
-                  <TextInput
-                    style={styles.searchInput}
-                    placeholder="Search "
-                    onChangeText={handleSearchFabricOrTrims}
-                    placeholderTextColor="#000"
-                  />
-                  <ScrollView
-                    style={styles.scrollView}
-                    nestedScrollEnabled={true}>
-                    {filteredFabricOrTrims.length === 0 ? (
-                      <Text style={styles.noCategoriesText}>
-                        Sorry, no results found!
-                      </Text>
-                    ) : (
-                      filteredFabricOrTrims.map((item, index) => (
-                        <TouchableOpacity
-                          key={index}
-                          style={styles.dropdownOption}
-                          onPress={() => actionOnBuyerPO(item)}>
-                          <Text style={{color: '#000'}}>{item.name}</Text>
-                        </TouchableOpacity>
-                      ))
-                    )}
-                  </ScrollView>
-                </View>
-              )}
+            <View style={{width: '85%', paddingHorizontal: 10}}>
+              <TextInput
+                label="Start Date *"
+                value={startDate ? startDate : ''}
+                placeholder="Start Date"
+                placeholderTextColor="#000"
+                mode="outlined"
+                color="#000"
+              />
             </View>
-          )}
+            <TouchableOpacity
+              onPress={() => {
+                showDatePicker('startDate');
+              }}
+              style={{padding: 5}}>
+              <Image
+                source={require('./../../../../assets/images/png/calendar11.png')}
+                style={{width: 40, height: 40}}
+              />
+            </TouchableOpacity>
+          </View>}
 
-          {reportType === 'PDF' && (
+          {reportType === 'BatchWise' && <View
+            style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: '#fff',
+              marginTop: hp('2%'),
+              flexDirection: 'row',
+            }}>
+            <View style={{width: '85%', paddingHorizontal: 10}}>
+              <TextInput
+                label="End Date *"
+                value={endDate ? endDate : ''}
+                placeholderTextColor="#000"
+                placeholder="End Date"
+                mode="outlined"
+                color="#000"
+              />
+            </View>
+            <TouchableOpacity
+              onPress={() => {
+                showDatePicker('endDate');
+              }}
+              style={{padding: 5}}>
+              <Image
+                source={require('./../../../../assets/images/png/calendar11.png')}
+                style={{width: 40, height: 40}}
+              />
+            </TouchableOpacity>
+          </View>}
+
+          {/* drop down lists */}
+
+          {reportType === 'Summary' && (
             <View
               style={{
                 alignItems: 'center',
@@ -564,22 +308,22 @@ const StyleBomReportUI = ({route, ...props}) => {
                   width: wp('90%'),
                 }}
                 onPress={() => {
-                  set_showRMNameList(!showRMNameList);
+                  set_showStylesList(!showStylesList);
                 }}>
                 <View>
                   <View style={[styles.SectionStyle1, {}]}>
                     <View style={{flexDirection: 'column'}}>
                       <Text
                         style={
-                          rmId
+                          stylesId
                             ? [styles.dropTextLightStyle]
                             : [styles.dropTextInputStyle]
                         }>
-                        {'RM Type'}
+                        {'Style'}
                       </Text>
-                      {rmId ? (
+                      {stylesId ? (
                         <Text style={[styles.dropTextInputStyle]}>
-                          {rmName}
+                          {stylesName}
                         </Text>
                       ) : null}
                     </View>
@@ -591,27 +335,27 @@ const StyleBomReportUI = ({route, ...props}) => {
                 </View>
               </TouchableOpacity>
 
-              {showRMNameList && (
+              {showStylesList && (
                 <View style={styles.dropdownContent1}>
                   <TextInput
                     style={styles.searchInput}
                     placeholder="Search "
-                    onChangeText={handleSearchRMName}
+                    onChangeText={handleSearchStyles}
                     placeholderTextColor="#000"
                   />
                   <ScrollView
                     style={styles.scrollView}
                     nestedScrollEnabled={true}>
-                    {filteredRMName.length === 0 ? (
+                    {filteredStyles.length === 0 ? (
                       <Text style={styles.noCategoriesText}>
                         Sorry, no results found!
                       </Text>
                     ) : (
-                      filteredRMName.map((item, index) => (
+                      filteredStyles.map((item, index) => (
                         <TouchableOpacity
                           key={index}
                           style={styles.dropdownOption}
-                          onPress={() => actionOnRMName(item)}>
+                          onPress={() => actionOnStyles(item)}>
                           <Text style={{color: '#000'}}>{item.name}</Text>
                         </TouchableOpacity>
                       ))
@@ -664,7 +408,7 @@ const StyleBomReportUI = ({route, ...props}) => {
   );
 };
 
-export default StyleBomReportUI;
+export default BatchWiseReportUI;
 
 const getStyles = colors =>
   StyleSheet.create({

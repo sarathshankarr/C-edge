@@ -26,7 +26,6 @@ import {TextInput} from 'react-native-paper';
 let downArrowImg = require('./../../../assets/images/png/dropDownImg.png');
 let closeImg = require('./../../../assets/images/png/close1.png');
 
-
 const CreatePartProcessingUI = ({route, navigation, ...props}) => {
   const [employeeBarcode, setEmployeeBarcode] = useState('');
   const [barcode, setBarcode] = useState('');
@@ -40,33 +39,34 @@ const CreatePartProcessingUI = ({route, navigation, ...props}) => {
     props.popOkBtnAction();
   };
 
-  useEffect(()=>{
-    if(props.lists){
-      console.log("data need to set ==> ", props.lists)
-     const tempObj ={
-      enterDate:props.lists.enterDate ? props.lists.enterDate :"",
-      styleNo:props.lists.styleName ? props.lists.styleName :"",
-      size:props.lists.size ? props.lists.size :"",
-      enterQty:props.lists.enterDate ? props.lists.enterDate :"",
-      inputQty:props.lists.scanQty ? props.lists.scanQty :"",
-      process:props.lists.processName ? props.lists.processName :"",
-      partsName:props.lists.part ? props.lists.part :"",
-      barCode:props.lists.enterDate ? props.lists.enterDate :"",
-      username:props.lists.userName ? props.lists.userName :"",
-     }
+  useEffect(() => {
+    if (props.lists) {
+      console.log('data need to set ==> ', props.lists);
+      const tempObj = {
+        barcodeid: props.lists.enterDate ? props.lists.enterDate : '',
+        enterDate: props.lists.enterDate ? props.lists.enterDate : '20-02-2025',
+        styleNo: props.lists.styleName ? props.lists.styleName : '',
+        size: props.lists.size ? props.lists.size : '',
+        inputQty: props.lists.scanQty ? props.lists.scanQty.toString() : '',
+        process: props.lists.processName ? props.lists.processName : processName,
+        partsName: props.lists.part ? props.lists.part : '',
+        barCode: props.lists.enterDate ? props.lists.enterDate : '',
+        username: props.lists.userName ? props.lists.userName : '',
+        damagedQty: '',
+        remarks: '',
+      };
 
-    //  if(processId){
+      //  if(processId){
       setRows(prev => [...prev, tempObj]);
-    //  }
-
+      //  }
     }
-  },[props.lists])
+  }, [props.lists]);
 
   // Process
   const [processList, setProcessList] = useState([]);
   const [filteredProcess, setFilteredProcess] = useState([]);
   const [showProcessList, setShowProcessList] = useState(false);
-  const [processName, setProcessName] = useState('');
+  const [processName, setProcessName] = useState('Assembly');
   const [processId, setProcessId] = useState('');
 
   const actionOnProcess = item => {
@@ -74,12 +74,12 @@ const CreatePartProcessingUI = ({route, navigation, ...props}) => {
     setProcessName(item.name);
     setShowProcessList(false);
 
-    const tempObj={
-      empBarcode:employeeBarcode,
-      barCode:barcode,
-      processId:item.id, 
-    }
-      props.getData(tempObj);
+    const tempObj = {
+      empBarcode: employeeBarcode,
+      barCode: barcode,
+      processId: item.id,
+    };
+    props.getData(tempObj);
   };
 
   const handleSearchProcess = text => {
@@ -98,23 +98,37 @@ const CreatePartProcessingUI = ({route, navigation, ...props}) => {
   };
 
   const submitAction = async () => {
+    // rows.map((row,index)=> (
+
     const tempObj = {
-      styleNo: styleNo,
+      empcode: '2020104',
+      barcodeid: 456,
+      scanQty: 0,
+      nxtProcessQty: 0,
+      remarksDamaged: 'hi',
+      processid: 64,
+      enterDate: '2025-02-10',
+      queryFlag: 0,
+      companyId: 1,
     };
     props.submitAction(tempObj);
   };
 
-  const handleBarcode = async (text) => {
+  const handleBarcode = async text => {
     setBarcode(text);
-    const tempObj={
-      empBarcode:employeeBarcode,
-      barCode:text,
-      processId:"80", 
-    }
-    if(text.length===7 && employeeBarcode){
-          // console.log("create OBj ===> ", tempObj);
+    const tempObj = {
+      empBarcode: employeeBarcode,
+      barCode: text,
+      processId: '80',
+    };
+    if (text.length === 7 && employeeBarcode) {
+      // console.log("create OBj ===> ", tempObj);
       props.getData(tempObj);
     }
+  };
+
+  const handleRemoveRow = id => {
+    setRows(prev => prev.filter((_, index) => index !== id));
   };
 
   return (
@@ -174,7 +188,7 @@ const CreatePartProcessingUI = ({route, navigation, ...props}) => {
                 borderColor: '#D8D8D8',
                 borderRadius: hp('0.5%'),
                 width: '100%',
-                justifyContent:"space-between"
+                justifyContent: 'space-between',
               }}
               onPress={() => {
                 setShowProcessList(!showProcessList);
@@ -242,7 +256,7 @@ const CreatePartProcessingUI = ({route, navigation, ...props}) => {
                   <View style={{width: 60}}>
                     <Text style={styles.table_head_captions}>Action</Text>
                   </View>
-                  <View style={{width: 60}}>
+                  <View style={{width: 100}}>
                     <Text style={styles.table_head_captions}>Date</Text>
                   </View>
                   <View style={{width: 120}}>
@@ -276,20 +290,20 @@ const CreatePartProcessingUI = ({route, navigation, ...props}) => {
                   </View>
                 </View>
 
-                {console.log("rows ==> ", rows)}
+                {console.log('rows ==> ', rows)}
 
                 {/* Table Body - Rows */}
-                {rows.map((row,index)=> (
+                {rows.map((row, index) => (
                   <View key={index} style={styles.table_body_single_row}>
                     <View style={{width: 60}}>
                       <TouchableOpacity
                         style={{alignItems: '', justifyContent: ''}}
-                        onPress={() => RemoveRow(row.id)}>
+                        onPress={() => handleRemoveRow(index)}>
                         <Image source={closeImg} style={styles.imageStyle1} />
                       </TouchableOpacity>
                     </View>
 
-                    <View style={{width: 60}}>
+                    <View style={{width: 100}}>
                       <Text style={styles.table_data}>{row.enterDate}</Text>
                     </View>
                     <View style={{width: 120}}>
@@ -299,17 +313,17 @@ const CreatePartProcessingUI = ({route, navigation, ...props}) => {
                     <View style={{width: 60}}>
                       <Text style={styles.table_data}>{row.size}</Text>
                     </View>
-                    <View style={{width: 100}}>
-                      <Text style={styles.table_data}>{row.enterQty}</Text>
+                    <View style={{width: 60}}>
+                      <Text style={styles.table_data}>{row.inputQty}</Text>
                     </View>
                     <View style={{width: 100}}>
                       <TextInput
                         style={styles.table_data_input}
-                        value={row.inputQty}
+                        value={row.damagedQty}
                         onChangeText={text => {
                           setRows(
-                            rows.map(r =>
-                              r.id === row.id ? {...r, remarks: text} : r,
+                            rows.map((r,i )=>
+                              i === index ? {...r, damagedQty: text} : r,
                             ),
                           );
                         }}
@@ -326,6 +340,19 @@ const CreatePartProcessingUI = ({route, navigation, ...props}) => {
                     </View>
                     <View style={{width: 100}}>
                       <Text style={styles.table_data}>{row.username}</Text>
+                    </View>
+                    <View style={{width: 100}}>
+                      <TextInput
+                        style={styles.table_data_input}
+                        value={row.remarks}
+                        onChangeText={text => {
+                          setRows(
+                            rows.map((r, i) =>
+                              i === index ? {...r, remarks: text} : r,
+                            ),
+                          );
+                        }}
+                      />
                     </View>
                   </View>
                 ))}
@@ -489,6 +516,7 @@ const styles = StyleSheet.create({
   table_data: {
     fontSize: 13,
     color: '#333',
+    textAlign: 'center',
   },
   searchInput: {
     marginTop: 10,
