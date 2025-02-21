@@ -31,7 +31,33 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
 
   useEffect(() => {
     if (props.itemsObj) {
-      // console.log("Props from data =========> ", props.itemsObj.processMap);
+      // console.log("Props from data =========> ", props.itemsObj);
+
+      if (props.itemsObj.inOutTimesMap) {
+        const inOutTimesMapList = Object.keys(props.itemsObj.inOutTimesMap).map(
+          key => ({
+            id: key,
+            name: props.itemsObj.inOutTimesMap[key],
+          }),
+        );
+
+        if(props.itemsObj.fpt_outtime){
+          const menuID = props.itemsObj.fpt_outtime.toString();
+          setOutTimeName(props?.itemsObj?.inOutTimesMap[menuID]);
+          setOutTimeId(props.itemsObj.fpt_outtime.toString());
+        }
+        if(props.itemsObj.fpt_intime){
+          const menuID = props.itemsObj.fpt_intime.toString();
+          setInTimeName(props?.itemsObj?.inOutTimesMap[menuID]);
+          setInTimeId(props.itemsObj.fpt_intime.toString());
+        }
+
+        setFilteredOutTime(inOutTimesMapList);
+        setFilteredInTime(inOutTimesMapList);
+        setInTimeList(inOutTimesMapList);
+        setOutTimeList(inOutTimesMapList);
+      }
+
       if (props.itemsObj.processMap) {
         const menuID = props.itemsObj.fpt_menuOut_id.toString();
         console.log('menuID =========> ', menuID);
@@ -44,12 +70,12 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
       if (props.itemsObj.datestr) {
         setDate(props.itemsObj.datestr);
       }
-      if (props.itemsObj.fpt_outtime) {
-        set_outTime(props.itemsObj.fpt_outtime);
-      }
-      if (props.itemsObj.fpt_intime) {
-        set_inTime(props.itemsObj.fpt_intime);
-      }
+      // if (props.itemsObj.fpt_outtime) {
+      //   set_outTime(props.itemsObj.fpt_outtime);
+      // }
+      // if (props.itemsObj.fpt_intime) {
+      //   set_inTime(props.itemsObj.fpt_intime);
+      // }
       if (props.itemsObj.fpt_shift_id) {
         console.log(
           'Shiift id ====> ',
@@ -198,13 +224,29 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
   const [editFabricIssued, set_editFabricIssued] = useState(true);
   const [edit6fields, set_edit6fields] = useState(false);
 
+  const [inTimeList, setInTimeList] = useState([]);
+  const [filteredInTime, setFilteredInTime] = useState([]);
+  const [showInTimeList, setShowInTimeList] = useState(false);
+  const [inTimeName, setInTimeName] = useState('');
+  const [inTimeId, setInTimeId] = useState('');
+
+  const [outTimeList, setOutTimeList] = useState([]);
+  const [filteredOutTime, setFilteredOutTime] = useState([]);
+  const [showOutTimeList, setShowOutTimeList] = useState(false);
+  const [outTimeName, setOutTimeName] = useState(''); // Set a default if needed
+  const [outTimeId, setOutTimeId] = useState('');
+
   const popOkBtnAction = () => {
     props.popOkBtnAction();
   };
 
   const submitAction = async () => {
-    if (!outTime) {
-      Alert.alert('Please Enter outTime  !');
+    if (!outTimeId) {
+      Alert.alert('Please Select outTime  !');
+      return;
+    }
+    if (!inTimeId) {
+      Alert.alert('Please Select inTime  !');
       return;
     }
     if (props.itemsObj.fpt_menuOut_id === 608 && !fabricType) {
@@ -250,8 +292,8 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
       fpt_entry_date: formatted_date,
       fpt_machine_id: MachineNoId,
       fpt_attendby_id: attendedById,
-      fpt_intime: inTime ? inTime : '',
-      fpt_outtime: outTime ? outTime : '',
+      fpt_intime: inTimeId ? inTimeId : '',
+      fpt_outtime: outTimeId ? outTimeId : '',
       Fpt_temparature: props.itemsObj.fpt_temparature,
       fpt_mcspeed: props.itemsObj.fpt_mcspeed,
       fpt_qty: props.itemsObj.fpt_qty,
@@ -311,6 +353,7 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
     set_processName(item.name);
     set_showProcessList(false);
   };
+
   const actionOnMachineNo = (id, name) => {
     set_MachineNoId(id);
     set_MachineNoName(name);
@@ -331,6 +374,40 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
     set_batchNoId(item.id);
     set_batchNo(item.name);
     set_showBatchNoList(false);
+  };
+
+  const actionOnInTime = item => {
+    setInTimeId(item.id);
+    setInTimeName(item.name);
+    setShowInTimeList(false);
+  };
+
+  const handleSearchInTime = text => {
+    if (text.trim().length > 0) {
+      const filtered = inTimeList.filter(item =>
+        item.name.toLowerCase().includes(text.toLowerCase()),
+      );
+      setFilteredInTime(filtered);
+    } else {
+      setFilteredInTime(inTimeList);
+    }
+  };
+
+  const actionOnOutTime = item => {
+    setOutTimeId(item.id);
+    setOutTimeName(item.name);
+    setShowOutTimeList(false);
+  };
+
+  const handleSearchOutTime = text => {
+    if (text.trim().length > 0) {
+      const filtered = outTimeList.filter(item =>
+        item.name.toLowerCase().includes(text.toLowerCase()),
+      );
+      setFilteredOutTime(filtered);
+    } else {
+      setFilteredOutTime(outTimeList);
+    }
   };
 
   const showDatePicker = () => {
@@ -550,7 +627,7 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
                 borderColor: '#D8D8D8',
                 borderRadius: hp('0.5%'),
                 width: '100%',
-                justifyContent:"space-between"
+                justifyContent: 'space-between',
               }}
               onPress={() => {
                 set_showShiftList(!showShiftList);
@@ -592,7 +669,7 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
             ) : null}
           </View>
 
-          <View style={{marginTop: hp('2%'), flexDirection: 'row',width: '95%',}}>
+          {/* <View style={{marginTop: hp('2%'), flexDirection: 'row',width: '95%',}}>
             <View style={{width: '45%', marginRight: '9%'}}>
               <TextInput
                 label="Out Time"
@@ -609,9 +686,161 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
                 onChangeText={text => set_inTime(text)}
               />
             </View>
+          </View> */}
+
+          <View
+            style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginTop: hp('2%'),
+              backgroundColor: '#fff',
+              borderRadius: 10,
+              width: '95%',
+            }}>
+            <TouchableOpacity
+              style={{
+                flexDirection: 'row',
+                borderWidth: 0.5,
+                borderColor: '#D8D8D8',
+                borderRadius: hp('0.5%'),
+                width: '100%',
+                justifyContent: 'space-between',
+              }}
+              onPress={() => {
+                setShowOutTimeList(!showOutTimeList);
+              }}>
+              <View>
+                <View style={[styles.SectionStyle1, {}]}>
+                  <View style={{flexDirection: 'column'}}>
+                    <Text
+                      style={
+                        outTimeId
+                          ? [styles.dropTextLightStyle]
+                          : [styles.dropTextInputStyle]
+                      }>
+                      {'Out Time '}
+                    </Text>
+                    {outTimeId ? (
+                      <Text style={[styles.dropTextInputStyle]}>
+                        {outTimeName}
+                      </Text>
+                    ) : null}
+                  </View>
+                </View>
+              </View>
+
+              <View style={{justifyContent: 'center'}}>
+                <Image source={downArrowImg} style={styles.imageStyle} />
+              </View>
+            </TouchableOpacity>
+
+            {showOutTimeList && (
+              <View style={styles.dropdownContent1}>
+                <TextInput
+                  style={styles.searchInput}
+                  placeholder="Search "
+                  onChangeText={handleSearchOutTime}
+                  placeholderTextColor="#000"
+                />
+                <ScrollView
+                  style={styles.scrollView}
+                  nestedScrollEnabled={true}>
+                  {filteredOutTime.length === 0 ? (
+                    <Text style={styles.noCategoriesText}>
+                      Sorry, no results found!
+                    </Text>
+                  ) : (
+                    filteredOutTime.map((item, index) => (
+                      <TouchableOpacity
+                        key={index}
+                        style={styles.dropdownOption}
+                        onPress={() => actionOnOutTime(item)}>
+                        <Text style={{color: '#000'}}>{item.name}</Text>
+                      </TouchableOpacity>
+                    ))
+                  )}
+                </ScrollView>
+              </View>
+            )}
           </View>
 
-          <View style={{marginTop: hp('2%'),width: '95%',}}>
+          <View
+            style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginTop: hp('2%'),
+              backgroundColor: '#fff',
+              borderRadius: 10,
+              width: '95%',
+            }}>
+            <TouchableOpacity
+              style={{
+                flexDirection: 'row',
+                borderWidth: 0.5,
+                borderColor: '#D8D8D8',
+                borderRadius: hp('0.5%'),
+                width: '100%',
+                justifyContent: 'space-between',
+              }}
+              onPress={() => {
+                setShowInTimeList(!showInTimeList);
+              }}>
+              <View>
+                <View style={[styles.SectionStyle1, {}]}>
+                  <View style={{flexDirection: 'column'}}>
+                    <Text
+                      style={
+                        inTimeId
+                          ? [styles.dropTextLightStyle]
+                          : [styles.dropTextInputStyle]
+                      }>
+                      {'In Time '}
+                    </Text>
+                    {inTimeId ? (
+                      <Text style={[styles.dropTextInputStyle]}>
+                        {inTimeName}
+                      </Text>
+                    ) : null}
+                  </View>
+                </View>
+              </View>
+
+              <View style={{justifyContent: 'center'}}>
+                <Image source={downArrowImg} style={styles.imageStyle} />
+              </View>
+            </TouchableOpacity>
+
+            {showInTimeList && (
+              <View style={styles.dropdownContent1}>
+                <TextInput
+                  style={styles.searchInput}
+                  placeholder="Search "
+                  onChangeText={handleSearchInTime}
+                  placeholderTextColor="#000"
+                />
+                <ScrollView
+                  style={styles.scrollView}
+                  nestedScrollEnabled={true}>
+                  {filteredInTime.length === 0 ? (
+                    <Text style={styles.noCategoriesText}>
+                      Sorry, no results found!
+                    </Text>
+                  ) : (
+                    filteredInTime.map((item, index) => (
+                      <TouchableOpacity
+                        key={index}
+                        style={styles.dropdownOption}
+                        onPress={() => actionOnInTime(item)}>
+                        <Text style={{color: '#000'}}>{item.name}</Text>
+                      </TouchableOpacity>
+                    ))
+                  )}
+                </ScrollView>
+              </View>
+            )}
+          </View>
+
+          <View style={{marginTop: hp('2%'), width: '95%'}}>
             <TextInput
               label="Batch No *"
               value={batchNoName}
@@ -621,7 +850,8 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
             />
           </View>
 
-          <View style={{marginTop: hp('2%'), flexDirection: 'row',width: '95%',}}>
+          <View
+            style={{marginTop: hp('2%'), flexDirection: 'row', width: '95%'}}>
             <View style={{width: '45%', marginRight: '9%'}}>
               <TextInput
                 label="Lot No"
@@ -642,7 +872,7 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
             </View>
           </View>
 
-          <View style={{marginTop: hp('2%'),width: '95%'}}>
+          <View style={{marginTop: hp('2%'), width: '95%'}}>
             <TextInput
               label="Fabric Issued"
               value={fabricIssued.toString()}
@@ -652,7 +882,8 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
             />
           </View>
 
-          <View style={{marginTop: hp('2%'), flexDirection: 'row',width: '95%'}}>
+          <View
+            style={{marginTop: hp('2%'), flexDirection: 'row', width: '95%'}}>
             <View style={{width: '80%'}}>
               <TextInput
                 label="Fabric Processed "
@@ -682,7 +913,7 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
             </View>
           </View>
 
-          <View style={{marginTop: hp('2%'),width: '95%'}}>
+          <View style={{marginTop: hp('2%'), width: '95%'}}>
             <TextInput
               label="Batch *"
               value={batch.toString()}
@@ -708,7 +939,7 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
                 borderColor: '#D8D8D8',
                 borderRadius: hp('0.5%'),
                 width: '100%',
-                justifyContent:"space-between"
+                justifyContent: 'space-between',
               }}
               onPress={() => {
                 set_showMachineNoList(!showMachineNoList);
@@ -788,7 +1019,7 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
                 borderColor: '#D8D8D8',
                 borderRadius: hp('0.5%'),
                 width: '100%',
-                justifyContent:"space-between"
+                justifyContent: 'space-between',
               }}
               onPress={() => {
                 set_showattendedByList(!showattendedByList);
@@ -852,7 +1083,7 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
             )}
           </View>
 
-          <View style={{marginTop: hp('2%'),width: '95%'}}>
+          <View style={{marginTop: hp('2%'), width: '95%'}}>
             <TextInput
               label="Fabric no"
               value={fabricNo}
@@ -861,7 +1092,7 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
               onChangeText={text => set_fabricNo(text)}
             />
           </View>
-          <View style={{marginTop: hp('2%'),width: '95%'}}>
+          <View style={{marginTop: hp('2%'), width: '95%'}}>
             <TextInput
               label="Quality"
               value={quality}
@@ -870,7 +1101,7 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
               onChangeText={text => set_quality(text)}
             />
           </View>
-          <View style={{marginTop: hp('2%'),width: '95%'}}>
+          <View style={{marginTop: hp('2%'), width: '95%'}}>
             <TextInput
               label="OrderNo"
               value={orderNO}
@@ -879,7 +1110,7 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
               onChangeText={text => set_OrderNo(text)}
             />
           </View>
-          <View style={{marginTop: hp('2%'),width: '95%'}}>
+          <View style={{marginTop: hp('2%'), width: '95%'}}>
             <TextInput
               label="Design"
               value={designNO}
@@ -888,7 +1119,7 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
               onChangeText={text => set_designNO(text)}
             />
           </View>
-          <View style={{marginTop: hp('2%'),width: '95%'}}>
+          <View style={{marginTop: hp('2%'), width: '95%'}}>
             <TextInput
               label="MatchingName"
               value={machineNo}
@@ -897,7 +1128,7 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
               onChangeText={text => set_machineNo(text)}
             />
           </View>
-          <View style={{marginTop: hp('2%'),width: '95%'}}>
+          <View style={{marginTop: hp('2%'), width: '95%'}}>
             <TextInput
               label="Fabric Type"
               value={fabricType}

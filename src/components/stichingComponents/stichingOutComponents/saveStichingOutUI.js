@@ -34,6 +34,12 @@ const SaveStichingOutUI = ({route, ...props}) => {
   const [locationName, set_locationName] = useState('');
   const [editLocation, set_editLocation] = useState(true);
 
+   const [showEmployeeList, set_showEmployeeList] = useState(false);
+    const [employeeName, set_employeeName] = useState('');
+    const [employeeId, set_employeeId] = useState(0);
+    const [employeesList, set_employeesList] = useState([]);
+    const [filteredEmployees, set_filteredEmployees] = useState([]);
+
   useEffect(() => {
     if (props?.itemsObj) {
       // console.log("props =====> ", props?.itemsObj)
@@ -118,6 +124,24 @@ const SaveStichingOutUI = ({route, ...props}) => {
     }
   };
 
+
+  const actionOnEmployee = (key, value) => {
+    set_employeeName(value);
+    set_employeeId(key);
+    set_showEmployeeList(false);
+  };
+  
+  const handleSearchEmployees = text => {
+    if (text.trim().length > 0) {
+      const filtered = Object.keys(employeesList).filter(key =>
+        employeesList[key].toLowerCase().includes(text.toLowerCase()),
+      );
+      set_filteredEmployees(filtered);
+    } else {
+      set_filteredEmployees(Object.keys(employeesList));
+    }
+  };
+
   return (
     <View style={[CommonStyles.mainComponentViewStyle]}>
       <View style={[CommonStyles.headerView]}>
@@ -138,15 +162,6 @@ const SaveStichingOutUI = ({route, ...props}) => {
           <Text style={[CommonStyles.tylesHeaderTextStyle, { textAlign: 'left' }]}>{props.itemsObj ? props.itemsObj.styleName : null}</Text>
         </View> */}
       </View>
-
-      {/* <View style = {{marginTop:hp('3%'),width:wp('90%'),marginBottom:hp('2%')}}>
-
-        <View style = {{flexDirection:'row'}}>
-          <Text style={[CommonStyles.tylesHeaderTextStyle,{textAlign:'left'}]}>{'Main Fabric - '}</Text>
-          <Text style={[CommonStyles.tylesHeaderTextStyle,{textAlign:'left'}]}>{props.itemsObj ? props.itemsObj.fabricType : null}</Text>
-        </View>
-        
-      </View> */}
 
       <View style={{marginBottom: hp('5%')}}>
         <KeyboardAwareScrollView
@@ -208,14 +223,14 @@ const SaveStichingOutUI = ({route, ...props}) => {
             />
           </View>
 
-          <View
+          {/* <View
             style={{
               alignItems: 'center',
               justifyContent: 'center',
-              marginTop: hp('1%'),
-              backgroundColor: editLocation ? '#ffffff' : '#dedede',
-              width: '90%',
-              alignSelf: 'center',
+              marginTop: hp('2%'),
+              backgroundColor: '#fff',
+              width: '90%',  
+              alignSelf: 'center', 
             }}>
             <TouchableOpacity
               style={{
@@ -223,8 +238,7 @@ const SaveStichingOutUI = ({route, ...props}) => {
                 borderWidth: 0.5,
                 borderColor: '#D8D8D8',
                 borderRadius: hp('0.5%'),
-                width: '100%',
-                justifyContent: 'space-between',
+                width: '100%', 
               }}
               onPress={() => {
                 set_showLocationList(!showLocationList);
@@ -253,23 +267,8 @@ const SaveStichingOutUI = ({route, ...props}) => {
                 <Image source={downArrowImg} style={styles.imageStyle} />
               </View>
             </TouchableOpacity>
-
-            {/* {showLocationList && editLocation? (
-              <View style={styles.popSearchViewStyle}>
-                <ScrollView nestedScrollEnabled={true}>
-                  {Object.keys(locationsList).map((locationId) => (
-                    <TouchableOpacity key={locationId} onPress={() => actionOnLocation(locationId, locationsList[locationId])}>
-                      <View style={styles.flatview}>
-                        <Text style={styles.dropTextInputStyle}>{locationsList[locationId]}</Text>
-                      </View>
-                    </TouchableOpacity>
-                  ))}
-                </ScrollView>
-              </View>
-            ) : null} */}
             {showLocationList && editLocation && (
               <View style={styles.dropdownContent}>
-                {/* Search bar */}
                 <TextInput
                   style={styles.searchInput}
                   placeholder="Search"
@@ -277,11 +276,93 @@ const SaveStichingOutUI = ({route, ...props}) => {
                   placeholderTextColor="#000"
                 />
 
-                {/* Dropdown list */}
                 <ScrollView
                   nestedScrollEnabled={true}
                   style={styles.scrollView}>
-                  {/* Check if filtered results are empty */}
+                  {filteredLocations.length === 0 ? (
+                    <Text style={styles.noCategoriesText}>
+                      Sorry, no results found!
+                    </Text>
+                  ) : (
+                    filteredLocations.map(locationId => (
+                      <TouchableOpacity
+                        key={locationId}
+                        onPress={() =>
+                          actionOnLocation(
+                            locationId,
+                            locationsList[locationId],
+                          )
+                        }>
+                        <View style={styles.dropdownOption}>
+                          <Text style={styles.dropTextInputStyle}>
+                            {locationsList[locationId]}
+                          </Text>
+                        </View>
+                      </TouchableOpacity>
+                    ))
+                  )}
+                </ScrollView>
+              </View>
+            )}
+          </View> */}
+
+          <View
+            style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginTop: hp('2%'),
+              backgroundColor: '#fff',
+              width: '90%',  
+              alignSelf: 'center', 
+            }}>
+            <TouchableOpacity
+              style={{
+                flexDirection: 'row',
+                borderWidth: 0.5,
+                borderColor: '#D8D8D8',
+                borderRadius: hp('0.5%'),
+                width: '100%', 
+              }}
+              onPress={() => {
+                set_showLocationList(!showLocationList);
+              }}>
+              <View style={[styles.SectionStyle1]}>
+              <View style={{flexDirection: 'column'}}>
+                    <Text
+                      style={
+                        locationName
+                          ? [styles.dropTextLightStyle]
+                          : [styles.dropTextInputStyle]
+                      }>
+                      {'Select Location '}
+                    </Text>
+                    {locationName ? (
+                      <Text style={[styles.dropTextInputStyle]}>
+                        {locationName}
+                      </Text>
+                    ) : null}
+                  </View>
+              </View>
+              <View style={{justifyContent: 'center'}}>
+                <Image source={downArrowImg} style={styles.imageStyle} />
+              </View>
+            </TouchableOpacity>
+
+            {showLocationList && editLocation && (
+              <View style={styles.dropdownContent}>
+               
+                <TextInput
+                  style={styles.searchInput}
+                  placeholder="Search"
+                  onChangeText={handleSearchLocations}
+                  placeholderTextColor="#000"
+                />
+
+               
+                <ScrollView
+                  nestedScrollEnabled={true}
+                  style={styles.scrollView}>
+                  
                   {filteredLocations.length === 0 ? (
                     <Text style={styles.noCategoriesText}>
                       Sorry, no results found!
@@ -308,6 +389,83 @@ const SaveStichingOutUI = ({route, ...props}) => {
               </View>
             )}
           </View>
+
+
+          {/* <View
+            style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginTop: hp('2%'),
+              backgroundColor: '#fff',
+              width: '90%',  
+              alignSelf: 'center', 
+            }}>
+            <TouchableOpacity
+              style={{
+                flexDirection: 'row',
+                borderWidth: 0.5,
+                borderColor: '#D8D8D8',
+                borderRadius: hp('0.5%'),
+                width: '100%', 
+              }}
+              onPress={() => {
+                set_showEmployeeList(!showEmployeeList);
+              }}>
+              <View style={[styles.SectionStyle1]}>
+                <View style={{flexDirection: 'column'}}>
+                  <Text
+                    style={
+                      employeeId
+                        ? [styles.dropTextLightStyle]
+                        : [styles.dropTextInputStyle]
+                    }>
+                    {'Select Employee'}
+                  </Text>
+                  {employeeId ? (
+                    <Text style={[styles.dropTextInputStyle]}>{employeeName}</Text>
+                  ) : null}
+                </View>
+              </View>
+              <View style={{justifyContent: 'center'}}>
+                <Image source={downArrowImg} style={styles.imageStyle} />
+              </View>
+            </TouchableOpacity>
+
+            {showEmployeeList && (
+              <View style={styles.dropdownContent}>
+                <TextInput
+                  style={styles.searchInput}
+                  placeholder="Search"
+                  onChangeText={handleSearchEmployees}
+                  placeholderTextColor="#000"
+                />
+
+                <ScrollView
+                  nestedScrollEnabled={true}
+                  style={styles.scrollView}>
+                  {filteredEmployees.length === 0 ? (
+                    <Text style={styles.noCategoriesText}>
+                      Sorry, no results found!
+                    </Text>
+                  ) : (
+                    filteredEmployees.map(key => (
+                      <TouchableOpacity
+                        key={key}
+                        onPress={() =>
+                          actionOnEmployee(key, employeesList[key])
+                        }>
+                        <View style={styles.dropdownOption}>
+                          <Text style={styles.dropTextInputStyle}>
+                            {employeesList[key]}
+                          </Text>
+                        </View>
+                      </TouchableOpacity>
+                    ))
+                  )}
+                </ScrollView>
+              </View>
+            )}
+          </View> */}
 
           {/* <View style={CommonStyles.listStyle}>
             <FlatList

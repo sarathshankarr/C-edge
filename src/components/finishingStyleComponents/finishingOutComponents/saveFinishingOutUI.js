@@ -31,6 +31,12 @@ const SaveFinishingOutUI = ({route, ...props}) => {
   const [unitPrice, set_unitPrice] = useState('0');
   const [editLocation, set_editLocation] = useState(true);
 
+  const [showEmployeeList, set_showEmployeeList] = useState(false);
+  const [employeeName, set_employeeName] = useState('');
+  const [employeeId, set_employeeId] = useState(0);
+  const [employeesList, set_employeesList] = useState([]);
+  const [filteredEmployees, set_filteredEmployees] = useState([]);
+
   useEffect(() => {
     if (props.itemsObj) {
       set_enterSizesArray(props.itemsObj.sizeDetails);
@@ -71,7 +77,23 @@ const SaveFinishingOutUI = ({route, ...props}) => {
     set_showLocationList(false);
   };
 
-  // console.log("selcted location details", locationId, selectedLocation)
+  const actionOnEmployee = (key, value) => {
+    set_employeeName(value);
+    set_employeeId(key);
+    set_showEmployeeList(false);
+  };
+  
+  const handleSearchEmployees = text => {
+    if (text.trim().length > 0) {
+      const filtered = Object.keys(employeesList).filter(key =>
+        employeesList[key].toLowerCase().includes(text.toLowerCase()),
+      );
+      set_filteredEmployees(filtered);
+    } else {
+      set_filteredEmployees(Object.keys(employeesList));
+    }
+  };
+
 
   return (
     <View style={[CommonStyles.mainComponentViewStyle]}>
@@ -219,6 +241,82 @@ const SaveFinishingOutUI = ({route, ...props}) => {
               </View>
             ) : null}
           </View>
+
+          {/* <View
+            style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginTop: hp('2%'),
+              backgroundColor: '#f8f8f8',
+              width: '90%',  
+              alignSelf: 'center', 
+            }}>
+            <TouchableOpacity
+              style={{
+                flexDirection: 'row',
+                borderWidth: 0.5,
+                borderColor: '#D8D8D8',
+                borderRadius: hp('0.5%'),
+                width: '100%', 
+              }}
+              onPress={() => {
+                set_showEmployeeList(!showEmployeeList);
+              }}>
+              <View style={[styles.SectionStyle1]}>
+                <View style={{flexDirection: 'column'}}>
+                  <Text
+                    style={
+                      employeeId
+                        ? [styles.dropTextLightStyle]
+                        : [styles.dropTextInputStyle]
+                    }>
+                  </Text>
+                  {employeeId ? (
+                    <Text style={[styles.dropTextInputStyle]}>{batchText}</Text>
+                  ) : null}
+                </View>
+              </View>
+              <View style={{justifyContent: 'center'}}>
+                <Image source={downArrowImg} style={styles.imageStyle} />
+              </View>
+            </TouchableOpacity>
+
+            {showEmployeeList && (
+              <View style={styles.dropdownContent}>
+               
+                <TextInput
+                  style={styles.searchInput}
+                  placeholder="Search"
+                  onChangeText={handleSearchEmployees}
+                  placeholderTextColor="#000"
+                />
+
+                <ScrollView
+                  nestedScrollEnabled={true}
+                  style={styles.scrollView}>
+                  {filteredEmployees.length === 0 ? (
+                    <Text style={styles.noCategoriesText}>
+                      Sorry, no results found!
+                    </Text>
+                  ) : (
+                    filteredEmployees.map(key => (
+                      <TouchableOpacity
+                        key={key}
+                        onPress={() =>
+                          actionOnEmployee(key, batchMapArr[key])
+                        }>
+                        <View style={styles.dropdownOption}>
+                          <Text style={styles.dropTextInputStyle}>
+                            {batchMapArr[key]}
+                          </Text>
+                        </View>
+                      </TouchableOpacity>
+                    ))
+                  )}
+                </ScrollView>
+              </View>
+            )}
+          </View> */}
 
           <View style={CommonStyles.listStyle}>
             {enterSizesArray &&
