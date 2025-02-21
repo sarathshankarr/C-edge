@@ -23,6 +23,7 @@ const CreateInProcessComponent = ({ route }) => {
     batchNoMap: [],
     ordersMap: [],
     colorsMap: [],
+    inTime:[]
   });
 
 
@@ -57,6 +58,8 @@ const CreateInProcessComponent = ({ route }) => {
     if (LISTAPIOBJ && LISTAPIOBJ.statusData) {
       if (LISTAPIOBJ && LISTAPIOBJ.responseData) {
 
+
+
         if (LISTAPIOBJ?.responseData?.processMap) {
           const processList = Object.keys(LISTAPIOBJ.responseData.processMap).map(key => ({
             id: key,
@@ -68,7 +71,6 @@ const CreateInProcessComponent = ({ route }) => {
           }));
         }
 
-        console.log("LISTAPIOBJ?.responseData?.machineNosMap===> ", LISTAPIOBJ?.responseData?.machineNosMap)
         if (LISTAPIOBJ?.responseData?.machineNosMap) {
           const machineNosList = Object.keys(LISTAPIOBJ.responseData.machineNosMap).map(key => ({
             id: key,
@@ -149,6 +151,20 @@ const CreateInProcessComponent = ({ route }) => {
             colorsMap: colorsList  // Store the array format
           }));
         }
+
+        // InTime Map
+        if (LISTAPIOBJ?.responseData?.inOutTimesMap) {
+          const inOutTimesMapList = Object.keys(LISTAPIOBJ.responseData.inOutTimesMap).map(key => ({
+            id: key,
+            name: LISTAPIOBJ.responseData.inOutTimesMap[key]
+          }));
+          set_lists(prevLists => ({
+            ...prevLists,
+            inTime: inOutTimesMapList 
+          }));
+        }
+
+
       }
     }
     else {

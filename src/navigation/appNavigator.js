@@ -103,6 +103,9 @@ import SavePartProcessing from '../components/Part Processing/SavePartProcessing
 import CreatePartProcessing from '../components/Part Processing/CreatePartProcessing';
 import CuttingReport from '../components/reports/CuttingReport/CuttingReport';
 import BatchWiseReport from '../components/reports/Batch Wise Production Process Report/BatchWiseReport';
+import CreatePurchaseOrderDraft from '../components/Purchase Order Draft/CreatePurchaseOrderDraft';
+import PurchaseOrderDraftList from '../components/Purchase Order Draft/PurchaseOrderDraftList';
+import SavePurchaseOrderDraft from '../components/Purchase Order Draft/SavePurchaseOrderDraft';
 
 
 const Stack = createNativeStackNavigator();
@@ -209,6 +212,9 @@ const AppStack = () => {
       <Stack.Screen name="CreatePartProcessing" component={CreatePartProcessing} options={{ headerShown: false }} /> 
       <Stack.Screen name="CuttingReport" component={CuttingReport} options={{ headerShown: false }} /> 
       <Stack.Screen name="BatchWiseReport" component={BatchWiseReport} options={{ headerShown: false }} /> 
+      <Stack.Screen name="CreatePurchaseOrderDraft" component={CreatePurchaseOrderDraft} options={{ headerShown: false }} /> 
+      <Stack.Screen name="PurchaseOrderDraftList" component={PurchaseOrderDraftList} options={{ headerShown: false }} /> 
+      <Stack.Screen name="SavePurchaseOrderDraft" component={SavePurchaseOrderDraft} options={{ headerShown: false }} /> 
     </Stack.Navigator>
   );
 };

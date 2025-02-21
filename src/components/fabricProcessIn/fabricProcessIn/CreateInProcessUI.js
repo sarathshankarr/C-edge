@@ -89,7 +89,7 @@ const CreateInProcessUI = ({route, navigation, ...props}) => {
   const [matchingNoId, set_matchingNoId] = useState('');
 
   const [date, setDate] = useState('N/A');
-  const [inTime, set_inTime] = useState('');
+  // const [inTime, set_inTime] = useState('');
   const [lotNo, set_lotNo] = useState('');
   const [rollNo, set_rollNo] = useState('');
   const [fabricIssued, set_fabricIssued] = useState('');
@@ -118,11 +118,19 @@ const CreateInProcessUI = ({route, navigation, ...props}) => {
   const [previousQty, set_previousQty] = useState(0);
   const [printingId, set_printingId] = useState(0);
 
+const [inTimeList, setInTimeList] = useState([]);
+const [filteredInTime, setFilteredInTime] = useState([]);
+const [showInTimeList, setShowInTimeList] = useState(false);
+const [inTimeName, setInTimeName] = useState(''); 
+const [inTimeId, setInTimeId] = useState('');
+
   useEffect(() => {
     // console.log("USE EFFECT ===>", )
     handleConfirm(new Date());
 
     if (props?.itemsArray) {
+              // console.log("machineNoList===> ", props.itemsArray.machineNosMap);
+
       if (props.itemsArray.processMap) {
         set_filteredProcess(props.itemsArray.processMap);
         setProcessList(props.itemsArray.processMap);
@@ -135,6 +143,10 @@ const CreateInProcessUI = ({route, navigation, ...props}) => {
       if (props.itemsArray.empMap) {
         set_filteredattendedBy(props.itemsArray.empMap);
         setAttendedByList(props.itemsArray.empMap);
+      }
+      if (props.itemsArray.inTime) {
+        setFilteredInTime(props.itemsArray.inTime);
+        setInTimeList(props.itemsArray.inTime);
       }
       if (props.itemsArray.shiftMap) {
         set_shiftList(props.itemsArray.shiftMap);
@@ -227,7 +239,7 @@ const CreateInProcessUI = ({route, navigation, ...props}) => {
     console.log({
       date: date,
       shiftId: shiftId,
-      inTime: inTime,
+      inTime: inTimeId,
       batchNoId: batchNoId,
       batch: batch,
       MachineNoId: MachineNoId,
@@ -242,7 +254,7 @@ const CreateInProcessUI = ({route, navigation, ...props}) => {
       !processId ||
       !date ||
       !Number(shiftId) ||
-      !inTime ||
+      !inTimeId ||
       !batchNoId ||
       !batch ||
       (!MachineNoId && !(showAddmcNO && addmachno)) ||
@@ -311,7 +323,7 @@ const CreateInProcessUI = ({route, navigation, ...props}) => {
       machineId: MachineNoId ? Number(MachineNoId) : 0,
       shiftId: Number(shiftId),
       attendedById: attendedById ? Number(attendedById) : 0,
-      intime: inTime,
+      intime: inTimeId,
       batchNo: a ? Number(a) : '',
       quality: quality,
       lotNo: lotNo ? lotNo : '',
@@ -409,6 +421,23 @@ const CreateInProcessUI = ({route, navigation, ...props}) => {
         await getfabIssuedafterPrinting(item.id);
         await getBatchListAfterPriniting(item.id);
       }
+    }
+  };
+
+  const actionOnInTime = item => {
+    setInTimeId(item.id);
+    setInTimeName(item.name);
+    setShowInTimeList(false);
+  };
+  
+  const handleSearchInTime = text => {
+    if (text.trim().length > 0) {
+      const filtered = inTimeList.filter(item =>
+        item.name.toLowerCase().includes(text.toLowerCase())
+      );
+      setFilteredInTime(filtered);
+    } else {
+      setFilteredInTime(inTimeList);
     }
   };
 
@@ -1228,13 +1257,88 @@ const CreateInProcessUI = ({route, navigation, ...props}) => {
             ) : null}
           </View>
 
-          <View style={{marginTop: hp('2%'), width:'95%'}}>
+          {/* <View style={{marginTop: hp('2%'), width:'95%'}}>
             <TextInput
               label="In Time *"
               value={inTime}
               mode="outlined"
               onChangeText={text => set_inTime(text)}
             />
+          </View> */}
+
+          <View
+            style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: '#fff',
+              marginTop: hp('2%'),
+              width: '95%',
+            }}>
+            <TouchableOpacity
+              style={{
+                flexDirection: 'row',
+                borderWidth: 0.5,
+                borderColor: '#D8D8D8',
+                borderRadius: hp('0.5%'),
+                width: '100%',
+                justifyContent: 'space-between',
+              }}
+              onPress={() => {
+                setShowInTimeList(!showInTimeList);
+              }}>
+              <View>
+                <View style={[styles.SectionStyle1, {}]}>
+                  <View style={{flexDirection: 'column'}}>
+                    <Text
+                      style={
+                        inTimeId
+                          ? [styles.dropTextLightStyle]
+                          : [styles.dropTextInputStyle]
+                      }>
+                      {'In Time * '}
+                    </Text>
+                    {inTimeId ? (
+                      <Text style={[styles.dropTextInputStyle]}>
+                        {inTimeName}
+                      </Text>
+                    ) : null}
+                  </View>
+                </View>
+              </View>
+
+              <View style={{justifyContent: 'center'}}>
+                <Image source={downArrowImg} style={styles.imageStyle} />
+              </View>
+            </TouchableOpacity>
+
+            {showInTimeList && (
+              <View style={styles.dropdownContent1}>
+                <TextInput
+                  style={styles.searchInput}
+                  placeholder="Search "
+                  onChangeText={handleSearchInTime}
+                  placeholderTextColor="#000"
+                />
+                <ScrollView
+                  style={styles.scrollView}
+                  nestedScrollEnabled={true}>
+                  {filteredInTime.length === 0 ? (
+                    <Text style={styles.noCategoriesText}>
+                      Sorry, no results found!
+                    </Text>
+                  ) : (
+                    filteredInTime.map((item, index) => (
+                      <TouchableOpacity
+                        key={index}
+                        style={styles.dropdownOption}
+                        onPress={() => actionOnInTime(item)}>
+                        <Text style={{color: '#000'}}>{item.name}</Text>
+                      </TouchableOpacity>
+                    ))
+                  )}
+                </ScrollView>
+              </View>
+            )}
           </View>
 
           <View

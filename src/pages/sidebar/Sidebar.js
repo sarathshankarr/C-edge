@@ -52,6 +52,12 @@ const Sidebar = ({navigation}) => {
           menu_id: 4,
           src: require('../../../assets/images/png/stamp.png'),
         },
+        {
+          label: ' Purchase Order Draft',
+          route: 'PurchaseOrderDraftList',
+          menu_id: 4,
+          src: require('../../../assets/images/png/stamp.png'),
+        },
       ],
     },
     masters: {

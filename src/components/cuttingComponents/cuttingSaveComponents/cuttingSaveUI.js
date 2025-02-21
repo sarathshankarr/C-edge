@@ -55,6 +55,13 @@ const CuttingSaveUI = ({route, ...props}) => {
   const [filteredBatchTypes, set_filteredBatchTypes] = useState([]);
   const [filteredLocations, set_filteredLocations] = useState([]);
 
+  const [showEmployeeList, set_showEmployeeList] = useState(false);
+  const [employeeName, set_employeeName] = useState('');
+  const [employeeId, set_employeeId] = useState(0);
+  const [employeesList, set_employeesList] = useState([]);
+  const [filteredEmployees, set_filteredEmployees] = useState([]);
+
+
   // const [searchText, set_searchText] = useState('');
 
   useEffect(() => {
@@ -88,6 +95,7 @@ const CuttingSaveUI = ({route, ...props}) => {
     }
   }, [props.itemsObj]);
 
+  
   const backBtnAction = () => {
     props.backBtnAction();
   };
@@ -260,6 +268,25 @@ const CuttingSaveUI = ({route, ...props}) => {
     }
   };
 
+  const actionOnEmployee = (key, value) => {
+    set_employeeName(value);
+    set_employeeId(key);
+    set_showEmployeeList(false);
+  };
+  
+  const handleSearchEmployees = text => {
+    if (text.trim().length > 0) {
+      const filtered = Object.keys(employeesList).filter(key =>
+        employeesList[key].toLowerCase().includes(text.toLowerCase()),
+      );
+      set_filteredEmployees(filtered);
+    } else {
+      set_filteredEmployees(Object.keys(employeesList));
+    }
+  };
+
+
+
   return (
     <View style={[CommonStyles.mainComponentViewStyle]}>
       <View style={[CommonStyles.headerView]}>
@@ -385,11 +412,11 @@ const CuttingSaveUI = ({route, ...props}) => {
                       <TouchableOpacity
                         key={key}
                         onPress={() =>
-                          actionOnBatchtype(key, batchMapArr[key])
+                          actionOnBatchtype(key, employeesList[key])
                         }>
                         <View style={styles.dropdownOption}>
                           <Text style={styles.dropTextInputStyle}>
-                            {batchMapArr[key]}
+                            {employeesList[key]}
                           </Text>
                         </View>
                       </TouchableOpacity>
@@ -485,6 +512,86 @@ const CuttingSaveUI = ({route, ...props}) => {
               </View>
             )}
           </View>
+
+          {/* <View
+            style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginTop: hp('2%'),
+              backgroundColor: '#f8f8f8',
+              width: '90%',  
+              alignSelf: 'center', 
+            }}>
+            <TouchableOpacity
+              style={{
+                flexDirection: 'row',
+                borderWidth: 0.5,
+                borderColor: '#D8D8D8',
+                borderRadius: hp('0.5%'),
+                width: '100%', 
+              }}
+              onPress={() => {
+                set_showEmployeeList(!showEmployeeList);
+              }}>
+              <View style={[styles.SectionStyle1]}>
+                <View style={{flexDirection: 'column'}}>
+                  <Text
+                    style={
+                      employeeId
+                        ? [styles.dropTextLightStyle]
+                        : [styles.dropTextInputStyle]
+                    }>
+                    {'Select Employee'}
+                  </Text>
+                  {employeeId ? (
+                    <Text style={[styles.dropTextInputStyle]}>{batchText}</Text>
+                  ) : null}
+                </View>
+              </View>
+              <View style={{justifyContent: 'center'}}>
+                <Image source={downArrowImg} style={styles.imageStyle} />
+              </View>
+            </TouchableOpacity>
+
+           
+            {showEmployeeList && (
+              <View style={styles.dropdownContent}>
+                
+                <TextInput
+                  style={styles.searchInput}
+                  placeholder="Search"
+                  onChangeText={handleSearchEmployees}
+                  placeholderTextColor="#000"
+                />
+
+               
+                <ScrollView
+                  nestedScrollEnabled={true}
+                  style={styles.scrollView}>
+                  
+                  {filteredEmployees.length === 0 ? (
+                    <Text style={styles.noCategoriesText}>
+                      Sorry, no results found!
+                    </Text>
+                  ) : (
+                    filteredEmployees.map(key => (
+                      <TouchableOpacity
+                        key={key}
+                        onPress={() =>
+                          actionOnEmployee(key, batchMapArr[key])
+                        }>
+                        <View style={styles.dropdownOption}>
+                          <Text style={styles.dropTextInputStyle}>
+                            {batchMapArr[key]}
+                          </Text>
+                        </View>
+                      </TouchableOpacity>
+                    ))
+                  )}
+                </ScrollView>
+              </View>
+            )}
+          </View> */}
 
           <View
             style={{
