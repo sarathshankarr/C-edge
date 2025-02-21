@@ -298,6 +298,7 @@ const BatchWiseReportUI = ({route, ...props}) => {
                 justifyContent: 'center',
                 backgroundColor: '#fff',
                 marginTop: hp('2%'),
+                width:"95%"
               }}>
               <TouchableOpacity
                 style={{
@@ -305,7 +306,8 @@ const BatchWiseReportUI = ({route, ...props}) => {
                   borderWidth: 0.5,
                   borderColor: '#D8D8D8',
                   borderRadius: hp('0.5%'),
-                  width: wp('90%'),
+                  width:'100%',
+                  justifyContent:'space-between'
                 }}
                 onPress={() => {
                   set_showStylesList(!showStylesList);

@@ -71,16 +71,18 @@ const CreatePartProcessing = ({ route }) => {
 
   };
 
-  const submitAction = async (tempObj) => {
+  const submitAction = async (checkedData) => {
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
     let companyObj = await AsyncStorage.getItem('companyObj');
+    const tempObj={};
 
     tempObj.menuId = 787;
     tempObj.username = userName;
     tempObj.password = userPsd;
     tempObj.compIds = usercompanyId;
+    tempObj.checkedData = checkedData;
     tempObj.company = JSON.parse(companyObj);
 
     console.log("saving obj ==>", tempObj);
