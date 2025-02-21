@@ -149,6 +149,7 @@ const CuttingReportUI = ({route, ...props}) => {
               justifyContent: 'center',
               backgroundColor: '#fff',
               marginTop: hp('2%'),
+              width: '95%',
             }}>
             <TouchableOpacity
               style={{
@@ -156,7 +157,8 @@ const CuttingReportUI = ({route, ...props}) => {
                 borderWidth: 0.5,
                 borderColor: '#D8D8D8',
                 borderRadius: hp('0.5%'),
-                width: wp('90%'),
+                width: '100%',
+                justifyContent:"space-between"
               }}
               onPress={() => {
                 set_showStylesList(!showStylesList);
@@ -216,7 +218,7 @@ const CuttingReportUI = ({route, ...props}) => {
             )}
           </View>
 
-          {/* <View style={{marginBottom: 150}} /> */}
+         <View style={{marginBottom: 150}} /> 
         </View>
       </KeyboardAwareScrollView>
 

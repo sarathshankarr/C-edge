@@ -22,6 +22,7 @@ import AlertComponent from '../../utils/commonComponents/alertComponent';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import BottomComponent from '../../utils/commonComponents/bottomComponent';
 import {TextInput} from 'react-native-paper';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 let downArrowImg = require('./../../../assets/images/png/dropDownImg.png');
 let closeImg = require('./../../../assets/images/png/close1.png');
@@ -42,23 +43,44 @@ const CreatePartProcessingUI = ({route, navigation, ...props}) => {
   useEffect(() => {
     if (props.lists) {
       console.log('data need to set ==> ', props.lists);
-      const tempObj = {
-        barcodeid: props.lists.enterDate ? props.lists.enterDate : '',
-        enterDate: props.lists.enterDate ? props.lists.enterDate : '20-02-2025',
-        styleNo: props.lists.styleName ? props.lists.styleName : '',
-        size: props.lists.size ? props.lists.size : '',
-        inputQty: props.lists.scanQty ? props.lists.scanQty.toString() : '',
-        process: props.lists.processName ? props.lists.processName : processName,
-        partsName: props.lists.part ? props.lists.part : '',
-        barCode: props.lists.enterDate ? props.lists.enterDate : '',
-        username: props.lists.userName ? props.lists.userName : '',
-        damagedQty: '',
-        remarks: '',
-      };
 
-      //  if(processId){
-      setRows(prev => [...prev, tempObj]);
-      //  }
+      if (processId) {
+        const tempObj = {
+          barcodeid: props.lists.enterDate ? props.lists.enterDate : '',
+          enterDate: props.lists.enterDate
+            ? props.lists.enterDate
+            : '20-02-2025',
+          styleNo: props.lists.styleName ? props.lists.styleName : '',
+          size: props.lists.size ? props.lists.size : '',
+          inputQty: props.lists.scanQty ? props.lists.scanQty.toString() : '',
+          process: props.lists.processName
+            ? props.lists.processName
+            : processName,
+          partsName: props.lists.part ? props.lists.part : '',
+          username: props.lists.userName ? props.lists.userName : '',
+          barCode: barcode,
+          damagedQty: '',
+          remarks: '',
+          processId: processId,
+          empBarcode: employeeBarcode,
+        };
+
+        if (processId) {
+          setRows(prev => [...prev, tempObj]);
+        }
+      } else {
+        if (props.lists?.partprocess) {
+          const ProcessList = Object.keys(props.lists?.partprocess).map(
+            key => ({
+              id: key,
+              name: props.lists.partprocess[key],
+            }),
+          );
+          setFilteredProcess(ProcessList || []);
+          setProcessList(ProcessList || []);
+          setRows([]);
+        }
+      }
     }
   }, [props.lists]);
 
@@ -99,30 +121,49 @@ const CreatePartProcessingUI = ({route, navigation, ...props}) => {
 
   const submitAction = async () => {
     // rows.map((row,index)=> (
+      let usercompanyId = await AsyncStorage.getItem('companyId');
 
-    const tempObj = {
-      empcode: '2020104',
-      barcodeid: 456,
-      scanQty: 0,
-      nxtProcessQty: 0,
-      remarksDamaged: 'hi',
-      processid: 64,
-      enterDate: '2025-02-10',
-      queryFlag: 0,
-      companyId: 1,
-    };
-    props.submitAction(tempObj);
+    const checkedData = [];
+    rows.forEach((item, index) => {
+      const tempObj = {
+        empcode: item.empBarcode,
+        barcodeid: item.barcodeid,
+        scanQty: item.damagedQty,
+        nxtProcessQty: 0,
+        remarksDamaged: item.remarks,
+        processid: item.processId,
+        enterDate: item.enterDate,
+        queryFlag: 0,
+        companyId: usercompanyId,
+      };
+      checkedData.push(tempObj);
+    });
+
+    console.log('checkedData ==> ', checkedData);
+
+    props.submitAction(checkedData);
   };
 
   const handleBarcode = async text => {
     setBarcode(text);
+
+    if (rows.length > 0) {
+      const exists = rows.some(item => item.barCode === text);
+      if (exists) {
+        Alert.alert('Barcode Already Scanned');
+        setBarcode('');
+        return;
+      }
+    }
+
+
     const tempObj = {
       empBarcode: employeeBarcode,
       barCode: text,
-      processId: '80',
+      processId: processId,
     };
+
     if (text.length === 7 && employeeBarcode) {
-      // console.log("create OBj ===> ", tempObj);
       props.getData(tempObj);
     }
   };
@@ -290,8 +331,6 @@ const CreatePartProcessingUI = ({route, navigation, ...props}) => {
                   </View>
                 </View>
 
-                {console.log('rows ==> ', rows)}
-
                 {/* Table Body - Rows */}
                 {rows.map((row, index) => (
                   <View key={index} style={styles.table_body_single_row}>
@@ -322,7 +361,7 @@ const CreatePartProcessingUI = ({route, navigation, ...props}) => {
                         value={row.damagedQty}
                         onChangeText={text => {
                           setRows(
-                            rows.map((r,i )=>
+                            rows.map((r, i) =>
                               i === index ? {...r, damagedQty: text} : r,
                             ),
                           );
@@ -369,7 +408,7 @@ const CreatePartProcessingUI = ({route, navigation, ...props}) => {
           isLeftBtnEnable={true}
           rigthBtnState={true}
           isRightBtnEnable={true}
-          rightButtonAction={async () => console.log('HI')}
+          rightButtonAction={async () => submitAction()}
           leftButtonAction={async () => backAction()}
         />
       </View>
