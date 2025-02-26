@@ -32,7 +32,7 @@ let filterImg = require('./../../../assets/images/png/setting.png');
 let filterImg1 = require('./../../../assets/images/png/filter.png');
 
 
-const PurchaseOrderDraftListUI = ({route, navigation, ...props}) => {
+const GrnApproveListUI = ({route, navigation, ...props}) => {
   const [isListOpen, set_ListOpen] = useState(false);
   const [refreshing, set_refreshing] = useState(false);
   const [filterArray, set_filterArray] = useState([]);
@@ -201,7 +201,7 @@ const PurchaseOrderDraftListUI = ({route, navigation, ...props}) => {
           isChatEnable={false}
           isTImerEnable={false}
           isTitleHeaderEnable={true}
-          title={'Purchase Order Draft List'}
+          title={'GRN Approve'}
           backBtnAction={() => backBtnAction()}
         />
       </View>
@@ -391,7 +391,7 @@ const PurchaseOrderDraftListUI = ({route, navigation, ...props}) => {
         reqBody={filterReqBody}
       />
 
-      <AddNewItem navItem={'CreatePurchaseOrderDraft'} />
+      {/* <AddNewItem navItem={'CreatePurchaseOrderDraft'} /> */}
 
       {props.isPopUp ? (
         <View style={CommonStyles.customPopUpStyle}>
@@ -419,7 +419,7 @@ const PurchaseOrderDraftListUI = ({route, navigation, ...props}) => {
   );
 };
 
-export default PurchaseOrderDraftListUI;
+export default GrnApproveListUI;
 
 const styles = StyleSheet.create({
   container: {

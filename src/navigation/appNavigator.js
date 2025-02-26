@@ -106,6 +106,8 @@ import BatchWiseReport from '../components/reports/Batch Wise Production Process
 import CreatePurchaseOrderDraft from '../components/Purchase Order Draft/CreatePurchaseOrderDraft';
 import PurchaseOrderDraftList from '../components/Purchase Order Draft/PurchaseOrderDraftList';
 import SavePurchaseOrderDraft from '../components/Purchase Order Draft/SavePurchaseOrderDraft';
+import GrnApproveList from '../components/GRN Approve/GrnApproveList';
+import SaveGrnApprove from '../components/GRN Approve/SaveGrnApprove';
 
 
 const Stack = createNativeStackNavigator();
@@ -215,6 +217,8 @@ const AppStack = () => {
       <Stack.Screen name="CreatePurchaseOrderDraft" component={CreatePurchaseOrderDraft} options={{ headerShown: false }} /> 
       <Stack.Screen name="PurchaseOrderDraftList" component={PurchaseOrderDraftList} options={{ headerShown: false }} /> 
       <Stack.Screen name="SavePurchaseOrderDraft" component={SavePurchaseOrderDraft} options={{ headerShown: false }} /> 
+      <Stack.Screen name="GrnApproveList" component={GrnApproveList} options={{ headerShown: false }} /> 
+      <Stack.Screen name="SaveGrnApprove" component={SaveGrnApprove} options={{ headerShown: false }} /> 
     </Stack.Navigator>
   );
 };

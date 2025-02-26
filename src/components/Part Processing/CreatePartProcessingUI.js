@@ -45,11 +45,13 @@ const CreatePartProcessingUI = ({route, navigation, ...props}) => {
       console.log('data need to set ==> ', props.lists);
 
       if (processId) {
+        const getDate = new Date().toISOString().split('T')[0].split('-').reverse().join('-');
+
         const tempObj = {
-          barcodeid: props.lists.enterDate ? props.lists.enterDate : '',
+          barcodeid: props.lists.inId ? props.lists.inId : '',
           enterDate: props.lists.enterDate
             ? props.lists.enterDate
-            : '20-02-2025',
+            : getDate,
           styleNo: props.lists.styleName ? props.lists.styleName : '',
           size: props.lists.size ? props.lists.size : '',
           inputQty: props.lists.scanQty ? props.lists.scanQty.toString() : '',
@@ -65,9 +67,10 @@ const CreatePartProcessingUI = ({route, navigation, ...props}) => {
           empBarcode: employeeBarcode,
         };
 
-        if (processId) {
+
+       
           setRows(prev => [...prev, tempObj]);
-        }
+     
       } else {
         if (props.lists?.partprocess) {
           const ProcessList = Object.keys(props.lists?.partprocess).map(
@@ -122,6 +125,7 @@ const CreatePartProcessingUI = ({route, navigation, ...props}) => {
   const submitAction = async () => {
     // rows.map((row,index)=> (
       let usercompanyId = await AsyncStorage.getItem('companyId');
+
 
     const checkedData = [];
     rows.forEach((item, index) => {

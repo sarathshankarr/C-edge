@@ -208,7 +208,7 @@ const CreateInProcessComponent = ({ route }) => {
     let SAVEAPIObj = await APIServiceCall.saveCreateProcessIn(tempObj);
     set_isLoading(false);
 
-    console.log("Sucess before returned obj ", SAVEAPIObj);
+    console.log("Sucess before returned obj ", SAVEAPIObj?.responseData);
 
     if (SAVEAPIObj && SAVEAPIObj?.statusData && SAVEAPIObj?.responseData !== 0) {
       console.log("Sucessfully saved ===> ");
