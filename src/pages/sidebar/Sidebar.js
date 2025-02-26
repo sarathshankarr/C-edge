@@ -58,6 +58,12 @@ const Sidebar = ({navigation}) => {
           menu_id: 4,
           src: require('../../../assets/images/png/stamp.png'),
         },
+        {
+          label: 'GRN Approve',
+          route: 'GrnApproveList',
+          menu_id: 4,
+          src: require('../../../assets/images/png/stamp.png'),
+        },
       ],
     },
     masters: {
