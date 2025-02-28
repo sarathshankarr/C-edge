@@ -32,7 +32,7 @@ let filterImg = require('./../../../assets/images/png/setting.png');
 let filterImg1 = require('./../../../assets/images/png/filter.png');
 
 
-const GrnApproveListUI = ({route, navigation, ...props}) => {
+const MasterBoxPackingListUI = ({route, navigation, ...props}) => {
   const [isListOpen, set_ListOpen] = useState(false);
   const [refreshing, set_refreshing] = useState(false);
   const [filterArray, set_filterArray] = useState([]);
@@ -201,7 +201,7 @@ const GrnApproveListUI = ({route, navigation, ...props}) => {
           isChatEnable={false}
           isTImerEnable={false}
           isTitleHeaderEnable={true}
-          title={'GRN Approve'}
+          title={'Master Box  Packing'}
           backBtnAction={() => backBtnAction()}
         />
       </View>
@@ -391,7 +391,7 @@ const GrnApproveListUI = ({route, navigation, ...props}) => {
         reqBody={filterReqBody}
       />
 
-      <AddNewItem navItem={'SaveGrnApprove'} />
+      <AddNewItem navItem={'SaveMasterBoxPacking'} />
 
       {props.isPopUp ? (
         <View style={CommonStyles.customPopUpStyle}>
@@ -418,8 +418,7 @@ const GrnApproveListUI = ({route, navigation, ...props}) => {
     </View>
   );
 };
-
-export default GrnApproveListUI;
+export default MasterBoxPackingListUI;
 
 const styles = StyleSheet.create({
   container: {

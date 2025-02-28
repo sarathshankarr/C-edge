@@ -45,13 +45,29 @@ const CreatePartProcessingUI = ({route, navigation, ...props}) => {
       console.log('data need to set ==> ', props.lists);
 
       if (processId) {
-        const getDate = new Date().toISOString().split('T')[0].split('-').reverse().join('-');
+        if (props.lists.status) {
+          // Alert.alert(props.lists.statusRemarks);
+          props.popUpAction(
+            props.lists.statusRemarks,
+            Constant.DefaultAlert_MSG,
+            'OK',
+            true,
+            false,
+          );
+
+          return;
+        }
+
+        const getDate = new Date()
+          .toISOString()
+          .split('T')[0]
+          .split('-')
+          .reverse()
+          .join('-');
 
         const tempObj = {
           barcodeid: props.lists.inId ? props.lists.inId : '',
-          enterDate: props.lists.enterDate
-            ? props.lists.enterDate
-            : getDate,
+          enterDate: props.lists.enterDate ? props.lists.enterDate : getDate,
           styleNo: props.lists.styleName ? props.lists.styleName : '',
           size: props.lists.size ? props.lists.size : '',
           inputQty: props.lists.scanQty ? props.lists.scanQty.toString() : '',
@@ -66,11 +82,7 @@ const CreatePartProcessingUI = ({route, navigation, ...props}) => {
           processId: processId,
           empBarcode: employeeBarcode,
         };
-
-
-       
-          setRows(prev => [...prev, tempObj]);
-     
+        setRows(prev => [...prev, tempObj]);
       } else {
         if (props.lists?.partprocess) {
           const ProcessList = Object.keys(props.lists?.partprocess).map(
@@ -123,9 +135,7 @@ const CreatePartProcessingUI = ({route, navigation, ...props}) => {
   };
 
   const submitAction = async () => {
-    // rows.map((row,index)=> (
-      let usercompanyId = await AsyncStorage.getItem('companyId');
-
+    let usercompanyId = await AsyncStorage.getItem('companyId');
 
     const checkedData = [];
     rows.forEach((item, index) => {
@@ -159,7 +169,6 @@ const CreatePartProcessingUI = ({route, navigation, ...props}) => {
         return;
       }
     }
-
 
     const tempObj = {
       empBarcode: employeeBarcode,

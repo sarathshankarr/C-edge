@@ -52,18 +52,30 @@ const Sidebar = ({navigation}) => {
           menu_id: 4,
           src: require('../../../assets/images/png/stamp.png'),
         },
-        {
-          label: ' Purchase Order Draft',
-          route: 'PurchaseOrderDraftList',
-          menu_id: 4,
-          src: require('../../../assets/images/png/stamp.png'),
-        },
-        {
-          label: 'GRN Approve',
-          route: 'GrnApproveList',
-          menu_id: 4,
-          src: require('../../../assets/images/png/stamp.png'),
-        },
+        // {
+        //   label: ' Purchase Order Draft',
+        //   route: 'PurchaseOrderDraftList',
+        //   menu_id: 4,
+        //   src: require('../../../assets/images/png/stamp.png'),
+        // },
+        // {
+        //   label: 'GRN Approve',
+        //   route: 'GrnApproveList',
+        //   menu_id: 4,
+        //   src: require('../../../assets/images/png/stamp.png'),
+        // },
+        // {
+        //   label: 'Box Packing',
+        //   route: 'BoxPackingList',
+        //   menu_id: 4,
+        //   src: require('../../../assets/images/png/stamp.png'),
+        // },
+        // {
+        //   label: 'Master Box Packing',
+        //   route: 'masterBoxPackingList',
+        //   menu_id: 4,
+        //   src: require('../../../assets/images/png/stamp.png'),
+        // },
       ],
     },
     masters: {
@@ -280,18 +292,18 @@ const Sidebar = ({navigation}) => {
           menu_id: 743,
           src: require('../../../assets/images/png/report.png'),
         },
-        {
-          label: 'Cutting Report',
-          route: 'CuttingReport',
-          menu_id: 743,
-          src: require('../../../assets/images/png/report.png'),
-        },
-        {
-          label: 'Batch Wise Production Process Report',
-          route: 'BatchWiseReport',
-          menu_id: 743,
-          src: require('../../../assets/images/png/report.png'),
-        },
+        // {
+        //   label: 'Cutting Report',
+        //   route: 'CuttingReport',
+        //   menu_id: 743,
+        //   src: require('../../../assets/images/png/report.png'),
+        // },
+        // {
+        //   label: 'Batch Wise Production Process Report',
+        //   route: 'BatchWiseReport',
+        //   menu_id: 743,
+        //   src: require('../../../assets/images/png/report.png'),
+        // },
       ],
     },
   };

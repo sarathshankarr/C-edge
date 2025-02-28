@@ -4,8 +4,9 @@ import * as Constant from "../../utils/constants/constant";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { useNavigation } from '@react-navigation/native';
+import CreateMasterBoxPackingUI from './CreateMasterBoxPackingUI';
 
-const CreatePurchaseOrderDraft = ({ route }) => {
+const CreateMasterBoxPacking = ({ route }) => {
   const navigation = useNavigation();
 
   const [isLoading, set_isLoading] = useState(false);
@@ -111,7 +112,7 @@ const CreatePurchaseOrderDraft = ({ route }) => {
 
   return (
 
-    <CreatePurchaseOrderDraftUI
+    <CreateMasterBoxPackingUI
       isLoading={isLoading}
       popUpAction={popUpAction}
       set_isLoading={set_isLoading}
@@ -131,7 +132,6 @@ const CreatePurchaseOrderDraft = ({ route }) => {
 
 }
 
-export default CreatePurchaseOrderDraft;
-
+export default CreateMasterBoxPacking;
 
 
