@@ -286,7 +286,11 @@ const submitAction = async (tempObj) => {
       }
 
       // Define the file path for saving the Excel file
-      const filePath = `/storage/emulated/0/Download/${Date.now()}.xlsx`;
+      const filePath1 = `/storage/emulated/0/Download/${Date.now()}.xlsx`;
+
+       const filePath = Platform.OS === 'android' 
+          ? `/storage/emulated/0/Download/${Date.now()}.xlsx` 
+          : `${ReactNativeBlobUtil.fs.dirs.DocumentDir}/${Date.now()}}.xlsx`;
       
       // Save the file using ReactNativeBlobUtil
       await ReactNativeBlobUtil.fs.writeFile(filePath, excelData, 'base64');

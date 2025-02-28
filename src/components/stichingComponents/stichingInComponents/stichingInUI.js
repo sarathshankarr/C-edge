@@ -298,8 +298,6 @@ const StichingInUI = ({route, ...props }) => {
 
         {filterArray && filterArray.length > 0 ? <View style={CommonStyles.listCommonHeader1}>
           <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:3,textAlign:'left'}]}>{'Style Details'}</Text>
-          {/* <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:1,textAlign:'center',}]}>{'Color'}</Text>
-          <Text style={[CommonStyles.tylesHeaderTextStyle,{flex:1,textAlign:'center',}]}>{'WO'}</Text> */}
           <Text style={[CommonStyles.tylesHeaderTextStyle,{textAlign:'left', flex:1}]}>{'Total qty'}</Text>
         </View> : <View style = {CommonStyles.noRecordsFoundStyle}>
             {!props.MainLoading ? <Text style={[CommonStyles.tylesHeaderTextStyle, {fontSize: 18}]}>{Constant.noRecFound}</Text> : null}

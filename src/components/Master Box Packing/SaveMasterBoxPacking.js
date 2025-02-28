@@ -4,9 +4,9 @@ import * as Constant from '../../utils/constants/constant';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import {useFocusEffect} from '@react-navigation/native';
-import SaveGrnApproveUI from './SaveGrnApproveUI';
+import SaveMasterBoxPackingUI from './SaveMasterBoxPackingUI';
 
-const SaveGrnApprove = ({navigation, route, ...props}) => {
+const SaveMasterBoxPacking = ({navigation, route, ...props}) => {
   const [itemsObj, set_itemsObj] = useState([]);
   const [isLoading, set_isLoading] = useState(false);
   const [isPopUp, set_isPopUp] = useState(false);
@@ -20,7 +20,7 @@ const SaveGrnApprove = ({navigation, route, ...props}) => {
     if (route.params) {
       if (route.params?.item) {
         console.log('Route Params ===> ', route.params?.item);
-        getInitialData(route.params?.item?.woId);
+        // getInitialData(route.params?.item?.woId);
       }
     }
   }, [route.params]);
@@ -90,7 +90,7 @@ const SaveGrnApprove = ({navigation, route, ...props}) => {
 
 
   return (
-    <SaveGrnApproveUI
+    <SaveMasterBoxPackingUI
       itemsObj={itemsObj}
       isLoading={isLoading}
       popUpAlert={popUpAlert}
@@ -105,5 +105,5 @@ const SaveGrnApprove = ({navigation, route, ...props}) => {
   );
 };
 
-export default SaveGrnApprove;
+export default SaveMasterBoxPacking;
 

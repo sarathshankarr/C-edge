@@ -27,7 +27,7 @@ import CustomCheckBox from '../../utils/commonComponents/CustomCheckBox';
 let downArrowImg = require('./../../../assets/images/png/dropDownImg.png');
 let closeImg = require('./../../../assets/images/png/close1.png');
 
-const SaveGrnApproveUI = ({route, navigation, ...props}) => {
+const SaveMasterBoxPackingUI = ({route, navigation, ...props}) => {
   const [po, setPo] = useState('');
   const [rows, setRows] = useState([]);
   const [date, setDate] = useState('');
@@ -88,7 +88,7 @@ const SaveGrnApproveUI = ({route, navigation, ...props}) => {
           isChatEnable={false}
           isTImerEnable={false}
           isTitleHeaderEnable={true}
-          title={'Edit GRN Approve'}
+          title={'Master CTN Box'}
           backBtnAction={() => backAction()}
         />
       </View>
@@ -107,7 +107,7 @@ const SaveGrnApproveUI = ({route, navigation, ...props}) => {
           }}>
           <View style={{marginTop: hp('2%')}}>
             <TextInput
-              label="PO#"
+              label="Master Box Name"
               value={po}
               mode="outlined"
               onChangeText={text => console.log(text)}
@@ -115,7 +115,7 @@ const SaveGrnApproveUI = ({route, navigation, ...props}) => {
           </View>
           <View style={{marginTop: hp('2%')}}>
             <TextInput
-              label="Date"
+              label=" Buyer PO No"
               value={date}
               mode="outlined"
               onChangeText={text => console.log(text)}
@@ -123,71 +123,33 @@ const SaveGrnApproveUI = ({route, navigation, ...props}) => {
           </View>
           <View style={{marginTop: hp('2%')}}>
             <TextInput
-              label="ITEM/TRIMS"
+              label="Buyer Name"
               value={itemOrTrims}
               mode="outlined"
               onChangeText={text => console.log(text)}
             />
           </View>
-          <View style={{marginTop: hp('2%')}}>
-            <TextInput
-              label="Ship To"
-              value={shipTo}
-              mode="outlined"
-              onChangeText={text => console.log(text)}
-            />
-          </View>
+
           <View style={styles.wrapper}>
             <ScrollView nestedScrollEnabled={true} horizontal>
               <View style={styles.table}>
                 <View style={styles.table_head}>
-                  <View style={{width: 100}}>
-                    <Text style={styles.table_head_captions}>Action</Text>
+                  <View style={{width: 200}}>
+                    <Text style={styles.table_head_captions}>Box Name</Text>
                   </View>
                   <View style={{width: 100}}>
-                    <Text style={styles.table_head_captions}>Roll No/Lot.</Text>
+                    <Text style={styles.table_head_captions}>Style</Text>
                   </View>
                   <View style={{width: 100}}>
-                    <Text style={styles.table_head_captions}>Required Qty</Text>
+                    <Text style={styles.table_head_captions}>Size</Text>
                   </View>
                   <View style={{width: 100}}>
-                    <Text style={styles.table_head_captions}>
-                      Rem Qty/Entered Qty
-                    </Text>
-                  </View>
-                  <View style={{width: 100}}>
-                    <Text style={styles.table_head_captions}>
-                      Present Received
-                    </Text>
-                  </View>
-                  <View style={{width: 100}}>
-                    <Text style={styles.table_head_captions}>Fabric</Text>
-                  </View>
-                  <View style={{width: 100}}>
-                    <Text style={styles.table_head_captions}>Price</Text>
-                  </View>
-                  <View style={{width: 100}}>
-                    <Text style={styles.table_head_captions}>GRN No</Text>
-                  </View>
-                  <View style={{width: 100}}>
-                    <Text style={styles.table_head_captions}>GST%</Text>
-                  </View>
-                  <View style={{width: 100}}>
-                    <Text style={styles.table_head_captions}>Item Rate</Text>
-                  </View>
-                  <View style={{width: 100}}>
-                    <Text style={styles.table_head_captions}>Disc.     Amount</Text>
-                  </View>
-                  <View style={{width: 100}}>
-                    <Text style={styles.table_head_captions}>GST</Text>
-                  </View>
-                  <View style={{width: 100}}>
-                    <Text style={styles.table_head_captions}>Total</Text>
+                    <Text style={styles.table_head_captions}>Qty</Text>
                   </View>
                 </View>
                 {rows.map((row, index) => (
                   <View key={index} style={styles.table_body_single_row}>
-                    <View style={{width: 100}}>
+                    <View style={{width: 200}}>
                       <Text style={styles.table_data}>{row.enterDate}</Text>
                     </View>
                     <View style={{width: 100}}>
@@ -199,97 +161,8 @@ const SaveGrnApproveUI = ({route, navigation, ...props}) => {
                     <View style={{width: 100}}>
                       <Text style={styles.table_data}>{row.enterQty}</Text>
                     </View>
-                    <View style={{width: 100}}>
-                      <Text style={styles.table_data}>{row.lotno}</Text>
-                    </View>
-                    <View style={{width: 100}}>
-                      <Text style={styles.table_data}>{row.bundleno}</Text>
-                    </View>
-                    <View style={{width: 100}}>
-                      <Text style={styles.table_data}>{row.username}</Text>
-                    </View>
-                    <View style={{width: 100}}>
-                      <Text style={styles.table_data}>{row.username}</Text>
-                    </View>
-                    <View style={{width: 100}}>
-                      <Text style={styles.table_data}>{row.username}</Text>
-                    </View>
-                    <View style={{width: 100}}>
-                      <Text style={styles.table_data}>{row.username}</Text>
-                    </View>
-                    <View style={{width: 100}}>
-                      <Text style={styles.table_data}>{row.username}</Text>
-                    </View>
-                    <View style={{width: 100}}>
-                      <Text style={styles.table_data}>{row.username}</Text>
-                    </View>
-                    <View style={{width: 100}}>
-                      <Text style={styles.table_data}>{row.username}</Text>
-                    </View>
                   </View>
                 ))}
-                  <View style={styles.table_body_single_row}>
-                    <View style={{width: 100}}>
-                    </View>
-                    <View style={{width: 100}}>
-                    </View>
-                    <View style={{width: 100}}>
-                    </View>
-                    <View style={{width: 100}}>
-                    </View>
-                    <View style={{width: 100}}>
-                    </View>
-                    <View style={{width: 100}}>
-                    </View>
-                    <View style={{width: 100}}>
-                    </View>
-                    <View style={{width: 100}}>
-                    </View>
-                    <View style={{width: 100}}>
-                    </View>
-                    <View style={{width: 100}}>
-                      <Text style={styles.table_data}>{'0.0'}</Text>
-                    </View>
-                    <View style={{width: 100}}>
-                      <Text style={styles.table_data}>{'0.0'}</Text>
-                    </View>
-                    <View style={{width: 100}}>
-                      <Text style={styles.table_data}>{'0.0'}</Text>
-                    </View>
-                    <View style={{width: 100}}>
-                      <Text style={styles.table_data}>{'0.0'}</Text>
-                    </View>
-                  </View>
-                  <View style={styles.table_body_single_row}>
-                    <View style={{width: 100}}>
-                    </View>
-                    <View style={{width: 100}}>
-                    </View>
-                    <View style={{width: 100}}>
-                    </View>
-                    <View style={{width: 100}}>
-                    </View>
-                    <View style={{width: 100}}>
-                    </View>
-                    <View style={{width: 100}}>
-                    </View>
-                    <View style={{width: 100}}>
-                    </View>
-                    <View style={{width: 100}}>
-                    </View>
-                    <View style={{width: 100}}>
-                    </View>
-                    <View style={{width: 100}}>
-                    </View>
-                    <View style={{width: 100}}>
-                    </View>
-                    <View style={{width: 100}}>
-                      <Text style={styles.table_data}>{'Total'}</Text>
-                    </View>
-                    <View style={{width: 100}}>
-                      <Text style={styles.table_data}>{'0.0'}</Text>
-                    </View>
-                  </View>
               </View>
             </ScrollView>
           </View>
@@ -301,8 +174,8 @@ const SaveGrnApproveUI = ({route, navigation, ...props}) => {
           rightBtnTitle={'Save'}
           leftBtnTitle={'Back'}
           isLeftBtnEnable={true}
-          rigthBtnState={true}
-          isRightBtnEnable={true}
+          rigthBtnState={false}
+          isRightBtnEnable={false}
           rightButtonAction={async () => submitAction()}
           leftButtonAction={async () => backAction()}
         />
@@ -334,7 +207,7 @@ const SaveGrnApproveUI = ({route, navigation, ...props}) => {
   );
 };
 
-export default SaveGrnApproveUI;
+export default SaveMasterBoxPackingUI;
 
 const getStyles = colors =>
   StyleSheet.create({

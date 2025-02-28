@@ -217,7 +217,7 @@ const FabricProcessInList = ({ route }) => {
 
 
 
-const handlePdf = async (item) => {
+const handlePdf1 = async (item) => {
   let userName = await AsyncStorage.getItem('userName');
   let userPsd = await AsyncStorage.getItem('userPsd');
   let usercompanyId = await AsyncStorage.getItem('companyId');
@@ -283,7 +283,7 @@ const handlePdf = async (item) => {
   }
 };
 
-const handleScan = async (item) => {
+const handleScan1 = async (item) => {
   let userName = await AsyncStorage.getItem('userName');
   let userPsd = await AsyncStorage.getItem('userPsd');
   let usercompanyId = await AsyncStorage.getItem('companyId');
@@ -334,6 +334,154 @@ const handleScan = async (item) => {
       await ReactNativeBlobUtil.fs.writeFile(pdfPath, base64Data, 'base64');
 
       Alert.alert('QR Scan Downloaded', `PDF saved successfully at ${pdfPath}`);
+  } catch (error) {
+      console.error('Error generating or saving PDF:', error);
+      Alert.alert('Error', `Failed to generate or save PDF: ${error.message}`);
+  }finally {
+    set_isLoading(false);
+  }
+ 
+};
+
+const handlePdf = async (item) => {
+  let userName = await AsyncStorage.getItem('userName');
+  let userPsd = await AsyncStorage.getItem('userPsd');
+  let usercompanyId = await AsyncStorage.getItem('companyId');
+  let companyObj = await AsyncStorage.getItem('companyObj');
+  set_isLoading(true);
+
+  let obj = {
+      "menuId": 587,
+      "so_style_id": item.so_style_id,
+      "username": userName,
+      "password": userPsd,
+      "compIds": usercompanyId,
+      "company":JSON.parse(companyObj),
+  }
+
+  const apiUrl = APIServiceCall.downloadPdf();
+
+  try {
+      const response = await axios.post(
+          apiUrl,
+          obj,
+          {
+              headers: {
+                  'Content-Type': 'application/json', 
+              },
+              responseType: 'arraybuffer', 
+          }
+      );
+
+      console.log("Response for pdf API ==> ",typeof response?.request?._response);
+
+      // Ensure the data is in binary form
+      let base64Data = response?.request?._response;
+
+      if (Platform.OS === 'android') {
+          const hasPermission = await requestStoragePermission();
+          if (!hasPermission) {
+              Alert.alert(
+                  'Permission Denied',
+                  'Storage permission is required to save the PDF.'
+              );
+              return;
+          }
+      }
+
+      const downloadFolder = Platform.OS === 'android' 
+      ? ReactNativeBlobUtil.fs.dirs.DownloadDir 
+      : ReactNativeBlobUtil.fs.dirs.DocumentDir; 
+            // const pdfPath = `${downloadFolder}/${item.so_style_id}.pdf`;
+      // const pdfPath = `/storage/emulated/0/Download/${item.so_style_id}_${Date.now()}.pdf`;
+
+      const pdfPath = Platform.OS === 'android' 
+    ? `/storage/emulated/0/Download/${item.so_style_id}_${Date.now()}.pdf` 
+    : `${ReactNativeBlobUtil.fs.dirs.DocumentDir}/${item.so_style_id}_${Date.now()}.pdf`;
+
+      await ReactNativeBlobUtil.fs.writeFile(pdfPath, base64Data, 'base64');
+
+      // Alert.alert('PDF Downloaded', `PDF saved successfully at ${pdfPath}`);
+      // popUpAction(`PDF saved successfully at ${pdfPath}`,Constant.DefaultAlert_MSG,'OK', true,false)
+
+      if (Platform.OS === 'android') {
+        popUpAction(`PDF saved successfully at ${pdfPath}`, Constant.DefaultAlert_MSG, 'OK', true, false);
+    } else {
+        popUpAction('PDF saved successfully', Constant.DefaultAlert_MSG, 'OK', true, false);
+    }
+    
+  } catch (error) {
+      console.error('Error generating or saving PDF:', error);
+      // Alert.alert('Error', `Failed to generate or save PDF: ${error.message}`);
+      popUpAction(Constant.SERVICE_FAIL_PDF_MSG,Constant.DefaultAlert_MSG,'OK', true,false)
+
+  }finally {
+    set_isLoading(false);
+  }
+};
+
+const handleScan = async (item) => {
+  let userName = await AsyncStorage.getItem('userName');
+  let userPsd = await AsyncStorage.getItem('userPsd');
+  let usercompanyId = await AsyncStorage.getItem('companyId');
+  let companyObj = await AsyncStorage.getItem('companyObj');
+  set_isLoading(true);
+
+  let obj = {
+      "menuId": 587,
+      "so_style_id": item.so_style_id,
+      "username": userName,
+      "password": userPsd,
+      "compIds": usercompanyId,
+      "company":JSON.parse(companyObj),
+  };
+
+  const apiUrl = APIServiceCall.downloadQrPdf();
+
+  try {
+      const response = await axios.post(
+          apiUrl,
+          obj,
+          {
+              headers: {
+                  'Content-Type': 'application/json', 
+              },
+              responseType: 'arraybuffer', 
+          }
+      );
+
+
+      let base64Data = response?.request?._response;
+
+      if (Platform.OS === 'android') {
+          const hasPermission = await requestStoragePermission();
+          if (!hasPermission) {
+              Alert.alert(
+                  'Permission Denied',
+                  'Storage permission is required to save the PDF.'
+              );
+              return;
+          }
+      }
+
+
+      // const pdfPath = `/storage/emulated/0/Download/${item.so_style_id}.pdf`;
+
+      const pdfPath = Platform.OS === 'android' 
+      ? `/storage/emulated/0/Download/${item.so_style_id}_${Date.now()}.pdf` 
+      : `${ReactNativeBlobUtil.fs.dirs.DocumentDir}/${item.so_style_id}_${Date.now()}.pdf`;
+  
+
+      await ReactNativeBlobUtil.fs.writeFile(pdfPath, base64Data, 'base64');
+
+      // Alert.alert('QR Scan Downloaded', `PDF saved successfully at ${pdfPath}`);
+
+    if (Platform.OS === 'android') {
+      popUpAction(`QR Scan Downloaded', PDF saved successfully at ${pdfPath}`, Constant.DefaultAlert_MSG, 'OK', true, false);
+  } else {
+      popUpAction('QR Scan Downloaded', 'PDF saved successfully', Constant.DefaultAlert_MSG, 'OK', true, false);
+  }
+    
   } catch (error) {
       console.error('Error generating or saving PDF:', error);
       Alert.alert('Error', `Failed to generate or save PDF: ${error.message}`);

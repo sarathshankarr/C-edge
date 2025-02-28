@@ -27,7 +27,7 @@ import CustomCheckBox from '../../utils/commonComponents/CustomCheckBox';
 let downArrowImg = require('./../../../assets/images/png/dropDownImg.png');
 let closeImg = require('./../../../assets/images/png/close1.png');
 
-const SaveGrnApproveUI = ({route, navigation, ...props}) => {
+const SaveBoxPackingUI = ({route, navigation, ...props}) => {
   const [po, setPo] = useState('');
   const [rows, setRows] = useState([]);
   const [date, setDate] = useState('');
@@ -88,7 +88,7 @@ const SaveGrnApproveUI = ({route, navigation, ...props}) => {
           isChatEnable={false}
           isTImerEnable={false}
           isTitleHeaderEnable={true}
-          title={'Edit GRN Approve'}
+          title={'Box Packing Process'}
           backBtnAction={() => backAction()}
         />
       </View>
@@ -107,7 +107,7 @@ const SaveGrnApproveUI = ({route, navigation, ...props}) => {
           }}>
           <View style={{marginTop: hp('2%')}}>
             <TextInput
-              label="PO#"
+              label="Box Name"
               value={po}
               mode="outlined"
               onChangeText={text => console.log(text)}
@@ -115,7 +115,7 @@ const SaveGrnApproveUI = ({route, navigation, ...props}) => {
           </View>
           <View style={{marginTop: hp('2%')}}>
             <TextInput
-              label="Date"
+              label=" Buyer PO No"
               value={date}
               mode="outlined"
               onChangeText={text => console.log(text)}
@@ -123,7 +123,7 @@ const SaveGrnApproveUI = ({route, navigation, ...props}) => {
           </View>
           <View style={{marginTop: hp('2%')}}>
             <TextInput
-              label="ITEM/TRIMS"
+              label="Buyer Name"
               value={itemOrTrims}
               mode="outlined"
               onChangeText={text => console.log(text)}
@@ -131,7 +131,7 @@ const SaveGrnApproveUI = ({route, navigation, ...props}) => {
           </View>
           <View style={{marginTop: hp('2%')}}>
             <TextInput
-              label="Ship To"
+              label="Packer Name "
               value={shipTo}
               mode="outlined"
               onChangeText={text => console.log(text)}
@@ -142,48 +142,24 @@ const SaveGrnApproveUI = ({route, navigation, ...props}) => {
               <View style={styles.table}>
                 <View style={styles.table_head}>
                   <View style={{width: 100}}>
-                    <Text style={styles.table_head_captions}>Action</Text>
+                    <Text style={styles.table_head_captions}>Barcode No</Text>
                   </View>
                   <View style={{width: 100}}>
-                    <Text style={styles.table_head_captions}>Roll No/Lot.</Text>
+                    <Text style={styles.table_head_captions}>Order No</Text>
                   </View>
                   <View style={{width: 100}}>
-                    <Text style={styles.table_head_captions}>Required Qty</Text>
-                  </View>
-                  <View style={{width: 100}}>
-                    <Text style={styles.table_head_captions}>
-                      Rem Qty/Entered Qty
-                    </Text>
+                    <Text style={styles.table_head_captions}>Styles</Text>
                   </View>
                   <View style={{width: 100}}>
                     <Text style={styles.table_head_captions}>
-                      Present Received
+                    Sizes
                     </Text>
                   </View>
                   <View style={{width: 100}}>
-                    <Text style={styles.table_head_captions}>Fabric</Text>
+                    <Text style={styles.table_head_captions}>Quantity</Text>
                   </View>
-                  <View style={{width: 100}}>
-                    <Text style={styles.table_head_captions}>Price</Text>
-                  </View>
-                  <View style={{width: 100}}>
-                    <Text style={styles.table_head_captions}>GRN No</Text>
-                  </View>
-                  <View style={{width: 100}}>
-                    <Text style={styles.table_head_captions}>GST%</Text>
-                  </View>
-                  <View style={{width: 100}}>
-                    <Text style={styles.table_head_captions}>Item Rate</Text>
-                  </View>
-                  <View style={{width: 100}}>
-                    <Text style={styles.table_head_captions}>Disc.     Amount</Text>
-                  </View>
-                  <View style={{width: 100}}>
-                    <Text style={styles.table_head_captions}>GST</Text>
-                  </View>
-                  <View style={{width: 100}}>
-                    <Text style={styles.table_head_captions}>Total</Text>
-                  </View>
+                  
+                 
                 </View>
                 {rows.map((row, index) => (
                   <View key={index} style={styles.table_body_single_row}>
@@ -202,94 +178,11 @@ const SaveGrnApproveUI = ({route, navigation, ...props}) => {
                     <View style={{width: 100}}>
                       <Text style={styles.table_data}>{row.lotno}</Text>
                     </View>
-                    <View style={{width: 100}}>
-                      <Text style={styles.table_data}>{row.bundleno}</Text>
-                    </View>
-                    <View style={{width: 100}}>
-                      <Text style={styles.table_data}>{row.username}</Text>
-                    </View>
-                    <View style={{width: 100}}>
-                      <Text style={styles.table_data}>{row.username}</Text>
-                    </View>
-                    <View style={{width: 100}}>
-                      <Text style={styles.table_data}>{row.username}</Text>
-                    </View>
-                    <View style={{width: 100}}>
-                      <Text style={styles.table_data}>{row.username}</Text>
-                    </View>
-                    <View style={{width: 100}}>
-                      <Text style={styles.table_data}>{row.username}</Text>
-                    </View>
-                    <View style={{width: 100}}>
-                      <Text style={styles.table_data}>{row.username}</Text>
-                    </View>
-                    <View style={{width: 100}}>
-                      <Text style={styles.table_data}>{row.username}</Text>
-                    </View>
+                   
                   </View>
                 ))}
-                  <View style={styles.table_body_single_row}>
-                    <View style={{width: 100}}>
-                    </View>
-                    <View style={{width: 100}}>
-                    </View>
-                    <View style={{width: 100}}>
-                    </View>
-                    <View style={{width: 100}}>
-                    </View>
-                    <View style={{width: 100}}>
-                    </View>
-                    <View style={{width: 100}}>
-                    </View>
-                    <View style={{width: 100}}>
-                    </View>
-                    <View style={{width: 100}}>
-                    </View>
-                    <View style={{width: 100}}>
-                    </View>
-                    <View style={{width: 100}}>
-                      <Text style={styles.table_data}>{'0.0'}</Text>
-                    </View>
-                    <View style={{width: 100}}>
-                      <Text style={styles.table_data}>{'0.0'}</Text>
-                    </View>
-                    <View style={{width: 100}}>
-                      <Text style={styles.table_data}>{'0.0'}</Text>
-                    </View>
-                    <View style={{width: 100}}>
-                      <Text style={styles.table_data}>{'0.0'}</Text>
-                    </View>
-                  </View>
-                  <View style={styles.table_body_single_row}>
-                    <View style={{width: 100}}>
-                    </View>
-                    <View style={{width: 100}}>
-                    </View>
-                    <View style={{width: 100}}>
-                    </View>
-                    <View style={{width: 100}}>
-                    </View>
-                    <View style={{width: 100}}>
-                    </View>
-                    <View style={{width: 100}}>
-                    </View>
-                    <View style={{width: 100}}>
-                    </View>
-                    <View style={{width: 100}}>
-                    </View>
-                    <View style={{width: 100}}>
-                    </View>
-                    <View style={{width: 100}}>
-                    </View>
-                    <View style={{width: 100}}>
-                    </View>
-                    <View style={{width: 100}}>
-                      <Text style={styles.table_data}>{'Total'}</Text>
-                    </View>
-                    <View style={{width: 100}}>
-                      <Text style={styles.table_data}>{'0.0'}</Text>
-                    </View>
-                  </View>
+               
+                
               </View>
             </ScrollView>
           </View>
@@ -301,8 +194,8 @@ const SaveGrnApproveUI = ({route, navigation, ...props}) => {
           rightBtnTitle={'Save'}
           leftBtnTitle={'Back'}
           isLeftBtnEnable={true}
-          rigthBtnState={true}
-          isRightBtnEnable={true}
+          rigthBtnState={false}
+          isRightBtnEnable={false}
           rightButtonAction={async () => submitAction()}
           leftButtonAction={async () => backAction()}
         />
@@ -334,7 +227,7 @@ const SaveGrnApproveUI = ({route, navigation, ...props}) => {
   );
 };
 
-export default SaveGrnApproveUI;
+export default SaveBoxPackingUI;
 
 const getStyles = colors =>
   StyleSheet.create({
