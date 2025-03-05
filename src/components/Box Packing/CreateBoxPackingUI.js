@@ -230,6 +230,7 @@ const CreateBoxPackingUI = ({route, navigation, ...props}) => {
             width: '90%',
             marginHorizontal: wp('5%'),
           }}>
+
           <View style={{marginTop: hp('2%')}}>
             <TextInput
               label="Box Name "
@@ -324,10 +325,10 @@ const CreateBoxPackingUI = ({route, navigation, ...props}) => {
 
           <View
             style={{
-              width: '90%',
+              // width: '90%',
               marginTop: 20,
               marginBottom: 30,
-              marginHorizontal: 15,
+              // marginHorizontal: 15,
             }}>
             <TouchableOpacity
               onPress={addRow}
@@ -583,9 +584,12 @@ const CreateBoxPackingUI = ({route, navigation, ...props}) => {
                     </View>
                   </View>
                 ))}
+
               </View>
             </ScrollView>
           </View>
+
+          
         </View>
       </KeyboardAwareScrollView>
 
@@ -719,11 +723,11 @@ const getStyles = colors =>
     wrapper: {
       justifyContent: 'center',
       alignItems: 'center',
-      flex: 1,
+      // flex: 1,
       marginTop: hp('2%'),
-      width: '95%',
+      // width: '95%',
       marginBottom: 10,
-      marginHorizontal: 10,
+      // marginHorizontal: 10,
     },
 
     table_head: {

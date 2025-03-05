@@ -114,6 +114,12 @@ import SaveBoxPacking from '../components/Box Packing/SaveBoxPacking';
 import CreateMasterBoxPacking from '../components/Master Box Packing/CreateMasterBoxPacking';
 import masterBoxPackingList from '../components/Master Box Packing/MasterBoxPackingList';
 import SaveMasterBoxPacking from '../components/Master Box Packing/SaveMasterBoxPacking';
+import CreateWorkOrderStyle from '../components/Work Order Style/CreateWorkOrderStyle';
+import WorkOrderStyleList from '../components/Work Order Style/WorkOrderStyleList';
+import SaveWorkOrderStyle from '../components/Work Order Style/SaveWorkOrderStyle';
+import CreateBillGeneration from '../components/Bill Generation/CreateBillGeneration';
+import BillGenerationList from '../components/Bill Generation/BillGenerationList';
+import SaveBillGeneration from '../components/Bill Generation/SaveBillGeneration';
 
 
 const Stack = createNativeStackNavigator();
@@ -231,6 +237,12 @@ const AppStack = () => {
       <Stack.Screen name="CreateMasterBoxPacking" component={CreateMasterBoxPacking} options={{ headerShown: false }} /> 
       <Stack.Screen name="masterBoxPackingList" component={masterBoxPackingList} options={{ headerShown: false }} /> 
       <Stack.Screen name="SaveMasterBoxPacking" component={SaveMasterBoxPacking} options={{ headerShown: false }} /> 
+      <Stack.Screen name="CreateWorkOrderStyle" component={CreateWorkOrderStyle} options={{ headerShown: false }} /> 
+      <Stack.Screen name="WorkOrderStyleList" component={WorkOrderStyleList} options={{ headerShown: false }} /> 
+      <Stack.Screen name="SaveWorkOrderStyle" component={SaveWorkOrderStyle} options={{ headerShown: false }} /> 
+      <Stack.Screen name="CreateBillGeneration" component={CreateBillGeneration} options={{ headerShown: false }} /> 
+      <Stack.Screen name="BillGenerationList" component={BillGenerationList} options={{ headerShown: false }} /> 
+      <Stack.Screen name="SaveBillGeneration" component={SaveBillGeneration} options={{ headerShown: false }} /> 
     </Stack.Navigator>
   );
 };

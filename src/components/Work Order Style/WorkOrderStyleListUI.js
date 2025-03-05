@@ -31,7 +31,8 @@ let addImg1 = require('./../../../assets/images/png/add.png');
 let filterImg = require('./../../../assets/images/png/setting.png');
 let filterImg1 = require('./../../../assets/images/png/filter.png');
 
-const PurchaseOrderDraftListUI = ({route, navigation, ...props}) => {
+
+const WorkOrderStyleListUI = ({route, navigation, ...props}) => {
   const [isListOpen, set_ListOpen] = useState(false);
   const [refreshing, set_refreshing] = useState(false);
   const [filterArray, set_filterArray] = useState([]);
@@ -66,6 +67,7 @@ const PurchaseOrderDraftListUI = ({route, navigation, ...props}) => {
       set_ItemsArray(props.itemsArray);
     }
     // getRequestBody();
+
   }, [props?.itemsArray]);
 
   const getRequestBody = async () => {
@@ -117,8 +119,8 @@ const PurchaseOrderDraftListUI = ({route, navigation, ...props}) => {
         (item?.styleCode !== '' &&
           item?.styleCode?.toLowerCase().includes(searchTerm)) ||
         (item?.processName !== '' &&
-          item?.processName?.toLowerCase().includes(searchTerm))
-      );
+          item?.processName?.toLowerCase().includes(searchTerm)) 
+      )
     });
 
     set_filterArray(styleArray || []);
@@ -150,61 +152,35 @@ const PurchaseOrderDraftListUI = ({route, navigation, ...props}) => {
     setIsFiltering(false);
   };
 
+
   const renderItem = ({item, index}) => {
     return (
       <TouchableOpacity
         onPress={() => actionOnRow(item, index)}
         style={[CommonStyles.cellBackViewStyle, {marginBottom: 3}]}>
-       
-        {true && (
-          <View
-            style={{
-              position: 'absolute',
-              top: 1,
-              right: 0,
-              // backgroundColor:'lightgray',
-              backgroundColor:colors.color2,
-              paddingHorizontal: 10,
-              paddingVertical: 2,
-              borderTopLeftRadius: 7, // Capsule shape
-              elevation: 3,
-              shadowColor: '#000',
-              shadowOffset: {width: 0, height: 2},
-              shadowOpacity: 0.2,
-              shadowRadius: 3,
-              zIndex: 10,
-            }}>
-            <Text
-              style={{
-                // color: 'black',
-                color: 'white',
-                fontSize: 8,
-                fontWeight: '600',
-              }}>
-              Draft
-            </Text>
-          </View>
-        )}
-
         <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-          <View style={{flex: 1, justifyContent: 'center'}}>
+          <View
+            style={{flex: 1, justifyContent: 'center'}}>
             <Text style={[CommonStyles.tylesTextStyle, {textAlign: 'center'}]}>
-              {item.poNumberWithPrefix}
+              {item.styleCode}
             </Text>
           </View>
-          <View style={{flex: 1, justifyContent: 'center'}}>
+          <View
+            style={{flex: 0.7, justifyContent: 'center'}}>
             <Text style={[CommonStyles.tylesTextStyle, {textAlign: 'center'}]}>
-              {item.vendorName}
+              {item.processName}
             </Text>
           </View>
-          <View style={{flex: 1, justifyContent: 'center'}}>
+          <View
+            style={{flex: 0.5, justifyContent: 'center'}}>
             <Text style={[CommonStyles.tylesTextStyle, {textAlign: 'center'}]}>
-              {item.price}
+              {item.producttype}
             </Text>
           </View>
-          <View style={{flex: 1, justifyContent: 'center'}}>
+          <View
+            style={{flex: 0.7, justifyContent: 'center'}}>
             <Text style={[CommonStyles.tylesTextStyle, {textAlign: 'center'}]}>
-              {item.rmFabric}
+              {item.totalQty}
             </Text>
           </View>
         </View>
@@ -225,7 +201,7 @@ const PurchaseOrderDraftListUI = ({route, navigation, ...props}) => {
           isChatEnable={false}
           isTImerEnable={false}
           isTitleHeaderEnable={true}
-          title={'Purchase Order Draft List'}
+          title={'Work Order Style List'}
           backBtnAction={() => backBtnAction()}
         />
       </View>
@@ -244,7 +220,7 @@ const PurchaseOrderDraftListUI = ({route, navigation, ...props}) => {
             style={{
               flexDirection: 'row',
               alignItems: 'center',
-              flex: 1, 
+              flex: 1, // Allows the search bar to take up available space
               borderWidth: 1,
               borderColor: '#D1D1D1',
               borderRadius: 20,
@@ -335,33 +311,34 @@ const PurchaseOrderDraftListUI = ({route, navigation, ...props}) => {
 
         {filterArray && filterArray.length > 0 ? (
           <View style={CommonStyles.listCommonHeader}>
+           
             <Text
               style={[
                 CommonStyles.tylesHeaderTextStyle,
                 {flex: 1, textAlign: 'center'},
               ]}>
-              {' PO#'}
+              {'Style No (Color)'}
             </Text>
             <Text
               style={[
                 CommonStyles.tylesHeaderTextStyle,
-                {flex: 1, textAlign: 'center'},
+                {flex: 0.7, textAlign: 'center'},
               ]}>
-              {'Vendor'}
+              {'Process'}
             </Text>
             <Text
               style={[
                 CommonStyles.tylesHeaderTextStyle,
-                {flex: 1, textAlign: 'center'},
+                {flex: 0.5, textAlign: 'center'},
               ]}>
-              {'Total Price'}
+              {'Part'}
             </Text>
             <Text
               style={[
                 CommonStyles.tylesHeaderTextStyle,
-                {flex: 1, textAlign: 'center'},
+                {flex: 0.7, textAlign: 'center'},
               ]}>
-              {'RM/Trims/FG'}
+              {'Total Scanned Barcodes'}
             </Text>
           </View>
         ) : (
@@ -414,7 +391,7 @@ const PurchaseOrderDraftListUI = ({route, navigation, ...props}) => {
         reqBody={filterReqBody}
       />
 
-      <AddNewItem navItem={'CreatePurchaseOrderDraft'} />
+      <AddNewItem navItem={'CreateWorkOrderStyle'} />
 
       {props.isPopUp ? (
         <View style={CommonStyles.customPopUpStyle}>
@@ -442,7 +419,7 @@ const PurchaseOrderDraftListUI = ({route, navigation, ...props}) => {
   );
 };
 
-export default PurchaseOrderDraftListUI;
+export default WorkOrderStyleListUI;
 
 const styles = StyleSheet.create({
   container: {
@@ -470,3 +447,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 });
+
+
+
+
