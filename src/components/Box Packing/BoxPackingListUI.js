@@ -391,7 +391,7 @@ const BoxPackingListUI = ({route, navigation, ...props}) => {
         reqBody={filterReqBody}
       />
 
-      <AddNewItem navItem={'SaveBoxPacking'} />
+      <AddNewItem navItem={'CreateBoxPacking'} />
 
       {props.isPopUp ? (
         <View style={CommonStyles.customPopUpStyle}>

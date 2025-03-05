@@ -34,7 +34,6 @@ let downArrowImg = require('./../../../assets/images/png/dropDownImg.png');
 let closeImg = require('./../../../assets/images/png/close1.png');
 
 const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
-  const [employeeBarcode, setEmployeeBarcode] = useState('');
   const [rows, setRows] = React.useState([
     {
       rmName: 'BUTTONS ADD 1',
@@ -65,9 +64,38 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
 
   useEffect(() => {
     if (props.lists) {
-      console.log('data need to set ==> ', props.lists);
+      // console.log('data need to set ==> ', props.lists);
+      if(props.lists.ShipTo){
+        setFilteredShipTo(props.lists.ShipTo)
+        setShipToList(props.lists.ShipTo)
+      }
+      if(props.lists.ShipLocation){
+        setShipLocationList(props.lists.ShipLocation)
+        setFilteredShipLocation(props.lists.ShipLocation)
+      }
+      if(props.lists.vendorsMap){
+        setFilteredVendor(props.lists.vendorsMap)
+        setVendorList(props.lists.vendorsMap)
+      }
     }
   }, [props.lists]);
+
+  useEffect(() => {
+    if (props.modalLists) {
+      console.log('data need to set ==> ', props.modalLists.StyleFg);
+      if(props.modalLists.StyleFg){
+        setModalLists(props.modalLists.StyleFg)
+      }
+      // if(props.lists.ShipLocation){
+      //   setShipLocationList(props.lists.ShipLocation)
+      //   setFilteredShipLocation(props.lists.ShipLocation)
+      // }
+      // if(props.lists.vendorsMap){
+      //   setFilteredVendor(props.lists.vendorsMap)
+      //   setVendorList(props.lists.vendorsMap)
+      // }
+    }
+  }, [props.modalLists]);
 
   // Process
   // Vendor state variables
@@ -101,57 +129,8 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
   const [query, setquery] = useState('');
   const [selectedIdxs, setSelectedIdxs] = useState([]);
   const [selectAllCheckBox, setSelectAllCheckBox] = useState(false);
+  const [modalLists, setModalLists] = useState([]);
 
-  const mockData = [
-    {
-      rmName: 'BUTTONS ADD 1',
-      rmType: 'BUTTONS',
-      color: 'WHITE',
-      uom: 'Kgs',
-    },
-    {
-      rmName: 'GREIGE FAB 120',
-      rmType: 'GREIGE FABRIC',
-      color: 'GREIGE',
-      uom: 'Meters',
-    },
-    {
-      rmName: 'BTN NSW 10',
-      rmType: 'BUTTONS',
-      color: 'BLUE',
-      uom: 'Kgs',
-    },
-    {
-      rmName: 'NSW RM GT CHK',
-      rmType: 'BUTTONS',
-      color: 'GREEN',
-      uom: 'Kgs',
-    },
-    {
-      rmName: 'RM GREIGE TEST',
-      rmType: 'FABRIC',
-      color: 'BROWN',
-      uom: 'Meters',
-    },
-    {
-      rmName: 'CHECK SCALE MST RM',
-      rmType: 'BUTTONS',
-      color: 'RED',
-      uom: 'Kgs',
-    },
-    {
-      rmName: 'CHECK MASTER RM',
-      rmType: 'BUTTONS',
-      color: 'BLACK',
-      uom: 'Kgs',
-    },
-    {
-      rmName: 'POLY NONSCALE BT ALBN',
-      rmType: 'BUTTONS',
-      color: 'YELLOW',
-      uom: 'Kgs',
-    },
-  ];
 
   const actionOnVendor = item => {
     setVendorId(item.id);
@@ -336,10 +315,10 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
   // const filteredCompanyList = companyList.filter(item =>
   //   companyList[item].toLowerCase().includes(query.toLowerCase()),
 
-  const filteredCompanyList = mockData.filter(item => {
+  const filteredCompanyList = modalLists.filter(item => {
     return (
-      item?.rmName?.toLowerCase().includes(query.toLowerCase()) ||
-      item?.color?.toLowerCase().includes(query.toLowerCase())
+      item?.custStyleName?.toLowerCase().includes(query.toLowerCase()) ||
+      item?.styleName?.toLowerCase().includes(query.toLowerCase())
     );
   });
 
@@ -370,6 +349,17 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
     });
   };
 
+  const handleOpenModal = item => {
+
+
+   setShowmodal(!showModal);
+
+   if(selectedradiooption1==="Style (FG)"){
+    props.getModalStyleFgList();
+   }
+
+  };
+
   return (
     <View style={[CommonStyles.mainComponentViewStyle]}>
       <View style={[CommonStyles.headerView]}>
@@ -396,15 +386,7 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
             width: '90%',
             marginHorizontal: wp('5%'),
           }}>
-          <View style={{marginTop: hp('2%')}}>
-            <TextInput
-              label="Employee Barcode *"
-              value={employeeBarcode}
-              mode="outlined"
-              onChangeText={text => setEmployeeBarcode(text)}
-            />
-          </View>
-
+          
           <View
             style={{
               alignItems: 'center',
@@ -705,7 +687,7 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
 
           <View style={{marginBottom: 20}} />
 
-          <RadioGroup
+         {selectedradiooption1 !=="Style (FG)" &&  <RadioGroup
             style={{flexDirection: 'row', color: '#000', marginTop: 20}}
             radioButtons={radiogroup2}
             onPress={handleOptionChange2}
@@ -713,11 +695,11 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
             selectedId={
               radiogroup2.find(item => item.value === selectedradiooption2)?.id
             }
-          />
+          />}
 
           <TouchableOpacity
             style={styles.searchButton}
-            onPress={() => setShowmodal(!showModal)}>
+            onPress={handleOpenModal}>
             <Text style={styles.searchbuttonText}>
               Search {selectedradiooption2}
             </Text>
@@ -1168,13 +1150,13 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
                             />
                           </View>
                           <Text style={styles.companyModalDropdownItemText}>
-                            {item.rmName}
+                            {item.styleName}
                           </Text>
                           <Text style={styles.companyModalDropdownItemText}>
-                            {item.rmType}
+                            {item.custStyleName}
                           </Text>
                           <Text style={styles.companyModalDropdownItemText}>
-                            {item.color}
+                            {item.availQty}
                           </Text>
                         </View>
                       </TouchableOpacity>

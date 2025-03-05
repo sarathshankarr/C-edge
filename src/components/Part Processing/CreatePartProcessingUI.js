@@ -45,6 +45,7 @@ const CreatePartProcessingUI = ({route, navigation, ...props}) => {
       console.log('data need to set ==> ', props.lists);
 
       if (processId) {
+        
         if (props.lists.status) {
           // Alert.alert(props.lists.statusRemarks);
           props.popUpAction(
