@@ -27,7 +27,6 @@ const CreatePurchaseOrderDraft = ({route}) => {
     styleFab: [],
   });
 
-
   useEffect(() => {
     getInitialData();
   }, []);
@@ -125,7 +124,7 @@ const CreatePurchaseOrderDraft = ({route}) => {
       );
     }
   };
-  const getModalStyleFgList = async tempObj => {
+  const getModalStyleFgList = async () => {
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
@@ -142,19 +141,135 @@ const CreatePurchaseOrderDraft = ({route}) => {
       compIds: usercompanyId,
       company: JSON.parse(companyObj),
     };
+    console.log('modal lsit ===>  req body ===> ', obj);
 
     let LISTAPIOBJ = await APIServiceCall.getPODStyeleFogDetails(obj);
     set_isLoading(false);
 
     if (LISTAPIOBJ && LISTAPIOBJ.statusData) {
       if (LISTAPIOBJ && LISTAPIOBJ.responseData) {
-     console.log("modal lsit ===> ",  LISTAPIOBJ.responseData)
+        //  console.log("modal lsit ===> ",  LISTAPIOBJ.responseData)
+        set_modalLists(prevLists => ({
+          ...prevLists,
+          StyleFg: LISTAPIOBJ.responseData,
+        }));
+      }
+    } else {
+      popUpAction(
+        Constant.SERVICE_FAIL_MSG,
+        Constant.DefaultAlert_MSG,
+        'OK',
+        true,
+        false,
+      );
+    }
+
+    if (LISTAPIOBJ && LISTAPIOBJ.error) {
+      popUpAction(
+        Constant.SERVICE_FAIL_MSG,
+        Constant.DefaultAlert_MSG,
+        'OK',
+        true,
+        false,
+      );
+    }
+  };
+  const getModalLists = async id => {
+    let userName = await AsyncStorage.getItem('userName');
+    let userPsd = await AsyncStorage.getItem('userPsd');
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
+
+    set_isLoading(true);
+    let rmObj = {
+      fromRecord: 0,
+      userName: userName,
+      userPwd: userPsd,
+      searchKeyValue: '',
+      styleSearchDropdown: '-1',
+      menuId: 145,
+      locIds: 0,
+      brandIds: 0,
+      fromRecord: 0,
+      toRecord: 999,
+      dataFilter: '0',
+      compIds: usercompanyId,
+      company: JSON.parse(companyObj),
+    };
+    let fabObj = {
+      fromRecord: 0,
+      username: userName,
+      password: userPsd,
+      searchKeyValue: '',
+      styleSearchDropdown: '-1',
+      menuId: 29,
+      locIds: 0,
+      brandIds: 0,
+      fromRecord: 0,
+      toRecord: 999,
+      dataFilter: '0',
+      compIds: usercompanyId,
+      company: JSON.parse(companyObj),
+      styleId: 0,
+      ids: '',
+      buyperPoId: 0,
+      withAllowance: 0,
+      withTrimFab: 0,
+      withLining: 0,
+      rmId: 0,
+    };
+    let TrimfabObj = {
+      fromRecord: 0,
+      userName: userName,
+      userPwd: userPsd,
+      searchKeyValue: '',
+      styleSearchDropdown: '-1',
+      menuId: 145,
+      locIds: 0,
+      brandIds: 0,
+      fromRecord: 0,
+      toRecord: 999,
+      dataFilter: '0',
+      compIds: usercompanyId,
+      company: JSON.parse(companyObj),
+      styleId: 0,
+      ids: '',
+      buyperPoId: 0,
+      withAllowance: 0,
+      rmId: 0,
+    };
+    console.log('modal lsit ===> , calling 1, id, req body ===> ', id);
+
+    let LISTAPIOBJ;
+
+    if (id === 1) {
+      LISTAPIOBJ = await APIServiceCall.getStyleRm(rmObj);
+    } else if (id === 2) {
+      LISTAPIOBJ = await APIServiceCall.getstyleFab(fabObj);
+    } else {
+      LISTAPIOBJ = await APIServiceCall.getStyleTrimfab(TrimfabObj);
+    }
+
+    set_isLoading(false);
+
+    if (LISTAPIOBJ && LISTAPIOBJ.statusData) {
+      if (LISTAPIOBJ && LISTAPIOBJ.responseData) {
+        if (id === 1) {
           set_modalLists(prevLists => ({
             ...prevLists,
-            StyleFg: LISTAPIOBJ.responseData,
+            styleRm: LISTAPIOBJ.responseData,
           }));
-      
-        
+        } else if (id === 2) {
+          set_modalLists(prevLists => ({
+            ...prevLists,
+            styleFab: LISTAPIOBJ.responseData,
+          }));
+        } else {
+          set_modalLists(prevLists => ({
+            ...prevLists,
+            styleTrimfab: LISTAPIOBJ.responseData,
+          }));
+        }
       }
     } else {
       popUpAction(
@@ -198,7 +313,7 @@ const CreatePurchaseOrderDraft = ({route}) => {
     let SAVEAPIObj = await APIServiceCall.saveCreatePartsProcessing(tempObj);
     set_isLoading(false);
 
-    console.log('Sucess before returned obj ', SAVEAPIObj);
+    // console.log('Sucess before returned obj ', SAVEAPIObj);
 
     if (
       SAVEAPIObj &&
@@ -241,6 +356,7 @@ const CreatePurchaseOrderDraft = ({route}) => {
       isPopUp={isPopUp}
       lists={lists}
       modalLists={modalLists}
+      getModalLists={getModalLists}
       getModalStyleFgList={getModalStyleFgList}
       submitAction={submitAction}
       backBtnAction={backBtnAction}

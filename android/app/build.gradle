@@ -79,7 +79,7 @@ android {
 
     namespace "com.erp"
     defaultConfig {
-        applicationId "com.cedge"
+        applicationId "com.CodvCedge"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

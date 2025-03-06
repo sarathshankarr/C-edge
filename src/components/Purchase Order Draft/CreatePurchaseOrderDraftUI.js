@@ -82,10 +82,17 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
 
   useEffect(() => {
     if (props.modalLists) {
-      console.log('data need to set ==> ', props.modalLists.StyleFg);
+      // console.log('data need to set ==> ', props.modalLists.StyleFg);
       if(props.modalLists.StyleFg){
         setModalLists(props.modalLists.StyleFg)
       }
+      console.log("StyleFg ==> ", props.modalLists.StyleFg.length)
+      console.log("styleRm ==> ", props.modalLists.styleRm.length)
+      console.log("styleFab ==> ", props.modalLists.styleFab.length)
+      console.log("styleTrimfab ==> ", props.modalLists.styleTrimfab.length)
+
+
+
       // if(props.lists.ShipLocation){
       //   setShipLocationList(props.lists.ShipLocation)
       //   setFilteredShipLocation(props.lists.ShipLocation)
@@ -349,14 +356,20 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
     });
   };
 
-  const handleOpenModal = item => {
-
-
-   setShowmodal(!showModal);
+  const handleOpenModal = () => {
 
    if(selectedradiooption1==="Style (FG)"){
     props.getModalStyleFgList();
+   }else{
+    if(selectedradiooption2==="RM"){
+      props.getModalLists(1);
+    }else if(selectedradiooption2==="Fabric"){
+      props.getModalLists(2);
+    }else{
+      props.getModalLists(3);
+    }
    }
+   setShowmodal(!showModal);
 
   };
 
@@ -782,11 +795,12 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
                     <View style={{width: 10}} />
 
                     <View style={{width: 100}}>
-                      <Text style={styles.table_data}>{row.rmName}</Text>
+                      {/* <Text style={styles.table_data}>{row.rmName}</Text> */}
+                      {selectedradiooption1 ==="Style (FG)"  && <Text style={styles.table_data}>{row.styleName}</Text>}
                     </View>
 
                     <View style={{width: 100}}>
-                      <Text style={styles.table_data}>{row.size}</Text>
+                      {selectedradiooption1 ==="Style (FG)"  && <Text style={styles.table_data}>{row.custStyleName}</Text>}
                     </View>
                     <View style={{width: 200}}>
                       <View
@@ -1111,15 +1125,18 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
                     onToggle={updateAllIndexes}
                   />
                 </View>
-                <Text style={styles.companyModalDropdownItemTextHeader}>
-                  {'RM NAME'}
-                </Text>
-                <Text style={styles.companyModalDropdownItemTextHeader}>
-                  {'RM TYPE'}
-                </Text>
-                <Text style={styles.companyModalDropdownItemTextHeader}>
-                  {'COLOR'}
-                </Text>
+               {selectedradiooption1 ==="Style (FG)"  && <Text style={styles.companyModalDropdownItemTextHeader}>
+                  {'Style No'}
+                  {/* {'RM NAME'} */}
+                </Text>}
+               {selectedradiooption1 ==="Style (FG)"  &&  <Text style={styles.companyModalDropdownItemTextHeader}>
+                  {'Customer Style No'}
+                  {/* {'RM TYPE'} */}
+                </Text>}
+                {selectedradiooption1 ==="Style (FG)"  && <Text style={styles.companyModalDropdownItemTextHeader}>
+                  {'Avail Qty'}
+                  {/* {'COLOR'} */}
+                </Text>}
               </View>
               <View style={styles.companyModalListContainer}>
                 {filteredCompanyList.length === 0 ? (
@@ -1129,7 +1146,7 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
                 ) : (
                   <FlatList
                     data={filteredCompanyList}
-                    keyExtractor={item => item.rmName}
+                    keyExtractor={item => item.styleId}
                     renderItem={({item, index}) => (
                       <TouchableOpacity
                         style={styles.companyModalDropdownItem}
@@ -1269,7 +1286,8 @@ const getStyles = colors =>
       flexDirection: 'row',
       borderBottomWidth: 1,
       borderColor: '#ddd',
-      backgroundColor: '#5177c0',
+      backgroundColor: colors.color2,
+      // backgroundColor: '#5177c0',
       alignItems: 'center',
       paddingVertical: 7,
       paddingHorizontal: 5,

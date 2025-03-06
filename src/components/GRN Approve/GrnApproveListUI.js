@@ -63,6 +63,8 @@ const GrnApproveListUI = ({route, navigation, ...props}) => {
 
   React.useEffect(() => {
     if (props.itemsArray) {
+
+      console.log("lists ===> ", props.itemsArray);
       set_filterArray(props.itemsArray);
       set_ItemsArray(props.itemsArray);
     }
@@ -162,25 +164,25 @@ const GrnApproveListUI = ({route, navigation, ...props}) => {
           <View
             style={{flex: 1, justifyContent: 'center'}}>
             <Text style={[CommonStyles.tylesTextStyle, {textAlign: 'center'}]}>
-              {item.styleCode}
+              {item.poNumberWithPrefix}
             </Text>
           </View>
           <View
             style={{flex: 0.7, justifyContent: 'center'}}>
             <Text style={[CommonStyles.tylesTextStyle, {textAlign: 'center'}]}>
-              {item.processName}
+              {item.vendorName}
             </Text>
           </View>
           <View
             style={{flex: 0.5, justifyContent: 'center'}}>
             <Text style={[CommonStyles.tylesTextStyle, {textAlign: 'center'}]}>
-              {item.producttype}
+              {item.rmFabric}
             </Text>
           </View>
           <View
             style={{flex: 0.7, justifyContent: 'center'}}>
             <Text style={[CommonStyles.tylesTextStyle, {textAlign: 'center'}]}>
-              {item.totalQty}
+              {item.price}
             </Text>
           </View>
         </View>

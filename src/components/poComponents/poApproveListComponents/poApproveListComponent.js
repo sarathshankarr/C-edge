@@ -65,22 +65,35 @@ const POApproveListComponent = ({ navigation, route, ...props }) => {
 
 
     try {
-    let obj = {
-      "menuId": '4',
-      "searchKeyValue": "Not Approved",
-      "styleSearchDropdown": "Po_status",
-      "dataFilter": "120Days", 
-      "locIds": locIds ? locIds : 0,
-      "brandIds":brandIds ? brandIds: 0 ,
-      "fromRecord": fromRecord,
-      "toRecord": toRecord,
-      "userName":userName,
-      "userPwd": userPsd,
-      "compIds": usercompanyId,
-      "company":JSON.parse(companyObj),
-  }
+  //   let obj = {
+  //     "menuId": '4',
+  //     "searchKeyValue": "Not Approved",
+  //     "styleSearchDropdown": "Po_status",
+  //     "dataFilter": "120Days", 
+  //     "locIds": locIds ? locIds : 0,
+  //     "brandIds":brandIds ? brandIds: 0 ,
+  //     "fromRecord": fromRecord,
+  //     "toRecord": toRecord,
+  //     "userName":userName,
+  //     "userPwd": userPsd,
+  //     "compIds": usercompanyId,
+  //     "company":JSON.parse(companyObj),
+  // }
 
-  // console.log("list po req obj ===> ", obj);
+  let obj = {
+    menuId: 145,
+    searchKeyValue: '',
+    styleSearchDropdown: '-1',
+    dataFilter: '0',
+    locIds: 0,
+    brandIds: 0,
+    compIds: usercompanyId,
+    company: JSON.parse(companyObj),
+    fromRecord: fromRecord,
+    toRecord: toRecord,
+    userName: userName,
+    userPwd: userPsd,
+  };
 
     let poEditAPIObj = await APIServiceCall.allPOAPIService(obj);
     set_isLoading(false);
@@ -173,7 +186,11 @@ const POApproveListComponent = ({ navigation, route, ...props }) => {
   };
 
   const actionOnRow = (item,index) => {
-    navigation.navigate('POApprovalComponent',{item:item});
+    if(item.poSave===2){
+      navigation.navigate('SavePurchaseOrderDraft',{item:item});
+    }else{
+      navigation.navigate('POApprovalComponent',{item:item});
+    }
   };
 
   const fetchMore= (more) =>{
