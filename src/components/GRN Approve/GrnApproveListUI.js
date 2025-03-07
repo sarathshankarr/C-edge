@@ -319,28 +319,28 @@ const GrnApproveListUI = ({route, navigation, ...props}) => {
                 CommonStyles.tylesHeaderTextStyle,
                 {flex: 1, textAlign: 'center'},
               ]}>
-              {'Style No (Color)'}
+              {'PO'}
             </Text>
             <Text
               style={[
                 CommonStyles.tylesHeaderTextStyle,
                 {flex: 0.7, textAlign: 'center'},
               ]}>
-              {'Process'}
+              {'Vendor'}
             </Text>
             <Text
               style={[
                 CommonStyles.tylesHeaderTextStyle,
                 {flex: 0.5, textAlign: 'center'},
               ]}>
-              {'Part'}
+              {'Style'}
             </Text>
             <Text
               style={[
                 CommonStyles.tylesHeaderTextStyle,
                 {flex: 0.7, textAlign: 'center'},
               ]}>
-              {'Total Scanned Barcodes'}
+              {'Total Price'}
             </Text>
           </View>
         ) : (

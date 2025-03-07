@@ -34,22 +34,10 @@ let downArrowImg = require('./../../../assets/images/png/dropDownImg.png');
 let closeImg = require('./../../../assets/images/png/close1.png');
 
 const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
-  const [rows, setRows] = React.useState([
-    {
-      rmName: 'BUTTONS ADD 1',
-      rmType: 'BUTTONS',
-      color: 'WHITE',
-      uom: 'Kgs',
-    },
-    {
-      rmName: 'GREIGE FAB 120',
-      rmType: 'GREIGE FABRIC',
-      color: 'GREIGE',
-      uom: 'Meters',
-    },
-  ]);
+  const [rows, setRows] = React.useState([]);
   const [selectedradiooption1, setSelectedradiooption1] = useState('StyleWise');
   const [selectedradiooption2, setSelectedradiooption2] = useState('RM');
+  const [totalQty, setTotalQty] = useState(false);
   const {colors} = useContext(ColorContext);
 
   const styles = getStyles(colors);
@@ -65,42 +53,45 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
   useEffect(() => {
     if (props.lists) {
       // console.log('data need to set ==> ', props.lists);
-      if(props.lists.ShipTo){
-        setFilteredShipTo(props.lists.ShipTo)
-        setShipToList(props.lists.ShipTo)
+      if (props.lists.ShipTo) {
+        setFilteredShipTo(props.lists.ShipTo);
+        setShipToList(props.lists.ShipTo);
       }
-      if(props.lists.ShipLocation){
-        setShipLocationList(props.lists.ShipLocation)
-        setFilteredShipLocation(props.lists.ShipLocation)
+      if (props.lists.ShipLocation) {
+        setShipLocationList(props.lists.ShipLocation);
+        setFilteredShipLocation(props.lists.ShipLocation);
       }
-      if(props.lists.vendorsMap){
-        setFilteredVendor(props.lists.vendorsMap)
-        setVendorList(props.lists.vendorsMap)
+      if (props.lists.vendorsMap) {
+        setFilteredVendor(props.lists.vendorsMap);
+        setVendorList(props.lists.vendorsMap);
       }
     }
   }, [props.lists]);
 
   useEffect(() => {
     if (props.modalLists) {
-      // console.log('data need to set ==> ', props.modalLists.StyleFg);
-      if(props.modalLists.StyleFg){
-        setModalLists(props.modalLists.StyleFg)
+      if (props.modalLists.StyleFg && selectedradiooption1 === 'Style (FG)') {
+        setModalLists(props.modalLists.StyleFg);
       }
-      console.log("StyleFg ==> ", props.modalLists.StyleFg.length)
-      console.log("styleRm ==> ", props.modalLists.styleRm.length)
-      console.log("styleFab ==> ", props.modalLists.styleFab.length)
-      console.log("styleTrimfab ==> ", props.modalLists.styleTrimfab.length)
+      if (
+        props.modalLists.styleTrimfab &&
+        selectedradiooption2 === 'Trim Fabric(RM)'
+      ) {
+        setModalLists(props.modalLists.styleTrimfab);
+      }
+      if (props.modalLists.styleRm && selectedradiooption2 === 'RM') {
+        setModalLists(props.modalLists.styleRm);
+      }
+      if (props.modalLists.styleFab && selectedradiooption2 === 'Fabric') {
+        setModalLists(props.modalLists.styleFab);
+      }
 
+      // console.log('LIst ==> ', props.modalLists.styleFab);
 
-
-      // if(props.lists.ShipLocation){
-      //   setShipLocationList(props.lists.ShipLocation)
-      //   setFilteredShipLocation(props.lists.ShipLocation)
-      // }
-      // if(props.lists.vendorsMap){
-      //   setFilteredVendor(props.lists.vendorsMap)
-      //   setVendorList(props.lists.vendorsMap)
-      // }
+      console.log('StyleFg ==> ', props.modalLists.StyleFg.length);
+      console.log('styleRm ==> ', props.modalLists.styleRm.length);
+      console.log('styleFab ==> ', props.modalLists.styleFab.length);
+      console.log('styleTrimfab ==> ', props.modalLists.styleTrimfab.length);
     }
   }, [props.modalLists]);
 
@@ -137,7 +128,6 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
   const [selectedIdxs, setSelectedIdxs] = useState([]);
   const [selectAllCheckBox, setSelectAllCheckBox] = useState(false);
   const [modalLists, setModalLists] = useState([]);
-
 
   const actionOnVendor = item => {
     setVendorId(item.id);
@@ -282,6 +272,9 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
     const selected = radiogroup1.find(button => button.id === selectedId);
     if (selected) {
       setSelectedradiooption1(selected.value);
+      if (selected.value === 'Style (FG)') {
+        setSelectedradiooption2('');
+      } else setSelectedradiooption2('RM');
     }
   };
 
@@ -319,24 +312,91 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
     }
   };
 
-  // const filteredCompanyList = companyList.filter(item =>
-  //   companyList[item].toLowerCase().includes(query.toLowerCase()),
-
   const filteredCompanyList = modalLists.filter(item => {
-    return (
-      item?.custStyleName?.toLowerCase().includes(query.toLowerCase()) ||
-      item?.styleName?.toLowerCase().includes(query.toLowerCase())
-    );
+    if (selectedradiooption1 === 'Style (FG)') {
+      return (
+        item?.custStyleName?.toLowerCase().includes(query.toLowerCase()) ||
+        item?.styleName?.toLowerCase().includes(query.toLowerCase())
+      );
+    } else if (selectedradiooption2 === 'RM') {
+      return (
+        item?.trimName?.toLowerCase().includes(query.toLowerCase()) ||
+        item?.description?.toLowerCase().includes(query.toLowerCase())
+      );
+    } else if (selectedradiooption2 === 'Fabric') {
+      return (
+        item?.fabricNo?.toLowerCase().includes(query.toLowerCase()) ||
+        item?.colorName?.toLowerCase().includes(query.toLowerCase())
+      );
+    } else if (selectedradiooption2 === 'Trim Fabric(RM)') {
+      return (
+        item?.trimName?.toLowerCase().includes(query.toLowerCase()) ||
+        item?.description?.toLowerCase().includes(query.toLowerCase())
+      );
+    }
+    return false;
   });
 
+  // const handleSelectFromModal = () => {
+  //   const list = [];
+  //   selectedIdxs.forEach((item, index) => {
+  //     list.push(modalLists[item]);
+  //   });
+
+  //   if (selectedradiooption1 === 'Style (FG)' && selectedradiooption2==="") {
+
+  //     const Obj={
+  //       styleName:modalLists[item]?.trimName || "",
+  //     }
+
+  //   } else if (selectedradiooption2 === 'RM') {
+
+  //     const Obj={
+  //       styleName:modalLists[item]?.trimName || "",
+  //     }
+
+  //   } else if (selectedradiooption2 === 'Fabric') {
+  //     const Obj={
+  //       styleName:modalLists[item]?.fabricNo || "",
+  //     }
+  //   } else if (selectedradiooption2 === 'Trim Fabric(RM)') {
+  //     const Obj={
+  //       styleName:modalLists[item]?.fabricNo || "",
+  //     }
+  //   }
+
+  //   console.log('lists ===> ', list);
+  //   setRows(list);
+  //   setShowmodal(false);
+  // };
+
   const handleSelectFromModal = () => {
-    const list = [];
-    selectedIdxs.forEach((item, index) => {
-      list.push(filteredCompanyList[item]);
+
+    setRows([])
+    const list = selectedIdxs.map(index => {
+      const item = {...modalLists[index]};
+
+      if (
+        selectedradiooption1 === 'Style (FG)' &&
+        selectedradiooption2 === ''
+      ) {
+        item.styleNameALL = item.styleName || '';
+      } else if (selectedradiooption2 === 'RM') {
+        item.styleNameALL = item.trimName || '';
+      } else if (selectedradiooption2 === 'Fabric') {
+        item.styleNameALL = item.fabricNo || '';
+      } else if (selectedradiooption2 === 'Trim Fabric(RM)') {
+        item.styleNameALL = item.trimName || '';
+      }
+
+      return item;
     });
+
+    console.log('Updated list ===>', list);
     setRows(list);
     setShowmodal(false);
   };
+
   const updateAllIndexes = () => {
     setSelectedIdxs(
       selectAllCheckBox ? [] : filteredCompanyList.map((_, index) => index),
@@ -357,20 +417,18 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
   };
 
   const handleOpenModal = () => {
-
-   if(selectedradiooption1==="Style (FG)"){
-    props.getModalStyleFgList();
-   }else{
-    if(selectedradiooption2==="RM"){
-      props.getModalLists(1);
-    }else if(selectedradiooption2==="Fabric"){
-      props.getModalLists(2);
-    }else{
-      props.getModalLists(3);
+    if (selectedradiooption1 === 'Style (FG)') {
+      props.getModalStyleFgList();
+    } else {
+      if (selectedradiooption2 === 'RM') {
+        props.getModalLists(1);
+      } else if (selectedradiooption2 === 'Fabric') {
+        props.getModalLists(2);
+      } else {
+        props.getModalLists(3);
+      }
     }
-   }
-   setShowmodal(!showModal);
-
+    setShowmodal(!showModal);
   };
 
   return (
@@ -399,7 +457,6 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
             width: '90%',
             marginHorizontal: wp('5%'),
           }}>
-          
           <View
             style={{
               alignItems: 'center',
@@ -700,15 +757,26 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
 
           <View style={{marginBottom: 20}} />
 
-         {selectedradiooption1 !=="Style (FG)" &&  <RadioGroup
-            style={{flexDirection: 'row', color: '#000', marginTop: 20}}
-            radioButtons={radiogroup2}
-            onPress={handleOptionChange2}
-            layout="row"
-            selectedId={
-              radiogroup2.find(item => item.value === selectedradiooption2)?.id
-            }
-          />}
+          {selectedradiooption1 !== 'Style (FG)' && (
+            <RadioGroup
+              style={{flexDirection: 'row', color: '#000', marginTop: 20}}
+              radioButtons={radiogroup2}
+              onPress={handleOptionChange2}
+              layout="row"
+              selectedId={
+                radiogroup2.find(item => item.value === selectedradiooption2)
+                  ?.id
+              }
+            />
+          )}
+
+          <View style={[styles.checkboxItem, {marginTop: hp('2%')}]}>
+            <CustomCheckBox
+              isChecked={totalQty}
+              onToggle={() => setTotalQty(!totalQty)}
+            />
+            <Text style={styles.checkboxLabel}>{'Total Qty'}</Text>
+          </View>
 
           <TouchableOpacity
             style={styles.searchButton}
@@ -718,356 +786,408 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
             </Text>
           </TouchableOpacity>
 
-          <View style={styles.wrapper}>
-            <ScrollView nestedScrollEnabled={true} horizontal>
-              <View style={styles.table}>
-                <View style={styles.table_head}>
-                  <View style={{width: 60}}>
-                    <Text style={styles.table_head_captions}>Action</Text>
-                  </View>
-                  <View style={{width: 60}}>
-                    <Text style={styles.table_head_captions}>Qty</Text>
-                  </View>
-                  <View style={{width: 10}} />
-
-                  <View style={{width: 100}}>
-                    <Text style={styles.table_head_captions}>Style No</Text>
-                  </View>
-                  <View style={{width: 100}}>
-                    <Text style={styles.table_head_captions}>RM Name</Text>
-                  </View>
-                  <View style={{width: 200}}>
-                    <Text style={styles.table_head_captions}>Lot</Text>
-                  </View>
-                  <View style={{width: 5}} />
-                  <View style={{width: 60}}>
-                    <Text style={styles.table_head_captions}>Unit Price </Text>
-                  </View>
-                  <View style={{width: 5}} />
-                  <View style={{width: 60}}>
-                    <Text style={styles.table_head_captions}>GST %</Text>
-                  </View>
-                  <View style={{width: 5}} />
-                  <View style={{width: 60}}>
-                    <Text style={styles.table_head_captions}>Discount</Text>
-                  </View>
-                  <View style={{width: 5}} />
-                  <View style={{width: 60}}>
-                    <Text style={styles.table_head_captions}>Disc. Amount</Text>
-                  </View>
-                  <View style={{width: 5}} />
-                  <View style={{width: 60}}>
-                    <Text style={styles.table_head_captions}>NET Amount</Text>
-                  </View>
-                  <View style={{width: 5}} />
-                  <View style={{width: 60}}>
-                    <Text style={styles.table_head_captions}>GST</Text>
-                  </View>
-                  <View style={{width: 5}} />
-                  <View style={{width: 60}}>
-                    <Text style={styles.table_head_captions}>Total</Text>
-                  </View>
-                </View>
-
-                {rows.map((row, index) => (
-                  <View key={index} style={styles.table_body_single_row}>
+          {rows.length > 0 && (
+            <View style={styles.wrapper}>
+              <ScrollView nestedScrollEnabled={true} horizontal>
+                <View style={styles.table}>
+                  <View style={styles.table_head}>
                     <View style={{width: 60}}>
-                      <TouchableOpacity
-                        style={{alignItems: '', justifyContent: ''}}
-                        onPress={() => handleRemoveRow(index)}>
-                        <Image source={closeImg} style={styles.imageStyle1} />
-                      </TouchableOpacity>
+                      <Text style={styles.table_head_captions}>Action</Text>
                     </View>
-
                     <View style={{width: 60}}>
-                      <TextInput
-                        style={styles.table_data_input}
-                        value={row.damagedQty}
-                        onChangeText={text => {
-                          setRows(
-                            rows.map((r, i) =>
-                              i === index ? {...r, damagedQty: text} : r,
-                            ),
-                          );
-                        }}
-                      />
+                      <Text style={styles.table_head_captions}>Qty</Text>
                     </View>
                     <View style={{width: 10}} />
 
                     <View style={{width: 100}}>
-                      {/* <Text style={styles.table_data}>{row.rmName}</Text> */}
-                      {selectedradiooption1 ==="Style (FG)"  && <Text style={styles.table_data}>{row.styleName}</Text>}
+                      <Text style={styles.table_head_captions}>Style No</Text>
                     </View>
-
+                    {/* <View style={{width: 100}}>
+                      if(selectedradiooption2==="RM"){
+                      <Text style={styles.table_head_captions}>RM Name</Text>
+                      }
+                      if(selectedradiooption2==="Fabric"){
+                      <Text style={styles.table_head_captions}>RM Name</Text>
+                      }
+                      if(selectedradiooption2==="Trim Fabric(RM)"){
+                      <Text style={styles.table_head_captions}>RM Name</Text>
+                      }   
+                    </View> */}
                     <View style={{width: 100}}>
-                      {selectedradiooption1 ==="Style (FG)"  && <Text style={styles.table_data}>{row.custStyleName}</Text>}
-                    </View>
-                    <View style={{width: 200}}>
-                      <View
-                        style={{
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          marginTop: hp('1%'),
-                          backgroundColor: !row?.editStockType
-                            ? '#ffffff'
-                            : '#dedede',
-                        }}>
-                        <TouchableOpacity
-                          style={{
-                            flexDirection: 'row',
-                            borderWidth: 0.5,
-                            borderColor: '#D8D8D8',
-                            borderRadius: hp('0.5%'),
-                            width: '100%',
-                            overflow: 'hidden',
-                          }}
-                          onPress={() => {
-                            setRows(
-                              rows.map(r =>
-                                r.id === row.id
-                                  ? {
-                                      ...r,
-                                      showStockTypesList: !r.showStockTypesList,
-                                      showStocksList: false,
-                                      filteredStockTypes:
-                                        props.lists.getStockTypes,
-                                    }
-                                  : {
-                                      ...r,
-                                      showStockTypesList: false,
-                                      filteredStockTypes:
-                                        props.lists.getStockTypes,
-                                    },
-                              ),
-                            );
-                          }}>
-                          <View style={[styles.SectionStyle1]}>
-                            <View style={{flexDirection: 'column'}}>
-                              <Text
-                                style={
-                                  row.stockType
-                                    ? styles.dropTextLightStyle
-                                    : styles.dropTextInputStyle
-                                }>
-                                {'Lot '}
-                              </Text>
-                              <Text style={styles.dropTextInputStyle}>
-                                {row.stockTypeId ? row.stockType : 'Select Lot'}
-                              </Text>
-                            </View>
-                          </View>
-                          <View style={{justifyContent: 'center'}}>
-                            <Image
-                              source={downArrowImg}
-                              style={styles.imageStyle}
-                            />
-                          </View>
-                        </TouchableOpacity>
-                        {row.showStockTypesList && row.editStockType && (
-                          <View style={styles.dropdownContent2}>
-                            <TextInput
-                              style={styles.searchInput}
-                              placeholder="Search Stock Type"
-                              onChangeText={text =>
-                                handleSearchStockType(text, row.id)
-                              }
-                              placeholderTextColor="#000"
-                            />
-                            <ScrollView nestedScrollEnabled={true}>
-                              {row.filteredStockTypes.length === 0 ? (
-                                <Text style={styles.noCategoriesText}>
-                                  Sorry, no results found!
-                                </Text>
-                              ) : (
-                                row.filteredStockTypes.map(item => (
-                                  <TouchableOpacity
-                                    key={item?.id}
-                                    onPress={() =>
-                                      actionOnStockTypes(item, row.id)
-                                    }>
-                                    <View style={styles.dropdownOption}>
-                                      <Text style={{color: '#000'}}>
-                                        {item?.name}
-                                      </Text>
-                                    </View>
-                                  </TouchableOpacity>
-                                ))
-                              )}
-                            </ScrollView>
-                          </View>
+                      {selectedradiooption1 === 'Style (FG)' &&
+                        selectedradiooption2 === '' && (
+                          <Text style={styles.table_head_captions}>
+                            Customer Style No
+                          </Text>
                         )}
+                      {selectedradiooption2 === 'RM' && (
+                        <Text style={styles.table_head_captions}>RM Name</Text>
+                      )}
+                      {selectedradiooption2 === 'Fabric' && (
+                        <Text style={styles.table_head_captions}>Fabric</Text>
+                      )}
+                      {selectedradiooption2 === 'Trim Fabric(RM)' && (
+                        <Text style={styles.table_head_captions}>
+                          RM Name - Color
+                        </Text>
+                      )}
+                    </View>
+
+                    <View style={{width: 200}}>
+                      <Text style={styles.table_head_captions}>Lot</Text>
+                    </View>
+                    <View style={{width: 5}} />
+                    <View style={{width: 60}}>
+                      <Text style={styles.table_head_captions}>
+                        Unit Price{' '}
+                      </Text>
+                    </View>
+                    <View style={{width: 5}} />
+                    <View style={{width: 60}}>
+                      <Text style={styles.table_head_captions}>GST %</Text>
+                    </View>
+                    <View style={{width: 5}} />
+                    <View style={{width: 60}}>
+                      <Text style={styles.table_head_captions}>Discount</Text>
+                    </View>
+                    <View style={{width: 5}} />
+                    <View style={{width: 60}}>
+                      <Text style={styles.table_head_captions}>
+                        Disc. Amount
+                      </Text>
+                    </View>
+                    <View style={{width: 5}} />
+                    <View style={{width: 60}}>
+                      <Text style={styles.table_head_captions}>NET Amount</Text>
+                    </View>
+                    <View style={{width: 5}} />
+                    <View style={{width: 60}}>
+                      <Text style={styles.table_head_captions}>GST</Text>
+                    </View>
+                    <View style={{width: 5}} />
+                    <View style={{width: 60}}>
+                      <Text style={styles.table_head_captions}>Total</Text>
+                    </View>
+                  </View>
+
+                  {rows.length > 0 &&
+                    rows.map((row, index) => (
+                      <View key={index} style={styles.table_body_single_row}>
+                        <View style={{width: 60}}>
+                          <TouchableOpacity
+                            style={{alignItems: '', justifyContent: ''}}
+                            onPress={() => handleRemoveRow(index)}>
+                            <Image
+                              source={closeImg}
+                              style={styles.imageStyle1}
+                            />
+                          </TouchableOpacity>
+                        </View>
+
+                        <View style={{width: 60}}>
+                          <TextInput
+                            style={styles.table_data_input}
+                            value={row.damagedQty}
+                            onChangeText={text => {
+                              setRows(
+                                rows.map((r, i) =>
+                                  i === index ? {...r, damagedQty: text} : r,
+                                ),
+                              );
+                            }}
+                          />
+                        </View>
+                        <View style={{width: 10}} />
+
+                        <View style={{width: 100}}>
+                          {selectedradiooption1 === 'Style (FG)' && (
+                            <Text style={styles.table_data}>
+                              {row.custStyleName}
+                            </Text>
+                          )}
+                        </View>
+
+                        <View style={{width: 100}}>
+                          {/* <Text style={styles.table_data}>{row.rmName}</Text> */}
+
+                          <Text style={styles.table_data}>{row.styleNameALL}</Text>
+                        </View>
+
+                        <View style={{width: 200}}>
+                          <View
+                            style={{
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              marginTop: hp('1%'),
+                              backgroundColor: !row?.editStockType
+                                ? '#ffffff'
+                                : '#dedede',
+                            }}>
+                            <TouchableOpacity
+                              style={{
+                                flexDirection: 'row',
+                                borderWidth: 0.5,
+                                borderColor: '#D8D8D8',
+                                borderRadius: hp('0.5%'),
+                                width: '100%',
+                                overflow: 'hidden',
+                              }}
+                              onPress={() => {
+                                setRows(
+                                  rows.map(r =>
+                                    r.id === row.id
+                                      ? {
+                                          ...r,
+                                          showStockTypesList:
+                                            !r.showStockTypesList,
+                                          showStocksList: false,
+                                          filteredStockTypes:
+                                            props.lists.getStockTypes,
+                                        }
+                                      : {
+                                          ...r,
+                                          showStockTypesList: false,
+                                          filteredStockTypes:
+                                            props.lists.getStockTypes,
+                                        },
+                                  ),
+                                );
+                              }}>
+                              <View style={[styles.SectionStyle1]}>
+                                <View style={{flexDirection: 'column'}}>
+                                  <Text
+                                    style={
+                                      row.stockType
+                                        ? styles.dropTextLightStyle
+                                        : styles.dropTextInputStyle
+                                    }>
+                                    {'Lot '}
+                                  </Text>
+                                  <Text style={styles.dropTextInputStyle}>
+                                    {row.stockTypeId
+                                      ? row.stockType
+                                      : 'Select Lot'}
+                                  </Text>
+                                </View>
+                              </View>
+                              <View style={{justifyContent: 'center'}}>
+                                <Image
+                                  source={downArrowImg}
+                                  style={styles.imageStyle}
+                                />
+                              </View>
+                            </TouchableOpacity>
+                            {row.showStockTypesList && row.editStockType && (
+                              <View style={styles.dropdownContent2}>
+                                <TextInput
+                                  style={styles.searchInput}
+                                  placeholder="Search Stock Type"
+                                  onChangeText={text =>
+                                    handleSearchStockType(text, row.id)
+                                  }
+                                  placeholderTextColor="#000"
+                                />
+                                <ScrollView nestedScrollEnabled={true}>
+                                  {row.filteredStockTypes.length === 0 ? (
+                                    <Text style={styles.noCategoriesText}>
+                                      Sorry, no results found!
+                                    </Text>
+                                  ) : (
+                                    row.filteredStockTypes.map(item => (
+                                      <TouchableOpacity
+                                        key={item?.id}
+                                        onPress={() =>
+                                          actionOnStockTypes(item, row.id)
+                                        }>
+                                        <View style={styles.dropdownOption}>
+                                          <Text style={{color: '#000'}}>
+                                            {item?.name}
+                                          </Text>
+                                        </View>
+                                      </TouchableOpacity>
+                                    ))
+                                  )}
+                                </ScrollView>
+                              </View>
+                            )}
+                          </View>
+                        </View>
+                        <View style={{width: 5}} />
+                        <View style={{width: 60}}>
+                          <TextInput
+                            style={styles.table_data_input}
+                            value={row.damagedQty}
+                            onChangeText={text => {
+                              setRows(
+                                rows.map((r, i) =>
+                                  i === index ? {...r, damagedQty: text} : r,
+                                ),
+                              );
+                            }}
+                          />
+                        </View>
+                        <View style={{width: 5}} />
+                        <View style={{width: 60}}>
+                          <TextInput
+                            style={styles.table_data_input}
+                            value={row.damagedQty}
+                            onChangeText={text => {
+                              setRows(
+                                rows.map((r, i) =>
+                                  i === index ? {...r, damagedQty: text} : r,
+                                ),
+                              );
+                            }}
+                          />
+                        </View>
+                        <View style={{width: 5}} />
+                        <View style={{width: 60}}>
+                          <TextInput
+                            style={styles.table_data_input}
+                            value={row.damagedQty}
+                            onChangeText={text => {
+                              setRows(
+                                rows.map((r, i) =>
+                                  i === index ? {...r, damagedQty: text} : r,
+                                ),
+                              );
+                            }}
+                          />
+                        </View>
+                        <View style={{width: 5}} />
+                        <View style={{width: 60}}>
+                          <TextInput
+                            style={styles.table_data_input}
+                            value={row.damagedQty}
+                            onChangeText={text => {
+                              setRows(
+                                rows.map((r, i) =>
+                                  i === index ? {...r, damagedQty: text} : r,
+                                ),
+                              );
+                            }}
+                          />
+                        </View>
+                        <View style={{width: 5}} />
+                        <View style={{width: 60}}>
+                          <TextInput
+                            style={styles.table_data_input}
+                            value={row.damagedQty}
+                            onChangeText={text => {
+                              setRows(
+                                rows.map((r, i) =>
+                                  i === index ? {...r, damagedQty: text} : r,
+                                ),
+                              );
+                            }}
+                          />
+                        </View>
+                        <View style={{width: 5}} />
+                        <View style={{width: 60}}>
+                          <TextInput
+                            style={styles.table_data_input}
+                            value={row.damagedQty}
+                            onChangeText={text => {
+                              setRows(
+                                rows.map((r, i) =>
+                                  i === index ? {...r, damagedQty: text} : r,
+                                ),
+                              );
+                            }}
+                          />
+                        </View>
+                        <View style={{width: 5}} />
+                        <View style={{width: 60}}>
+                          <TextInput
+                            style={styles.table_data_input}
+                            value={row.damagedQty}
+                            onChangeText={text => {
+                              setRows(
+                                rows.map((r, i) =>
+                                  i === index ? {...r, damagedQty: text} : r,
+                                ),
+                              );
+                            }}
+                          />
+                        </View>
                       </View>
+                    ))}
+
+                  <View
+                    style={[
+                      styles.table_body_single_row,
+                      {paddingVertical: 12},
+                    ]}>
+                    <View style={{width: 60}}></View>
+
+                    <View style={{width: 60}}></View>
+                    <View style={{width: 10}} />
+
+                    <View style={{width: 100}}></View>
+
+                    <View style={{width: 100}}></View>
+                    <View style={{width: 200}}></View>
+                    <View style={{width: 5}} />
+                    <View style={{width: 60}}></View>
+                    <View style={{width: 5}} />
+                    <View style={{width: 60}}></View>
+                    <View style={{width: 5}} />
+                    <View style={{width: 60}}></View>
+                    <View style={{width: 5}} />
+                    <View style={{width: 60}}>
+                      <Text style={styles.table_data}>{'0.0'}</Text>
                     </View>
                     <View style={{width: 5}} />
                     <View style={{width: 60}}>
-                      <TextInput
-                        style={styles.table_data_input}
-                        value={row.damagedQty}
-                        onChangeText={text => {
-                          setRows(
-                            rows.map((r, i) =>
-                              i === index ? {...r, damagedQty: text} : r,
-                            ),
-                          );
-                        }}
-                      />
+                      <Text style={styles.table_data}>{'0.0'}</Text>
                     </View>
                     <View style={{width: 5}} />
                     <View style={{width: 60}}>
-                      <TextInput
-                        style={styles.table_data_input}
-                        value={row.damagedQty}
-                        onChangeText={text => {
-                          setRows(
-                            rows.map((r, i) =>
-                              i === index ? {...r, damagedQty: text} : r,
-                            ),
-                          );
-                        }}
-                      />
+                      <Text style={styles.table_data}>{'0.0'}</Text>
                     </View>
                     <View style={{width: 5}} />
                     <View style={{width: 60}}>
-                      <TextInput
-                        style={styles.table_data_input}
-                        value={row.damagedQty}
-                        onChangeText={text => {
-                          setRows(
-                            rows.map((r, i) =>
-                              i === index ? {...r, damagedQty: text} : r,
-                            ),
-                          );
-                        }}
-                      />
-                    </View>
-                    <View style={{width: 5}} />
-                    <View style={{width: 60}}>
-                      <TextInput
-                        style={styles.table_data_input}
-                        value={row.damagedQty}
-                        onChangeText={text => {
-                          setRows(
-                            rows.map((r, i) =>
-                              i === index ? {...r, damagedQty: text} : r,
-                            ),
-                          );
-                        }}
-                      />
-                    </View>
-                    <View style={{width: 5}} />
-                    <View style={{width: 60}}>
-                      <TextInput
-                        style={styles.table_data_input}
-                        value={row.damagedQty}
-                        onChangeText={text => {
-                          setRows(
-                            rows.map((r, i) =>
-                              i === index ? {...r, damagedQty: text} : r,
-                            ),
-                          );
-                        }}
-                      />
-                    </View>
-                    <View style={{width: 5}} />
-                    <View style={{width: 60}}>
-                      <TextInput
-                        style={styles.table_data_input}
-                        value={row.damagedQty}
-                        onChangeText={text => {
-                          setRows(
-                            rows.map((r, i) =>
-                              i === index ? {...r, damagedQty: text} : r,
-                            ),
-                          );
-                        }}
-                      />
-                    </View>
-                    <View style={{width: 5}} />
-                    <View style={{width: 60}}>
-                      <TextInput
-                        style={styles.table_data_input}
-                        value={row.damagedQty}
-                        onChangeText={text => {
-                          setRows(
-                            rows.map((r, i) =>
-                              i === index ? {...r, damagedQty: text} : r,
-                            ),
-                          );
-                        }}
-                      />
+                      <Text style={styles.table_data}>{'0.0'}</Text>
                     </View>
                   </View>
-                ))}
 
-                <View  style={[styles.table_body_single_row, {paddingVertical: 12}]}>
-                  <View style={{width: 60}}></View>
+                  <View
+                    style={[
+                      styles.table_body_single_row,
+                      {paddingVertical: 12},
+                    ]}>
+                    <View style={{width: 60}}></View>
 
-                  <View style={{width: 60}}></View>
-                  <View style={{width: 10}} />
+                    <View style={{width: 60}}></View>
+                    <View style={{width: 10}} />
 
-                  <View style={{width: 100}}></View>
+                    <View style={{width: 100}}></View>
 
-                  <View style={{width: 100}}></View>
-                  <View style={{width: 200}}></View>
-                  <View style={{width: 5}} />
-                  <View style={{width: 60}}></View>
-                  <View style={{width: 5}} />
-                  <View style={{width: 60}}></View>
-                  <View style={{width: 5}} />
-                  <View style={{width: 60}}></View>
-                  <View style={{width: 5}} />
-                  <View style={{width: 60}}>
-                    <Text style={styles.table_data}>{'0.0'}</Text>
-                  </View>
-                  <View style={{width: 5}} />
-                  <View style={{width: 60}}>
-                    <Text style={styles.table_data}>{'0.0'}</Text>
-                  </View>
-                  <View style={{width: 5}} />
-                  <View style={{width: 60}}>
-                    <Text style={styles.table_data}>{'0.0'}</Text>
-                  </View>
-                  <View style={{width: 5}} />
-                  <View style={{width: 60}}>
-                    <Text style={styles.table_data}>{'0.0'}</Text>
+                    <View style={{width: 100}}></View>
+                    <View style={{width: 200}}></View>
+                    <View style={{width: 5}} />
+                    <View style={{width: 60}}></View>
+                    <View style={{width: 5}} />
+                    <View style={{width: 60}}></View>
+                    <View style={{width: 5}} />
+                    <View style={{width: 60}}></View>
+                    <View style={{width: 5}} />
+                    <View style={{width: 60}}></View>
+                    <View style={{width: 5}} />
+                    <View style={{width: 60}}></View>
+                    <View style={{width: 5}} />
+                    <View style={{width: 60}}>
+                      <Text style={styles.table_data}>{'Total Amount'}</Text>
+                    </View>
+                    <View style={{width: 5}} />
+                    <View style={{width: 60}}>
+                      <Text style={styles.table_data}>{'0.0'}</Text>
+                    </View>
                   </View>
                 </View>
-
-                <View  style={[styles.table_body_single_row, {paddingVertical: 12}]}>
-                  <View style={{width: 60}}></View>
-
-                  <View style={{width: 60}}></View>
-                  <View style={{width: 10}} />
-
-                  <View style={{width: 100}}></View>
-
-                  <View style={{width: 100}}></View>
-                  <View style={{width: 200}}></View>
-                  <View style={{width: 5}} />
-                  <View style={{width: 60}}></View>
-                  <View style={{width: 5}} />
-                  <View style={{width: 60}}></View>
-                  <View style={{width: 5}} />
-                  <View style={{width: 60}}></View>
-                  <View style={{width: 5}} />
-                  <View style={{width: 60}}>
-                  </View>
-                  <View style={{width: 5}} />
-                  <View style={{width: 60}}>
-                  </View>
-                  <View style={{width: 5}} />
-                  <View style={{width: 60}}>
-                    <Text style={styles.table_data}>{'Total Amount'}</Text>
-                  </View>
-                  <View style={{width: 5}} />
-                  <View style={{width: 60}}>
-                    <Text style={styles.table_data}>{'0.0'}</Text>
-                  </View>
-                </View>
-
-              </View>
-            </ScrollView>
-          </View>
+              </ScrollView>
+            </View>
+          )}
 
           <Modal
             animationType="slide"
@@ -1112,8 +1232,6 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
                 </View>
               </View>
 
-              {/* Company List */}
-
               <View style={styles.companyModalItemContentHeader}>
                 <View
                   style={[
@@ -1125,19 +1243,82 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
                     onToggle={updateAllIndexes}
                   />
                 </View>
-               {selectedradiooption1 ==="Style (FG)"  && <Text style={styles.companyModalDropdownItemTextHeader}>
-                  {'Style No'}
-                  {/* {'RM NAME'} */}
-                </Text>}
-               {selectedradiooption1 ==="Style (FG)"  &&  <Text style={styles.companyModalDropdownItemTextHeader}>
-                  {'Customer Style No'}
-                  {/* {'RM TYPE'} */}
-                </Text>}
-                {selectedradiooption1 ==="Style (FG)"  && <Text style={styles.companyModalDropdownItemTextHeader}>
-                  {'Avail Qty'}
-                  {/* {'COLOR'} */}
-                </Text>}
+
+                {/* Conditionally Render Table Headers Based on Selected Option */}
+                {selectedradiooption1 === 'Style (FG)' &&
+                  selectedradiooption2 === '' && (
+                    <>
+                      <Text style={styles.companyModalDropdownItemTextHeader}>
+                        Style No
+                      </Text>
+                      <View style={{flex: 0.2}} />
+
+                      <Text style={styles.companyModalDropdownItemTextHeader}>
+                        Customer Style No
+                      </Text>
+                      <View style={{flex: 0.2}} />
+
+                      <Text style={styles.companyModalDropdownItemTextHeader}>
+                        Avail Qty
+                      </Text>
+                    </>
+                  )}
+
+                {selectedradiooption2 === 'RM' && (
+                  <>
+                    <Text style={styles.companyModalDropdownItemTextHeader}>
+                      RM Name
+                    </Text>
+                    <View style={{flex: 0.2}} />
+
+                    <Text style={styles.companyModalDropdownItemTextHeader}>
+                      Raw Material Code
+                    </Text>
+                    <View style={{flex: 0.2}} />
+
+                    <Text style={styles.companyModalDropdownItemTextHeader}>
+                      RM Type
+                    </Text>
+                  </>
+                )}
+
+                {selectedradiooption2 === 'Fabric' && (
+                  <>
+                    <Text style={styles.companyModalDropdownItemTextHeader}>
+                      Fabric No
+                    </Text>
+                    <View style={{flex: 0.2}} />
+
+                    <Text style={styles.companyModalDropdownItemTextHeader}>
+                      Color
+                    </Text>
+                    <View style={{flex: 0.2}} />
+
+                    <Text style={styles.companyModalDropdownItemTextHeader}>
+                      UOM
+                    </Text>
+                  </>
+                )}
+
+                {selectedradiooption2 === 'Trim Fabric(RM)' && (
+                  <>
+                    <Text style={styles.companyModalDropdownItemTextHeader}>
+                      RM Name
+                    </Text>
+                    <View style={{flex: 0.2}} />
+
+                    <Text style={styles.companyModalDropdownItemTextHeader}>
+                      RM Type
+                    </Text>
+                    <View style={{flex: 0.2}} />
+
+                    <Text style={styles.companyModalDropdownItemTextHeader}>
+                      UOM
+                    </Text>
+                  </>
+                )}
               </View>
+
               <View style={styles.companyModalListContainer}>
                 {filteredCompanyList.length === 0 ? (
                   <Text style={styles.companyModalNoResultsText}>
@@ -1146,7 +1327,7 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
                 ) : (
                   <FlatList
                     data={filteredCompanyList}
-                    keyExtractor={item => item.styleId}
+                    keyExtractor={(_, index) => index.toString()}
                     renderItem={({item, index}) => (
                       <TouchableOpacity
                         style={styles.companyModalDropdownItem}
@@ -1166,15 +1347,78 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
                               onToggle={() => toggleSelection(index)}
                             />
                           </View>
-                          <Text style={styles.companyModalDropdownItemText}>
-                            {item.styleName}
-                          </Text>
-                          <Text style={styles.companyModalDropdownItemText}>
-                            {item.custStyleName}
-                          </Text>
-                          <Text style={styles.companyModalDropdownItemText}>
-                            {item.availQty}
-                          </Text>
+
+                          {/* Conditionally render fields based on selection */}
+                          {selectedradiooption1 === 'Style (FG)' && (
+                            <>
+                              <Text style={styles.companyModalDropdownItemText}>
+                                {item.styleName}
+                              </Text>
+                              <View style={{flex: 0.2}} />
+
+                              <Text style={styles.companyModalDropdownItemText}>
+                                {item.custStyleName}
+                              </Text>
+                              <View style={{flex: 0.3}} />
+                              <Text style={styles.companyModalDropdownItemText}>
+                                {item.availQty}
+                              </Text>
+                            </>
+                          )}
+
+                          {selectedradiooption2 === 'RM' && (
+                            <>
+                              <Text style={styles.companyModalDropdownItemText}>
+                                {item.trimName}
+                              </Text>
+                              <View style={{flex: 0.2}} />
+
+                              <Text style={styles.companyModalDropdownItemText}>
+                                {item.description}
+                              </Text>
+                              <View style={{flex: 0.2}} />
+
+                              <Text style={styles.companyModalDropdownItemText}>
+                                {item.uomTypeDescription}
+                              </Text>
+                            </>
+                          )}
+
+                          {selectedradiooption2 === 'Fabric' && (
+                            <>
+                              <Text style={styles.companyModalDropdownItemText}>
+                                {item.fabricNo}
+                              </Text>
+                              <View style={{flex: 0.2}} />
+
+                              <Text style={styles.companyModalDropdownItemText}>
+                                {item.colorName}
+                              </Text>
+                              <View style={{flex: 0.2}} />
+
+                              <Text style={styles.companyModalDropdownItemText}>
+                                {item.uomTypeDescription}
+                              </Text>
+                            </>
+                          )}
+
+                          {selectedradiooption2 === 'Trim Fabric(RM)' && (
+                            <>
+                              <Text style={styles.companyModalDropdownItemText}>
+                                {item.trimName}
+                              </Text>
+                              <View style={{flex: 0.2}} />
+
+                              <Text style={styles.companyModalDropdownItemText}>
+                                {item.description}
+                              </Text>
+                              <View style={{flex: 0.2}} />
+
+                              <Text style={styles.companyModalDropdownItemText}>
+                                {item.uomTypeDescription}
+                              </Text>
+                            </>
+                          )}
                         </View>
                       </TouchableOpacity>
                     )}
@@ -1309,7 +1553,7 @@ const getStyles = colors =>
     },
     table_data: {
       fontSize: 13,
-      color: '#333',
+      color: '#000',
       textAlign: 'center',
     },
     searchInput: {
@@ -1509,5 +1753,18 @@ const getStyles = colors =>
       paddingHorizontal: 4,
       textAlign: 'center',
       backgroundColor: '#fff',
+    },
+
+    checkboxItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      width: '45%', // Adjust width for better alignment
+      marginVertical: 5,
+      marginHorizontal: 5,
+    },
+    checkboxLabel: {
+      marginLeft: 8,
+      fontSize: 14,
+      color: '#000',
     },
   });
