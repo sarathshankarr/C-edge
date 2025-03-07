@@ -238,7 +238,7 @@ const CreatePurchaseOrderDraft = ({route}) => {
       withAllowance: 0,
       rmId: 0,
     };
-    console.log('modal lsit ===> , calling 1, id, req body ===> ', id);
+    console.log('modal list ===> , calling 1, id, req body ===> ', id);
 
     let LISTAPIOBJ;
 
@@ -310,7 +310,7 @@ const CreatePurchaseOrderDraft = ({route}) => {
 
     set_isLoading(true);
 
-    let SAVEAPIObj = await APIServiceCall.saveCreatePartsProcessing(tempObj);
+    let SAVEAPIObj = await APIServiceCall.saveCreatePODraft(tempObj);
     set_isLoading(false);
 
     // console.log('Sucess before returned obj ', SAVEAPIObj);
