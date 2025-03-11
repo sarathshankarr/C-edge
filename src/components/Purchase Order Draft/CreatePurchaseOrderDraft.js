@@ -25,6 +25,8 @@ const CreatePurchaseOrderDraft = ({route}) => {
     styleTrimfab: [],
     styleRm: [],
     styleFab: [],
+    batch: [],
+    styleMap: [],
   });
 
   useEffect(() => {
@@ -60,10 +62,13 @@ const CreatePurchaseOrderDraft = ({route}) => {
       menuId: '145',
       compIds: usercompanyId,
       company: JSON.parse(companyObj),
+      locIds: '0',
+      brandIds: '0',
     };
 
     let LISTAPIOBJ = await APIServiceCall.getPurchaseOrderDraftDetails(obj);
     set_isLoading(false);
+    // console.log("intial req bidy ====>  ", obj)
 
     if (LISTAPIOBJ && LISTAPIOBJ.statusData) {
       if (LISTAPIOBJ && LISTAPIOBJ.responseData) {
@@ -101,6 +106,31 @@ const CreatePurchaseOrderDraft = ({route}) => {
           set_lists(prevLists => ({
             ...prevLists,
             ShipTo: locationsMapList,
+          }));
+        }
+        if (LISTAPIOBJ?.responseData?.batch) {
+          const batchList = Object.keys(LISTAPIOBJ.responseData.batch).map(
+            key => ({
+              id: key,
+              name: LISTAPIOBJ.responseData.batch[key],
+            }),
+          );
+          set_lists(prevLists => ({
+            ...prevLists,
+            batch: batchList,
+          }));
+        }
+        if (LISTAPIOBJ?.responseData?.styleMap) {
+          const styleMapList = Object.keys(LISTAPIOBJ.responseData.styleMap).map(
+            key => ({
+              id: key,
+              name: LISTAPIOBJ.responseData.styleMap[key],
+            }),
+          );
+          styleMapList.reverse();
+          set_lists(prevLists => ({
+            ...prevLists,
+            styleMap: styleMapList,
           }));
         }
       }
@@ -299,11 +329,12 @@ const CreatePurchaseOrderDraft = ({route}) => {
     let companyObj = await AsyncStorage.getItem('companyObj');
     const tempObj = {};
 
-    tempObj.menuId = 787;
-    tempObj.username = userName;
-    tempObj.password = userPsd;
-    tempObj.compIds = usercompanyId;
+    tempObj.menuId = 145;
+    tempObj.vendorId = 145;
+    tempObj.userName = userName;
+    tempObj.userPwd = userPsd;
     tempObj.checkedData = checkedData;
+    tempObj.compIds = usercompanyId;
     tempObj.company = JSON.parse(companyObj);
 
     console.log('saving obj ==>', tempObj);

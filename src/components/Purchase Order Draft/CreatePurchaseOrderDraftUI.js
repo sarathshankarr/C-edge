@@ -65,6 +65,10 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
         setFilteredVendor(props.lists.vendorsMap);
         setVendorList(props.lists.vendorsMap);
       }
+      if (props.lists.styleMap) {
+        setFilteredStyle(props.lists.styleMap);
+        setStyleList(props.lists.styleMap);
+      }
     }
   }, [props.lists]);
 
@@ -129,6 +133,30 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
   const [selectAllCheckBox, setSelectAllCheckBox] = useState(false);
   const [modalLists, setModalLists] = useState([]);
 
+  const [styleList, setStyleList] = useState([]);
+  const [filteredStyle, setFilteredStyle] = useState([]);
+  const [showStyleList, setShowStyleList] = useState(false);
+  const [styleName, setStyleName] = useState(''); // Default can be set as needed
+  const [styleId, setStyleId] = useState('');
+
+  const actionOnStyle = item => {
+    setStyleId(item.id);
+    setStyleName(item.name);
+    setShowStyleList(false);
+  };
+
+  const handleSearchStyle = text => {
+    if (text.trim().length > 0) {
+        const filtered = styleList.filter(
+            item => item.name && item.name.trim() !== '' && item.name.toLowerCase().includes(text.toLowerCase())
+        );
+        setFilteredStyle(filtered);
+    } else {
+        setFilteredStyle(styleList.filter(item => item.name && item.name.trim() !== ''));
+    }
+};
+
+
   const actionOnVendor = item => {
     setVendorId(item.id);
     setVendorName(item.name);
@@ -191,18 +219,82 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
     const checkedData = [];
     rows.forEach((item, index) => {
       const tempObj = {
-        empcode: item.empBarcode,
-        barcodeid: item.barcodeid,
-        scanQty: item.damagedQty,
-        nxtProcessQty: 0,
-        remarksDamaged: item.remarks,
-        processid: item.processId,
-        enterDate: item.enterDate,
-        queryFlag: 0,
-        companyId: usercompanyId,
+        itemId: 477,
+        itemQty: 100,
+        itemTrimsType: 'Fabric',
+        itemdesc: 'RAYON PLAIN12',
+        sizeCapacity: '',
+        gsCode: '',
+        gstAmount: '5',
+        price: 1,
+        pml_gst: 5,
+        uom: 'MTRS',
+        discountAmount: 0,
+        styleId: 0,
+        buyer_Po_Id: 0,
+        grnAllow: '0',
+        style_size_id: 0,
+        pml_fab_width: 0,
+        buyerNo: 0,
+        batchid: 0,
+        withAllowance: 0,
+        po_gsm: '',
+        weight: '',
+        po_rib_id: '0',
+        processid: '0',
+        description: '',
       };
       checkedData.push(tempObj);
     });
+
+    const Obj = {
+      deliveryDate: deliveryDate,
+      shiploc: shipLocationId,
+      orderDate: orderDate,
+      itemTrimsType: 'Fabric', // Rm //
+      issueDate: '',
+      shipcancelDate: '',
+      preferredDate: '',
+      shipextDate: '',
+      completionDate: '',
+      availDate: '',
+      notes: '',
+      codeType: '',
+      contactId: 0,
+      cf_gst: 0,
+      vendorCustomerId: vendorId,
+      transportCost: 0,
+      additional_cost: 0,
+      costfoc: 0,
+      hsn: '0',
+      companySymbol: '',
+      suffix: '',
+      qtys: 0,
+      poNumber: 0,
+      posave: 0,
+      p_conv_rate: 0.0,
+      pocancel: '',
+      tc_gst: 0,
+      tc_hsn: 0,
+      ac_gst: 0,
+      ac_hsn: 0,
+      cf_hsn: '0',
+      financialYear: 0,
+      yearwiseId: 0,
+      termofpayment: '',
+      otherReference: '',
+      destination: '',
+      buyerno: '',
+      dispatch: '',
+      roundOff: 0.0,
+      isCustStyleWise: 0,
+      additionalAmount: 0,
+      poTcs: 0,
+      seqIdForStyle: '',
+      modify_user: '',
+      styleOrBuyerpo: 0,
+      lineItemsSet:checkedData
+    };
 
     console.log('checkedData ==> ', checkedData);
 
@@ -248,13 +340,6 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
         label: 'StyleWise',
         value: 'StyleWise',
         selected: selectedradiooption1 === 'StyleWise',
-        labelStyle: {color: '#000'},
-      },
-      {
-        id: '2',
-        label: 'BuyerPoWise',
-        value: 'BuyerPoWise',
-        selected: selectedradiooption1 === 'BuyerPoWise',
         labelStyle: {color: '#000'},
       },
       {
@@ -337,42 +422,8 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
     return false;
   });
 
-  // const handleSelectFromModal = () => {
-  //   const list = [];
-  //   selectedIdxs.forEach((item, index) => {
-  //     list.push(modalLists[item]);
-  //   });
-
-  //   if (selectedradiooption1 === 'Style (FG)' && selectedradiooption2==="") {
-
-  //     const Obj={
-  //       styleName:modalLists[item]?.trimName || "",
-  //     }
-
-  //   } else if (selectedradiooption2 === 'RM') {
-
-  //     const Obj={
-  //       styleName:modalLists[item]?.trimName || "",
-  //     }
-
-  //   } else if (selectedradiooption2 === 'Fabric') {
-  //     const Obj={
-  //       styleName:modalLists[item]?.fabricNo || "",
-  //     }
-  //   } else if (selectedradiooption2 === 'Trim Fabric(RM)') {
-  //     const Obj={
-  //       styleName:modalLists[item]?.fabricNo || "",
-  //     }
-  //   }
-
-  //   console.log('lists ===> ', list);
-  //   setRows(list);
-  //   setShowmodal(false);
-  // };
-
   const handleSelectFromModal = () => {
-
-    setRows([])
+    setRows([]);
     const list = selectedIdxs.map(index => {
       const item = {...modalLists[index]};
 
@@ -392,7 +443,14 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
       return item;
     });
 
-    console.log('Updated list ===>', list);
+    list.input_Qty = '';
+    list.input_UnitPrice = '';
+    list.input_Gst = '';
+    list.input_NetAmount = '';
+    list.input_GstAmount = '';
+    list.input_TotalAmount = '';
+
+    // console.log('Updated list ===>', list);
     setRows(list);
     setShowmodal(false);
   };
@@ -430,6 +488,22 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
     }
     setShowmodal(!showModal);
   };
+
+  const totalGstAmount = rows.reduce(
+    (sum, row) =>
+      sum +
+      (Number(row.input_Qty || 0) *
+        Number(row.input_UnitPrice || 0) *
+        Number(row.input_Gst || 0)) /
+        100,
+    0,
+  );
+  const totalNetAmount = rows.reduce(
+    (sum, row) =>
+      sum + Number(row.input_Qty || 0) * Number(row.input_UnitPrice || 0),
+    0,
+  );
+  const totalTotalAmount = totalNetAmount + totalGstAmount;
 
   return (
     <View style={[CommonStyles.mainComponentViewStyle]}>
@@ -770,13 +844,13 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
             />
           )}
 
-          <View style={[styles.checkboxItem, {marginTop: hp('2%')}]}>
+          {/* <View style={[styles.checkboxItem, {marginTop: hp('2%')}]}>
             <CustomCheckBox
               isChecked={totalQty}
               onToggle={() => setTotalQty(!totalQty)}
             />
             <Text style={styles.checkboxLabel}>{'Total Qty'}</Text>
-          </View>
+          </View> */}
 
           <TouchableOpacity
             style={styles.searchButton}
@@ -802,17 +876,7 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
                     <View style={{width: 100}}>
                       <Text style={styles.table_head_captions}>Style No</Text>
                     </View>
-                    {/* <View style={{width: 100}}>
-                      if(selectedradiooption2==="RM"){
-                      <Text style={styles.table_head_captions}>RM Name</Text>
-                      }
-                      if(selectedradiooption2==="Fabric"){
-                      <Text style={styles.table_head_captions}>RM Name</Text>
-                      }
-                      if(selectedradiooption2==="Trim Fabric(RM)"){
-                      <Text style={styles.table_head_captions}>RM Name</Text>
-                      }   
-                    </View> */}
+
                     <View style={{width: 100}}>
                       {selectedradiooption1 === 'Style (FG)' &&
                         selectedradiooption2 === '' && (
@@ -833,9 +897,6 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
                       )}
                     </View>
 
-                    <View style={{width: 200}}>
-                      <Text style={styles.table_head_captions}>Lot</Text>
-                    </View>
                     <View style={{width: 5}} />
                     <View style={{width: 60}}>
                       <Text style={styles.table_head_captions}>
@@ -847,14 +908,9 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
                       <Text style={styles.table_head_captions}>GST %</Text>
                     </View>
                     <View style={{width: 5}} />
+
                     <View style={{width: 60}}>
-                      <Text style={styles.table_head_captions}>Discount</Text>
-                    </View>
-                    <View style={{width: 5}} />
-                    <View style={{width: 60}}>
-                      <Text style={styles.table_head_captions}>
-                        Disc. Amount
-                      </Text>
+                      <Text style={styles.table_head_captions}>GST</Text>
                     </View>
                     <View style={{width: 5}} />
                     <View style={{width: 60}}>
@@ -862,15 +918,11 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
                     </View>
                     <View style={{width: 5}} />
                     <View style={{width: 60}}>
-                      <Text style={styles.table_head_captions}>GST</Text>
-                    </View>
-                    <View style={{width: 5}} />
-                    <View style={{width: 60}}>
                       <Text style={styles.table_head_captions}>Total</Text>
                     </View>
                   </View>
 
-                  {rows.length > 0 &&
+                  {/* {rows.length > 0 &&
                     rows.map((row, index) => (
                       <View key={index} style={styles.table_body_single_row}>
                         <View style={{width: 60}}>
@@ -887,11 +939,11 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
                         <View style={{width: 60}}>
                           <TextInput
                             style={styles.table_data_input}
-                            value={row.damagedQty}
+                            value={row.input_Qty}
                             onChangeText={text => {
                               setRows(
                                 rows.map((r, i) =>
-                                  i === index ? {...r, damagedQty: text} : r,
+                                  i === index ? {...r, input_Qty: text} : r,
                                 ),
                               );
                             }}
@@ -908,119 +960,24 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
                         </View>
 
                         <View style={{width: 100}}>
-                          {/* <Text style={styles.table_data}>{row.rmName}</Text> */}
+                          
 
-                          <Text style={styles.table_data}>{row.styleNameALL}</Text>
+                          <Text style={styles.table_data}>
+                            {row.styleNameALL}
+                          </Text>
                         </View>
 
-                        <View style={{width: 200}}>
-                          <View
-                            style={{
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              marginTop: hp('1%'),
-                              backgroundColor: !row?.editStockType
-                                ? '#ffffff'
-                                : '#dedede',
-                            }}>
-                            <TouchableOpacity
-                              style={{
-                                flexDirection: 'row',
-                                borderWidth: 0.5,
-                                borderColor: '#D8D8D8',
-                                borderRadius: hp('0.5%'),
-                                width: '100%',
-                                overflow: 'hidden',
-                              }}
-                              onPress={() => {
-                                setRows(
-                                  rows.map(r =>
-                                    r.id === row.id
-                                      ? {
-                                          ...r,
-                                          showStockTypesList:
-                                            !r.showStockTypesList,
-                                          showStocksList: false,
-                                          filteredStockTypes:
-                                            props.lists.getStockTypes,
-                                        }
-                                      : {
-                                          ...r,
-                                          showStockTypesList: false,
-                                          filteredStockTypes:
-                                            props.lists.getStockTypes,
-                                        },
-                                  ),
-                                );
-                              }}>
-                              <View style={[styles.SectionStyle1]}>
-                                <View style={{flexDirection: 'column'}}>
-                                  <Text
-                                    style={
-                                      row.stockType
-                                        ? styles.dropTextLightStyle
-                                        : styles.dropTextInputStyle
-                                    }>
-                                    {'Lot '}
-                                  </Text>
-                                  <Text style={styles.dropTextInputStyle}>
-                                    {row.stockTypeId
-                                      ? row.stockType
-                                      : 'Select Lot'}
-                                  </Text>
-                                </View>
-                              </View>
-                              <View style={{justifyContent: 'center'}}>
-                                <Image
-                                  source={downArrowImg}
-                                  style={styles.imageStyle}
-                                />
-                              </View>
-                            </TouchableOpacity>
-                            {row.showStockTypesList && row.editStockType && (
-                              <View style={styles.dropdownContent2}>
-                                <TextInput
-                                  style={styles.searchInput}
-                                  placeholder="Search Stock Type"
-                                  onChangeText={text =>
-                                    handleSearchStockType(text, row.id)
-                                  }
-                                  placeholderTextColor="#000"
-                                />
-                                <ScrollView nestedScrollEnabled={true}>
-                                  {row.filteredStockTypes.length === 0 ? (
-                                    <Text style={styles.noCategoriesText}>
-                                      Sorry, no results found!
-                                    </Text>
-                                  ) : (
-                                    row.filteredStockTypes.map(item => (
-                                      <TouchableOpacity
-                                        key={item?.id}
-                                        onPress={() =>
-                                          actionOnStockTypes(item, row.id)
-                                        }>
-                                        <View style={styles.dropdownOption}>
-                                          <Text style={{color: '#000'}}>
-                                            {item?.name}
-                                          </Text>
-                                        </View>
-                                      </TouchableOpacity>
-                                    ))
-                                  )}
-                                </ScrollView>
-                              </View>
-                            )}
-                          </View>
-                        </View>
                         <View style={{width: 5}} />
                         <View style={{width: 60}}>
                           <TextInput
                             style={styles.table_data_input}
-                            value={row.damagedQty}
+                            value={row.input_UnitPrice}
                             onChangeText={text => {
                               setRows(
                                 rows.map((r, i) =>
-                                  i === index ? {...r, damagedQty: text} : r,
+                                  i === index
+                                    ? {...r, input_UnitPrice: text}
+                                    : r,
                                 ),
                               );
                             }}
@@ -1030,11 +987,26 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
                         <View style={{width: 60}}>
                           <TextInput
                             style={styles.table_data_input}
-                            value={row.damagedQty}
+                            value={row.input_Gst}
                             onChangeText={text => {
                               setRows(
                                 rows.map((r, i) =>
-                                  i === index ? {...r, damagedQty: text} : r,
+                                  i === index ? {...r, input_Gst: text} : r,
+                                ),
+                              );
+                            }}
+                          />
+                        </View>
+
+                        <View style={{width: 5}} />
+                        <View style={{width: 60}}>
+                          <TextInput
+                            style={styles.table_data_input}
+                            value={row.input_GstAmount}
+                            onChangeText={text => {
+                              setRows(
+                                rows.map((r, i) =>
+                                  i === index ? {...r, input_GstAmount: (Number(r.input_NetAmount) * Number(r.input_Gst)).toString()} : r,
                                 ),
                               );
                             }}
@@ -1044,11 +1016,11 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
                         <View style={{width: 60}}>
                           <TextInput
                             style={styles.table_data_input}
-                            value={row.damagedQty}
+                            value={row.input_NetAmount}
                             onChangeText={text => {
                               setRows(
                                 rows.map((r, i) =>
-                                  i === index ? {...r, damagedQty: text} : r,
+                                  i === index ? {...r, input_NetAmount:(Number(r.input_Qty) * Number(r.input_UnitPrice)).toString()} : r,
                                 ),
                               );
                             }}
@@ -1058,60 +1030,132 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
                         <View style={{width: 60}}>
                           <TextInput
                             style={styles.table_data_input}
-                            value={row.damagedQty}
+                            value={row.input_TotalAmount}
                             onChangeText={text => {
                               setRows(
                                 rows.map((r, i) =>
-                                  i === index ? {...r, damagedQty: text} : r,
-                                ),
-                              );
-                            }}
-                          />
-                        </View>
-                        <View style={{width: 5}} />
-                        <View style={{width: 60}}>
-                          <TextInput
-                            style={styles.table_data_input}
-                            value={row.damagedQty}
-                            onChangeText={text => {
-                              setRows(
-                                rows.map((r, i) =>
-                                  i === index ? {...r, damagedQty: text} : r,
-                                ),
-                              );
-                            }}
-                          />
-                        </View>
-                        <View style={{width: 5}} />
-                        <View style={{width: 60}}>
-                          <TextInput
-                            style={styles.table_data_input}
-                            value={row.damagedQty}
-                            onChangeText={text => {
-                              setRows(
-                                rows.map((r, i) =>
-                                  i === index ? {...r, damagedQty: text} : r,
-                                ),
-                              );
-                            }}
-                          />
-                        </View>
-                        <View style={{width: 5}} />
-                        <View style={{width: 60}}>
-                          <TextInput
-                            style={styles.table_data_input}
-                            value={row.damagedQty}
-                            onChangeText={text => {
-                              setRows(
-                                rows.map((r, i) =>
-                                  i === index ? {...r, damagedQty: text} : r,
+                                  i === index ? {...r, input_TotalAmount:Number(input_NetAmount) + Number(input_GstAmount)} : r,
                                 ),
                               );
                             }}
                           />
                         </View>
                       </View>
-                    ))}
+                    ))} */}
+
+                  {rows.length > 0 &&
+                    rows.map((row, index) => {
+                      const netAmount =
+                        Number(row.input_Qty || 0) *
+                        Number(row.input_UnitPrice || 0);
+                      const gstAmount =
+                        (netAmount * Number(row.input_Gst || 0)) / 100;
+                      const totalAmount = netAmount + gstAmount;
+
+                      return (
+                        <View key={index} style={styles.table_body_single_row}>
+                          <View style={{width: 60}}>
+                            <TouchableOpacity
+                              onPress={() => handleRemoveRow(index)}>
+                              <Image
+                                source={closeImg}
+                                style={styles.imageStyle1}
+                              />
+                            </TouchableOpacity>
+                          </View>
+
+                          <View style={{width: 60}}>
+                            <TextInput
+                              style={styles.table_data_input}
+                              value={row.input_Qty}
+                              onChangeText={text => {
+                                setRows(
+                                  rows.map((r, i) =>
+                                    i === index ? {...r, input_Qty: text} : r,
+                                  ),
+                                );
+                              }}
+                              keyboardType="numeric"
+                            />
+                          </View>
+                          <View style={{width: 10}} />
+
+                          <View style={{width: 100}}>
+                            {selectedradiooption1 === 'Style (FG)' && (
+                              <Text style={styles.table_data}>
+                                {row.custStyleName}
+                              </Text>
+                            )}
+                          </View>
+
+                          <View style={{width: 100}}>
+                            <Text style={styles.table_data}>
+                              {row.styleNameALL}
+                            </Text>
+                          </View>
+
+                          <View style={{width: 5}} />
+                          <View style={{width: 60}}>
+                            <TextInput
+                              style={styles.table_data_input}
+                              value={row.input_UnitPrice}
+                              onChangeText={text => {
+                                setRows(
+                                  rows.map((r, i) =>
+                                    i === index
+                                      ? {...r, input_UnitPrice: text}
+                                      : r,
+                                  ),
+                                );
+                              }}
+                              keyboardType="numeric"
+                            />
+                          </View>
+                          <View style={{width: 5}} />
+                          <View style={{width: 60}}>
+                            <TextInput
+                              style={styles.table_data_input}
+                              value={row.input_Gst}
+                              onChangeText={text => {
+                                setRows(
+                                  rows.map((r, i) =>
+                                    i === index ? {...r, input_Gst: text} : r,
+                                  ),
+                                );
+                              }}
+                              keyboardType="numeric"
+                            />
+                          </View>
+
+                          <View style={{width: 5}} />
+                          <View style={{width: 60}}>
+                            <TextInput
+                              style={styles.table_data_input}
+                              value={gstAmount.toFixed(2)}
+                              editable={false}
+                            />
+                          </View>
+
+                          <View style={{width: 5}} />
+                          <View style={{width: 60}}>
+                            <TextInput
+                              style={styles.table_data_input}
+                              value={netAmount.toFixed(2)}
+                              editable={false}
+                            />
+                          </View>
+
+                          <View style={{width: 5}} />
+                          <View style={{width: 60}}>
+                            <TextInput
+                              style={styles.table_data_input}
+                              value={totalAmount.toFixed(2)}
+                              editable={false}
+                            />
+                          </View>
+                        </View>
+                      );
+                    })}
 
                   <View
                     style={[
@@ -1119,35 +1163,31 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
                       {paddingVertical: 12},
                     ]}>
                     <View style={{width: 60}}></View>
-
                     <View style={{width: 60}}></View>
                     <View style={{width: 10}} />
-
                     <View style={{width: 100}}></View>
-
                     <View style={{width: 100}}></View>
-                    <View style={{width: 200}}></View>
                     <View style={{width: 5}} />
                     <View style={{width: 60}}></View>
                     <View style={{width: 5}} />
                     <View style={{width: 60}}></View>
                     <View style={{width: 5}} />
-                    <View style={{width: 60}}></View>
-                    <View style={{width: 5}} />
                     <View style={{width: 60}}>
-                      <Text style={styles.table_data}>{'0.0'}</Text>
+                      <Text style={styles.table_data}>
+                        {totalGstAmount.toFixed(2)}
+                      </Text>
                     </View>
                     <View style={{width: 5}} />
                     <View style={{width: 60}}>
-                      <Text style={styles.table_data}>{'0.0'}</Text>
+                      <Text style={styles.table_data}>
+                        {totalNetAmount.toFixed(2)}
+                      </Text>
                     </View>
                     <View style={{width: 5}} />
                     <View style={{width: 60}}>
-                      <Text style={styles.table_data}>{'0.0'}</Text>
-                    </View>
-                    <View style={{width: 5}} />
-                    <View style={{width: 60}}>
-                      <Text style={styles.table_data}>{'0.0'}</Text>
+                      <Text style={styles.table_data}>
+                        {totalTotalAmount.toFixed(2)}
+                      </Text>
                     </View>
                   </View>
 
@@ -1157,18 +1197,10 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
                       {paddingVertical: 12},
                     ]}>
                     <View style={{width: 60}}></View>
-
                     <View style={{width: 60}}></View>
                     <View style={{width: 10}} />
-
                     <View style={{width: 100}}></View>
-
                     <View style={{width: 100}}></View>
-                    <View style={{width: 200}}></View>
-                    <View style={{width: 5}} />
-                    <View style={{width: 60}}></View>
-                    <View style={{width: 5}} />
-                    <View style={{width: 60}}></View>
                     <View style={{width: 5}} />
                     <View style={{width: 60}}></View>
                     <View style={{width: 5}} />
@@ -1181,7 +1213,9 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
                     </View>
                     <View style={{width: 5}} />
                     <View style={{width: 60}}>
-                      <Text style={styles.table_data}>{'0.0'}</Text>
+                      <Text style={styles.table_data}>
+                        {totalTotalAmount.toFixed(2)}
+                      </Text>
                     </View>
                   </View>
                 </View>
@@ -1200,7 +1234,14 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
             <View style={styles.companyModalContainer}>
               <View style={styles.companyModalHeader}>
                 <View />
-                <Text style={styles.companyModalHeaderText}> List</Text>
+                <Text style={styles.companyModalHeaderText}>
+                  {' '}
+                  {selectedradiooption2 === 'RM'
+                    ? 'RM'
+                    : selectedradiooption2 === 'Fabric'
+                    ? 'Fabric'
+                    : 'Trim Fabric'}
+                </Text>
                 <TouchableOpacity
                   onPress={() => {
                     setShowmodal(false);
@@ -1211,6 +1252,80 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
                     style={{width: 30, height: 30, tintColor: colors.color2}}
                   />
                 </TouchableOpacity>
+              </View>
+
+              <View
+                style={{
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: '#eee',
+                  marginTop: hp('2%'),
+                }}>
+                <TouchableOpacity
+                  style={{
+                    flexDirection: 'row',
+                    borderWidth: 0.5,
+                    borderColor: '#D8D8D8',
+                    borderRadius: hp('0.5%'),
+                    width: '100%',
+                    justifyContent: 'space-between',
+                  }}
+                  onPress={() => {
+                    setShowStyleList(!showStyleList);
+                  }}>
+                  <View>
+                    <View style={[styles.SectionStyle1, {}]}>
+                      <View style={{flexDirection: 'column'}}>
+                        <Text
+                          style={
+                            styleId
+                              ? [styles.dropTextLightStyle]
+                              : [styles.dropTextInputStyle]
+                          }>
+                          {'Select Style '}
+                        </Text>
+                        {styleId ? (
+                          <Text style={[styles.dropTextInputStyle]}>
+                            {styleName}
+                          </Text>
+                        ) : null}
+                      </View>
+                    </View>
+                  </View>
+
+                  <View style={{justifyContent: 'center'}}>
+                    <Image source={downArrowImg} style={styles.imageStyle} />
+                  </View>
+                </TouchableOpacity>
+
+                {showStyleList && (
+                  <View style={styles.dropdownContent1}>
+                    <TextInput
+                      style={styles.searchInput}
+                      placeholder="Search "
+                      onChangeText={handleSearchStyle}
+                      placeholderTextColor="#000"
+                    />
+                    <ScrollView
+                      style={styles.scrollView}
+                      nestedScrollEnabled={true}>
+                      {filteredStyle.length === 0 ? (
+                        <Text style={styles.noCategoriesText}>
+                          Sorry, no results found!
+                        </Text>
+                      ) : (
+                        filteredStyle.map((item, index) => (
+                          <TouchableOpacity
+                            key={index}
+                            style={styles.dropdownOption}
+                            onPress={() => actionOnStyle(item)}>
+                            <Text style={{color: '#000'}}>{item.name}</Text>
+                          </TouchableOpacity>
+                        ))
+                      )}
+                    </ScrollView>
+                  </View>
+                )}
               </View>
 
               <View style={styles.companyModalSearchBarContainer}>

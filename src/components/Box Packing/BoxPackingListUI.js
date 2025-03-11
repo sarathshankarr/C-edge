@@ -63,6 +63,7 @@ const BoxPackingListUI = ({route, navigation, ...props}) => {
 
   React.useEffect(() => {
     if (props.itemsArray) {
+      console.log("resultttttt   ====> ", props.itemsArray)
       set_filterArray(props.itemsArray);
       set_ItemsArray(props.itemsArray);
     }
@@ -114,12 +115,14 @@ const BoxPackingListUI = ({route, navigation, ...props}) => {
 
     const styleArray = ItemsArray.filter(item => {
       return (
-        (item?.producttype !== '' &&
-          item?.producttype?.toLowerCase().includes(searchTerm)) ||
-        (item?.styleCode !== '' &&
-          item?.styleCode?.toLowerCase().includes(searchTerm)) ||
-        (item?.processName !== '' &&
-          item?.processName?.toLowerCase().includes(searchTerm)) 
+        (item?.boxname !== '' &&
+          item?.boxname?.toLowerCase().includes(searchTerm)) ||
+        (item?.locationName !== '' &&
+          item?.locationName?.toLowerCase().includes(searchTerm)) ||
+        (item?.username !== '' &&
+          item?.username?.toLowerCase().includes(searchTerm)) ||
+        (item?.createionDateStr !== '' &&
+          item?.createionDateStr?.toLowerCase().includes(searchTerm)) 
       )
     });
 
@@ -162,25 +165,25 @@ const BoxPackingListUI = ({route, navigation, ...props}) => {
           <View
             style={{flex: 1, justifyContent: 'center'}}>
             <Text style={[CommonStyles.tylesTextStyle, {textAlign: 'center'}]}>
-              {item.styleCode}
+              {item.boxname}
             </Text>
           </View>
           <View
-            style={{flex: 0.7, justifyContent: 'center'}}>
+            style={{flex: 1, justifyContent: 'center'}}>
             <Text style={[CommonStyles.tylesTextStyle, {textAlign: 'center'}]}>
-              {item.processName}
+              {item.locationName}
             </Text>
           </View>
           <View
-            style={{flex: 0.5, justifyContent: 'center'}}>
+            style={{flex: 1, justifyContent: 'center'}}>
             <Text style={[CommonStyles.tylesTextStyle, {textAlign: 'center'}]}>
-              {item.producttype}
+              {item.createionDateStr}
             </Text>
           </View>
           <View
-            style={{flex: 0.7, justifyContent: 'center'}}>
+            style={{flex: 1, justifyContent: 'center'}}>
             <Text style={[CommonStyles.tylesTextStyle, {textAlign: 'center'}]}>
-              {item.totalQty}
+              {item.username}
             </Text>
           </View>
         </View>
@@ -317,28 +320,28 @@ const BoxPackingListUI = ({route, navigation, ...props}) => {
                 CommonStyles.tylesHeaderTextStyle,
                 {flex: 1, textAlign: 'center'},
               ]}>
-              {'Style No (Color)'}
+              {'Box Name'}
             </Text>
             <Text
               style={[
                 CommonStyles.tylesHeaderTextStyle,
-                {flex: 0.7, textAlign: 'center'},
+                {flex: 1, textAlign: 'center'},
               ]}>
-              {'Process'}
+              {'Location'}
             </Text>
             <Text
               style={[
                 CommonStyles.tylesHeaderTextStyle,
-                {flex: 0.5, textAlign: 'center'},
+                {flex: 1, textAlign: 'center'},
               ]}>
-              {'Part'}
+              {'Creation Date'}
             </Text>
             <Text
               style={[
                 CommonStyles.tylesHeaderTextStyle,
-                {flex: 0.7, textAlign: 'center'},
+                {flex: 1, textAlign: 'center'},
               ]}>
-              {'Total Scanned Barcodes'}
+              {'UserName'}
             </Text>
           </View>
         ) : (
