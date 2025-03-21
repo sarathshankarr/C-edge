@@ -95,6 +95,9 @@ const CommonHeader = ({ title, showDrawerButton }) => {
       "companyId": companyId
     }
 
+    console.log("NOt calling notifications API, somevalue is missing ", userId, roleId, companyId);
+
+
     let GETNOTIFICATIONSAPIObj = await APIServiceCall.loadAllNotifications(obj);
     // set_isLoading(false);
 

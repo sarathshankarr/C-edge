@@ -127,6 +127,7 @@ const LoginComponent = ({ navigation, route, ...props }) => {
         await AsyncStorage.setItem('role_name', loginAPIObj?.responseData?.role_name ? loginAPIObj?.responseData?.role_name : "USER");
         await AsyncStorage.setItem('userName', userName);
         await AsyncStorage.setItem('userPsd', userPswd);
+        
 
         if (loginAPIObj?.responseData?.userRoleId) await AsyncStorage.setItem('userId', (loginAPIObj.responseData.userId.toString()));
 
@@ -155,21 +156,28 @@ const LoginComponent = ({ navigation, route, ...props }) => {
           const menus=loginAPIObj?.responseData?.menusList;
           const MenuListIds=menus.map((item)=> item.menu_id);
           updateMenuIds(MenuListIds);
+          await AsyncStorage.setItem('menuIds', JSON.stringify(MenuListIds));
         }else{
           clearMenuIds();
+          await AsyncStorage.removeItem('menuIds');
+
         }
         if (loginAPIObj?.responseData?.listmoduleListName) {
           const menuSubItems=loginAPIObj?.responseData?.listmoduleListName;
           const menuSubItemsListIds=menuSubItems.map((item)=> item.menu_id);
           updateSubMenuIds(menuSubItemsListIds);
+          await AsyncStorage.setItem('subMenuIds', JSON.stringify(menuSubItemsListIds));
         }else{
           clearSubMenuIds();
+          await AsyncStorage.removeItem('subMenuIds');
+
         }
 
         if (isChecked) {
           await AsyncStorage.setItem('save_username', userName);
           await AsyncStorage.setItem('save_password', userPswd);
           await AsyncStorage.setItem('save_code', code);
+          await AsyncStorage.setItem('KeepLoggedIn', "true");
         } else {
           await AsyncStorage.removeItem('save_username');
           await AsyncStorage.removeItem('save_password');

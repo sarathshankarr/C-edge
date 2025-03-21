@@ -1,6 +1,6 @@
-import React, { useContext, useEffect } from 'react';
-import { View, StyleSheet } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import React, {useContext, useEffect} from 'react';
+import {View, StyleSheet} from 'react-native';
+import {useNavigation} from '@react-navigation/native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -10,20 +10,28 @@ import Animated, {
   withSequence,
   Easing,
 } from 'react-native-reanimated';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {ColorContext} from '../../components/colorTheme/colorTheme';
 
 const Splash = () => {
+  const {updateMenuIds, updateSubMenuIds} = useContext(ColorContext);
   const navigation = useNavigation();
   const Logo = require('./../../../assets/images/png/Logo.png');
 
-
   // Shared values for animations
   const translateX = useSharedValue(-300);
-  const dotAnimations = [useSharedValue(0), useSharedValue(0), useSharedValue(0)];
+  const dotAnimations = [
+    useSharedValue(0),
+    useSharedValue(0),
+    useSharedValue(0),
+  ];
 
   useEffect(() => {
     // Slide-in animation for logo
-    translateX.value = withTiming(0, { duration: 1500, easing: Easing.out(Easing.exp) });
+    translateX.value = withTiming(0, {
+      duration: 1500,
+      easing: Easing.out(Easing.exp),
+    });
 
     // Start bounce animations for dots with delays for wave effect
     dotAnimations.forEach((dot, index) => {
@@ -31,21 +39,31 @@ const Splash = () => {
         index * 200, // Stagger start times
         withRepeat(
           withSequence(
-            withTiming(-10, { duration: 300, easing: Easing.out(Easing.cubic) }), // Bounce up
-            withTiming(0, { duration: 300, easing: Easing.in(Easing.cubic) }) // Bounce down
+            withTiming(-10, {duration: 300, easing: Easing.out(Easing.cubic)}), // Bounce up
+            withTiming(0, {duration: 300, easing: Easing.in(Easing.cubic)}), // Bounce down
           ),
           -1, // Infinite repeat
-          false
-        )
+          false,
+        ),
       );
     });
 
     // Check login status after animations
     const checkLoginStatus = async () => {
+      let KeepLoggedIn = await AsyncStorage.getItem('KeepLoggedIn');
+      let storedMenuIds = await AsyncStorage.getItem('menuIds');
+      if (storedMenuIds) {
+        updateMenuIds(JSON.parse(storedMenuIds));
+      }
+
+      let storedSubMenuIds = await AsyncStorage.getItem('subMenuIds');
+      if (storedSubMenuIds) {
+        updateSubMenuIds(JSON.parse(storedSubMenuIds));
+      }
       setTimeout(() => {
         navigation.reset({
           index: 0,
-          routes: [{ name: 'LoginComponent' }],
+          routes: [{name: KeepLoggedIn === 'true' ? 'Main' : 'LoginComponent'}],
         });
       }, 2000);
     };
@@ -55,12 +73,12 @@ const Splash = () => {
 
   // Animated styles
   const logoStyle = useAnimatedStyle(() => ({
-    transform: [{ translateX: translateX.value }],
+    transform: [{translateX: translateX.value}],
   }));
 
-  const getDotStyle = (index) =>
+  const getDotStyle = index =>
     useAnimatedStyle(() => ({
-      transform: [{ translateY: dotAnimations[index].value }],
+      transform: [{translateY: dotAnimations[index].value}],
     }));
 
   return (

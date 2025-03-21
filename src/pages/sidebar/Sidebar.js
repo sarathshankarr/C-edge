@@ -64,12 +64,12 @@ const Sidebar = ({navigation}) => {
         //   menu_id: 4,
         //   src: require('../../../assets/images/png/stamp.png'),
         // },
-        {
-          label: 'GRN Approve',
-          route: 'GrnApproveList',
-          menu_id: 4,
-          src: require('../../../assets/images/png/stamp.png'),
-        },
+        // {
+        //   label: 'GRN Approve',
+        //   route: 'GrnApproveList',
+        //   menu_id: 4,
+        //   src: require('../../../assets/images/png/stamp.png'),
+        // },
         {
           label: 'Box Packing',
           route: 'BoxPackingList',
@@ -400,6 +400,9 @@ const Sidebar = ({navigation}) => {
       await AsyncStorage.removeItem('companyIds');
       await AsyncStorage.removeItem('brandIds');
       await AsyncStorage.removeItem('CurrentCompanyLocations');
+      await AsyncStorage.removeItem('menuIds');
+      await AsyncStorage.removeItem('subMenuIds');
+      await AsyncStorage.setItem('KeepLoggedIn', "false");
       navigation.reset({
         index: 0,
         routes: [{name: 'LoginComponent'}],
