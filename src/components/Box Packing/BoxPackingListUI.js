@@ -63,7 +63,7 @@ const BoxPackingListUI = ({route, navigation, ...props}) => {
 
   React.useEffect(() => {
     if (props.itemsArray) {
-      console.log("resultttttt   ====> ", props.itemsArray)
+      // console.log("resultttttt   ====> ", props.itemsArray)
       set_filterArray(props.itemsArray);
       set_ItemsArray(props.itemsArray);
     }
@@ -223,7 +223,7 @@ const BoxPackingListUI = ({route, navigation, ...props}) => {
             style={{
               flexDirection: 'row',
               alignItems: 'center',
-              flex: 1, // Allows the search bar to take up available space
+              flex: 1, 
               borderWidth: 1,
               borderColor: '#D1D1D1',
               borderRadius: 20,
