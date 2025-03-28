@@ -16,11 +16,11 @@ const SaveMasterBoxPacking = ({navigation, route, ...props}) => {
   const [isPopupLeft, set_isPopupLeft] = useState(false);
   const [fptid, set_fptid] = useState(0);
 
-  React.useEffect(() => {
+ React.useEffect(() => {
     if (route.params) {
       if (route.params?.item) {
         console.log('Route Params ===> ', route.params?.item);
-        // getInitialData(route.params?.item?.woId);
+        getInitialData( route.params?.item.id);
       }
     }
   }, [route.params]);
@@ -40,12 +40,11 @@ const SaveMasterBoxPacking = ({navigation, route, ...props}) => {
       password: userPsd,
       compIds: usercompanyId,
       company: JSON.parse(companyObj),
-      menuId: 787,
-      isAssmeblyIn: 0,
-      primaryId: id,
+      menuId: 345,
+      masterboxId: id,
     };
     let EditFabricProcessInObj =
-      await APIServiceCall.getEditDetailsPartsProcessing(obj);
+      await APIServiceCall.getEditDetailsMasterBoxPacking(obj);
     set_isLoading(false);
 
     if (EditFabricProcessInObj && EditFabricProcessInObj.statusData) {

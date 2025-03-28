@@ -70,12 +70,12 @@ const Sidebar = ({navigation}) => {
         //   menu_id: 4,
         //   src: require('../../../assets/images/png/stamp.png'),
         // },
-        {
-          label: 'Box Packing',
-          route: 'BoxPackingList',
-          menu_id: 4,
-          src: require('../../../assets/images/png/stamp.png'),
-        },
+        // {
+        //   label: 'Box Packing',
+        //   route: 'BoxPackingList',
+        //   menu_id: 4,
+        //   src: require('../../../assets/images/png/stamp.png'),
+        // },
         // {
         //   label: 'Master Box Packing',
         //   route: 'masterBoxPackingList',

@@ -28,34 +28,27 @@ let downArrowImg = require('./../../../assets/images/png/dropDownImg.png');
 let closeImg = require('./../../../assets/images/png/close1.png');
 
 const SaveBoxPackingUI = ({route, navigation, ...props}) => {
-  const [po, setPo] = useState('');
   const [rows, setRows] = useState([]);
-  const [date, setDate] = useState('');
-  const [itemOrTrims, setItemOrTrims] = useState('');
-  const [shipTo, setShipTo] = useState('');
+  const [boxName, setBoxName] = useState('');
+  const [buyerPoNo, setBuyerPoNo] = useState('');
+  const [buyerName, setBuyerName] = useState('');
+  const [packerName, setPackerName] = useState('');
 
   const {colors} = useContext(ColorContext);
   const styles = getStyles(colors);
 
   useEffect(() => {
     if (props.itemsObj) {
-      console.log('props for child  ', props.itemsObj[0]?.childDetails);
-      if (props.itemsObj[0]) {
-        if (props.itemsObj[0]?.childDetails) {
-          setRows(props.itemsObj[0]?.childDetails);
-        }
-        if (props.itemsObj[0]?.styleName) {
-          setstyleNo(props.itemsObj[0]?.styleName);
-        }
-        if (props.itemsObj[0]?.partsName) {
-          setParts(props.itemsObj[0]?.partsName);
-        }
-        if (props.itemsObj[0]?.process) {
-          setProcess(props.itemsObj[0]?.process);
-        }
-        if (props.itemsObj[0]?.price) {
-          setPrice(props.itemsObj[0]?.price);
-        }
+      if (props.itemsObj.boxpackingList) {
+        setRows(props.itemsObj.boxpackingList);
+      }
+
+      if (props.itemsObj.boxpackingList1) {
+        console.log('props for child  ', props.itemsObj.boxpackingList1[0]);
+        setBoxName(props.itemsObj.boxpackingList1[0].boxname);
+        setBuyerName(props.itemsObj.boxpackingList1[0].buyername);
+        setBuyerPoNo(props.itemsObj.boxpackingList1[0].buyerpono);
+        setPackerName(props.itemsObj.boxpackingList1[0].packerName);
       }
     }
   }, [props.itemsObj]);
@@ -108,7 +101,7 @@ const SaveBoxPackingUI = ({route, navigation, ...props}) => {
           <View style={{marginTop: hp('2%')}}>
             <TextInput
               label="Box Name"
-              value={po}
+              value={boxName}
               mode="outlined"
               onChangeText={text => console.log(text)}
             />
@@ -116,7 +109,7 @@ const SaveBoxPackingUI = ({route, navigation, ...props}) => {
           <View style={{marginTop: hp('2%')}}>
             <TextInput
               label=" Buyer PO No"
-              value={date}
+              value={buyerPoNo}
               mode="outlined"
               onChangeText={text => console.log(text)}
             />
@@ -124,7 +117,7 @@ const SaveBoxPackingUI = ({route, navigation, ...props}) => {
           <View style={{marginTop: hp('2%')}}>
             <TextInput
               label="Buyer Name"
-              value={itemOrTrims}
+              value={buyerName}
               mode="outlined"
               onChangeText={text => console.log(text)}
             />
@@ -132,7 +125,7 @@ const SaveBoxPackingUI = ({route, navigation, ...props}) => {
           <View style={{marginTop: hp('2%')}}>
             <TextInput
               label="Packer Name "
-              value={shipTo}
+              value={packerName}
               mode="outlined"
               onChangeText={text => console.log(text)}
             />
@@ -144,45 +137,47 @@ const SaveBoxPackingUI = ({route, navigation, ...props}) => {
                   <View style={{width: 100}}>
                     <Text style={styles.table_head_captions}>Barcode No</Text>
                   </View>
+                  <View style={{width: 5}} />
                   <View style={{width: 100}}>
                     <Text style={styles.table_head_captions}>Order No</Text>
                   </View>
+                  <View style={{width: 5}} />
                   <View style={{width: 100}}>
                     <Text style={styles.table_head_captions}>Styles</Text>
                   </View>
+                  <View style={{width: 5}} />
                   <View style={{width: 100}}>
-                    <Text style={styles.table_head_captions}>
-                    Sizes
-                    </Text>
+                    <Text style={styles.table_head_captions}>Sizes</Text>
                   </View>
+                  <View style={{width: 5}} />
                   <View style={{width: 100}}>
                     <Text style={styles.table_head_captions}>Quantity</Text>
                   </View>
-                  
-                 
                 </View>
                 {rows.map((row, index) => (
                   <View key={index} style={styles.table_body_single_row}>
                     <View style={{width: 100}}>
-                      <Text style={styles.table_data}>{row.enterDate}</Text>
+                      <Text style={styles.table_data}>{row.barcodeNo}</Text>
                     </View>
+                    <View style={{width: 5}} />
                     <View style={{width: 100}}>
-                      <Text style={styles.table_data}>{row.barCode}</Text>
+                      <Text style={styles.table_data}>{row.order}</Text>
                     </View>
+                    <View style={{width: 5}} />
                     <View style={{width: 100}}>
-                      <Text style={styles.table_data}>{row.size}</Text>
+                      <Text style={styles.table_data}>{row.styleNames}</Text>
                     </View>
+                    <View style={{width: 5}} />
                     <View style={{width: 100}}>
-                      <Text style={styles.table_data}>{row.enterQty}</Text>
+                      <Text style={styles.table_data}>{row.sizeNames}</Text>
                     </View>
+                    <View style={{width: 5}} />
                     <View style={{width: 100}}>
-                      <Text style={styles.table_data}>{row.lotno}</Text>
+                      <Text style={styles.table_data}>{row.bpcSizeQty}</Text>
                     </View>
-                   
+                    <View style={{width: 5}} />
                   </View>
                 ))}
-               
-                
               </View>
             </ScrollView>
           </View>

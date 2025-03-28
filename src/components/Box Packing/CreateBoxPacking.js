@@ -163,9 +163,9 @@ const CreateBoxPacking = ({route}) => {
       // }
       if (id === 1) {
         set_lists1(LISTAPIOBJ.responseData);
-    } else {
+      } else {
         set_lists2(LISTAPIOBJ.responseData);
-    }
+      }
     } else {
       popUpAction(
         Constant.SERVICE_FAIL_MSG,
@@ -187,14 +187,52 @@ const CreateBoxPacking = ({route}) => {
     }
   };
 
+  const ValidateAction = async name => {
+    let userName = await AsyncStorage.getItem('userName');
+    let userPsd = await AsyncStorage.getItem('userPsd');
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
+
+    let Obj = {
+      menuid: 384,
+      username: userName,
+      password: userPsd,
+      boxname: '',
+      compIds: usercompanyId,
+      company: JSON.parse(companyObj),
+    };
+
+    set_isLoading(true);
+
+    let SAVEAPIObj = await APIServiceCall.validateCreateBoxPacking(Obj);
+    set_isLoading(false);
+
+    console.log('Sucess before returned obj ', SAVEAPIObj);
+
+    return SAVEAPIObj?.responseData;
+  };
+
   const submitAction = async tempObj => {
+    const validateRMT = await ValidateAction();
+
+    if (validateRMT === 'no') {
+      console.log('failed  saving =====> ');
+      popUpAction(
+        Constant.Fail_Validate_RMT_MSG,
+        Constant.DefaultAlert_MSG,
+        'OK',
+        true,
+        false,
+      );
+      return;
+    }
+
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
     let companyObj = await AsyncStorage.getItem('companyObj');
     let userId = await AsyncStorage.getItem('userId');
     let locIds = await AsyncStorage.getItem('CurrentCompanyLocations');
-
 
     tempObj.menuId = 345;
     tempObj.username = userName;

@@ -275,6 +275,9 @@ const Splash = () => {
           );
         }
 
+        if (loginAPIObj?.responseData?.dashboardlink) await AsyncStorage.setItem('dashboardlink', (loginAPIObj.responseData.dashboardlink || ''));
+
+
         if (loginAPIObj?.responseData?.menusList) {
           const menus = loginAPIObj?.responseData?.menusList;
           const MenuListIds = menus.map(item => item.menu_id);

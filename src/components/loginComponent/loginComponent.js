@@ -142,6 +142,8 @@ const LoginComponent = ({ navigation, route, ...props }) => {
             await AsyncStorage.setItem('CompaniesList', JSON.stringify(companyList));
           }
         }
+        if (loginAPIObj?.responseData?.dashboardlink) await AsyncStorage.setItem('dashboardlink', (loginAPIObj.responseData.dashboardlink|| ''));
+
         if (loginAPIObj?.responseData?.locIds) await AsyncStorage.setItem('locIds', (loginAPIObj.responseData.locIds));
         if (loginAPIObj?.responseData?.companyIds) await AsyncStorage.setItem('companyIds', (loginAPIObj.responseData.companyIds));
         if (loginAPIObj?.responseData?.brandIds) await AsyncStorage.setItem('brandIds', (loginAPIObj.responseData.brandIds));

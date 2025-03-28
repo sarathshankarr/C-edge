@@ -192,8 +192,7 @@ const BoxPackingList = ({route}) => {
   };
 
   const actionOnRow = (item, index) => {
-    // navigation.navigate('SavePurchaseOrderDraft', {item: item});
-    console.log("navigate")
+    navigation.navigate('SaveBoxPacking', {item: item});
   };
 
   const handleNavigation = () => {
