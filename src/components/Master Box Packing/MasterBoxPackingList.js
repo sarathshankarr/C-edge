@@ -26,15 +26,15 @@ const MasterBoxPackingList = ({ route }) => {
 
 
     
-  // React.useEffect(() => {
-  //   getInitialData(0, true);
-  // }, []);
+  React.useEffect(() => {
+    getInitialData(0, true);
+  }, []);
 
-  // useFocusEffect(
-  //   React.useCallback(() => {
-  //     getInitialData(0, true);
-  //   }, [])
-  // );
+  useFocusEffect(
+    React.useCallback(() => {
+      getInitialData(0, true);
+    }, [])
+  );
   
   const backBtnAction = () => {
     navigation.goBack();
@@ -79,21 +79,23 @@ const MasterBoxPackingList = ({ route }) => {
     try{
      
       let obj = {  
+        "menuId": 5,
+        "searchKeyValue": "",
+        "styleSearchDropdown": "-1", // mandatory
+        "dataFilter": "0", 
+        "locIds": 0,
+        "brandIds": 0,
         "username": userName,
         "password" : userPsd,
-        "menuId": 787,
         "fromRecord": fromRecord,
         "toRecord": toRecord,
-        "searchValue": "",
-        "searchDropdown": "-1",
         "compIds": usercompanyId,
         "company":JSON.parse(companyObj),
-        "days1":"0",
-        "locIds":"0",
-        "brandIds":"0",
-        "isAssmeblyIn":0,
+        "vendorLogin":"Admin",
+        "vendorId":0,
+        "days":"0",
     }
-      let LISTAPIOBJ = await APIServiceCall.LoadAllPartsProcessingList(obj);
+      let LISTAPIOBJ = await APIServiceCall.LoadAllMasterBoxPacking(obj);
       set_isLoading(false);
       
       if(LISTAPIOBJ && LISTAPIOBJ.statusData){
@@ -180,7 +182,7 @@ const MasterBoxPackingList = ({ route }) => {
   };
 
   const actionOnRow = (item,index) => {
-    navigation.navigate('SavePurchaseOrderDraft', {item:item});
+    navigation.navigate('SaveMasterBoxPacking', {item:item});
   };
 
   const handleNavigation = () => {

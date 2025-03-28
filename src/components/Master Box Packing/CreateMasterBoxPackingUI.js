@@ -34,9 +34,13 @@ let downArrowImg = require('./../../../assets/images/png/dropDownImg.png');
 let closeImg = require('./../../../assets/images/png/close1.png');
 
 const CreateMasterBoxPackingUI = ({route, navigation, ...props}) => {
-  const [boxName, setBoxName] = useState('');
-  const [masterBoxName , setMasterBoxName] = useState('');
+  const [masterBoxName, setMasterBoxName] = useState('');
   const [rows, setRows] = useState([]);
+  const [buyerName, setbuyerName] = React.useState('');
+  const [barcode, setBarcode] = React.useState('');
+  const [lastestBoxId, setLastestBoxId] = React.useState(0);
+  const [lastestBuyerPoId, setLastestBuyerPoId] = React.useState(0);
+  const [lastestBoxList, setLastestBoxList] = React.useState('');
 
   const {colors} = useContext(ColorContext);
 
@@ -52,74 +56,158 @@ const CreateMasterBoxPackingUI = ({route, navigation, ...props}) => {
 
   useEffect(() => {
     if (props.lists) {
-      console.log('data need to set ==> ', props.lists);
+      if (props.lists.buyerMap) {
+        const buyerMapList = Object.keys(props.lists.buyerMap).map(key => ({
+          id: key,
+          name: props.lists.buyerMap[key],
+        }));
+        setFilteredBuyerPo(buyerMapList);
+        setBuyerPoList(buyerMapList);
+      }
+      if (props.lists.boxid) {
+        const boxidList = Object.keys(props.lists.boxid).map(key => ({
+          id: key,
+          name: props.lists.boxid[key],
+        }));
+        setLastestBoxList(boxidList);
+        setRows([
+          ...rows,
+          {
+            id: Date.now(),
+            BoxName: '',
+            BoxId: '',
+            showBoxList: false,
+            BoxList: boxidList || [],
+            filteredBoxList: boxidList || [],
+            CustomerStyleName: '',
+            size: '',
+            Qty: '',
+            childTable: [],
+            PbuyerPoID: '',
+          },
+        ]);
+      }
     }
   }, [props.lists]);
 
+  useEffect(() => {
+    if (props.quality) {
+      console.log('quality ====> ', props.quality);
 
+      if (props?.quality?.selectedSizeCodesJson) {
+        let parsedData = JSON.parse(props?.quality?.selectedSizeCodesJson);
+
+        let updatedData = parsedData.map(item => ({
+          ...item,
+          checked: false,
+        }));
+
+        setRows(prevRows =>
+          prevRows.map(row =>
+            row.BoxId === lastestBoxId
+              ? {
+                  ...row,
+                  size: props.quality.size,
+                  Qty: props.quality.qty,
+                  CustomerStyleName: props.quality.style,
+                  childTable: updatedData,
+                  PbuyerPoID: lastestBuyerPoId,
+                }
+              : row,
+          ),
+        );
+      }
+    }
+  }, [props.quality]);
 
   const backAction = async () => {
     props.backBtnAction();
   };
 
   const submitAction = async () => {
-    // rows.map((row,index)=> (
-    props.submitAction('checkedData');
+
+
+    const mappedRows = rows.flatMap(row => {
+      const barcodeString = row.childTable?.length
+        ? Array(row.childTable.length).fill(row.barcode).join(',')
+        : '';
+
+      return (
+        row.childTable?.map(child => ({
+          masterboxId: row.BoxId,
+          barcode: barcodeString,
+          boxId: child.SIZE_VAL,
+          m_buyerpo_id: row.PbuyerPoID,
+        })) || []
+      );
+    });
+
+    const tempObj = {
+      boxId: 0,
+      masterBox: masterBoxName,
+      buyerpoId: buyerPoId,
+      particulars: mappedRows || [],
+    };
+
+    // console.log('temp obj ===> ', tempObj);
+    props.submitAction(tempObj);
   };
 
   const handleRemoveRow = id => {
-    setRows(prev => prev.filter((_, index) => index !== id));
-  };
-
-  const handleSearchboxName = async (item, rowId) => {
-    set_dataFromStock({
-      row: rowId,
-      id: item?.id,
-    });
-
-    setRows(
-      rows.map(row =>
-        row.id === rowId
-          ? {
-              ...row,
-              orderName: item?.name,
-              orderID: item?.id,
-              showOrderList: false,
-            }
-          : row,
-      ),
-    );
-
-    // await getStockQty(rowId, item?.id);
-  };
-
-  const actionOnboxName = async (item, rowId) => {
-    set_dataFromStockType({
-      row: rowId,
-      id: item?.id,
-    });
-
-    setRows(
-      rows.map(row =>
-        row.id === rowId
-          ? {
-              ...row,
-              OrderName: item?.name,
-              orderId: item?.id,
-              showOrderliSt: false,
-            }
-          : row,
-      ),
-    );
-
-    // await getStockbyTypeId(rowId, item.id);
-  };
-
-
-  const RemoveRow = id => {
     console.log('ROW ID ===> ', id);
     const filtered = rows.filter(item => item.id !== id);
     setRows(filtered);
+  };
+
+  const handleSearchboxName = async (text, rowId) => {
+    setRows(
+      rows.map(r =>
+        r.id === rowId
+          ? {
+              ...r,
+              filteredBoxList: r.BoxList?.filter(item =>
+                item.name.toLowerCase().includes(text.toLowerCase()),
+              ),
+            }
+          : r,
+      ),
+    );
+  };
+
+  const actionOnboxName = async (item, rowId) => {
+    setRows(
+      rows.map(row =>
+        row.id === rowId
+          ? {
+              ...row,
+              BoxName: item?.name,
+              BoxId: item?.id,
+              showBoxList: false,
+            }
+          : row,
+      ),
+    );
+    setLastestBoxId(item.id);
+
+    const tempObj = {
+      sId: item.id,
+      bId: buyerPoId,
+    };
+    await props.getData(tempObj, 1);
+  };
+  const actionOnCheckBox = async (rowId, idx) => {
+    setRows(prevRows =>
+      prevRows.map(row =>
+        row.id === rowId
+          ? {
+              ...row,
+              childTable: row.childTable.map((item, index) =>
+                index === idx ? {...item, checked: !item.checked} : item,
+              ),
+            }
+          : row,
+      ),
+    );
   };
 
   const addRow = () => {
@@ -127,19 +215,42 @@ const CreateMasterBoxPackingUI = ({route, navigation, ...props}) => {
       ...rows,
       {
         id: Date.now(),
-        orderName: '',
+        BoxName: '',
+        BoxId: '',
+        showBoxList: false,
+        BoxList: lastestBoxList || [],
+        filteredBoxList: lastestBoxList || [],
         CustomerStyleName: '',
-        orderId: '',
-        CustomerStyleId: '',
-        showCustomerStyleList: false,
-        showOrderList: false,
-        OrderList: [],
-        CustomerStyleList: [],
-        filteredboxName: [],
-        filteredCustomerStyle: [],
-        Colors:[]
+        size: '',
+        Qty: '',
+        childTable: [],
+        PbuyerPoID: lastestBuyerPoId || '',
       },
     ]);
+  };
+
+  const [buyerPoList, setBuyerPoList] = useState([]);
+  const [filteredBuyerPo, setFilteredBuyerPo] = useState([]);
+  const [showBuyerPoList, setShowBuyerPoList] = useState(false);
+  const [buyerPoName, setBuyerPoName] = useState('');
+  const [buyerPoId, setBuyerPoId] = useState('');
+
+  const actionOnBuyerPo = item => {
+    setBuyerPoId(item.id);
+    setBuyerPoName(item.name);
+    setShowBuyerPoList(false);
+    setLastestBuyerPoId(item.id);
+  };
+
+  const handleSearchBuyerPo = text => {
+    if (text.trim().length > 0) {
+      const filtered = buyerPoList.filter(item =>
+        item.name.toLowerCase().includes(text.toLowerCase()),
+      );
+      setFilteredBuyerPo(filtered);
+    } else {
+      setFilteredBuyerPo(buyerPoList);
+    }
   };
 
   return (
@@ -168,7 +279,6 @@ const CreateMasterBoxPackingUI = ({route, navigation, ...props}) => {
             width: '90%',
             marginHorizontal: wp('5%'),
           }}>
-
           <View style={{marginTop: hp('2%')}}>
             <TextInput
               label="Master Box Name : "
@@ -178,13 +288,104 @@ const CreateMasterBoxPackingUI = ({route, navigation, ...props}) => {
             />
           </View>
 
-       
+          <View
+            style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: '#fff',
+              marginTop: hp('2%'),
+            }}>
+            <TouchableOpacity
+              style={{
+                flexDirection: 'row',
+                borderWidth: 0.5,
+                borderColor: '#D8D8D8',
+                borderRadius: hp('0.5%'),
+                width: '100%',
+                justifyContent: 'space-between',
+              }}
+              onPress={() => {
+                setShowBuyerPoList(!showBuyerPoList);
+              }}>
+              <View>
+                <View style={[styles.SectionStyle1, {}]}>
+                  <View style={{flexDirection: 'column'}}>
+                    <Text
+                      style={
+                        buyerPoId
+                          ? [styles.dropTextLightStyle]
+                          : [styles.dropTextInputStyle]
+                      }>
+                      {'Buyer PO '}
+                    </Text>
+                    {buyerPoId ? (
+                      <Text style={[styles.dropTextInputStyle]}>
+                        {buyerPoName}
+                      </Text>
+                    ) : null}
+                  </View>
+                </View>
+              </View>
+
+              <View style={{justifyContent: 'center'}}>
+                <Image source={downArrowImg} style={styles.imageStyle} />
+              </View>
+            </TouchableOpacity>
+
+            {showBuyerPoList && (
+              <View style={styles.dropdownContent1}>
+                <TextInput
+                  style={styles.searchInput}
+                  placeholder="Search "
+                  onChangeText={handleSearchBuyerPo}
+                  placeholderTextColor="#000"
+                />
+                <ScrollView
+                  style={styles.scrollView}
+                  nestedScrollEnabled={true}>
+                  {filteredBuyerPo.length === 0 ? (
+                    <Text style={styles.noCategoriesText}>
+                      Sorry, no results found!
+                    </Text>
+                  ) : (
+                    filteredBuyerPo.map((item, index) => (
+                      <TouchableOpacity
+                        key={index}
+                        style={styles.dropdownOption}
+                        onPress={() => actionOnBuyerPo(item)}>
+                        <Text style={{color: '#000'}}>{item.name}</Text>
+                      </TouchableOpacity>
+                    ))
+                  )}
+                </ScrollView>
+              </View>
+            )}
+          </View>
+
+          <View style={{marginTop: hp('2%')}}>
+            <TextInput
+              label="Buyer Name"
+              value={buyerName}
+              mode="outlined"
+              onChangeText={text => setbuyerName(text)}
+            />
+          </View>
+
+          <View style={{marginTop: hp('2%')}}>
+            <TextInput
+              label="Barcode"
+              value={barcode}
+              mode="outlined"
+              onChangeText={text => setBarcode(text)}
+            />
+          </View>
 
           <View
             style={{
+              // width: '90%',
               marginTop: 20,
               marginBottom: 30,
-              marginHorizontal: 15,
+              // marginHorizontal: 15,
             }}>
             <TouchableOpacity
               onPress={addRow}
@@ -230,151 +431,194 @@ const CreateMasterBoxPackingUI = ({route, navigation, ...props}) => {
 
                 {/* Table Body - Rows */}
                 {rows.map(row => (
-                  <View key={row.id} style={styles.table_body_single_row}>
-                    <View style={{width: 60}}>
-                      <TouchableOpacity
-                        style={{alignItems: '', justifyContent: ''}}
-                        onPress={() => RemoveRow(row.id)}>
-                        <Image source={closeImg} style={styles.imageStyle1} />
-                      </TouchableOpacity>
-                    </View>
-                    <View style={{width: 5}}></View>
-                    <View style={{width: 200}}>
-                      <View
-                        style={{
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          marginTop: hp('1%'),
-                          backgroundColor: '#ffffff',
-                        }}>
+                  <View key={row.id}>
+                    <View style={styles.table_body_single_row}>
+                      <View style={{width: 60}}>
                         <TouchableOpacity
+                          style={{alignItems: '', justifyContent: ''}}
+                          onPress={() => handleRemoveRow(row.id)}>
+                          <Image source={closeImg} style={styles.imageStyle1} />
+                        </TouchableOpacity>
+                      </View>
+                      <View style={{width: 5}}></View>
+                      <View style={{width: 200}}>
+                        <View
                           style={{
-                            flexDirection: 'row',
-                            borderWidth: 0.5,
-                            borderColor: '#D8D8D8',
-                            borderRadius: hp('0.5%'),
-                            width: '100%',
-                            overflow: 'hidden',
-                          }}
-                          onPress={() => {
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            marginTop: hp('1%'),
+                            backgroundColor: '#ffffff',
+                          }}>
+                          <TouchableOpacity
+                            style={{
+                              flexDirection: 'row',
+                              borderWidth: 0.5,
+                              borderColor: '#D8D8D8',
+                              borderRadius: hp('0.5%'),
+                              width: '100%',
+                              overflow: 'hidden',
+                            }}
+                            onPress={() => {
+                              setRows(
+                                rows.map(r =>
+                                  r.id === row.id
+                                    ? {
+                                        ...r,
+                                        showBoxList: !r.showBoxList,
+                                      }
+                                    : {...r, showBoxList: false},
+                                ),
+                              );
+                            }}>
+                            <View style={[styles.SectionStyle1]}>
+                              <View style={{flexDirection: 'column'}}>
+                                <Text
+                                  style={
+                                    row.BoxId
+                                      ? styles.dropTextLightStyle
+                                      : styles.dropTextInputStyle
+                                  }>
+                                  {'Box Name  '}
+                                </Text>
+                                <Text style={styles.dropTextInputStyle}>
+                                  {row.BoxId ? row.BoxName : 'Select '}
+                                </Text>
+                              </View>
+                            </View>
+                            <View style={{justifyContent: 'center'}}>
+                              <Image
+                                source={downArrowImg}
+                                style={{
+                                  height: 20,
+                                  width: 20,
+                                  tintColor: 'red',
+                                  aspectRatio: 1,
+                                  marginRight: 20,
+                                  resizeMode: 'contain',
+                                }}
+                              />
+                            </View>
+                          </TouchableOpacity>
+                          {row.showBoxList && (
+                            <View style={styles.dropdownContent2}>
+                              <TextInput
+                                style={styles.searchInput}
+                                placeholder="Search "
+                                onChangeText={text =>
+                                  handleSearchboxName(text, row.id)
+                                }
+                                placeholderTextColor="#000"
+                              />
+                              <ScrollView nestedScrollEnabled={true}>
+                                {row.filteredBoxList.length === 0 ? (
+                                  <Text style={styles.noCategoriesText}>
+                                    Sorry, no results found!
+                                  </Text>
+                                ) : (
+                                  row.filteredBoxList.map(item => (
+                                    <TouchableOpacity
+                                      key={item?.id}
+                                      onPress={() =>
+                                        actionOnboxName(item, row.id)
+                                      }>
+                                      <View style={styles.dropdownOption}>
+                                        <Text style={{color: '#000'}}>
+                                          {item?.name}
+                                        </Text>
+                                      </View>
+                                    </TouchableOpacity>
+                                  ))
+                                )}
+                              </ScrollView>
+                            </View>
+                          )}
+                        </View>
+                      </View>
+                      {/* {console.log("row.CustomerStyleName =====> ", row.CustomerStyleName)} */}
+                      <View style={{width: 5}}></View>
+                      <View style={{width: 100}}>
+                        <TextInput
+                          style={styles.table_data_input}
+                          value={row.CustomerStyleName}
+                          editable={false}
+                          onChangeText={text => {
                             setRows(
                               rows.map(r =>
                                 r.id === row.id
-                                  ? {
-                                      ...r,
-                                      showboxNameList: !r.showboxNameList,
-                                    }
-                                  : {
-                                      ...r,
-                                      showboxNameList: false,
-                                      filteredboxName: props.lists.getStockTypes,
-                                    },
+                                  ? {...r, CustomerStyleName: text}
+                                  : r,
                               ),
                             );
-                          }}>
-                          <View style={[styles.SectionStyle1]}>
-                            <View style={{flexDirection: 'column'}}>
-                              <Text
-                                style={
-                                  row.boxName
-                                    ? styles.dropTextLightStyle
-                                    : styles.dropTextInputStyle
-                                }>
-                                {'Box Name '}
-                              </Text>
-                              <Text style={styles.dropTextInputStyle}>
-                                {row.orderId ? row.orderName : 'Select Box Id'}
-                              </Text>
-                            </View>
-                          </View>
-                          <View style={{justifyContent: 'center'}}>
-                            <Image
-                              source={downArrowImg}
-                              style={styles.imageStyle}
-                            />
-                          </View>
-                        </TouchableOpacity>
-                        {row.showboxNameList && (
-                          <View style={styles.dropdownContent2}>
-                            <TextInput
-                              style={styles.searchInput}
-                              placeholder="Search "
-                              onChangeText={text =>
-                                handleSearchboxName(text, row.id)
-                              }
-                              placeholderTextColor="#000"
-                            />
-                            <ScrollView nestedScrollEnabled={true}>
-                              {row.filteredboxName.length === 0 ? (
-                                <Text style={styles.noCategoriesText}>
-                                  Sorry, no results found!
-                                </Text>
-                              ) : (
-                                row.filteredboxName.map(item => (
-                                  <TouchableOpacity
-                                    key={item?.id}
-                                    onPress={() =>
-                                      actionOnboxName(item, row.id)
-                                    }>
-                                    <View style={styles.dropdownOption}>
-                                      <Text style={{color: '#000'}}>
-                                        {item?.name}
-                                      </Text>
-                                    </View>
-                                  </TouchableOpacity>
-                                ))
-                              )}
-                            </ScrollView>
-                          </View>
-                        )}
+                          }}
+                        />
+                      </View>
+
+                      <View style={{width: 5}}></View>
+                      <View style={{width: 100}}>
+                        <TextInput
+                          style={styles.table_data_input}
+                          value={row.size}
+                          editable={false}
+                          onChangeText={text => {
+                            setRows(
+                              rows.map(r =>
+                                r.id === row.id ? {...r, size: text} : r,
+                              ),
+                            );
+                          }}
+                        />
+                      </View>
+
+                      <View style={{width: 5}}></View>
+                      <View style={{width: 100}}>
+                        <TextInput
+                          style={styles.table_data_input}
+                          value={row.Qty.toString()}
+                          onChangeText={text => {
+                            setRows(
+                              rows.map(r =>
+                                r.id === row.id ? {...r, Qty: text} : r,
+                              ),
+                            );
+                          }}
+                          editable={false}
+                        />
                       </View>
                     </View>
-                    
-                    <View style={{width: 5}}></View>
-                    <View style={{width: 100}}>
-                      <TextInput
-                        style={styles.table_data_input}
-                        value={row.inputQty}
-                        onChangeText={text => {
-                          setRows(
-                            rows.map(r =>
-                              r.id === row.id ? {...r, inputQty: text} : r,
-                            ),
-                          );
-                        }}
-                      />
-                    </View>
 
-                    <View style={{width: 5}}></View>
-                    <View style={{width: 100}}>
-                      <TextInput
-                        style={styles.table_data_input}
-                        value={row.inputQty}
-                        onChangeText={text => {
-                          setRows(
-                            rows.map(r =>
-                              r.id === row.id ? {...r, inputQty: text} : r,
-                            ),
-                          );
-                        }}
-                      />
-                    </View>
+                    {/* row2 */}
 
-                    <View style={{width: 5}}></View>
-                    <View style={{width: 100}}>
-                      <TextInput
-                        style={styles.table_data_input}
-                        value={row.inputQty}
-                        onChangeText={text => {
-                          setRows(
-                            rows.map(r =>
-                              r.id === row.id ? {...r, inputQty: text} : r,
-                            ),
-                          );
-                        }}
-                      />
-                    </View>
+                    {row?.childTable?.length >= 0 && (
+                      <View style={styles.table_body_single_row}>
+                        <View
+                          style={{
+                            width: 470,
+                            flexDirection: 'row',
+                          }}>
+                          {row?.childTable?.map((item, index) => (
+                            <View
+                              key={item?.SIZE_ID}
+                              style={{
+                                width: 100,
+                                margin: 5,
+                                alignItems: 'center',
+                                padding: 10,
+                                borderRadius: 5,
+                                flexDirection: 'row',
+                              }}>
+                              <CustomCheckBox
+                                isChecked={item?.checked}
+                                onToggle={() => actionOnCheckBox(row.id, index)}
+                              />
 
+                              <Text style={{marginTop: 5, color: '#000'}}>
+                                {item.SIZE_VAL}
+                              </Text>
+                            </View>
+                          ))}
+                        </View>
+                      </View>
+                    )}
                   </View>
                 ))}
               </View>
@@ -515,9 +759,9 @@ const getStyles = colors =>
       alignItems: 'center',
       flex: 1,
       marginTop: hp('2%'),
-      width: '95%',
+      width: '100%',
       marginBottom: 10,
-      marginHorizontal: 10,
+      // marginHorizontal: 10,
     },
 
     table_head: {
@@ -630,4 +874,4 @@ const getStyles = colors =>
       fontWeight: '600',
       color: '#000000',
     },
-});
+  });

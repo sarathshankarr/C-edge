@@ -19,8 +19,8 @@ const SaveBoxPacking = ({navigation, route, ...props}) => {
   React.useEffect(() => {
     if (route.params) {
       if (route.params?.item) {
-        console.log('Route Params ===> ', route.params?.item);
-        // getInitialData(route.params?.item?.woId);
+        console.log('Route Params ===> ', route.params?.item.boxPackId);
+        getInitialData( route.params?.item.boxPackId);
       }
     }
   }, [route.params]);
@@ -40,12 +40,11 @@ const SaveBoxPacking = ({navigation, route, ...props}) => {
       password: userPsd,
       compIds: usercompanyId,
       company: JSON.parse(companyObj),
-      menuId: 787,
-      isAssmeblyIn: 0,
-      primaryId: id,
+      menuId: 345,
+      bpmID: id,
     };
     let EditFabricProcessInObj =
-      await APIServiceCall.getEditDetailsPartsProcessing(obj);
+      await APIServiceCall.getEditDetailsBoxPacking(obj);
     set_isLoading(false);
 
     if (EditFabricProcessInObj && EditFabricProcessInObj.statusData) {

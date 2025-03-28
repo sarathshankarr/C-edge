@@ -65,6 +65,7 @@ const MasterBoxPackingListUI = ({route, navigation, ...props}) => {
     if (props.itemsArray) {
       set_filterArray(props.itemsArray);
       set_ItemsArray(props.itemsArray);
+      // console.log("list , ",props.itemsArray)
     }
     // getRequestBody();
 
@@ -162,25 +163,25 @@ const MasterBoxPackingListUI = ({route, navigation, ...props}) => {
           <View
             style={{flex: 1, justifyContent: 'center'}}>
             <Text style={[CommonStyles.tylesTextStyle, {textAlign: 'center'}]}>
-              {item.styleCode}
+              {item.masterboxname}
             </Text>
           </View>
           <View
             style={{flex: 0.7, justifyContent: 'center'}}>
             <Text style={[CommonStyles.tylesTextStyle, {textAlign: 'center'}]}>
-              {item.processName}
+              {item.boxes}
             </Text>
           </View>
           <View
             style={{flex: 0.5, justifyContent: 'center'}}>
             <Text style={[CommonStyles.tylesTextStyle, {textAlign: 'center'}]}>
-              {item.producttype}
+              {item.barcordeno}
             </Text>
           </View>
           <View
             style={{flex: 0.7, justifyContent: 'center'}}>
             <Text style={[CommonStyles.tylesTextStyle, {textAlign: 'center'}]}>
-              {item.totalQty}
+              {item.barcordeno}
             </Text>
           </View>
         </View>
@@ -317,21 +318,21 @@ const MasterBoxPackingListUI = ({route, navigation, ...props}) => {
                 CommonStyles.tylesHeaderTextStyle,
                 {flex: 1, textAlign: 'center'},
               ]}>
-              {'Style No (Color)'}
+              {'Master Box Name'}
             </Text>
             <Text
               style={[
                 CommonStyles.tylesHeaderTextStyle,
                 {flex: 0.7, textAlign: 'center'},
               ]}>
-              {'Process'}
+              {'Box Names'}
             </Text>
             <Text
               style={[
                 CommonStyles.tylesHeaderTextStyle,
                 {flex: 0.5, textAlign: 'center'},
               ]}>
-              {'Part'}
+              {'Barcode'}
             </Text>
             <Text
               style={[
@@ -391,7 +392,7 @@ const MasterBoxPackingListUI = ({route, navigation, ...props}) => {
         reqBody={filterReqBody}
       />
 
-      <AddNewItem navItem={'SaveMasterBoxPacking'} />
+      <AddNewItem navItem={'CreateMasterBoxPacking'} />
 
       {props.isPopUp ? (
         <View style={CommonStyles.customPopUpStyle}>
