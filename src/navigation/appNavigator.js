@@ -120,6 +120,12 @@ import SaveWorkOrderStyle from '../components/Work Order Style/SaveWorkOrderStyl
 import CreateBillGeneration from '../components/Bill Generation/CreateBillGeneration';
 import BillGenerationList from '../components/Bill Generation/BillGenerationList';
 import SaveBillGeneration from '../components/Bill Generation/SaveBillGeneration';
+import CreateNewProcessIn from '../components/New Process In/CreateNewProcessIn';
+import NewProcessInList from '../components/New Process In/NewProcessInList';
+import SaveNewProcessIn from '../components/New Process In/SaveNewProcessIn';
+import CreateNewProcessOut from '../components/New Process Out/CreateNewProcessOut';
+import NewProcessOutList from '../components/New Process Out/NewProcessOutList';
+import SaveNewProcessOut from '../components/New Process Out/SaveNewProcessOut';
 
 
 const Stack = createNativeStackNavigator();
@@ -243,6 +249,12 @@ const AppStack = () => {
       <Stack.Screen name="CreateBillGeneration" component={CreateBillGeneration} options={{ headerShown: false }} /> 
       <Stack.Screen name="BillGenerationList" component={BillGenerationList} options={{ headerShown: false }} /> 
       <Stack.Screen name="SaveBillGeneration" component={SaveBillGeneration} options={{ headerShown: false }} /> 
+      <Stack.Screen name="CreateNewProcessIn" component={CreateNewProcessIn} options={{ headerShown: false }} /> 
+      <Stack.Screen name="NewProcessInList" component={NewProcessInList} options={{ headerShown: false }} /> 
+      <Stack.Screen name="SaveNewProcessIn" component={SaveNewProcessIn} options={{ headerShown: false }} /> 
+      <Stack.Screen name="CreateNewProcessOut" component={CreateNewProcessOut} options={{ headerShown: false }} /> 
+      <Stack.Screen name="NewProcessOutList" component={NewProcessOutList} options={{ headerShown: false }} /> 
+      <Stack.Screen name="SaveNewProcessOut" component={SaveNewProcessOut} options={{ headerShown: false }} /> 
     </Stack.Navigator>
   );
 };
