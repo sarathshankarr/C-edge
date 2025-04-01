@@ -76,12 +76,12 @@ const Sidebar = ({navigation}) => {
         //   menu_id: 4,
         //   src: require('../../../assets/images/png/stamp.png'),
         // },
-        // {
-        //   label: 'Master Box Packing',
-        //   route: 'masterBoxPackingList',
-        //   menu_id: 4,
-        //   src: require('../../../assets/images/png/stamp.png'),
-        // },
+        {
+          label: 'Master Box Packing',
+          route: 'masterBoxPackingList',
+          menu_id: 4,
+          src: require('../../../assets/images/png/stamp.png'),
+        },
         // {
         //   label: 'Bill Generation',
         //   route: 'BillGenerationList',
@@ -239,6 +239,18 @@ const Sidebar = ({navigation}) => {
         {
           label: 'Parts Processing',
           route: 'PartProcessingList',
+          menu_id: 787,
+          src: require('../../../assets/images/png/fabricProce.png'),
+        },
+        {
+          label: 'New Process In',
+          route: 'NewProcessInList',
+          menu_id: 787,
+          src: require('../../../assets/images/png/fabricProce.png'),
+        },
+        {
+          label: 'New Process Out',
+          route: 'NewProcessOutList',
           menu_id: 787,
           src: require('../../../assets/images/png/fabricProce.png'),
         },
