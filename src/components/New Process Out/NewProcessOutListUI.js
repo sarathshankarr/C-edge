@@ -391,7 +391,8 @@ const NewProcessOutListUI = ({route, navigation, ...props}) => {
         reqBody={filterReqBody}
       />
 
-      <AddNewItem navItem={'CreateNewProcessOut'} />
+      {/* <AddNewItem navItem={'CreateNewProcessOut'} /> */}
+      <AddNewItem navItem={'SaveNewProcessOut'} />
 
       {props.isPopUp ? (
         <View style={CommonStyles.customPopUpStyle}>

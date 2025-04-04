@@ -32,7 +32,7 @@ let filterImg = require('./../../../assets/images/png/setting.png');
 let filterImg1 = require('./../../../assets/images/png/filter.png');
 
 
-const NewProcessInListUI = ({route, navigation, ...props}) => {
+const WorkOrderBuyerPoListUI = ({route, navigation, ...props}) => {
   const [isListOpen, set_ListOpen] = useState(false);
   const [refreshing, set_refreshing] = useState(false);
   const [filterArray, set_filterArray] = useState([]);
@@ -201,7 +201,7 @@ const NewProcessInListUI = ({route, navigation, ...props}) => {
           isChatEnable={false}
           isTImerEnable={false}
           isTitleHeaderEnable={true}
-          title={'New Process In List'}
+          title={'Work Order Buyer PO List'}
           backBtnAction={() => backBtnAction()}
         />
       </View>
@@ -391,8 +391,7 @@ const NewProcessInListUI = ({route, navigation, ...props}) => {
         reqBody={filterReqBody}
       />
 
-      {/* <AddNewItem navItem={'CreateNewProcessIn'} /> */}
-      <AddNewItem navItem={'SaveNewProcessIn'} />
+      <AddNewItem navItem={'CreateWorkOrderBuyerPo'} />
 
       {props.isPopUp ? (
         <View style={CommonStyles.customPopUpStyle}>
@@ -420,7 +419,7 @@ const NewProcessInListUI = ({route, navigation, ...props}) => {
   );
 };
 
-export default NewProcessInListUI;
+export default WorkOrderBuyerPoListUI;
 
 const styles = StyleSheet.create({
   container: {
@@ -448,3 +447,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 });
+
+
