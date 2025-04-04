@@ -4,9 +4,10 @@ import * as Constant from '../../utils/constants/constant';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import {useFocusEffect} from '@react-navigation/native';
-import SaveNewProcessInUI from './SaveNewProcessInUI';
+import SaveWorkOrderBuyerPoUI from './SaveWorkOrderBuyerPoUI';
 
-const SaveNewProcessIn = ({navigation, route, ...props}) => {
+
+const SaveWorkOrderBuyerPo = ({navigation, route, ...props}) => {
   const [itemsObj, set_itemsObj] = useState([]);
   const [isLoading, set_isLoading] = useState(false);
   const [isPopUp, set_isPopUp] = useState(false);
@@ -16,14 +17,14 @@ const SaveNewProcessIn = ({navigation, route, ...props}) => {
   const [isPopupLeft, set_isPopupLeft] = useState(false);
   const [fptid, set_fptid] = useState(0);
 
-  // React.useEffect(() => {
-  //   if (route.params) {
-  //     if (route.params?.item) {
-  //       console.log('Route Params ===> ', route.params?.item);
-  //       getInitialData(route.params?.item?.woId);
-  //     }
-  //   }
-  // }, [route.params]);
+  React.useEffect(() => {
+    if (route.params) {
+      if (route.params?.item) {
+        console.log('Route Params ===> ', route.params?.item);
+        // getInitialData(route.params?.item?.woId);
+      }
+    }
+  }, [route.params]);
 
   const backBtnAction = () => {
     navigation.goBack();
@@ -90,7 +91,7 @@ const SaveNewProcessIn = ({navigation, route, ...props}) => {
 
 
   return (
-    <SaveNewProcessInUI
+    <SaveWorkOrderBuyerPoUI
       itemsObj={itemsObj}
       isLoading={isLoading}
       popUpAlert={popUpAlert}
@@ -105,4 +106,5 @@ const SaveNewProcessIn = ({navigation, route, ...props}) => {
   );
 };
 
-export default SaveNewProcessIn;
+export default SaveWorkOrderBuyerPo;
+

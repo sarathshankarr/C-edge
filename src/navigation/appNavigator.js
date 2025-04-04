@@ -126,6 +126,9 @@ import SaveNewProcessIn from '../components/New Process In/SaveNewProcessIn';
 import CreateNewProcessOut from '../components/New Process Out/CreateNewProcessOut';
 import NewProcessOutList from '../components/New Process Out/NewProcessOutList';
 import SaveNewProcessOut from '../components/New Process Out/SaveNewProcessOut';
+import CreateWorkOrderBuyerPo from '../components/Work Order Buyer Po/CreateWorkOrderBuyerPo';
+import WorkOrderBuyerPoList from '../components/Work Order Buyer Po/WorkOrderBuyerPoList';
+import SaveWorkOrderBuyerPo from '../components/Work Order Buyer Po/SaveWorkOrderBuyerPo';
 
 
 const Stack = createNativeStackNavigator();
@@ -246,6 +249,9 @@ const AppStack = () => {
       <Stack.Screen name="CreateWorkOrderStyle" component={CreateWorkOrderStyle} options={{ headerShown: false }} /> 
       <Stack.Screen name="WorkOrderStyleList" component={WorkOrderStyleList} options={{ headerShown: false }} /> 
       <Stack.Screen name="SaveWorkOrderStyle" component={SaveWorkOrderStyle} options={{ headerShown: false }} /> 
+      <Stack.Screen name="CreateWorkOrderBuyerPo" component={CreateWorkOrderBuyerPo} options={{ headerShown: false }} /> 
+      <Stack.Screen name="WorkOrderBuyerPoList" component={WorkOrderBuyerPoList} options={{ headerShown: false }} /> 
+      <Stack.Screen name="SaveWorkOrderBuyerPo" component={SaveWorkOrderBuyerPo} options={{ headerShown: false }} /> 
       <Stack.Screen name="CreateBillGeneration" component={CreateBillGeneration} options={{ headerShown: false }} /> 
       <Stack.Screen name="BillGenerationList" component={BillGenerationList} options={{ headerShown: false }} /> 
       <Stack.Screen name="SaveBillGeneration" component={SaveBillGeneration} options={{ headerShown: false }} /> 
