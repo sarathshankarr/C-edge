@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useContext} from 'react';
+import React, {useState, useEffect, useContext, useMemo} from 'react';
 import {
   View,
   Text,
@@ -24,15 +24,47 @@ import {formatDateIntoDMY} from '../../utils/constants/constant';
 import {RadioButton, TextInput} from 'react-native-paper';
 import {ColorContext} from '../colorTheme/colorTheme';
 import CustomCheckBox from '../../utils/commonComponents/CustomCheckBox';
+import { RadioGroup } from 'react-native-radio-buttons-group';
 let downArrowImg = require('./../../../assets/images/png/dropDownImg.png');
 let closeImg = require('./../../../assets/images/png/close1.png');
 
 const SaveWorkOrderBuyerPoUI = ({route, navigation, ...props}) => {
-  const [po, setPo] = useState('');
   const [rows, setRows] = useState([]);
+  const [styleName, setStyleName] = useState('');
+  const [buyer, setBuyer] = useState('');
+  const [woNo, setWoNo] = useState('');
+  const [buyerPoNo, setBuyerPoNo] = useState('');
+  const [deliveryDate, setDeliveryDate] = useState('');
   const [date, setDate] = useState('');
-  const [itemOrTrims, setItemOrTrims] = useState('');
-  const [shipTo, setShipTo] = useState('');
+  const [quantityAllowance, setQuantityAllowance] = useState('');
+
+  const [trimFabricRadio, set_trimFabricRadio] = useState('Yes');
+
+  // Ship To state variables
+  const [locationList, setLocationList] = useState([]);
+  const [filteredLocation, setFilteredLocation] = useState([]);
+  const [showLocationList, setShowLocationList] = useState(false);
+  const [locationName, setLocationName] = useState('');
+  const [locationId, setLocationId] = useState('');
+
+  const [rowId_ColorList, setRowId_ColorList] = useState('');
+
+  const actionOnLocation = item => {
+    setLocationId(item.id);
+    setLocationName(item.name);
+    setShowLocationList(false);
+  };
+
+  const handleSearchLocation = text => {
+    if (text.trim().length > 0) {
+      const filtered = locationList.filter(item =>
+        item.name.toLowerCase().includes(text.toLowerCase()),
+      );
+      setFilteredLocation(filtered);
+    } else {
+      setFilteredLocation(locationList);
+    }
+  };
 
   const {colors} = useContext(ColorContext);
   const styles = getStyles(colors);
@@ -40,23 +72,6 @@ const SaveWorkOrderBuyerPoUI = ({route, navigation, ...props}) => {
   useEffect(() => {
     if (props.itemsObj) {
       console.log('props for child  ', props.itemsObj[0]?.childDetails);
-      if (props.itemsObj[0]) {
-        if (props.itemsObj[0]?.childDetails) {
-          setRows(props.itemsObj[0]?.childDetails);
-        }
-        if (props.itemsObj[0]?.styleName) {
-          setstyleNo(props.itemsObj[0]?.styleName);
-        }
-        if (props.itemsObj[0]?.partsName) {
-          setParts(props.itemsObj[0]?.partsName);
-        }
-        if (props.itemsObj[0]?.process) {
-          setProcess(props.itemsObj[0]?.process);
-        }
-        if (props.itemsObj[0]?.price) {
-          setPrice(props.itemsObj[0]?.price);
-        }
-      }
     }
   }, [props.itemsObj]);
 
@@ -79,6 +94,33 @@ const SaveWorkOrderBuyerPoUI = ({route, navigation, ...props}) => {
     props.backBtnAction();
   };
 
+  const trimFabricRadioButtons = useMemo(
+    () => [
+      {
+        id: '1',
+        label: 'Yes',
+        value: 'Yes',
+        selected: trimFabricRadio === 'Yes',
+        labelStyle: {color: '#000'},
+      },
+      {
+        id: '2',
+        label: 'No',
+        value: 'No',
+        selected: trimFabricRadio === 'No',
+        labelStyle: {color: '#000'},
+      },
+    ],
+    [trimFabricRadio],
+  );
+
+  const handletrimFabricRadioChange = selectedId => {
+    const selectedOption = trimFabricRadioButtons.find(
+      button => button.id === selectedId,
+    );
+    set_trimFabricRadio(selectedOption.value);
+  };
+
   return (
     <View style={[CommonStyles.mainComponentViewStyle]}>
       <View style={[CommonStyles.headerView]}>
@@ -88,7 +130,7 @@ const SaveWorkOrderBuyerPoUI = ({route, navigation, ...props}) => {
           isChatEnable={false}
           isTImerEnable={false}
           isTitleHeaderEnable={true}
-          title={'Save Work Order Buyer PO'}
+          title={'View Work Order (Style)'}
           backBtnAction={() => backAction()}
         />
       </View>
@@ -107,15 +149,123 @@ const SaveWorkOrderBuyerPoUI = ({route, navigation, ...props}) => {
           }}>
           <View style={{marginTop: hp('2%')}}>
             <TextInput
-              label="Box Name"
-              value={po}
+              label="Style Name"
+              value={styleName}
+              mode="outlined"
+              onChangeText={text => console.log(text)}
+            />
+          </View>
+
+          <View
+            style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: '#fff',
+              marginTop: hp('2%'),
+            }}>
+            <TouchableOpacity
+              style={{
+                flexDirection: 'row',
+                borderWidth: 0.5,
+                borderColor: '#D8D8D8',
+                borderRadius: hp('0.5%'),
+                width: '100%',
+                justifyContent: 'space-between',
+              }}
+              onPress={() => {
+                setShowLocationList(!showLocationList);
+              }}>
+              <View>
+                <View style={[styles.SectionStyle1, {}]}>
+                  <View style={{flexDirection: 'column'}}>
+                    <Text
+                      style={
+                        locationId
+                          ? [styles.dropTextLightStyle]
+                          : [styles.dropTextInputStyle]
+                      }>
+                      {'Location '}
+                    </Text>
+                    {locationId ? (
+                      <Text style={[styles.dropTextInputStyle]}>
+                        {locationName}
+                      </Text>
+                    ) : null}
+                  </View>
+                </View>
+              </View>
+
+              <View style={{justifyContent: 'center'}}>
+                <Image source={downArrowImg} style={styles.imageStyle} />
+              </View>
+            </TouchableOpacity>
+
+            {showLocationList && (
+              <View style={styles.dropdownContent1}>
+                <TextInput
+                  style={styles.searchInput}
+                  placeholder="Search "
+                  onChangeText={handleSearchLocation}
+                  placeholderTextColor="#000"
+                />
+                <ScrollView
+                  style={styles.scrollView}
+                  nestedScrollEnabled={true}>
+                  {filteredLocation.length === 0 ? (
+                    <Text style={styles.noCategoriesText}>
+                      Sorry, no results found!
+                    </Text>
+                  ) : (
+                    filteredLocation.map((item, index) => (
+                      <TouchableOpacity
+                        key={index}
+                        style={styles.dropdownOption}
+                        onPress={() => actionOnLocation(item)}>
+                        <Text style={{color: '#000'}}>{item.name}</Text>
+                      </TouchableOpacity>
+                    ))
+                  )}
+                </ScrollView>
+              </View>
+            )}
+          </View>
+
+          <View style={{marginTop: hp('2%')}}>
+            <TextInput
+              label="Buyer"
+              value={buyer}
               mode="outlined"
               onChangeText={text => console.log(text)}
             />
           </View>
           <View style={{marginTop: hp('2%')}}>
             <TextInput
+              label="WO NO"
+              value={woNo}
+              mode="outlined"
+              onChangeText={text => console.log(text)}
+            />
+          </View>
+
+          <View style={{marginTop: hp('2%')}}>
+            <TextInput
               label=" Buyer PO No"
+              value={buyerPoNo}
+              mode="outlined"
+              onChangeText={text => console.log(text)}
+            />
+          </View>
+          <View style={{marginTop: hp('2%')}}>
+            <TextInput
+              label="Delivery Date"
+              value={deliveryDate}
+              mode="outlined"
+              onChangeText={text => console.log(text)}
+            />
+          </View>
+          <View style={{marginTop: hp('2%')}}>
+            <TextInput
+              label="Date"
               value={date}
               mode="outlined"
               onChangeText={text => console.log(text)}
@@ -123,43 +273,42 @@ const SaveWorkOrderBuyerPoUI = ({route, navigation, ...props}) => {
           </View>
           <View style={{marginTop: hp('2%')}}>
             <TextInput
-              label="Buyer Name"
-              value={itemOrTrims}
+              label="QuantityAllowance "
+              value={quantityAllowance}
               mode="outlined"
               onChangeText={text => console.log(text)}
             />
           </View>
-          <View style={{marginTop: hp('2%')}}>
-            <TextInput
-              label="Packer Name "
-              value={shipTo}
-              mode="outlined"
-              onChangeText={text => console.log(text)}
-            />
-          </View>
+
+          <Text
+            style={{
+              width: '100%',
+              fontWeight: 'bold',
+              color: '#000',
+              marginVertical: 20,
+            }}>
+            Fabric Details
+          </Text>
+
           <View style={styles.wrapper}>
             <ScrollView nestedScrollEnabled={true} horizontal>
               <View style={styles.table}>
                 <View style={styles.table_head}>
                   <View style={{width: 100}}>
-                    <Text style={styles.table_head_captions}>Barcode No</Text>
-                  </View>
-                  <View style={{width: 100}}>
-                    <Text style={styles.table_head_captions}>Order No</Text>
-                  </View>
-                  <View style={{width: 100}}>
-                    <Text style={styles.table_head_captions}>Styles</Text>
-                  </View>
-                  <View style={{width: 100}}>
                     <Text style={styles.table_head_captions}>
-                    Sizes
+                      Approved Fabric Consumption
                     </Text>
                   </View>
                   <View style={{width: 100}}>
-                    <Text style={styles.table_head_captions}>Quantity</Text>
+                    <Text style={styles.table_head_captions}>
+                      Total Consumption
+                    </Text>
                   </View>
-                  
-                 
+                  <View style={{width: 100}}>
+                    <Text style={styles.table_head_captions}>
+                      Total Consumption(With Allowance)
+                    </Text>
+                  </View>
                 </View>
                 {rows.map((row, index) => (
                   <View key={index} style={styles.table_body_single_row}>
@@ -178,13 +327,224 @@ const SaveWorkOrderBuyerPoUI = ({route, navigation, ...props}) => {
                     <View style={{width: 100}}>
                       <Text style={styles.table_data}>{row.lotno}</Text>
                     </View>
-                   
                   </View>
                 ))}
-               
-                
               </View>
             </ScrollView>
+          </View>
+
+          <Text
+            style={{
+              width: '100%',
+              fontWeight: 'bold',
+              color: '#000',
+              marginVertical: 20,
+            }}>
+            Trim Fabric Details
+          </Text>
+
+          <View style={styles.wrapper}>
+            <ScrollView nestedScrollEnabled={true} horizontal>
+              <View style={styles.table}>
+                <View style={styles.table_head}>
+                  <View style={{width: 100}}>
+                    <Text style={styles.table_head_captions}>Consumption</Text>
+                  </View>
+                  <View style={{width: 100}}>
+                    <Text style={styles.table_head_captions}>Required Qty</Text>
+                  </View>
+                  <View style={{width: 100}}>
+                    <Text style={styles.table_head_captions}>Remarks</Text>
+                  </View>
+                </View>
+                {rows.map((row, index) => (
+                  <View key={index} style={styles.table_body_single_row}>
+                    <View style={{width: 100}}>
+                      <Text style={styles.table_data}>{row.enterDate}</Text>
+                    </View>
+                    <View style={{width: 100}}>
+                      <Text style={styles.table_data}>{row.barCode}</Text>
+                    </View>
+                    <View style={{width: 100}}>
+                      <Text style={styles.table_data}>{row.size}</Text>
+                    </View>
+                    <View style={{width: 100}}>
+                      <Text style={styles.table_data}>{row.enterQty}</Text>
+                    </View>
+                    <View style={{width: 100}}>
+                      <Text style={styles.table_data}>{row.lotno}</Text>
+                    </View>
+                  </View>
+                ))}
+              </View>
+            </ScrollView>
+          </View>
+
+          <Text
+            style={{
+              width: '100%',
+              fontWeight: 'bold',
+              color: '#000',
+              marginVertical: 20,
+            }}>
+            Quantity
+          </Text>
+
+          <Text
+            style={{
+              width: '100%',
+              fontWeight: 'bold',
+              color: '#000',
+              marginVertical: 20,
+            }}>
+            Interlining
+          </Text>
+
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginTop: hp('4%'),
+              width: '100%',
+            }}>
+            <Text style={{width: '50%', fontWeight: 'bold', color: '#000'}}>
+              WASH
+            </Text>
+            <RadioGroup
+              style={{flexDirection: 'row'}}
+              radioButtons={trimFabricRadioButtons}
+              onPress={handletrimFabricRadioChange}
+              layout="row"
+              selectedId={
+                trimFabricRadioButtons.find(
+                  item => item.value === trimFabricRadio,
+                )?.id
+              }
+            />
+          </View>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginTop: hp('4%'),
+              width: '100%',
+            }}>
+            <Text style={{width: '50%', fontWeight: 'bold', color: '#000'}}>
+              EMBROIDERY
+            </Text>
+            <RadioGroup
+              style={{flexDirection: 'row'}}
+              radioButtons={trimFabricRadioButtons}
+              onPress={handletrimFabricRadioChange}
+              layout="row"
+              selectedId={
+                trimFabricRadioButtons.find(
+                  item => item.value === trimFabricRadio,
+                )?.id
+              }
+            />
+          </View>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginTop: hp('4%'),
+              width: '100%',
+            }}>
+            <Text style={{width: '50%', fontWeight: 'bold', color: '#000'}}>
+              PRINT
+            </Text>
+            <RadioGroup
+              style={{flexDirection: 'row'}}
+              radioButtons={trimFabricRadioButtons}
+              onPress={handletrimFabricRadioChange}
+              layout="row"
+              selectedId={
+                trimFabricRadioButtons.find(
+                  item => item.value === trimFabricRadio,
+                )?.id
+              }
+            />
+          </View>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginTop: hp('4%'),
+              width: '100%',
+            }}>
+            <Text style={{width: '50%', fontWeight: 'bold', color: '#000'}}>
+              Job Work
+            </Text>
+            <RadioGroup
+              style={{flexDirection: 'row'}}
+              radioButtons={trimFabricRadioButtons}
+              onPress={handletrimFabricRadioChange}
+              layout="row"
+              selectedId={
+                trimFabricRadioButtons.find(
+                  item => item.value === trimFabricRadio,
+                )?.id
+              }
+            />
+          </View>
+
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginTop: hp('4%'),
+              width: '100%',
+            }}>
+            <Text style={{width: '50%', fontWeight: 'bold', color: '#000'}}>
+              Multi WO
+            </Text>
+            <View
+              style={{
+                width: 100,
+                margin: 5,
+                alignItems: 'center',
+                padding: 10,
+                borderRadius: 5,
+                flexDirection: 'row',
+              }}>
+              <CustomCheckBox
+                isChecked={true}
+                onToggle={() => console.log('hi')}
+              />
+            </View>
+          </View>
+
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginTop: hp('4%'),
+              width: '100%',
+            }}>
+            <Text style={{width: '50%', fontWeight: 'bold', color: '#000'}}>
+              Ratio
+            </Text>
+            <View
+              style={{
+                width: 100,
+                margin: 5,
+                alignItems: 'center',
+                padding: 10,
+                borderRadius: 5,
+                flexDirection: 'row',
+              }}>
+              <CustomCheckBox
+                isChecked={true}
+                onToggle={() => console.log('hi')}
+              />
+            </View>
           </View>
         </View>
       </KeyboardAwareScrollView>

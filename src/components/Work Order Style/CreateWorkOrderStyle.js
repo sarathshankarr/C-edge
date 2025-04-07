@@ -9,6 +9,10 @@ import CreateWorkOrderStyleUI from './CreateWorkOrderStyleUI';
 const CreateWorkOrderStyle = ({ route }) => {
   const navigation = useNavigation();
 
+  useEffect(()=>{
+    getData();
+  },[])
+
   const [isLoading, set_isLoading] = useState(false);
   const [isPopUp, set_isPopUp] = useState(false);
   const [popUpMessage, set_popUpMessage] = useState(undefined);
@@ -43,17 +47,13 @@ const CreateWorkOrderStyle = ({ route }) => {
     
     set_isLoading(true);
     let obj = {
+      "menuId": 144,
       "username": userName,
       "password": userPsd,
-      "menuId": 787,
       "compIds": usercompanyId,
-      "company":JSON.parse(companyObj),
-      "assemblyProcess":0,
-      "barCode":tempObj.barCode,
-      "empBarcode":tempObj.empBarcode,
-      "processId":tempObj.processId,
+      "company":JSON.parse(companyObj), 
     }
-    let LISTAPIOBJ = await APIServiceCall.getPartsProcessingCreateList(obj);
+    let LISTAPIOBJ = await APIServiceCall.getWorkOrderStyleCreate(obj);
     set_isLoading(false);
 
     if (LISTAPIOBJ && LISTAPIOBJ.statusData) {
