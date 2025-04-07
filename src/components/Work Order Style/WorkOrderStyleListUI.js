@@ -26,10 +26,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {ColorContext} from '../colorTheme/colorTheme';
 import AddNewItem from '../../utils/commonComponents/AddNewItem';
 let searchImg = require('./../../../assets/images/png/searchIcon.png');
-let addImg = require('./../../../assets/images/png/addition.png');
-let addImg1 = require('./../../../assets/images/png/add.png');
-let filterImg = require('./../../../assets/images/png/setting.png');
-let filterImg1 = require('./../../../assets/images/png/filter.png');
 
 
 const WorkOrderStyleListUI = ({route, navigation, ...props}) => {
@@ -67,7 +63,6 @@ const WorkOrderStyleListUI = ({route, navigation, ...props}) => {
       set_ItemsArray(props.itemsArray);
     }
     // getRequestBody();
-
   }, [props?.itemsArray]);
 
   const getRequestBody = async () => {
@@ -114,13 +109,13 @@ const WorkOrderStyleListUI = ({route, navigation, ...props}) => {
 
     const styleArray = ItemsArray.filter(item => {
       return (
-        (item?.producttype !== '' &&
-          item?.producttype?.toLowerCase().includes(searchTerm)) ||
         (item?.styleCode !== '' &&
           item?.styleCode?.toLowerCase().includes(searchTerm)) ||
-        (item?.processName !== '' &&
-          item?.processName?.toLowerCase().includes(searchTerm)) 
-      )
+        (item?.fabricName !== '' &&
+          item?.fabricName?.toLowerCase().includes(searchTerm)) ||
+        (item?.woIdWithSymbol !== '' &&
+          item?.woIdWithSymbol?.toLowerCase().includes(searchTerm))
+      );
     });
 
     set_filterArray(styleArray || []);
@@ -140,6 +135,9 @@ const WorkOrderStyleListUI = ({route, navigation, ...props}) => {
   const clearFilter = () => {
     onRefresh();
   };
+  const handlePdf = () => {
+    console.log("handlePdf");
+  };
 
   const onRefresh = () => {
     set_refreshing(true);
@@ -152,36 +150,34 @@ const WorkOrderStyleListUI = ({route, navigation, ...props}) => {
     setIsFiltering(false);
   };
 
-
   const renderItem = ({item, index}) => {
     return (
       <TouchableOpacity
         onPress={() => actionOnRow(item, index)}
         style={[CommonStyles.cellBackViewStyle, {marginBottom: 3}]}>
         <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-          <View
-            style={{flex: 1, justifyContent: 'center'}}>
+          <View style={{flex: 1, justifyContent: 'center'}}>
+            <Text style={[CommonStyles.tylesTextStyle, {textAlign: 'center'}]}>
+              {item.woIdWithSymbol}
+            </Text>
+          </View>
+          <View style={{flex: 0.7, justifyContent: 'center'}}>
+            <Text style={[CommonStyles.tylesTextStyle, {textAlign: 'center'}]}>
+              {item.wostyleId}
+            </Text>
+          </View>
+          <View style={{flex: 0.5, justifyContent: 'center'}}>
             <Text style={[CommonStyles.tylesTextStyle, {textAlign: 'center'}]}>
               {item.styleCode}
             </Text>
           </View>
-          <View
-            style={{flex: 0.7, justifyContent: 'center'}}>
-            <Text style={[CommonStyles.tylesTextStyle, {textAlign: 'center'}]}>
-              {item.processName}
-            </Text>
-          </View>
-          <View
-            style={{flex: 0.5, justifyContent: 'center'}}>
-            <Text style={[CommonStyles.tylesTextStyle, {textAlign: 'center'}]}>
-              {item.producttype}
-            </Text>
-          </View>
-          <View
-            style={{flex: 0.7, justifyContent: 'center'}}>
-            <Text style={[CommonStyles.tylesTextStyle, {textAlign: 'center'}]}>
-              {item.totalQty}
-            </Text>
+          <View style={{flex: 0.7, alignItems: 'center', justifyContent: 'center'}}>
+            <TouchableOpacity onPress={() => handlePdf(item)}>
+              <Image
+                source={require('./../../../assets/images/png/pdf2.png')}
+                style={{height: 25, width: 20}}
+              />
+            </TouchableOpacity>
           </View>
         </View>
       </TouchableOpacity>
@@ -311,34 +307,33 @@ const WorkOrderStyleListUI = ({route, navigation, ...props}) => {
 
         {filterArray && filterArray.length > 0 ? (
           <View style={CommonStyles.listCommonHeader}>
-           
             <Text
               style={[
                 CommonStyles.tylesHeaderTextStyle,
                 {flex: 1, textAlign: 'center'},
               ]}>
-              {'Style No (Color)'}
+              {'WO ID'}
             </Text>
             <Text
               style={[
                 CommonStyles.tylesHeaderTextStyle,
                 {flex: 0.7, textAlign: 'center'},
               ]}>
-              {'Process'}
+              {'Style ID'}
             </Text>
             <Text
               style={[
                 CommonStyles.tylesHeaderTextStyle,
                 {flex: 0.5, textAlign: 'center'},
               ]}>
-              {'Part'}
+              {'Style No'}
             </Text>
             <Text
               style={[
                 CommonStyles.tylesHeaderTextStyle,
                 {flex: 0.7, textAlign: 'center'},
               ]}>
-              {'Total Scanned Barcodes'}
+              {'Barcode PDF'}
             </Text>
           </View>
         ) : (
@@ -447,7 +442,3 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 });
-
-
-
-

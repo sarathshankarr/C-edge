@@ -391,7 +391,7 @@ const WorkOrderBuyerPoListUI = ({route, navigation, ...props}) => {
         reqBody={filterReqBody}
       />
 
-      <AddNewItem navItem={'CreateWorkOrderBuyerPo'} />
+      <AddNewItem navItem={'SaveWorkOrderBuyerPo'} />
 
       {props.isPopUp ? (
         <View style={CommonStyles.customPopUpStyle}>

@@ -25,6 +25,7 @@ import BottomComponent from '../../../utils/commonComponents/bottomComponent';
 import {ColorContext} from '../../colorTheme/colorTheme';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import {RadioGroup} from 'react-native-radio-buttons-group';
+import CustomCheckBox from '../../../utils/commonComponents/CustomCheckBox';
 
 let downArrowImg = require('./../../../../assets/images/png/dropDownImg.png');
 let closeImg = require('./../../../../assets/images/png/close1.png');
@@ -38,23 +39,20 @@ const CuttingReportUI = ({route, ...props}) => {
   const [showStylesList, set_showStylesList] = useState(false);
   const [stylesName, set_stylesName] = useState('');
   const [stylesId, set_stylesId] = useState('');
+  const [selectedIndices, setSelectedIndices] = useState([]);
 
-  //   useEffect(() => {
-  //     if (props?.lists) {
-  //       if (props.lists.getStockStyles) {
-  //         set_filteredStockStyles(props.lists.getStockStyles);
-  //       }
-  //       if (props.lists.getStockFabrics) {
-  //         set_filteredStockFabrics(props.lists.getStockFabrics);
-  //       }
-  //     }
-  //   }, [props]);
-
-  //   useEffect(() => {
-  //     if (props?.lists) {
-  //       setData(props?.lists);
-  //     }
-  //   }, [props?.lists]);
+  useEffect(() => {
+    if (props?.itemsObj) {
+      if (props.itemsObj.styleMap) {
+        const stylespList = Object.keys(props.itemsObj.styleMap).map(key => ({
+          id: key,
+          name: props.itemsObj.styleMap[key],
+        }));
+        setStylesList(stylespList);
+        set_filteredStyles(stylespList);
+      }
+    }
+  }, [props?.itemsObj]);
 
   const backBtnAction = () => {
     props.backBtnAction();
@@ -100,22 +98,35 @@ const CuttingReportUI = ({route, ...props}) => {
     console.log('Rejected');
   };
 
-  const actionOnStyles = (id, name) => {
-    set_stylesId(id);
-    set_stylesName(name);
-    set_showStylesList(false);
+  const actionOnStyles = (item) => {
+    set_stylesId(item.id);
+    set_stylesName(item.name);
+    // set_showStylesList(false);
   };
 
   const handleSearchStyles = text => {
     if (text.trim().length > 0) {
-      const filtered = props.lists.getStockStyles.filter(style =>
+      const filtered = stylesList.filter(style =>
         style.name.toLowerCase().includes(text.toLowerCase()),
       );
       set_filteredStyles(filtered);
     } else {
-      set_filteredStyles(props.lists.getStockStyles);
+      set_filteredStyles(stylesList);
     }
   };
+
+  const actionOnColor = id => {
+    setSelectedIndices(prevSelected => {
+      const exists = prevSelected.some(i => i === id);
+
+      if (exists) {
+        return prevSelected.filter(i => i !== id);
+      } else {
+        return [...prevSelected, id];
+      }
+    });
+  };
+
   return (
     <View style={[CommonStyles.mainComponentViewStyle]}>
       <View style={[CommonStyles.headerView]}>
@@ -158,7 +169,7 @@ const CuttingReportUI = ({route, ...props}) => {
                 borderColor: '#D8D8D8',
                 borderRadius: hp('0.5%'),
                 width: '100%',
-                justifyContent:"space-between"
+                justifyContent: 'space-between',
               }}
               onPress={() => {
                 set_showStylesList(!showStylesList);
@@ -176,7 +187,16 @@ const CuttingReportUI = ({route, ...props}) => {
                     </Text>
                     {stylesId ? (
                       <Text style={[styles.dropTextInputStyle]}>
-                        {stylesName}
+                        {selectedIndices.length > 0 ? (
+                          <Text style={[styles.dropTextInputStyle]}>
+                            {stylesList
+                              .filter(color =>
+                                selectedIndices.includes(color.id),
+                              )
+                              .map(color => color.name)
+                              .join(', ')}
+                          </Text>
+                        ) : null}
                       </Text>
                     ) : null}
                   </View>
@@ -207,8 +227,12 @@ const CuttingReportUI = ({route, ...props}) => {
                     filteredStyles.map((item, index) => (
                       <TouchableOpacity
                         key={index}
-                        style={styles.dropdownOption}
+                        style={styles.itemContainer}
                         onPress={() => actionOnStyles(item)}>
+                        <CustomCheckBox
+                          isChecked={selectedIndices.includes(item.id)}
+                          onToggle={() => actionOnColor(item.id)}
+                        />
                         <Text style={{color: '#000'}}>{item.name}</Text>
                       </TouchableOpacity>
                     ))
@@ -218,7 +242,7 @@ const CuttingReportUI = ({route, ...props}) => {
             )}
           </View>
 
-         <View style={{marginBottom: 150}} /> 
+          <View style={{marginBottom: 150}} />
         </View>
       </KeyboardAwareScrollView>
 
@@ -453,5 +477,13 @@ const getStyles = colors =>
       fontWeight: 'bold',
       color: '#000',
       marginVertical: 8,
+    },
+    itemContainer: {
+      borderBottomColor: '#e0e0e0',
+      flexDirection: 'row',
+      paddingHorizontal: 10,
+      paddingVertical: 12,
+      borderBottomWidth: 1,
+      borderBottomColor: '#ccc',
     },
   });
