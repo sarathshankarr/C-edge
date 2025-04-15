@@ -20,8 +20,8 @@ const SaveWorkOrderStyle = ({navigation, route, ...props}) => {
   React.useEffect(() => {
     if (route.params) {
       if (route.params?.item) {
-        console.log('Route Params ===> ', route.params?.item);
-        // getInitialData(route.params?.item?.woId);
+        console.log('Route Params ===> ',route.params?.item.wostyleId,  route.params?.item.woId, route.params?.item.soNumber);
+        getInitialData(route.params?.item.wostyleId,  route.params?.item.woId, route.params?.item.soNumber);
       }
     }
   }, [route.params]);
@@ -30,23 +30,24 @@ const SaveWorkOrderStyle = ({navigation, route, ...props}) => {
     navigation.goBack();
   };
 
-  const getInitialData = async id => {
+  const getInitialData = async (styleId, woId,soId) => {
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
     let companyObj = await AsyncStorage.getItem('companyObj');
     set_isLoading(true);
     let obj = {
-      username: userName,
-      password: userPsd,
+      menuId: 144, 
       compIds: usercompanyId,
       company: JSON.parse(companyObj),
-      menuId: 787,
-      isAssmeblyIn: 0,
-      primaryId: id,
+      username: userName,
+      password: userPsd,
+      styleId: styleId,
+      woId: woId,
+      soId: soId,
     };
     let EditFabricProcessInObj =
-      await APIServiceCall.getEditDetailsPartsProcessing(obj);
+      await APIServiceCall.getEditDetailsWorkOrderStyle(obj);
     set_isLoading(false);
 
     if (EditFabricProcessInObj && EditFabricProcessInObj.statusData) {

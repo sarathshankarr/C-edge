@@ -386,7 +386,7 @@ const WorkOrderStyleListUI = ({route, navigation, ...props}) => {
         reqBody={filterReqBody}
       />
 
-      <AddNewItem navItem={'CreateWorkOrderStyle'} />
+      {/* <AddNewItem navItem={'CreateWorkOrderStyle'} /> */}
 
       {props.isPopUp ? (
         <View style={CommonStyles.customPopUpStyle}>

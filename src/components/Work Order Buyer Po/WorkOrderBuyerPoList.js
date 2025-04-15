@@ -26,15 +26,15 @@ const WorkOrderBuyerPoList = ({ route }) => {
 
 
     
-  // React.useEffect(() => {
-  //   getInitialData(0, true);
-  // }, []);
+  React.useEffect(() => {
+    getInitialData(0, true);
+  }, []);
 
-  // useFocusEffect(
-  //   React.useCallback(() => {
-  //     getInitialData(0, true);
-  //   }, [])
-  // );
+  useFocusEffect(
+    React.useCallback(() => {
+      getInitialData(0, true);
+    }, [])
+  );
   
   const backBtnAction = () => {
     navigation.goBack();
@@ -79,21 +79,23 @@ const WorkOrderBuyerPoList = ({ route }) => {
     try{
      
       let obj = {  
-        "username": userName,
-        "password" : userPsd,
-        "menuId": 787,
-        "fromRecord": fromRecord,
-        "toRecord": toRecord,
-        "searchValue": "",
-        "searchDropdown": "-1",
-        "compIds": usercompanyId,
-        "company":JSON.parse(companyObj),
-        "days1":"0",
-        "locIds":"0",
-        "brandIds":"0",
-        "isAssmeblyIn":0,
+    "menuId":144, 
+    "searchKeyValue": "",
+    "styleSearchDropdown": "-1", 
+    "dataFilter": "0", 
+    "locIds": 0,
+    "brandIds": 0,
+    "compIds": usercompanyId,
+    "company":JSON.parse(companyObj),
+    "fromRecord": 0,
+    "toRecord": 25,
+    "username": userName,
+    "password" : userPsd,  
+    "vendorLogin":"Admin",
+    "vendorId":0,
+    "dateFilter":"olderDays",
     }
-      let LISTAPIOBJ = await APIServiceCall.LoadAllPartsProcessingList(obj);
+      let LISTAPIOBJ = await APIServiceCall.LoadAllWorkOrderBuyerPoList(obj);
       set_isLoading(false);
       
       if(LISTAPIOBJ && LISTAPIOBJ.statusData){
@@ -180,7 +182,7 @@ const WorkOrderBuyerPoList = ({ route }) => {
   };
 
   const actionOnRow = (item,index) => {
-    navigation.navigate('SavePurchaseOrderDraft', {item:item});
+    navigation.navigate('SaveWorkOrderBuyerPo', {item:item});
   };
 
   const handleNavigation = () => {
