@@ -65,6 +65,7 @@ const WorkOrderBuyerPoListUI = ({route, navigation, ...props}) => {
     if (props.itemsArray) {
       set_filterArray(props.itemsArray);
       set_ItemsArray(props.itemsArray);
+      // console.log("to set ===> ", props.itemsArray)
     }
     // getRequestBody();
 
@@ -168,19 +169,19 @@ const WorkOrderBuyerPoListUI = ({route, navigation, ...props}) => {
           <View
             style={{flex: 0.7, justifyContent: 'center'}}>
             <Text style={[CommonStyles.tylesTextStyle, {textAlign: 'center'}]}>
-              {item.processName}
+              {item.soIdStr}
             </Text>
           </View>
           <View
             style={{flex: 0.5, justifyContent: 'center'}}>
             <Text style={[CommonStyles.tylesTextStyle, {textAlign: 'center'}]}>
-              {item.producttype}
+              {item.totalBuyerpoQty}
             </Text>
           </View>
           <View
             style={{flex: 0.7, justifyContent: 'center'}}>
             <Text style={[CommonStyles.tylesTextStyle, {textAlign: 'center'}]}>
-              {item.totalQty}
+              {item.totalWOQty}
             </Text>
           </View>
         </View>
@@ -324,21 +325,21 @@ const WorkOrderBuyerPoListUI = ({route, navigation, ...props}) => {
                 CommonStyles.tylesHeaderTextStyle,
                 {flex: 0.7, textAlign: 'center'},
               ]}>
-              {'Process'}
+              {'Buyer PO NO'}
             </Text>
             <Text
               style={[
                 CommonStyles.tylesHeaderTextStyle,
                 {flex: 0.5, textAlign: 'center'},
               ]}>
-              {'Part'}
+              {'Total Qty'}
             </Text>
             <Text
               style={[
                 CommonStyles.tylesHeaderTextStyle,
                 {flex: 0.7, textAlign: 'center'},
               ]}>
-              {'Total Scanned Barcodes'}
+              {'WO Qty'}
             </Text>
           </View>
         ) : (
@@ -391,7 +392,7 @@ const WorkOrderBuyerPoListUI = ({route, navigation, ...props}) => {
         reqBody={filterReqBody}
       />
 
-      <AddNewItem navItem={'SaveWorkOrderBuyerPo'} />
+      {/* <AddNewItem navItem={'SaveWorkOrderBuyerPo'} /> */}
 
       {props.isPopUp ? (
         <View style={CommonStyles.customPopUpStyle}>

@@ -3,9 +3,7 @@ import * as APIServiceCall from '../../utils/apiCalls/apiCallsComponent';
 import * as Constant from '../../utils/constants/constant';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import {useFocusEffect} from '@react-navigation/native';
 import SaveWorkOrderBuyerPoUI from './SaveWorkOrderBuyerPoUI';
-
 
 const SaveWorkOrderBuyerPo = ({navigation, route, ...props}) => {
   const [itemsObj, set_itemsObj] = useState([]);
@@ -15,13 +13,13 @@ const SaveWorkOrderBuyerPo = ({navigation, route, ...props}) => {
   const [popUpAlert, set_popUpAlert] = useState(undefined);
   const [popUpRBtnTitle, set_popUpRBtnTitle] = useState(undefined);
   const [isPopupLeft, set_isPopupLeft] = useState(false);
-  const [fptid, set_fptid] = useState(0);
 
   React.useEffect(() => {
     if (route.params) {
       if (route.params?.item) {
-        console.log('Route Params ===> ', route.params?.item);
-        // getInitialData(route.params?.item?.woId);
+        console.log('Route ===> ', route.params?.item);
+        console.log('Route Params ===> ', route.params?.item?.woId);
+        getInitialData(route.params?.item?.woId );
       }
     }
   }, [route.params]);
@@ -30,23 +28,22 @@ const SaveWorkOrderBuyerPo = ({navigation, route, ...props}) => {
     navigation.goBack();
   };
 
-  const getInitialData = async id => {
+  const getInitialData = async (ID) => {
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
     let companyObj = await AsyncStorage.getItem('companyObj');
     set_isLoading(true);
     let obj = {
+      menuId: 167, 
       username: userName,
       password: userPsd,
+      styleId: ID,
       compIds: usercompanyId,
       company: JSON.parse(companyObj),
-      menuId: 787,
-      isAssmeblyIn: 0,
-      primaryId: id,
     };
-    let EditFabricProcessInObj =
-      await APIServiceCall.getEditDetailsPartsProcessing(obj);
+    // console.log("req body =====> ", obj)
+    let EditFabricProcessInObj = await APIServiceCall.getEditDetailsWorkOrderBuyerPo1(obj);
     set_isLoading(false);
 
     if (EditFabricProcessInObj && EditFabricProcessInObj.statusData) {
@@ -72,9 +69,7 @@ const SaveWorkOrderBuyerPo = ({navigation, route, ...props}) => {
     }
   };
 
-  const actionOnRow = (item, index) => {
-    navigation.navigate('FabricMainComponent', {styleId: item.styleId});
-  };
+
 
   const popUpAction = (popMsg, popAlert, rBtnTitle, isPopup, isPopLeft) => {
     set_popUpMessage(popMsg);
@@ -88,8 +83,6 @@ const SaveWorkOrderBuyerPo = ({navigation, route, ...props}) => {
     popUpAction(undefined, undefined, '', false, false);
   };
 
-
-
   return (
     <SaveWorkOrderBuyerPoUI
       itemsObj={itemsObj}
@@ -100,11 +93,9 @@ const SaveWorkOrderBuyerPo = ({navigation, route, ...props}) => {
       isPopupLeft={isPopupLeft}
       isPopUp={isPopUp}
       backBtnAction={backBtnAction}
-      actionOnRow={actionOnRow}
       popOkBtnAction={popOkBtnAction}
     />
   );
 };
 
 export default SaveWorkOrderBuyerPo;
-

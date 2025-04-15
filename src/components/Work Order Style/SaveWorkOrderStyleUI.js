@@ -19,9 +19,7 @@ import LoaderComponent from '../../utils/commonComponents/loaderComponent';
 import AlertComponent from '../../utils/commonComponents/alertComponent';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import BottomComponent from '../../utils/commonComponents/bottomComponent';
-import DateTimePickerModal from 'react-native-modal-datetime-picker';
-import {formatDateIntoDMY} from '../../utils/constants/constant';
-import {RadioButton, TextInput} from 'react-native-paper';
+import {TextInput} from 'react-native-paper';
 import {ColorContext} from '../colorTheme/colorTheme';
 import CustomCheckBox from '../../utils/commonComponents/CustomCheckBox';
 import {RadioGroup} from 'react-native-radio-buttons-group';
@@ -29,7 +27,9 @@ let downArrowImg = require('./../../../assets/images/png/dropDownImg.png');
 let closeImg = require('./../../../assets/images/png/close1.png');
 
 const SaveWorkOrderStyleUI = ({route, navigation, ...props}) => {
-  const [rows, setRows] = useState([]);
+  const [fabricRows, setFabricRows] = useState([]);
+  const [trimFabricRows, setTrimFabricRows] = useState([]);
+  const [quantityRows, setQuantityRows] = useState([]);
   const [styleName, setStyleName] = useState('');
   const [buyer, setBuyer] = useState('');
   const [woNo, setWoNo] = useState('');
@@ -37,6 +37,17 @@ const SaveWorkOrderStyleUI = ({route, navigation, ...props}) => {
   const [deliveryDate, setDeliveryDate] = useState('');
   const [date, setDate] = useState('');
   const [quantityAllowance, setQuantityAllowance] = useState('');
+  const [wash, setWash] = useState('');
+  const [embroidery, setEmbroidery] = useState('');
+  const [print, setPrint] = useState('');
+  const [jobWork, setJobWork] = useState('');
+  const [multiWo, setMultiWo] = useState('');
+  const [ratio, setRatio] = useState('');
+
+ 
+
+  const [checkboxData, setCheckboxData] = useState([]);
+
 
   const [trimFabricRadio, set_trimFabricRadio] = useState('Yes');
 
@@ -71,7 +82,101 @@ const SaveWorkOrderStyleUI = ({route, navigation, ...props}) => {
 
   useEffect(() => {
     if (props.itemsObj) {
-      console.log('props for child  ', props.itemsObj[0]?.childDetails);
+      console.log('props for child  ', props.itemsObj);
+      if (props.itemsObj.comboStyles) {
+        setStyleName(props.itemsObj.comboStyles);
+      }
+      if (props.itemsObj.brandNameStr) {
+        setBuyer(props.itemsObj.brandNameStr);
+      }
+      if (props.itemsObj.locationId) {
+        setLocationId(props.itemsObj.locationId);
+      }
+      if (props.itemsObj.locationname) {
+        setLocationName(props.itemsObj.locationname);
+      }
+      // if (props.itemsObj.locId) {
+      //   const id = props.itemsObj.locId;
+      //   if (props.itemsObj.locationsMap1) {
+      //     setLocationName(props.itemsObj.locationsMap1[id]);
+      //   }
+      //   setLocationId(props.itemsObj.locId);
+      // }
+      if (props.itemsObj.woNoStr) {
+        setWoNo(props.itemsObj.woNoStr);
+      }
+      if (props.itemsObj.wdeliveryDateStr) {
+        setDeliveryDate(props.itemsObj.wdeliveryDateStr);
+      }
+      if (props.itemsObj.creationDate) {
+        setDate(props.itemsObj.creationDate);
+      }
+      if (props.itemsObj.sizesGSCodesList) {
+        setQuantityRows(props.itemsObj.sizesGSCodesList);
+      }
+      if (props.itemsObj.qtyAllowance) {
+        setQuantityAllowance(props.itemsObj.qtyAllowance.toString());
+      }
+      if (props.itemsObj.trimRequestSectionList) {
+        setTrimFabricRows(props.itemsObj.trimRequestSectionList);
+      }
+     
+
+      const newCheckboxData = [
+        // Row 1
+        [
+          { label: 'Non Woven', isChecked: props.itemsObj.wovenStatus===1},
+          { label: 'Charcoal', isChecked: props.itemsObj.charcoalStatus===1 },
+          { label: 'Roll Form', isChecked: props.itemsObj.rollStatus ===1},
+          { label: 'Fusable', isChecked: props.itemsObj.fusableStatus ===1},
+        ],
+        // Row 2
+        [
+          { label: 'Woven', isChecked: props.itemsObj.wovenStatus ===2},
+          { label: 'White', isChecked: props.itemsObj.charcoalStatus===2 },
+          { label: 'Cut Form', isChecked: props.itemsObj.rollStatus===2 },
+          { label: 'Non Fusable', isChecked: props.itemsObj.fusableStatus ===2},
+        ]
+      ];
+      setCheckboxData(newCheckboxData);
+
+      if (props.itemsObj.washStatus) {
+        setWash(props.itemsObj.washStatus === 'N' ? 'No' : 'Yes');
+        console.log("wash ===> ", props.itemsObj.washStatus)
+      }
+      // if (props.itemsObj.isjobworkSelected) {
+      setJobWork(props.itemsObj.isJobworkSelected === 0 ? 'No' : 'Yes');
+
+      // }
+      if (props.itemsObj.printStatus) {
+        setPrint(props.itemsObj.printStatus === 'N' ? 'No' : 'Yes');
+      }
+      if (props.itemsObj.embStatus) {
+        setEmbroidery(props.itemsObj.embStatus === 'N' ? 'No' : 'Yes');
+      }
+
+      setRatio(props.itemsObj.ratiocheckbox === 1 ? true : false);
+      setMultiWo(props.itemsObj.multiwo === 1 ? true : false);
+
+      console.log("multiwo ===> ", props.itemsObj.multiwo)
+
+
+      if (
+        props.itemsObj.approvedFabCon ||
+        props.itemsObj.fabricColorStr ||
+        props.itemsObj.fabricTotAllow ||
+        props.itemsObj.fabricname1 ||
+        props.itemsObj.fabricTotCon
+      ) {
+        const obj = {
+          fabricName: props.itemsObj.fabricname1 || '',
+          color: props.itemsObj.fabricColorStr,
+          approvedFabCon: props.itemsObj.fabricConsumptionStr,
+          fabricTotCon: props.itemsObj.fabricTotCon,
+          fabricTotAllow: props.itemsObj.fabricTotAllow,
+        };
+        setFabricRows([obj]);
+      }
     }
   }, [props.itemsObj]);
 
@@ -93,6 +198,13 @@ const SaveWorkOrderStyleUI = ({route, navigation, ...props}) => {
   const backAction = async () => {
     props.backBtnAction();
   };
+
+  const toggleCheckbox = (rowIndex, colIndex) => {
+    const updatedData = [...checkboxData];
+    updatedData[rowIndex][colIndex].isChecked = !updatedData[rowIndex][colIndex].isChecked;
+    setCheckboxData(updatedData);
+  };
+  
 
   const trimFabricRadioButtons = useMemo(
     () => [
@@ -120,6 +232,11 @@ const SaveWorkOrderStyleUI = ({route, navigation, ...props}) => {
     );
     set_trimFabricRadio(selectedOption.value);
   };
+
+  const totalValue = quantityRows.reduce(
+    (acc, val) => acc + val.gs_code_quantity,
+    0,
+  );
 
   return (
     <View style={[CommonStyles.mainComponentViewStyle]}>
@@ -200,7 +317,7 @@ const SaveWorkOrderStyleUI = ({route, navigation, ...props}) => {
               </View>
             </TouchableOpacity>
 
-            {showLocationList && (
+            {false && (
               <View style={styles.dropdownContent1}>
                 <TextInput
                   style={styles.searchInput}
@@ -247,14 +364,14 @@ const SaveWorkOrderStyleUI = ({route, navigation, ...props}) => {
             />
           </View>
 
-          <View style={{marginTop: hp('2%')}}>
+          {/* <View style={{marginTop: hp('2%')}}>
             <TextInput
               label=" Buyer PO No"
               value={buyerPoNo}
               mode="outlined"
               onChangeText={text => console.log(text)}
             />
-          </View>
+          </View> */}
           <View style={{marginTop: hp('2%')}}>
             <TextInput
               label="Delivery Date"
@@ -295,6 +412,9 @@ const SaveWorkOrderStyleUI = ({route, navigation, ...props}) => {
               <View style={styles.table}>
                 <View style={styles.table_head}>
                   <View style={{width: 100}}>
+                    <Text style={styles.table_head_captions}>Color</Text>
+                  </View>
+                  <View style={{width: 100}}>
                     <Text style={styles.table_head_captions}>
                       Approved Fabric Consumption
                     </Text>
@@ -309,23 +429,30 @@ const SaveWorkOrderStyleUI = ({route, navigation, ...props}) => {
                       Total Consumption(With Allowance)
                     </Text>
                   </View>
+                  <View style={{width: 100}}>
+                    <Text style={styles.table_head_captions}>Fabric Name</Text>
+                  </View>
                 </View>
-                {rows.map((row, index) => (
+                {fabricRows.map((row, index) => (
                   <View key={index} style={styles.table_body_single_row}>
                     <View style={{width: 100}}>
-                      <Text style={styles.table_data}>{row.enterDate}</Text>
+                      <Text style={styles.table_data}>{row.color}</Text>
                     </View>
                     <View style={{width: 100}}>
-                      <Text style={styles.table_data}>{row.barCode}</Text>
+                      <Text style={styles.table_data}>
+                        {row.approvedFabCon}
+                      </Text>
                     </View>
                     <View style={{width: 100}}>
-                      <Text style={styles.table_data}>{row.size}</Text>
+                      <Text style={styles.table_data}>{row.fabricTotCon}</Text>
                     </View>
                     <View style={{width: 100}}>
-                      <Text style={styles.table_data}>{row.enterQty}</Text>
+                      <Text style={styles.table_data}>
+                        {row.approvedFabCon}
+                      </Text>
                     </View>
                     <View style={{width: 100}}>
-                      <Text style={styles.table_data}>{row.lotno}</Text>
+                      <Text style={styles.table_data}>{row.fabricName}</Text>
                     </View>
                   </View>
                 ))}
@@ -342,37 +469,36 @@ const SaveWorkOrderStyleUI = ({route, navigation, ...props}) => {
             }}>
             Trim Fabric Details
           </Text>
-
           <View style={styles.wrapper}>
             <ScrollView nestedScrollEnabled={true} horizontal>
               <View style={styles.table}>
                 <View style={styles.table_head}>
                   <View style={{width: 100}}>
-                    <Text style={styles.table_head_captions}>Consumption</Text>
+                    <Text style={styles.table_head_captions}>Raw Material</Text>
                   </View>
                   <View style={{width: 100}}>
-                    <Text style={styles.table_head_captions}>Required Qty</Text>
+                    <Text style={styles.table_head_captions}>Consumption</Text>
                   </View>
                   <View style={{width: 100}}>
                     <Text style={styles.table_head_captions}>Remarks</Text>
                   </View>
+                  <View style={{width: 100}}>
+                    <Text style={styles.table_head_captions}>Required Qty</Text>
+                  </View>
                 </View>
-                {rows.map((row, index) => (
+                {trimFabricRows.map((row, index) => (
                   <View key={index} style={styles.table_body_single_row}>
                     <View style={{width: 100}}>
-                      <Text style={styles.table_data}>{row.enterDate}</Text>
+                      <Text style={styles.table_data}>{row.color}</Text>
                     </View>
                     <View style={{width: 100}}>
-                      <Text style={styles.table_data}>{row.barCode}</Text>
+                      <Text style={styles.table_data}>{row.consumption}</Text>
                     </View>
                     <View style={{width: 100}}>
-                      <Text style={styles.table_data}>{row.size}</Text>
+                      <Text style={styles.table_data}>{row.remarks}</Text>
                     </View>
                     <View style={{width: 100}}>
-                      <Text style={styles.table_data}>{row.enterQty}</Text>
-                    </View>
-                    <View style={{width: 100}}>
-                      <Text style={styles.table_data}>{row.lotno}</Text>
+                      <Text style={styles.table_data}>{row.trimFabricStr}</Text>
                     </View>
                   </View>
                 ))}
@@ -390,6 +516,41 @@ const SaveWorkOrderStyleUI = ({route, navigation, ...props}) => {
             Quantity
           </Text>
 
+          <View style={styles.wrapper}>
+            <ScrollView nestedScrollEnabled={true} horizontal>
+              <View style={styles.table}>
+                <View style={styles.table_head}>
+                  <View style={{width: 150}}>
+                    <Text style={styles.table_head_captions}>Qty</Text>
+                  </View>
+                  <View style={{width: 200}}>
+                    <Text style={styles.table_head_captions}>Size</Text>
+                  </View>
+                </View>
+                {quantityRows.map((row, index) => (
+                  <View key={index} style={styles.table_body_single_row}>
+                    <View style={{width: 150}}>
+                      <Text style={styles.table_data}>{row.sizeCode}</Text>
+                    </View>
+                    <View style={{width: 200}}>
+                      <Text style={styles.table_data}>
+                        {row.gs_code_quantity}
+                      </Text>
+                    </View>
+                  </View>
+                ))}
+                <View style={styles.table_body_single_row}>
+                  <View style={{width: 150}}>
+                    <Text style={styles.table_data}>Total Quantity</Text>
+                  </View>
+                  <View style={{width: 200}}>
+                    <Text style={styles.table_data}>{totalValue}</Text>
+                  </View>
+                </View>
+              </View>
+            </ScrollView>
+          </View>
+
           <Text
             style={{
               width: '100%',
@@ -399,6 +560,31 @@ const SaveWorkOrderStyleUI = ({route, navigation, ...props}) => {
             }}>
             Interlining
           </Text>
+
+          <View style={styles.wrapper}>
+            <ScrollView nestedScrollEnabled={true} horizontal>
+              <View style={styles.table}>
+                {checkboxData.map((row, rowIndex) => (
+                  <View key={rowIndex} style={styles.table_body_single_row}>
+                    {row.map((item, colIndex) => (
+                      <View key={colIndex} style={{width: 150}}>
+                        <TouchableOpacity
+                          style={styles.itemContainer}
+                          // onPress={() => toggleCheckbox(rowIndex, colIndex)}>
+                          onPress={() => console.log("rowIndex, colIndex", rowIndex, colIndex)}>
+                          <CustomCheckBox
+                            isChecked={item.isChecked}
+                            onToggle={() => console.log("rowIndex, colIndex", rowIndex, colIndex)}
+                          />
+                          <Text style={{color: '#000'}}>{item.label}</Text>
+                        </TouchableOpacity>
+                      </View>
+                    ))}
+                  </View>
+                ))}
+              </View>
+            </ScrollView>
+          </View>
 
           <View
             style={{
@@ -417,9 +603,7 @@ const SaveWorkOrderStyleUI = ({route, navigation, ...props}) => {
               onPress={handletrimFabricRadioChange}
               layout="row"
               selectedId={
-                trimFabricRadioButtons.find(
-                  item => item.value === trimFabricRadio,
-                )?.id
+                trimFabricRadioButtons.find(item => item.value === wash)?.id
               }
             />
           </View>
@@ -440,9 +624,8 @@ const SaveWorkOrderStyleUI = ({route, navigation, ...props}) => {
               onPress={handletrimFabricRadioChange}
               layout="row"
               selectedId={
-                trimFabricRadioButtons.find(
-                  item => item.value === trimFabricRadio,
-                )?.id
+                trimFabricRadioButtons.find(item => item.value === embroidery)
+                  ?.id
               }
             />
           </View>
@@ -463,9 +646,7 @@ const SaveWorkOrderStyleUI = ({route, navigation, ...props}) => {
               onPress={handletrimFabricRadioChange}
               layout="row"
               selectedId={
-                trimFabricRadioButtons.find(
-                  item => item.value === trimFabricRadio,
-                )?.id
+                trimFabricRadioButtons.find(item => item.value === print)?.id
               }
             />
           </View>
@@ -486,9 +667,7 @@ const SaveWorkOrderStyleUI = ({route, navigation, ...props}) => {
               onPress={handletrimFabricRadioChange}
               layout="row"
               selectedId={
-                trimFabricRadioButtons.find(
-                  item => item.value === trimFabricRadio,
-                )?.id
+                trimFabricRadioButtons.find(item => item.value === jobWork)?.id
               }
             />
           </View>
@@ -514,7 +693,7 @@ const SaveWorkOrderStyleUI = ({route, navigation, ...props}) => {
                 flexDirection: 'row',
               }}>
               <CustomCheckBox
-                isChecked={true}
+                isChecked={multiWo}
                 onToggle={() => console.log('hi')}
               />
             </View>
@@ -541,7 +720,7 @@ const SaveWorkOrderStyleUI = ({route, navigation, ...props}) => {
                 flexDirection: 'row',
               }}>
               <CustomCheckBox
-                isChecked={true}
+                isChecked={ratio}
                 onToggle={() => console.log('hi')}
               />
             </View>
@@ -683,7 +862,7 @@ const getStyles = colors =>
     table_head_captions: {
       fontSize: 15,
       color: 'white',
-      alignItems: 'center',
+      textAlign: 'center',
     },
 
     table_body_single_row: {
@@ -697,7 +876,7 @@ const getStyles = colors =>
     table_data: {
       fontSize: 11,
       color: '#000',
-      alignItems: 'center',
+      textAlign: 'center',
     },
     table: {
       // margin: 15,
@@ -764,5 +943,13 @@ const getStyles = colors =>
       resizeMode: 'contain',
       tintColor: 'red',
       alignSelf: 'center',
+    },
+    itemContainer: {
+      // borderBottomColor: '#e0e0e0',
+      flexDirection: 'row',
+      paddingHorizontal: 15,
+      paddingVertical: 12,
+      // borderBottomWidth: 1,
+      // borderBottomColor: '#ccc',
     },
   });
