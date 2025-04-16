@@ -5771,7 +5771,7 @@ export async function getEditDetailsWorkOrderBuyerPo1(jsonValue) {
             body: JSON.stringify(jsonValue),
         }
     ).then((response) => response.json()).then(async (data) => {
-        console.log('getEditDetailsWorkOrderBuyerPo1', '', data)
+        // console.log('getEditDetailsWorkOrderBuyerPo1', '', data)
 
         if (data) {
             statusData = true;
@@ -6075,6 +6075,14 @@ export async function SaveRawMaterialsMastersEdit(jsonValue) {
 
 export const downloadPdf =()=>{
     const URL= Environment.uri + "fabricprocessinapi/apiFabricprocessinPdf";
+    return URL;
+} 
+export const downloadPdfWorkOrderStyle =()=>{
+    const URL= Environment.uri + "workorderstyleapi/workorderpdf";
+    return URL;
+} 
+export const downloadPdfWorkOrderBuyerPO =()=>{
+    const URL= Environment.uri + "workorderstyleapi/workorderBuyerpopdf";
     return URL;
 } 
 export const downloadQrPdf =()=>{

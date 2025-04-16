@@ -67,8 +67,8 @@ const SaveWorkOrderBuyerPoUI = ({route, navigation, ...props}) => {
       if (props.itemsObj.soIdStr) {
         setBuyerPoNo(props.itemsObj.soIdStr);
       }
-      if (props.itemsObj.woNoStr) {
-        setWoNo(props.itemsObj.woNoStr);
+      if (props.itemsObj.woIdWithSymbol) {
+        setWoNo(props.itemsObj.woIdWithSymbol);
       }
       if (props.itemsObj.creationDate) {
         setDeliveryDate(props.itemsObj.creationDate);
@@ -77,9 +77,9 @@ const SaveWorkOrderBuyerPoUI = ({route, navigation, ...props}) => {
       if (props.itemsObj.sizesGSCodesList) {
         setQuantityRows(props.itemsObj.sizesGSCodesList);
       }
-      if (props.itemsObj.qtyAllowance) {
-        setQuantityAllowance(props.itemsObj.qtyAllowance.toString());
-      }
+      // if (props.itemsObj.qtyAllowance) {
+        setQuantityAllowance(props.itemsObj?.qtyAllowance?.toString() || '0.0');
+      // }
       if (props.itemsObj.trimRequestSectionList) {
         setTrimFabricRows(props.itemsObj.trimRequestSectionList);
       }
@@ -133,7 +133,7 @@ const SaveWorkOrderBuyerPoUI = ({route, navigation, ...props}) => {
         const obj = {
           fabricName: props.itemsObj.fabricName || '',
           color: props.itemsObj.fabricColor,
-          approvedFabCon: props.itemsObj.fabricTotAllow,
+          approvedFabCon: props.itemsObj.approvedFabCon,
           fabricTotCon: props.itemsObj.fabricTotCon,
           fabricTotAllow: props.itemsObj.fabricTotAllow,
         };
@@ -271,7 +271,7 @@ const SaveWorkOrderBuyerPoUI = ({route, navigation, ...props}) => {
           <View style={{marginTop: hp('2%')}}>
             <TextInput
               label="QuantityAllowance "
-              value={quantityAllowance}
+              value={`${quantityAllowance} %`}
               mode="outlined"
               onChangeText={text => console.log(text)}
             />
@@ -313,6 +313,7 @@ const SaveWorkOrderBuyerPoUI = ({route, navigation, ...props}) => {
                     <Text style={styles.table_head_captions}>Fabric Name</Text>
                   </View>
                 </View>
+           
                 {fabricRows.map((row, index) => (
                   <View key={index} style={styles.table_body_single_row}>
                     <View style={{width: 100}}>
@@ -328,7 +329,7 @@ const SaveWorkOrderBuyerPoUI = ({route, navigation, ...props}) => {
                     </View>
                     <View style={{width: 100}}>
                       <Text style={styles.table_data}>
-                        {row.approvedFabCon}
+                        {row.fabricTotAllow}
                       </Text>
                     </View>
                     <View style={{width: 100}}>

@@ -31,7 +31,6 @@ let addImg1 = require('./../../../assets/images/png/add.png');
 let filterImg = require('./../../../assets/images/png/setting.png');
 let filterImg1 = require('./../../../assets/images/png/filter.png');
 
-
 const WorkOrderBuyerPoListUI = ({route, navigation, ...props}) => {
   const [isListOpen, set_ListOpen] = useState(false);
   const [refreshing, set_refreshing] = useState(false);
@@ -68,7 +67,6 @@ const WorkOrderBuyerPoListUI = ({route, navigation, ...props}) => {
       // console.log("to set ===> ", props.itemsArray)
     }
     // getRequestBody();
-
   }, [props?.itemsArray]);
 
   const getRequestBody = async () => {
@@ -120,8 +118,8 @@ const WorkOrderBuyerPoListUI = ({route, navigation, ...props}) => {
         (item?.styleCode !== '' &&
           item?.styleCode?.toLowerCase().includes(searchTerm)) ||
         (item?.processName !== '' &&
-          item?.processName?.toLowerCase().includes(searchTerm)) 
-      )
+          item?.processName?.toLowerCase().includes(searchTerm))
+      );
     });
 
     set_filterArray(styleArray || []);
@@ -153,36 +151,35 @@ const WorkOrderBuyerPoListUI = ({route, navigation, ...props}) => {
     setIsFiltering(false);
   };
 
-
   const renderItem = ({item, index}) => {
     return (
       <TouchableOpacity
         onPress={() => actionOnRow(item, index)}
         style={[CommonStyles.cellBackViewStyle, {marginBottom: 3}]}>
         <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-          <View
-            style={{flex: 1, justifyContent: 'center'}}>
+          <View style={{flex: 1, justifyContent: 'center'}}>
             <Text style={[CommonStyles.tylesTextStyle, {textAlign: 'center'}]}>
               {item.styleCode}
             </Text>
           </View>
-          <View
-            style={{flex: 0.7, justifyContent: 'center'}}>
+          <View style={{flex: 0.7, justifyContent: 'center'}}>
             <Text style={[CommonStyles.tylesTextStyle, {textAlign: 'center'}]}>
               {item.soIdStr}
             </Text>
           </View>
-          <View
-            style={{flex: 0.5, justifyContent: 'center'}}>
+          <View style={{flex: 0.5, justifyContent: 'center'}}>
             <Text style={[CommonStyles.tylesTextStyle, {textAlign: 'center'}]}>
               {item.totalBuyerpoQty}
             </Text>
           </View>
           <View
-            style={{flex: 0.7, justifyContent: 'center'}}>
-            <Text style={[CommonStyles.tylesTextStyle, {textAlign: 'center'}]}>
-              {item.totalWOQty}
-            </Text>
+            style={{flex: 0.7, alignItems: 'center', justifyContent: 'center'}}>
+            <TouchableOpacity onPress={() => handlePdf(item)}>
+              <Image
+                source={require('./../../../assets/images/png/pdf2.png')}
+                style={{height: 25, width: 20}}
+              />
+            </TouchableOpacity>
           </View>
         </View>
       </TouchableOpacity>
@@ -191,6 +188,10 @@ const WorkOrderBuyerPoListUI = ({route, navigation, ...props}) => {
 
   const handleNavigation = () => {
     props.handleNavigation();
+  };
+
+  const handlePdf = async item => {
+    props.handlePdf(item);
   };
 
   return (
@@ -312,7 +313,6 @@ const WorkOrderBuyerPoListUI = ({route, navigation, ...props}) => {
 
         {filterArray && filterArray.length > 0 ? (
           <View style={CommonStyles.listCommonHeader}>
-           
             <Text
               style={[
                 CommonStyles.tylesHeaderTextStyle,
@@ -339,7 +339,7 @@ const WorkOrderBuyerPoListUI = ({route, navigation, ...props}) => {
                 CommonStyles.tylesHeaderTextStyle,
                 {flex: 0.7, textAlign: 'center'},
               ]}>
-              {'WO Qty'}
+              {'PDF'}
             </Text>
           </View>
         ) : (
@@ -448,5 +448,3 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 });
-
-

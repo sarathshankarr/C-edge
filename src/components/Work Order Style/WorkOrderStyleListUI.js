@@ -135,8 +135,9 @@ const WorkOrderStyleListUI = ({route, navigation, ...props}) => {
   const clearFilter = () => {
     onRefresh();
   };
-  const handlePdf = () => {
-    console.log("handlePdf");
+
+  const handlePdf = async(item) => {
+    props.handlePdf(item);
   };
 
   const onRefresh = () => {
@@ -149,6 +150,7 @@ const WorkOrderStyleListUI = ({route, navigation, ...props}) => {
     setFilterVisible(false);
     setIsFiltering(false);
   };
+
 
   const renderItem = ({item, index}) => {
     return (
