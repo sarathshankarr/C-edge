@@ -114,9 +114,9 @@ const SaveWorkOrderStyleUI = ({route, navigation, ...props}) => {
       if (props.itemsObj.sizesGSCodesList) {
         setQuantityRows(props.itemsObj.sizesGSCodesList);
       }
-      if (props.itemsObj.qtyAllowance) {
-        setQuantityAllowance(props.itemsObj.qtyAllowance.toString());
-      }
+      // if (props.itemsObj.qtyAllowance) {
+        setQuantityAllowance(props.itemsObj?.qtyAllowance?.toString() || '0.0');
+      // }
       if (props.itemsObj.trimRequestSectionList) {
         setTrimFabricRows(props.itemsObj.trimRequestSectionList);
       }
@@ -391,7 +391,7 @@ const SaveWorkOrderStyleUI = ({route, navigation, ...props}) => {
           <View style={{marginTop: hp('2%')}}>
             <TextInput
               label="QuantityAllowance "
-              value={quantityAllowance}
+              value={`${quantityAllowance} %`}
               mode="outlined"
               onChangeText={text => console.log(text)}
             />

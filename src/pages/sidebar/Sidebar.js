@@ -285,6 +285,12 @@ const Sidebar = ({navigation}) => {
           menu_id: 759,
           src: require('../../../assets/images/png/acknowledge.png'),
         },
+        {
+          label: 'Style Transfer Out',
+          route: 'SaveStyleTransferOut',
+          menu_id: 49,
+          src: require('../../../assets/images/png/acknowledge.png'),
+        },
       ],
     },
     reports: {

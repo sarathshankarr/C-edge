@@ -129,6 +129,7 @@ import SaveNewProcessOut from '../components/New Process Out/SaveNewProcessOut';
 import CreateWorkOrderBuyerPo from '../components/Work Order Buyer Po/CreateWorkOrderBuyerPo';
 import WorkOrderBuyerPoList from '../components/Work Order Buyer Po/WorkOrderBuyerPoList';
 import SaveWorkOrderBuyerPo from '../components/Work Order Buyer Po/SaveWorkOrderBuyerPo';
+import SaveStyleTransferOut from '../components/Style Transfer Out/SaveStyleTransferOut';
 
 
 const Stack = createNativeStackNavigator();
@@ -261,6 +262,7 @@ const AppStack = () => {
       <Stack.Screen name="CreateNewProcessOut" component={CreateNewProcessOut} options={{ headerShown: false }} /> 
       <Stack.Screen name="NewProcessOutList" component={NewProcessOutList} options={{ headerShown: false }} /> 
       <Stack.Screen name="SaveNewProcessOut" component={SaveNewProcessOut} options={{ headerShown: false }} /> 
+      <Stack.Screen name="SaveStyleTransferOut" component={SaveStyleTransferOut} options={{ headerShown: false }} /> 
     </Stack.Navigator>
   );
 };
