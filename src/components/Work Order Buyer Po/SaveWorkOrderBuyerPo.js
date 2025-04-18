@@ -42,7 +42,7 @@ const SaveWorkOrderBuyerPo = ({navigation, route, ...props}) => {
       compIds: usercompanyId,
       company: JSON.parse(companyObj),
     };
-    // console.log("req body =====> ", obj)
+    console.log("req body 55 =====> ", obj)
     let EditFabricProcessInObj = await APIServiceCall.getEditDetailsWorkOrderBuyerPo1(obj);
     set_isLoading(false);
 
