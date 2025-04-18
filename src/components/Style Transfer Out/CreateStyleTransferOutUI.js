@@ -33,7 +33,7 @@ import CustomCheckBox from '../../utils/commonComponents/CustomCheckBox';
 let downArrowImg = require('./../../../assets/images/png/dropDownImg.png');
 let closeImg = require('./../../../assets/images/png/close1.png');
 
-const SaveStyleTransferOutUI = ({route, navigation, ...props}) => {
+const CreateStyleTransferOutUI = ({route, navigation, ...props}) => {
   const [masterBoxName, setMasterBoxName] = useState('');
   const [rows, setRows] = useState([]);
   const [buyerName, setbuyerName] = React.useState('');
@@ -41,15 +41,6 @@ const SaveStyleTransferOutUI = ({route, navigation, ...props}) => {
   const [lastestBoxId, setLastestBoxId] = React.useState(0);
   const [lastestBuyerPoId, setLastestBuyerPoId] = React.useState(0);
   const [lastestBoxList, setLastestBoxList] = React.useState('');
-
-  const [inHouse, setInHouse] = useState('Yes');
-  const [customer, setCustomer] = useState('No');
-
-  const [singleColor, setSingleColor] = useState('Yes');
-  const [multiColor, setMultiColor] = useState('No');
-  const [customerStyle, setCustomerStyle] = useState('No');
-  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-  const [date, setDate] = useState('');
 
   const {colors} = useContext(ColorContext);
 
@@ -134,6 +125,8 @@ const SaveStyleTransferOutUI = ({route, navigation, ...props}) => {
   };
 
   const submitAction = async () => {
+
+
     const mappedRows = rows.flatMap(row => {
       const barcodeString = row.childTable?.length
         ? Array(row.childTable.length).fill(row.barcode).join(',')
@@ -236,169 +229,28 @@ const SaveStyleTransferOutUI = ({route, navigation, ...props}) => {
     ]);
   };
 
-  // From Location
-  const [fromLocationList, setFromLocationList] = useState([]);
-  const [filteredFromLocation, setFilteredFromLocation] = useState([]);
-  const [showFromLocationList, setShowFromLocationList] = useState(false);
-  const [fromLocationName, setFromLocationName] = useState('');
-  const [fromLocationId, setFromLocationId] = useState('');
+  const [buyerPoList, setBuyerPoList] = useState([]);
+  const [filteredBuyerPo, setFilteredBuyerPo] = useState([]);
+  const [showBuyerPoList, setShowBuyerPoList] = useState(false);
+  const [buyerPoName, setBuyerPoName] = useState('');
+  const [buyerPoId, setBuyerPoId] = useState('');
 
-  // To Location
-  const [toLocationList, setToLocationList] = useState([]);
-  const [filteredToLocation, setFilteredToLocation] = useState([]);
-  const [showToLocationList, setShowToLocationList] = useState(false);
-  const [toLocationName, setToLocationName] = useState('');
-  const [toLocationId, setToLocationId] = useState('');
-
-  // To Customer
-  const [toCustomerList, setToCustomerList] = useState([]);
-  const [filteredToCustomer, setFilteredToCustomer] = useState([]);
-  const [showToCustomerList, setShowToCustomerList] = useState(false);
-  const [toCustomerName, setToCustomerName] = useState('');
-  const [toCustomerId, setToCustomerId] = useState('');
-
-  const actionOnFromLocation = item => {
-    setFromLocationId(item.id);
-    setFromLocationName(item.name);
-    setShowFromLocationList(false);
+  const actionOnBuyerPo = item => {
+    setBuyerPoId(item.id);
+    setBuyerPoName(item.name);
+    setShowBuyerPoList(false);
+    setLastestBuyerPoId(item.id);
   };
 
-  const actionOnToLocation = item => {
-    setToLocationId(item.id);
-    setToLocationName(item.name);
-    setShowToLocationList(false);
-  };
-
-  const actionOnToCustomer = item => {
-    setToCustomerId(item.id);
-    setToCustomerName(item.name);
-    setShowToCustomerList(false);
-  };
-
-  const handleSearchFromLocation = text => {
+  const handleSearchBuyerPo = text => {
     if (text.trim().length > 0) {
-      const filtered = fromLocationList.filter(item =>
+      const filtered = buyerPoList.filter(item =>
         item.name.toLowerCase().includes(text.toLowerCase()),
       );
-      setFilteredFromLocation(filtered);
+      setFilteredBuyerPo(filtered);
     } else {
-      setFilteredFromLocation(fromLocationList);
+      setFilteredBuyerPo(buyerPoList);
     }
-  };
-
-  const handleSearchToLocation = text => {
-    if (text.trim().length > 0) {
-      const filtered = toLocationList.filter(item =>
-        item.name.toLowerCase().includes(text.toLowerCase()),
-      );
-      setFilteredToLocation(filtered);
-    } else {
-      setFilteredToLocation(toLocationList);
-    }
-  };
-
-  const handleSearchToCustomer = text => {
-    if (text.trim().length > 0) {
-      const filtered = toCustomerList.filter(item =>
-        item.name.toLowerCase().includes(text.toLowerCase()),
-      );
-      setFilteredToCustomer(filtered);
-    } else {
-      setFilteredToCustomer(toCustomerList);
-    }
-  };
-
-  const inHouseRadioButtons = useMemo(
-    () => [
-      {
-        id: '1',
-        label: 'In House',
-        value: 'In House',
-        selected: inHouse === 'Yes',
-        labelStyle: {color: '#000'},
-      },
-      {
-        id: '2',
-        label: 'Customer',
-        value: 'Customer',
-        selected: customer === 'Yes',
-        labelStyle: {color: '#000'},
-      },
-    ],
-    [inHouse, customer],
-  );
-
-  const colorStyleRadioButtons = useMemo(
-    () => [
-      {
-        id: '1',
-        label: 'Single Color',
-        value: 'Single Color',
-        selected: singleColor === 'Yes',
-        labelStyle: {color: '#000'},
-      },
-      {
-        id: '2',
-        label: 'Multi Color',
-        value: 'Multi Color',
-        selected: multiColor === 'Yes',
-        labelStyle: {color: '#000'},
-      },
-      {
-        id: '3',
-        label: 'Customer ',
-        value: 'Customer Style',
-        selected: customerStyle === 'Yes',
-        labelStyle: {color: '#000'},
-      },
-    ],
-    [singleColor, multiColor, customerStyle],
-  );
-
-  const handleInHouseChange = selectedId => {
-    const selectedOption = inHouseRadioButtons.find(
-      button => button.id === selectedId,
-    );
-    if (selectedOption.value === 'In House') {
-      setInHouse('Yes');
-      setCustomer('No');
-    } else {
-      setInHouse('No');
-      setCustomer('Yes');
-    }
-  };
-
-  const handleColorStyleChange = selectedId => {
-    const selectedOption = colorStyleRadioButtons.find(
-      button => button.id === selectedId,
-    );
-    if (selectedOption.value === 'Single Color') {
-      setSingleColor('Yes');
-      setMultiColor('No');
-      setCustomerStyle('No');
-    } else if (selectedOption.value === 'Multi Color') {
-      setSingleColor('No');
-      setMultiColor('Yes');
-      setCustomerStyle('No');
-    } else if (selectedOption.value === 'Customer Style') {
-      setSingleColor('No');
-      setMultiColor('No');
-      setCustomerStyle('Yes');
-    }
-  };
-
-  const handleConfirm = d => {
-    const formattedDate = d.toISOString().split('T')[0];
-    setDate(formattedDate);
-    hideDatePicker();
-  };
-
-  const showDatePicker = () => {
-    setDatePickerVisibility(true);
-  };
-
-  const hideDatePicker = () => {
-    setDatePickerVisibility(false);
   };
 
   return (
@@ -427,171 +279,13 @@ const SaveStyleTransferOutUI = ({route, navigation, ...props}) => {
             width: '90%',
             marginHorizontal: wp('5%'),
           }}>
-            <View style={{height:15}}/>
-
-          <RadioGroup
-            style={{flexDirection: 'row'}}
-            radioButtons={inHouseRadioButtons}
-            onPress={handleInHouseChange}
-            layout="row"
-            selectedId={
-              inHouseRadioButtons.find(
-                item =>
-                  item.value === (inHouse === 'Yes' ? 'In House' : 'Customer'),
-              )?.id
-            }
-          />
-          {/* <RadioGroup
-            style={{flexDirection: 'row'}}
-            radioButtons={colorStyleRadioButtons}
-            onPress={handleColorStyleChange}
-            layout="row"
-            selectedId={
-              colorStyleRadioButtons.find(
-                item =>
-                  item.value ===
-                  (singleColor === 'Yes'
-                    ? 'Single Color'
-                    : multiColor === 'Yes'
-                    ? 'Multi Color'
-                    : customerStyle === 'Yes'
-                    ? 'Customer Style'
-                    : ''),
-              )?.id
-            }
-          /> */}
-
-          <DateTimePickerModal
-            isVisible={isDatePickerVisible}
-            mode="date"
-            onConfirm={handleConfirm}
-            onCancel={hideDatePicker}
-          />
-
-          {/* <View
-            style={{
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: '#fff',
-              marginTop: hp('2%'),
-              flexDirection: 'row',
-              borderRadius: 5,
-            }}>
-            <View style={{width: '85%', paddingHorizontal: 10}}>
-              <TextInput
-                label="Date"
-                value={date ? Constant.formatDateIntoDMY(date) : ''}
-                mode="outlined"
-                color="#000"
-              />
-            </View>
-            <TouchableOpacity onPress={showDatePicker} style={{padding: 5}}>
-              <Image
-                source={require('./../../../assets/images/png/calendar11.png')}
-                style={{width: 40, height: 40}}
-              />
-            </TouchableOpacity>
-          </View> */}
-
-          {/* <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              marginTop: hp('4%'),
-              width: '100%',
-            }}>
-            <View
-              style={{
-                width: 100,
-                margin: 5,
-                alignItems: 'center',
-                padding: 10,
-                borderRadius: 5,
-                flexDirection: 'row',
-              }}>
-              <CustomCheckBox
-                isChecked={true}
-                onToggle={() => console.log('hi')}
-              />
-            </View>
-            <Text style={{width: '50%', fontWeight: 'bold', color: '#000'}}>
-              Returnable
-            </Text>
-          </View> */}
-
-          <View
-            style={{
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: '#fff',
-              marginTop: hp('2%'),
-            }}>
-            <TouchableOpacity
-              style={{
-                flexDirection: 'row',
-                borderWidth: 0.5,
-                borderColor: '#D8D8D8',
-                borderRadius: hp('0.5%'),
-                width: '100%',
-                justifyContent: 'space-between',
-              }}
-              onPress={() => {
-                setShowFromLocationList(!showFromLocationList);
-              }}>
-              <View>
-                <View style={[styles.SectionStyle1, {}]}>
-                  <View style={{flexDirection: 'column'}}>
-                    <Text
-                      style={
-                        fromLocationId
-                          ? [styles.dropTextLightStyle]
-                          : [styles.dropTextInputStyle]
-                      }>
-                      {'From Location '}
-                    </Text>
-                    {fromLocationId ? (
-                      <Text style={[styles.dropTextInputStyle]}>
-                        {fromLocationName}
-                      </Text>
-                    ) : null}
-                  </View>
-                </View>
-              </View>
-
-              <View style={{justifyContent: 'center'}}>
-                <Image source={downArrowImg} style={styles.imageStyle} />
-              </View>
-            </TouchableOpacity>
-
-            {showFromLocationList && (
-              <View style={styles.dropdownContent1}>
-                <TextInput
-                  style={styles.searchInput}
-                  placeholder="Search "
-                  onChangeText={handleSearchFromLocation}
-                  placeholderTextColor="#000"
-                />
-                <ScrollView
-                  style={styles.scrollView}
-                  nestedScrollEnabled={true}>
-                  {filteredFromLocation.length === 0 ? (
-                    <Text style={styles.noCategoriesText}>
-                      Sorry, no results found!
-                    </Text>
-                  ) : (
-                    filteredFromLocation.map((item, index) => (
-                      <TouchableOpacity
-                        key={index}
-                        style={styles.dropdownOption}
-                        onPress={() => actionOnFromLocation(item)}>
-                        <Text style={{color: '#000'}}>{item.name}</Text>
-                      </TouchableOpacity>
-                    ))
-                  )}
-                </ScrollView>
-              </View>
-            )}
+          <View style={{marginTop: hp('2%')}}>
+            <TextInput
+              label="Master Box Name : "
+              value={masterBoxName}
+              mode="outlined"
+              onChangeText={text => setMasterBoxName(text)}
+            />
           </View>
 
           <View
@@ -611,22 +305,22 @@ const SaveStyleTransferOutUI = ({route, navigation, ...props}) => {
                 justifyContent: 'space-between',
               }}
               onPress={() => {
-                setShowToCustomerList(!showToLocationList);
+                setShowBuyerPoList(!showBuyerPoList);
               }}>
               <View>
                 <View style={[styles.SectionStyle1, {}]}>
                   <View style={{flexDirection: 'column'}}>
                     <Text
                       style={
-                        toLocationId
+                        buyerPoId
                           ? [styles.dropTextLightStyle]
                           : [styles.dropTextInputStyle]
                       }>
-                      {'To Location '}
+                      {'Buyer PO '}
                     </Text>
-                    {toLocationId ? (
+                    {buyerPoId ? (
                       <Text style={[styles.dropTextInputStyle]}>
-                        {toLocationName}
+                        {buyerPoName}
                       </Text>
                     ) : null}
                   </View>
@@ -638,101 +332,27 @@ const SaveStyleTransferOutUI = ({route, navigation, ...props}) => {
               </View>
             </TouchableOpacity>
 
-            {showToLocationList && (
+            {showBuyerPoList && (
               <View style={styles.dropdownContent1}>
                 <TextInput
                   style={styles.searchInput}
                   placeholder="Search "
-                  onChangeText={handleSearchToLocation}
+                  onChangeText={handleSearchBuyerPo}
                   placeholderTextColor="#000"
                 />
                 <ScrollView
                   style={styles.scrollView}
                   nestedScrollEnabled={true}>
-                  {filteredToLocation.length === 0 ? (
+                  {filteredBuyerPo.length === 0 ? (
                     <Text style={styles.noCategoriesText}>
                       Sorry, no results found!
                     </Text>
                   ) : (
-                    filteredToLocation.map((item, index) => (
+                    filteredBuyerPo.map((item, index) => (
                       <TouchableOpacity
                         key={index}
                         style={styles.dropdownOption}
-                        onPress={() => actionOnToLocation(item)}>
-                        <Text style={{color: '#000'}}>{item.name}</Text>
-                      </TouchableOpacity>
-                    ))
-                  )}
-                </ScrollView>
-              </View>
-            )}
-          </View>
-
-          <View
-            style={{
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: '#fff',
-              marginTop: hp('2%'),
-            }}>
-            <TouchableOpacity
-              style={{
-                flexDirection: 'row',
-                borderWidth: 0.5,
-                borderColor: '#D8D8D8',
-                borderRadius: hp('0.5%'),
-                width: '100%',
-                justifyContent: 'space-between',
-              }}
-              onPress={() => {
-                setShowToCustomerList(!showToCustomerList);
-              }}>
-              <View>
-                <View style={[styles.SectionStyle1, {}]}>
-                  <View style={{flexDirection: 'column'}}>
-                    <Text
-                      style={
-                        toCustomerId
-                          ? [styles.dropTextLightStyle]
-                          : [styles.dropTextInputStyle]
-                      }>
-                      {'To Customer '}
-                    </Text>
-                    {toCustomerId ? (
-                      <Text style={[styles.dropTextInputStyle]}>
-                        {toCustomerName}
-                      </Text>
-                    ) : null}
-                  </View>
-                </View>
-              </View>
-
-              <View style={{justifyContent: 'center'}}>
-                <Image source={downArrowImg} style={styles.imageStyle} />
-              </View>
-            </TouchableOpacity>
-
-            {showToCustomerList && (
-              <View style={styles.dropdownContent1}>
-                <TextInput
-                  style={styles.searchInput}
-                  placeholder="Search "
-                  onChangeText={handleSearchToCustomer}
-                  placeholderTextColor="#000"
-                />
-                <ScrollView
-                  style={styles.scrollView}
-                  nestedScrollEnabled={true}>
-                  {filteredToCustomer.length === 0 ? (
-                    <Text style={styles.noCategoriesText}>
-                      Sorry, no results found!
-                    </Text>
-                  ) : (
-                    filteredToCustomer.map((item, index) => (
-                      <TouchableOpacity
-                        key={index}
-                        style={styles.dropdownOption}
-                        onPress={() => actionOnToCustomer(item)}>
+                        onPress={() => actionOnBuyerPo(item)}>
                         <Text style={{color: '#000'}}>{item.name}</Text>
                       </TouchableOpacity>
                     ))
@@ -1045,7 +665,7 @@ const SaveStyleTransferOutUI = ({route, navigation, ...props}) => {
   );
 };
 
-export default SaveStyleTransferOutUI;
+export default CreateStyleTransferOutUI;
 
 const getStyles = colors =>
   StyleSheet.create({

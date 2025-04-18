@@ -39,18 +39,18 @@ const Sidebar = ({navigation}) => {
           route: 'DDAList',
           src: require('../../../assets/images/png/website.png'),
         },
-        {
-          label: 'Work Order (style)',
-          menu_id: 728,
-          route: 'WorkOrderStyleList',
-          src: require('../../../assets/images/png/website.png'),
-        },
-        {
-          label: 'Work Order (Buyer PO)',
-          menu_id: 728,
-          route: 'WorkOrderBuyerPoList',
-          src: require('../../../assets/images/png/website.png'),
-        },
+        // {
+        //   label: 'Work Order (style)',
+        //   menu_id: 728,
+        //   route: 'WorkOrderStyleList',
+        //   src: require('../../../assets/images/png/website.png'),
+        // },
+        // {
+        //   label: 'Work Order (Buyer PO)',
+        //   menu_id: 728,
+        //   route: 'WorkOrderBuyerPoList',
+        //   src: require('../../../assets/images/png/website.png'),
+        // },
       ],
     },
     order: {
@@ -82,12 +82,12 @@ const Sidebar = ({navigation}) => {
         //   menu_id: 4,
         //   src: require('../../../assets/images/png/stamp.png'),
         // },
-        {
-          label: 'Master Box Packing',
-          route: 'masterBoxPackingList',
-          menu_id: 4,
-          src: require('../../../assets/images/png/stamp.png'),
-        },
+        // {
+        //   label: 'Master Box Packing',
+        //   route: 'masterBoxPackingList',
+        //   menu_id: 4,
+        //   src: require('../../../assets/images/png/stamp.png'),
+        // },
         // {
         //   label: 'Bill Generation',
         //   route: 'BillGenerationList',
@@ -248,18 +248,18 @@ const Sidebar = ({navigation}) => {
           menu_id: 787,
           src: require('../../../assets/images/png/fabricProce.png'),
         },
-        {
-          label: 'New Process In',
-          route: 'NewProcessInList',
-          menu_id: 787,
-          src: require('../../../assets/images/png/fabricProce.png'),
-        },
-        {
-          label: 'New Process Out',
-          route: 'NewProcessOutList',
-          menu_id: 787,
-          src: require('../../../assets/images/png/fabricProce.png'),
-        },
+        // {
+        //   label: 'New Process In',
+        //   route: 'NewProcessInList',
+        //   menu_id: 787,
+        //   src: require('../../../assets/images/png/fabricProce.png'),
+        // },
+        // {
+        //   label: 'New Process Out',
+        //   route: 'NewProcessOutList',
+        //   menu_id: 787,
+        //   src: require('../../../assets/images/png/fabricProce.png'),
+        // },
       ],
     },
     outwardProcess: {
@@ -285,63 +285,63 @@ const Sidebar = ({navigation}) => {
           menu_id: 759,
           src: require('../../../assets/images/png/acknowledge.png'),
         },
-        {
-          label: 'Style Transfer Out',
-          route: 'SaveStyleTransferOut',
-          menu_id: 49,
-          src: require('../../../assets/images/png/acknowledge.png'),
-        },
-      ],
-    },
-    reports: {
-      label: 'Reports',
-      menu_id: 100,
-      icon: require('../../../assets/images/png/sales.png'),
-      style: [
-        {
-          label: 'Inventory Consumption Report',
-          route: 'InventoryConsumptionReport',
-          menu_id: 118,
-          src: require('../../../assets/images/png/report.png'),
-        },
-        {
-          label: 'Sales Order Report',
-          route: 'SalesOrderReport',
-          menu_id: 101,
-          src: require('../../../assets/images/png/report.png'),
-        },
-        {
-          label: 'Production Process Report',
-          route: 'ProductionProcessReport',
-          menu_id: 127,
-          src: require('../../../assets/images/png/report.png'),
-        },
-        {
-          label: 'Style Bom Report',
-          route: 'StyleBomReport',
-          menu_id: 423,
-          src: require('../../../assets/images/png/report.png'),
-        },
-        {
-          label: 'Worker Wages Report',
-          route: 'WorkerWagesReport',
-          menu_id: 743,
-          src: require('../../../assets/images/png/report.png'),
-        },
-        {
-          label: 'Cutting Report',
-          route: 'CuttingReport',
-          menu_id: 743,
-          src: require('../../../assets/images/png/report.png'),
-        },
         // {
-        //   label: 'Batch Wise Production Process Report',
-        //   route: 'BatchWiseReport',
-        //   menu_id: 743,
-        //   src: require('../../../assets/images/png/report.png'),
+        //   label: 'Style Transfer Out',
+        //   route: 'SaveStyleTransferOut',
+        //   menu_id: 49,
+        //   src: require('../../../assets/images/png/acknowledge.png'),
         // },
       ],
     },
+    // reports: {
+    //   label: 'Reports',
+    //   menu_id: 100,
+    //   icon: require('../../../assets/images/png/sales.png'),
+    //   style: [
+    //     {
+    //       label: 'Inventory Consumption Report',
+    //       route: 'InventoryConsumptionReport',
+    //       menu_id: 118,
+    //       src: require('../../../assets/images/png/report.png'),
+    //     },
+    //     {
+    //       label: 'Sales Order Report',
+    //       route: 'SalesOrderReport',
+    //       menu_id: 101,
+    //       src: require('../../../assets/images/png/report.png'),
+    //     },
+    //     {
+    //       label: 'Production Process Report',
+    //       route: 'ProductionProcessReport',
+    //       menu_id: 127,
+    //       src: require('../../../assets/images/png/report.png'),
+    //     },
+    //     {
+    //       label: 'Style Bom Report',
+    //       route: 'StyleBomReport',
+    //       menu_id: 423,
+    //       src: require('../../../assets/images/png/report.png'),
+    //     },
+    //     {
+    //       label: 'Worker Wages Report',
+    //       route: 'WorkerWagesReport',
+    //       menu_id: 743,
+    //       src: require('../../../assets/images/png/report.png'),
+    //     },
+    //     {
+    //       label: 'Cutting Report',
+    //       route: 'CuttingReport',
+    //       menu_id: 743,
+    //       src: require('../../../assets/images/png/report.png'),
+    //     },
+    //     // {
+    //     //   label: 'Batch Wise Production Process Report',
+    //     //   route: 'BatchWiseReport',
+    //     //   menu_id: 743,
+    //     //   src: require('../../../assets/images/png/report.png'),
+    //     // },
+    //   ],
+    // },
   };
 
   const filteredMenus = Object.fromEntries(
