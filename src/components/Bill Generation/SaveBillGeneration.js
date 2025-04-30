@@ -20,7 +20,7 @@ const SaveBillGeneration = ({navigation, route, ...props}) => {
     if (route.params) {
       if (route.params?.item) {
         console.log('Route Params ===> ', route.params?.item);
-        // getInitialData(route.params?.item?.woId);
+        // getInitialData(route.params?.item?.id);
       }
     }
   }, [route.params]);
@@ -36,16 +36,15 @@ const SaveBillGeneration = ({navigation, route, ...props}) => {
     let companyObj = await AsyncStorage.getItem('companyObj');
     set_isLoading(true);
     let obj = {
-      username: userName,
-      password: userPsd,
+      userName: userName,
+      userPwd: userPsd,
       compIds: usercompanyId,
       company: JSON.parse(companyObj),
-      menuId: 787,
-      isAssmeblyIn: 0,
-      primaryId: id,
+      menuId: 7,
+      soNumber: id,
     };
     let EditFabricProcessInObj =
-      await APIServiceCall.getEditDetailsPartsProcessing(obj);
+      await APIServiceCall.getEditDetailsBillGeneration(obj);
     set_isLoading(false);
 
     if (EditFabricProcessInObj && EditFabricProcessInObj.statusData) {

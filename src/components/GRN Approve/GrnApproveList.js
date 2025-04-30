@@ -192,7 +192,7 @@ const GrnApproveList = ({route}) => {
   };
 
   const actionOnRow = (item, index) => {
-    navigation.navigate('SavePurchaseOrderDraft', {item: item});
+    navigation.navigate('SaveGrnApprove', {item: item});
   };
 
   const handleNavigation = () => {

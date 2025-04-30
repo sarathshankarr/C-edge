@@ -230,8 +230,12 @@ const SaveStyleTransferOutUI = ({route, navigation, ...props}) => {
         CustomerStyleName: '',
         size: '',
         Qty: '',
-        childTable: [],
+        childTable: [{SIZE_VAL:205, SIZE_SIZE_ID:1},{SIZE_VAL:205, SIZE_SIZE_ID:2},{SIZE_VAL:205, SIZE_SIZE_ID:3}],
         PbuyerPoID: lastestBuyerPoId || '',
+        showColorList: false,
+        colorList: [],
+        filteredColor: [],
+        selectedIndices: [],
       },
     ]);
   };
@@ -401,6 +405,57 @@ const SaveStyleTransferOutUI = ({route, navigation, ...props}) => {
     setDatePickerVisibility(false);
   };
 
+  const actionOnColor = (colorId, rowId) => {
+    setRows(prevRows =>
+      prevRows.map(row =>
+        row.id === rowId
+          ? {
+              ...row,
+              selectedIndices: row.selectedIndices.includes(colorId)
+                ? row.selectedIndices.filter(id => id !== colorId)
+                : [...row.selectedIndices, colorId],
+              // showColorList: false,
+            }
+          : row,
+      ),
+    );
+  };
+
+  const handleSearchColor = async (text, rowId) => {
+    setRows(
+      rows.map(r =>
+        r.id === rowId
+          ? {
+              ...r,
+              filteredColor: r.colorList?.filter(item =>
+                item.name.toLowerCase().includes(text.toLowerCase()),
+              ),
+            }
+          : r,
+      ),
+    );
+  };
+
+  // check for create box packing ...
+  const updateChildInput = (rowId, sizeId, text) => {
+    setRows(prevRows =>
+      prevRows.map(row =>
+        row.id === rowId
+          ? {
+              ...row,
+              childTable: row.childTable.map(child =>
+                child.SIZE_ID === sizeId
+                  ? {...child, enteredInput: text}
+                  : child,
+              ),
+            }
+          : row,
+      ),
+    );
+  };
+
+
+
   return (
     <View style={[CommonStyles.mainComponentViewStyle]}>
       <View style={[CommonStyles.headerView]}>
@@ -410,7 +465,7 @@ const SaveStyleTransferOutUI = ({route, navigation, ...props}) => {
           isChatEnable={false}
           isTImerEnable={false}
           isTitleHeaderEnable={true}
-          title={'Create Master Box Packing'}
+          title={'Save Style TransferOut UI'}
           backBtnAction={() => backBtnAction()}
         />
       </View>
@@ -427,7 +482,7 @@ const SaveStyleTransferOutUI = ({route, navigation, ...props}) => {
             width: '90%',
             marginHorizontal: wp('5%'),
           }}>
-            <View style={{height:15}}/>
+          <View style={{height: 15}} />
 
           <RadioGroup
             style={{flexDirection: 'row'}}
@@ -441,7 +496,7 @@ const SaveStyleTransferOutUI = ({route, navigation, ...props}) => {
               )?.id
             }
           />
-          {/* <RadioGroup
+          <RadioGroup
             style={{flexDirection: 'row'}}
             radioButtons={colorStyleRadioButtons}
             onPress={handleColorStyleChange}
@@ -459,7 +514,7 @@ const SaveStyleTransferOutUI = ({route, navigation, ...props}) => {
                     : ''),
               )?.id
             }
-          /> */}
+          />
 
           <DateTimePickerModal
             isVisible={isDatePickerVisible}
@@ -468,7 +523,7 @@ const SaveStyleTransferOutUI = ({route, navigation, ...props}) => {
             onCancel={hideDatePicker}
           />
 
-          {/* <View
+          <View
             style={{
               alignItems: 'center',
               justifyContent: 'center',
@@ -491,9 +546,9 @@ const SaveStyleTransferOutUI = ({route, navigation, ...props}) => {
                 style={{width: 40, height: 40}}
               />
             </TouchableOpacity>
-          </View> */}
+          </View>
 
-          {/* <View
+          <View
             style={{
               flexDirection: 'row',
               alignItems: 'center',
@@ -518,7 +573,7 @@ const SaveStyleTransferOutUI = ({route, navigation, ...props}) => {
             <Text style={{width: '50%', fontWeight: 'bold', color: '#000'}}>
               Returnable
             </Text>
-          </View> */}
+          </View>
 
           <View
             style={{
@@ -611,7 +666,7 @@ const SaveStyleTransferOutUI = ({route, navigation, ...props}) => {
                 justifyContent: 'space-between',
               }}
               onPress={() => {
-                setShowToCustomerList(!showToLocationList);
+                setShowToLocationList(!showToLocationList);
               }}>
               <View>
                 <View style={[styles.SectionStyle1, {}]}>
@@ -793,19 +848,29 @@ const SaveStyleTransferOutUI = ({route, navigation, ...props}) => {
                   </View>
                   <View style={{width: 5}}></View>
                   <View style={{width: 200}}>
-                    <Text style={styles.table_head_captions}>Box Name</Text>
-                  </View>
-                  <View style={{width: 5}}></View>
-                  <View style={{width: 100}}>
                     <Text style={styles.table_head_captions}>Style</Text>
                   </View>
                   <View style={{width: 5}}></View>
                   <View style={{width: 100}}>
-                    <Text style={styles.table_head_captions}>Size</Text>
+                    <Text style={styles.table_head_captions}>Total Qty</Text>
                   </View>
                   <View style={{width: 5}}></View>
                   <View style={{width: 100}}>
-                    <Text style={styles.table_head_captions}>Qty</Text>
+                    <Text style={styles.table_head_captions}>Style Cost</Text>
+                  </View>
+                  <View style={{width: 5}}></View>
+                  <View style={{width: 100}}>
+                    <Text style={styles.table_head_captions}>Goods Value</Text>
+                  </View>
+                  <View style={{width: 5}}></View>
+                  <View style={{width: 200}}>
+                    <Text style={styles.table_head_captions}>
+                      Sample Process
+                    </Text>
+                  </View>
+                  <View style={{width: 5}}></View>
+                  <View style={{width: 100}}>
+                    <Text style={styles.table_head_captions}>Process Qty</Text>
                   </View>
                 </View>
 
@@ -914,7 +979,6 @@ const SaveStyleTransferOutUI = ({route, navigation, ...props}) => {
                           )}
                         </View>
                       </View>
-                      {/* {console.log("row.CustomerStyleName =====> ", row.CustomerStyleName)} */}
                       <View style={{width: 5}}></View>
                       <View style={{width: 100}}>
                         <TextInput
@@ -964,6 +1028,134 @@ const SaveStyleTransferOutUI = ({route, navigation, ...props}) => {
                           editable={false}
                         />
                       </View>
+
+                      <View style={{width: 5}}></View>
+                      <View style={{width: 200}}>
+                        <View
+                          style={{
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            marginTop: hp('1%'),
+                            backgroundColor: '#ffffff',
+                          }}>
+                          <TouchableOpacity
+                            style={{
+                              flexDirection: 'row',
+                              borderWidth: 0.5,
+                              borderColor: '#D8D8D8',
+                              borderRadius: hp('0.5%'),
+                              width: '100%',
+                              overflow: 'hidden',
+                            }}
+                            onPress={() => {
+                              setRows(
+                                rows.map(r =>
+                                  r.id === row.id
+                                    ? {
+                                        ...r,
+                                        showColorList: !r.showColorList,
+                                      }
+                                    : {...r, showColorList: false},
+                                ),
+                              );
+                            }}>
+                            <View>
+                              <View style={[styles.SectionStyle1, {}]}>
+                                <View style={{flexDirection: 'column'}}>
+                                  <Text
+                                    style={
+                                      row.selectedIndices.length > 0
+                                        ? [styles.dropTextLightStyle]
+                                        : [styles.dropTextInputStyle]
+                                    }>
+                                    {'Color *'}
+                                  </Text>
+                                  {row.selectedIndices.length > 0 ? (
+                                    <Text style={[styles.dropTextInputStyle]}>
+                                      {row.colorList
+                                        .filter(color =>
+                                          row.selectedIndices.includes(
+                                            color.id,
+                                          ),
+                                        )
+                                        .map(color => color.name)
+                                        .join(', ')}
+                                    </Text>
+                                  ) : null}
+                                </View>
+                              </View>
+                            </View>
+
+                            <View style={{justifyContent: 'center'}}>
+                              <Image
+                                source={downArrowImg}
+                                style={styles.imageStyle}
+                              />
+                            </View>
+                          </TouchableOpacity>
+
+                          {row.showColorList && (
+                            <View style={styles.dropdownContent1}>
+                              <TextInput
+                                style={styles.searchInput}
+                                placeholder="Search "
+                                onChangeText={text =>
+                                  handleSearchColor(text, row.id)
+                                }
+                                placeholderTextColor="#000"
+                              />
+                              <ScrollView
+                                style={styles.scrollView}
+                                nestedScrollEnabled={true}>
+                                {row?.filteredColor?.length === 0 ? (
+                                  <Text style={styles.noCategoriesText}>
+                                    Sorry, no results found!
+                                  </Text>
+                                ) : (
+                                  row?.filteredColor?.map((item, index) => (
+                                    <TouchableOpacity
+                                      key={index}
+                                      style={styles.itemContainer}
+                                      onPress={() =>
+                                        actionOnColor(item.id, row.id)
+                                      }>
+                                      <CustomCheckBox
+                                        isChecked={row.selectedIndices.includes(
+                                          item.id,
+                                        )}
+                                        onToggle={() =>
+                                          actionOnColor(item.id, row.id)
+                                        }
+                                      />
+                                      <Text style={{color: '#000'}}>
+                                        {item.name}
+                                      </Text>
+                                    </TouchableOpacity>
+                                  ))
+                                )}
+                              </ScrollView>
+                            </View>
+                          )}
+                        </View>
+                      </View>
+
+                      <View style={{width: 5}}></View>
+                      <View style={{width: 100}}>
+                        <TextInput
+                          style={styles.table_data_input}
+                          value={row.CustomerStyleName}
+                          editable={false}
+                          onChangeText={text => {
+                            setRows(
+                              rows.map(r =>
+                                r.id === row.id
+                                  ? {...r, CustomerStyleName: text}
+                                  : r,
+                              ),
+                            );
+                          }}
+                        />
+                      </View>
                     </View>
 
                     {/* row2 */}
@@ -980,25 +1172,28 @@ const SaveStyleTransferOutUI = ({route, navigation, ...props}) => {
                               key={item?.SIZE_ID}
                               style={{
                                 width: 100,
-                                margin: 5,
-                                alignItems: 'center',
-                                padding: 10,
-                                borderRadius: 5,
-                                flexDirection: 'row',
+                                  margin: 5,
+                                  alignItems: 'center',
+                                  padding: 10,
+                                  borderRadius: 5,
                               }}>
-                              <CustomCheckBox
-                                isChecked={item?.checked}
-                                onToggle={() => actionOnCheckBox(row.id, index)}
-                              />
-
-                              <Text style={{marginTop: 5, color: '#000'}}>
+                                 <Text style={{marginTop: 5, color: '#000'}}>
                                 {item.SIZE_VAL}
                               </Text>
+                              <TextInput
+                                style={styles.table_data_input1}
+                                label={item.SIZE_VAL}
+                                value={item.enteredInput}
+                                mode="outlined"
+                                onChangeText={text =>
+                                  updateChildInput(row.id, item.SIZE_ID, text)
+                                }
+                              />
                             </View>
                           ))}
                         </View>
                       </View>
-                    )}
+                     )} 
                   </View>
                 ))}
               </View>
@@ -1058,6 +1253,15 @@ const getStyles = colors =>
       borderColor: 'lightgray', // Optional: Adds subtle border (for effect)
       borderWidth: 1,
       marginTop: 3,
+    },
+    table_data_input1: {
+      fontSize: 16,
+      color: '#000',
+      borderBottomWidth: 1,
+      borderColor: '#ccc',
+      paddingHorizontal: 5,
+      textAlign: 'center',
+      flexDirection: 'row',
     },
     popSearchViewStyleTable: {
       height: hp('40%'),

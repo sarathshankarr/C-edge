@@ -39,24 +39,8 @@ const SaveGrnApproveUI = ({route, navigation, ...props}) => {
 
   useEffect(() => {
     if (props.itemsObj) {
-      console.log('props for child  ', props.itemsObj[0]?.childDetails);
-      if (props.itemsObj[0]) {
-        if (props.itemsObj[0]?.childDetails) {
-          setRows(props.itemsObj[0]?.childDetails);
-        }
-        if (props.itemsObj[0]?.styleName) {
-          setstyleNo(props.itemsObj[0]?.styleName);
-        }
-        if (props.itemsObj[0]?.partsName) {
-          setParts(props.itemsObj[0]?.partsName);
-        }
-        if (props.itemsObj[0]?.process) {
-          setProcess(props.itemsObj[0]?.process);
-        }
-        if (props.itemsObj[0]?.price) {
-          setPrice(props.itemsObj[0]?.price);
-        }
-      }
+      // console.log('props for child  grn approvve ', props.itemsObj);
+      
     }
   }, [props.itemsObj]);
 

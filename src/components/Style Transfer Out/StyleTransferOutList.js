@@ -26,15 +26,15 @@ const StyleTransferOutList = ({ route }) => {
 
 
     
-  React.useEffect(() => {
-    getInitialData(0, true);
-  }, []);
+  // React.useEffect(() => {
+  //   getInitialData(0, true);
+  // }, []);
 
-  useFocusEffect(
-    React.useCallback(() => {
-      getInitialData(0, true);
-    }, [])
-  );
+  // useFocusEffect(
+  //   React.useCallback(() => {
+  //     getInitialData(0, true);
+  //   }, [])
+  // );
   
   const backBtnAction = () => {
     navigation.goBack();

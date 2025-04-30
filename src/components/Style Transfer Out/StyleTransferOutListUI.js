@@ -202,7 +202,7 @@ const StyleTransferOutListUI = ({route, navigation, ...props}) => {
           isChatEnable={false}
           isTImerEnable={false}
           isTitleHeaderEnable={true}
-          title={'Master Box  Packing'}
+          title={'StyleTransferOutListUI'}
           backBtnAction={() => backBtnAction()}
         />
       </View>
@@ -392,7 +392,7 @@ const StyleTransferOutListUI = ({route, navigation, ...props}) => {
         reqBody={filterReqBody}
       />
 
-      <AddNewItem navItem={'CreateMasterBoxPacking'} />
+      <AddNewItem navItem={'SaveStyleTransferOut'} />
 
       {props.isPopUp ? (
         <View style={CommonStyles.customPopUpStyle}>

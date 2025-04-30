@@ -393,7 +393,7 @@ const GrnApproveListUI = ({route, navigation, ...props}) => {
         reqBody={filterReqBody}
       />
 
-      <AddNewItem navItem={'SaveGrnApprove'} />
+      {/* <AddNewItem navItem={'SaveGrnApprove'} /> */}
 
       {props.isPopUp ? (
         <View style={CommonStyles.customPopUpStyle}>

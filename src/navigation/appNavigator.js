@@ -130,6 +130,8 @@ import CreateWorkOrderBuyerPo from '../components/Work Order Buyer Po/CreateWork
 import WorkOrderBuyerPoList from '../components/Work Order Buyer Po/WorkOrderBuyerPoList';
 import SaveWorkOrderBuyerPo from '../components/Work Order Buyer Po/SaveWorkOrderBuyerPo';
 import SaveStyleTransferOut from '../components/Style Transfer Out/SaveStyleTransferOut';
+import CreateStyleTransferOut from '../components/Style Transfer Out/CreateStyleTransferOut';
+import StyleTransferOutList from '../components/Style Transfer Out/StyleTransferOutList';
 
 
 const Stack = createNativeStackNavigator();
@@ -259,9 +261,11 @@ const AppStack = () => {
       <Stack.Screen name="CreateNewProcessIn" component={CreateNewProcessIn} options={{ headerShown: false }} /> 
       <Stack.Screen name="NewProcessInList" component={NewProcessInList} options={{ headerShown: false }} /> 
       <Stack.Screen name="SaveNewProcessIn" component={SaveNewProcessIn} options={{ headerShown: false }} /> 
+      <Stack.Screen name="SaveNewProcessOut" component={SaveNewProcessOut} options={{ headerShown: false }} /> 
+      <Stack.Screen name="CreateStyleTransferOut" component={CreateStyleTransferOut} options={{ headerShown: false }} /> 
       <Stack.Screen name="CreateNewProcessOut" component={CreateNewProcessOut} options={{ headerShown: false }} /> 
       <Stack.Screen name="NewProcessOutList" component={NewProcessOutList} options={{ headerShown: false }} /> 
-      <Stack.Screen name="SaveNewProcessOut" component={SaveNewProcessOut} options={{ headerShown: false }} /> 
+      <Stack.Screen name="StyleTransferOutList" component={StyleTransferOutList} options={{ headerShown: false }} /> 
       <Stack.Screen name="SaveStyleTransferOut" component={SaveStyleTransferOut} options={{ headerShown: false }} /> 
     </Stack.Navigator>
   );

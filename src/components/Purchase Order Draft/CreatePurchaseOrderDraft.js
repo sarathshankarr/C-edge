@@ -268,7 +268,7 @@ const CreatePurchaseOrderDraft = ({route}) => {
       withAllowance: 0,
       rmId: 0,
     };
-    console.log('modal list ===> , calling 1, id, req body ===> ', id);
+    // console.log('modal list ===> , calling 1, id, req body ===> ', id);
 
     let LISTAPIOBJ;
 
