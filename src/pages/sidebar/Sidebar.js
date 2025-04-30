@@ -39,18 +39,18 @@ const Sidebar = ({navigation}) => {
           route: 'DDAList',
           src: require('../../../assets/images/png/website.png'),
         },
-        // {
-        //   label: 'Work Order (style)',
-        //   menu_id: 728,
-        //   route: 'WorkOrderStyleList',
-        //   src: require('../../../assets/images/png/website.png'),
-        // },
-        // {
-        //   label: 'Work Order (Buyer PO)',
-        //   menu_id: 728,
-        //   route: 'WorkOrderBuyerPoList',
-        //   src: require('../../../assets/images/png/website.png'),
-        // },
+        {
+          label: 'Work Order (style)',
+          menu_id: 728,
+          route: 'WorkOrderStyleList',
+          src: require('../../../assets/images/png/website.png'),
+        },
+        {
+          label: 'Work Order (Buyer PO)',
+          menu_id: 728,
+          route: 'WorkOrderBuyerPoList',
+          src: require('../../../assets/images/png/website.png'),
+        },
       ],
     },
     order: {
@@ -70,12 +70,12 @@ const Sidebar = ({navigation}) => {
         //   menu_id: 4,
         //   src: require('../../../assets/images/png/stamp.png'),
         // },
-        // {
-        //   label: 'GRN Approve',
-        //   route: 'GrnApproveList',
-        //   menu_id: 4,
-        //   src: require('../../../assets/images/png/stamp.png'),
-        // },
+        {
+          label: 'GRN Approve',
+          route: 'GrnApproveList',
+          menu_id: 4,
+          src: require('../../../assets/images/png/stamp.png'),
+        },
         // {
         //   label: 'Box Packing',
         //   route: 'BoxPackingList',
@@ -88,12 +88,12 @@ const Sidebar = ({navigation}) => {
         //   menu_id: 4,
         //   src: require('../../../assets/images/png/stamp.png'),
         // },
-        // {
-        //   label: 'Bill Generation',
-        //   route: 'BillGenerationList',
-        //   menu_id: 4,
-        //   src: require('../../../assets/images/png/stamp.png'),
-        // },
+        {
+          label: 'Bill Generation',
+          route: 'BillGenerationList',
+          menu_id: 4,
+          src: require('../../../assets/images/png/stamp.png'),
+        },
       ],
     },
     masters: {
@@ -285,12 +285,12 @@ const Sidebar = ({navigation}) => {
           menu_id: 759,
           src: require('../../../assets/images/png/acknowledge.png'),
         },
-        // {
-        //   label: 'Style Transfer Out',
-        //   route: 'SaveStyleTransferOut',
-        //   menu_id: 49,
-        //   src: require('../../../assets/images/png/acknowledge.png'),
-        // },
+        {
+          label: 'Style Transfer Out',
+          route: 'StyleTransferOutList',
+          menu_id: 49,
+          src: require('../../../assets/images/png/acknowledge.png'),
+        },
       ],
     },
     // reports: {

@@ -114,12 +114,12 @@ const BillGenerationListUI = ({route, navigation, ...props}) => {
 
     const styleArray = ItemsArray.filter(item => {
       return (
-        (item?.producttype !== '' &&
-          item?.producttype?.toLowerCase().includes(searchTerm)) ||
-        (item?.styleCode !== '' &&
-          item?.styleCode?.toLowerCase().includes(searchTerm)) ||
-        (item?.processName !== '' &&
-          item?.processName?.toLowerCase().includes(searchTerm)) 
+        (item?.invoiceNo !== '' &&
+          item?.invoiceNo?.toLowerCase().includes(searchTerm)) ||
+        (item?.vendorName !== '' &&
+          item?.vendorName?.toLowerCase().includes(searchTerm)) ||
+        (item?.txnDateStr !== '' &&
+          item?.txnDateStr?.toLowerCase().includes(searchTerm)) 
       )
     });
 
@@ -162,23 +162,23 @@ const BillGenerationListUI = ({route, navigation, ...props}) => {
           <View
             style={{flex: 1, justifyContent: 'center'}}>
             <Text style={[CommonStyles.tylesTextStyle, {textAlign: 'center'}]}>
-              {item.styleCode}
+              {item.invoiceNo}
             </Text>
           </View>
           <View
-            style={{flex: 0.7, justifyContent: 'center'}}>
+            style={{flex: 1, justifyContent: 'center'}}>
             <Text style={[CommonStyles.tylesTextStyle, {textAlign: 'center'}]}>
-              {item.processName}
+              {item.vendorName}
+            </Text>
+          </View>
+          <View
+            style={{flex: 1, justifyContent: 'center'}}>
+            <Text style={[CommonStyles.tylesTextStyle, {textAlign: 'center'}]}>
+              {item.txnDateStr}
             </Text>
           </View>
           <View
             style={{flex: 0.5, justifyContent: 'center'}}>
-            <Text style={[CommonStyles.tylesTextStyle, {textAlign: 'center'}]}>
-              {item.producttype}
-            </Text>
-          </View>
-          <View
-            style={{flex: 0.7, justifyContent: 'center'}}>
             <Text style={[CommonStyles.tylesTextStyle, {textAlign: 'center'}]}>
               {item.totalQty}
             </Text>
@@ -201,7 +201,7 @@ const BillGenerationListUI = ({route, navigation, ...props}) => {
           isChatEnable={false}
           isTImerEnable={false}
           isTitleHeaderEnable={true}
-          title={'Work Order Style List'}
+          title={'Bill Generation List'}
           backBtnAction={() => backBtnAction()}
         />
       </View>
@@ -317,28 +317,28 @@ const BillGenerationListUI = ({route, navigation, ...props}) => {
                 CommonStyles.tylesHeaderTextStyle,
                 {flex: 1, textAlign: 'center'},
               ]}>
-              {'Style No (Color)'}
+              {'Invoice'}
             </Text>
             <Text
               style={[
                 CommonStyles.tylesHeaderTextStyle,
-                {flex: 0.7, textAlign: 'center'},
+                {flex: 1, textAlign: 'center'},
               ]}>
-              {'Process'}
+              {'Customer'}
+            </Text>
+            <Text
+              style={[
+                CommonStyles.tylesHeaderTextStyle,
+                {flex: 1, textAlign: 'center'},
+              ]}>
+              {'Invoice Date'}
             </Text>
             <Text
               style={[
                 CommonStyles.tylesHeaderTextStyle,
                 {flex: 0.5, textAlign: 'center'},
               ]}>
-              {'Part'}
-            </Text>
-            <Text
-              style={[
-                CommonStyles.tylesHeaderTextStyle,
-                {flex: 0.7, textAlign: 'center'},
-              ]}>
-              {'Total Scanned Barcodes'}
+              {'Total Qty'}
             </Text>
           </View>
         ) : (

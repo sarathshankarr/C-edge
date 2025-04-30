@@ -19,8 +19,8 @@ const SaveGrnApprove = ({navigation, route, ...props}) => {
   React.useEffect(() => {
     if (route.params) {
       if (route.params?.item) {
-        console.log('Route Params ===> ', route.params?.item);
-        getInitialData(route.params?.item?.woId);
+        console.log('Route Params ===> ', route.params?.item?.poNumber);
+        getInitialData(route.params?.item?.poNumber);
       }
     }
   }, [route.params]);
@@ -35,17 +35,25 @@ const SaveGrnApprove = ({navigation, route, ...props}) => {
     let usercompanyId = await AsyncStorage.getItem('companyId');
     let companyObj = await AsyncStorage.getItem('companyObj');
     set_isLoading(true);
+
     let obj = {
-      username: userName,
-      password: userPsd,
+      menuId: 5, 
+      searchKeyValue: '',
+      styleSearchDropdown: '-1', 
+      dataFilter: '0',
+      locIds: 0,
+      brandIds: 0,
       compIds: usercompanyId,
       company: JSON.parse(companyObj),
-      menuId: 787,
-      isAssmeblyIn: 0,
-      primaryId: id,
+      fromRecord: 0, 
+      toRecord: 25, 
+      userName: userName, 
+      userPwd: userPsd,
+      poNumber: id,
     };
+console.log("req body ===> ", obj);
     let EditFabricProcessInObj =
-      await APIServiceCall.getEditDetailsPartsProcessing(obj);
+      await APIServiceCall.getEditDetailsGrnApprove(obj);
     set_isLoading(false);
 
     if (EditFabricProcessInObj && EditFabricProcessInObj.statusData) {
@@ -87,8 +95,6 @@ const SaveGrnApprove = ({navigation, route, ...props}) => {
     popUpAction(undefined, undefined, '', false, false);
   };
 
-
-
   return (
     <SaveGrnApproveUI
       itemsObj={itemsObj}
@@ -106,4 +112,3 @@ const SaveGrnApprove = ({navigation, route, ...props}) => {
 };
 
 export default SaveGrnApprove;
-
