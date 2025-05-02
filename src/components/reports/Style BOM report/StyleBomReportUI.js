@@ -37,9 +37,10 @@ const StyleBomReportUI = ({route, ...props}) => {
   const [data, setData] = useState([]);
   const [checkbox, set_checkbox] = useState(false);
 
-  const [reportType, setReportType] = useState('PDF');
+  const [reportType, setReportType] = useState('Consolidated Report');
   const [selection, setSelection] = useState('Style');
   const [balanceQty, setBalanceQty] = useState(false);
+  const [rows, setRows] = useState([]);
 
   const [buyerPOList, setBuyerPOList] = useState([]);
   const [filteredBuyerPO, set_filteredBuyerPO] = useState([]);
@@ -52,6 +53,8 @@ const StyleBomReportUI = ({route, ...props}) => {
   const [showStylesList, set_showStylesList] = useState(false);
   const [stylesName, set_stylesName] = useState('');
   const [stylesId, set_stylesId] = useState('');
+  const [initialStyleList, set_initialStyleList] = useState([]);
+  const [BuyerPOStyleList, set_BuyerPOStyleList] = useState([]);
 
   const [rmNameList, setRMNameList] = useState([]);
   const [filteredRMName, set_filteredRMName] = useState([]);
@@ -65,22 +68,46 @@ const StyleBomReportUI = ({route, ...props}) => {
   const [fabricOrTrimsName, setFabricOrTrimsName] = useState('');
   const [fabricOrTrimsId, setFabricOrTrimsId] = useState('');
 
-  //   useEffect(() => {
-  //     if (props?.lists) {
-  //       if (props.lists.getStockStyles) {
-  //         set_filteredStockStyles(props.lists.getStockStyles);
-  //       }
-  //       if (props.lists.getStockFabrics) {
-  //         set_filteredStockFabrics(props.lists.getStockFabrics);
-  //       }
-  //     }
-  //   }, [props]);
+  useEffect(() => {
+    if (props?.lists) {
+      // console.log('create listss ===> ', props?.lists);
+      if (props?.lists.styleMap1) {
+        const stylesMap = Object.keys(props?.lists.styleMap1).map(key => ({
+          id: key,
+          name: props?.lists.styleMap1[key],
+        }));
+        set_filteredStyles(stylesMap);
+        setStylesList(stylesMap);
+        set_initialStyleList(stylesMap);
+        set_BuyerPOStyleList(stylesMap);
+      }
+      if (props?.lists.buyerpomap) {
+        const buyerPoMap = Object.keys(props?.lists.buyerpomap).map(key => ({
+          id: key,
+          name: props?.lists.buyerpomap[key],
+        }));
+        setBuyerPOList(buyerPoMap);
+        set_filteredBuyerPO(buyerPoMap);
+      }
+      if (props?.lists.trimsConstructionsmap) {
+      }
+    }
+  }, [props?.lists]);
 
-  //   useEffect(() => {
-  //     if (props?.lists) {
-  //       setData(props?.lists);
-  //     }
-  //   }, [props?.lists]);
+  useEffect(() => {
+    if (props?.stylelist) {
+      console.log('create style list buyer po listss ===> ', props?.stylelist);
+      if (props?.stylelist.fabRmMap) {
+        const stylesMap = Object.keys(props?.stylelist.fabRmMap).map(key => ({
+          id: key,
+          name: props?.stylelist.fabRmMap[key],
+        }));
+        set_filteredStyles(stylesMap);
+        setStylesList(stylesMap);
+        set_BuyerPOStyleList(stylesMap);
+      }
+    }
+  }, [props?.stylelist]);
 
   const backBtnAction = () => {
     props.backBtnAction();
@@ -93,32 +120,15 @@ const StyleBomReportUI = ({route, ...props}) => {
   const ApproveAction = () => {
     console.log('Approved');
 
-    const requestDetails = rows.map(detail => ({
-      stockType: detail.stockTypeId,
-      stockTypeName: detail.stockType,
-      stock: detail.stockId,
-      stock_rm_lot: 0,
-      stockLocationId: 1,
-      styleRmSizeId: detail.size,
-      inputQty: detail.inputQty,
-      uomstock: detail.uom,
-    }));
+    const IdsList = rows.map(item => item.ids).join(",");
 
     let tempObj = {
-      processId: processId,
-      woStyleId: stylesId,
-      trimId: fabricId,
-      locationId: locationId,
-      unitMasterId: unitMasterId,
-      comments: remarks,
-      general: generalRadio === 'Yes' ? '1' : '0',
-      styleWise: displayStyleRadio === 'Yes' ? '1' : '0',
-      fabricQty: enteredFabQty,
-      uom: itemsObj?.uomfabric,
-      rmDetails: requestDetails,
+      multistyle: IdsList+",",
+      QtyVal: balanceQty ? 1 :0 ,
+      soId: buyerPOId ? buyerPOId : 0 ,
     };
 
-    // console.log("SAVING OBJ=====>   ", tempObj);
+    console.log("SAVING OBJ=====>   ", tempObj);
     props.submitAction(tempObj);
   };
 
@@ -126,16 +136,19 @@ const StyleBomReportUI = ({route, ...props}) => {
     console.log('Rejected');
   };
 
-  const actionOnBuyerPO = (id, name) => {
-    set_buyerPOId(id);
-    set_buyerPOName(name);
+  const actionOnBuyerPO = item => {
+    set_buyerPOId(item.id);
+    set_buyerPOName(item.name);
     set_showBuyerPOList(false);
+
+    props.getStyleListFromBuyerPo(item.id);
   };
-  const actionOnStyles = (id, name) => {
-    set_stylesId(id);
-    set_stylesName(name);
+  const actionOnStyles = item => {
+    set_stylesId(item.id);
+    set_stylesName(item.name);
     set_showStylesList(false);
   };
+
   const actionOnRMName = (id, name) => {
     set_rmId(id);
     set_rmName(name);
@@ -160,12 +173,12 @@ const StyleBomReportUI = ({route, ...props}) => {
 
   const handleSearchBuyerPO = text => {
     if (text.trim().length > 0) {
-      const filtered = props.lists.getStockBuyerPOs.filter(buyerPO =>
+      const filtered = buyerPOList.filter(buyerPO =>
         buyerPO.name.toLowerCase().includes(text.toLowerCase()),
       );
       set_filteredBuyerPO(filtered);
     } else {
-      set_filteredBuyerPO(props.lists.getStockBuyerPOs);
+      set_filteredBuyerPO(buyerPOList);
     }
   };
 
@@ -204,13 +217,13 @@ const StyleBomReportUI = ({route, ...props}) => {
 
   const reportRadioButtons = useMemo(
     () => [
-      {
-        id: '1',
-        label: 'PDF',
-        value: 'PDF',
-        selected: reportType === 'PDF',
-        labelStyle: {color: '#000'},
-      },
+      // {
+      //   id: '1',
+      //   label: 'PDF',
+      //   value: 'PDF',
+      //   selected: reportType === 'PDF',
+      //   labelStyle: {color: '#000'},
+      // },
       {
         id: '2',
         label: 'Consolidated Report',
@@ -258,6 +271,29 @@ const StyleBomReportUI = ({route, ...props}) => {
     if (selectedOption) {
       setSelection(selectedOption.value);
     }
+    console.log('changed radio ==> ', selectedId);
+
+    const newList = selectedId === '1' ? initialStyleList : BuyerPOStyleList;
+
+    set_filteredStyles(newList);
+    setStylesList(newList);
+  };
+
+  const addRow = () => {
+    setRows([
+      ...rows,
+      {
+        id: Date.now(),
+        Type: 'Style',
+        StyleName: stylesName || '',
+        ids:stylesId
+      },
+    ]);
+  };
+
+  const handleRemoveRow = id => {
+    console.log('handleRemoveRow ==> ', id);
+    setRows(prev => prev.filter((item, index) => item.id !== id));
   };
 
   return (
@@ -340,7 +376,7 @@ const StyleBomReportUI = ({route, ...props}) => {
                   borderColor: '#D8D8D8',
                   borderRadius: hp('0.5%'),
                   width: '100%',
-                  justifyContent:"space-between"
+                  justifyContent: 'space-between',
                 }}
                 onPress={() => {
                   set_showBuyerPOList(!showBuyerPOList);
@@ -407,7 +443,7 @@ const StyleBomReportUI = ({route, ...props}) => {
               justifyContent: 'center',
               backgroundColor: '#fff',
               marginTop: hp('2%'),
-              width:'95%'
+              width: '95%',
             }}>
             <TouchableOpacity
               style={{
@@ -415,9 +451,8 @@ const StyleBomReportUI = ({route, ...props}) => {
                 borderWidth: 0.5,
                 borderColor: '#D8D8D8',
                 borderRadius: hp('0.5%'),
-                width:'100%',
-                justifyContent:"space-between"
-
+                width: '100%',
+                justifyContent: 'space-between',
               }}
               onPress={() => {
                 set_showStylesList(!showStylesList);
@@ -477,7 +512,7 @@ const StyleBomReportUI = ({route, ...props}) => {
             )}
           </View>
 
-          {reportType === 'PDF' && (
+          {/* {reportType === 'PDF' && (
             <View
               style={{
                 alignItems: 'center',
@@ -631,16 +666,85 @@ const StyleBomReportUI = ({route, ...props}) => {
                 </View>
               )}
             </View>
-          )}
+          )} */}
 
-           <View style={{marginBottom: 150}} /> 
+          <View
+            style={{
+              marginTop: 20,
+              marginBottom: 30,
+              alignItems: 'center',
+              flexDirection: 'row',
+              justifyContent: 'center',
+            }}>
+            <TouchableOpacity
+              onPress={addRow}
+              style={{
+                backgroundColor: colors.color2,
+                paddingVertical: 10,
+                paddingHorizontal: 20,
+                borderRadius: 5,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}>
+              <Text style={{color: '#fff', fontSize: 16, fontWeight: 'bold'}}>
+                Add Style
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.wrapper}>
+            <ScrollView nestedScrollEnabled={true} horizontal>
+              <View style={styles.table}>
+                {/* Table Head */}
+                <View style={styles.table_head}>
+                  <View style={{width: 60}}>
+                    <Text style={styles.table_head_captions}>Action</Text>
+                  </View>
+                  <View style={{width: 5}}></View>
+                  <View style={{width: 100}}>
+                    <Text style={styles.table_head_captions}>Style</Text>
+                  </View>
+                  <View style={{width: 5}}></View>
+                  <View style={{width: 150}}>
+                    <Text style={styles.table_head_captions}>Total Qty</Text>
+                  </View>
+                </View>
+
+                {/* Table Body - Rows */}
+                {rows.map(row => (
+                  <View key={row.id}>
+                    <View style={styles.table_body_single_row}>
+                      <View style={{width: 60}}>
+                        <TouchableOpacity
+                          style={{alignItems: '', justifyContent: ''}}
+                          onPress={() => handleRemoveRow(row.id)}>
+                          <Image source={closeImg} style={styles.imageStyle1} />
+                        </TouchableOpacity>
+                      </View>
+                      <View style={{width: 5}}></View>
+                      <View style={{width: 100}}>
+                        <Text style={styles.table_data}>{row.Type}</Text>
+                      </View>
+
+                      <View style={{width: 5}}></View>
+                      <View style={{width: 150}}>
+                        <Text style={styles.table_data}>{row.StyleName}</Text>
+                      </View>
+                    </View>
+                  </View>
+                ))}
+              </View>
+            </ScrollView>
+          </View>
+
+          <View style={{marginBottom: 150}} />
         </View>
       </KeyboardAwareScrollView>
 
       <View style={CommonStyles.bottomViewComponentStyle}>
         <BottomComponent
-          rightBtnTitle={'Search'}
-          leftBtnTitle={'View'}
+          rightBtnTitle={'Download'}
+          leftBtnTitle={'Back'}
           isLeftBtnEnable={true}
           rigthBtnState={true}
           isRightBtnEnable={true}
