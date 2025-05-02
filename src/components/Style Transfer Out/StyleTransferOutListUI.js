@@ -65,7 +65,7 @@ const StyleTransferOutListUI = ({route, navigation, ...props}) => {
     if (props.itemsArray) {
       set_filterArray(props.itemsArray);
       set_ItemsArray(props.itemsArray);
-      // console.log("list , ",props.itemsArray)
+      console.log("list , ",props.itemsArray)
     }
     // getRequestBody();
 
@@ -115,12 +115,12 @@ const StyleTransferOutListUI = ({route, navigation, ...props}) => {
 
     const styleArray = ItemsArray.filter(item => {
       return (
-        (item?.producttype !== '' &&
-          item?.producttype?.toLowerCase().includes(searchTerm)) ||
-        (item?.styleCode !== '' &&
-          item?.styleCode?.toLowerCase().includes(searchTerm)) ||
-        (item?.processName !== '' &&
-          item?.processName?.toLowerCase().includes(searchTerm)) 
+        (item?.fromLocIdStr !== '' &&
+          item?.fromLocIdStr?.toLowerCase().includes(searchTerm)) ||
+        (item?.toLocIdStr !== '' &&
+          item?.toLocIdStr?.toLowerCase().includes(searchTerm)) ||
+        (item?.orderNo !== '' &&
+          item?.orderNo?.toLowerCase().includes(searchTerm)) 
       )
     });
 
@@ -163,25 +163,25 @@ const StyleTransferOutListUI = ({route, navigation, ...props}) => {
           <View
             style={{flex: 1, justifyContent: 'center'}}>
             <Text style={[CommonStyles.tylesTextStyle, {textAlign: 'center'}]}>
-              {item.masterboxname}
+              {item.fromLocIdStr}
             </Text>
           </View>
           <View
             style={{flex: 0.7, justifyContent: 'center'}}>
             <Text style={[CommonStyles.tylesTextStyle, {textAlign: 'center'}]}>
-              {item.boxes}
+              {item.toLocIdStr}
             </Text>
           </View>
           <View
             style={{flex: 0.5, justifyContent: 'center'}}>
             <Text style={[CommonStyles.tylesTextStyle, {textAlign: 'center'}]}>
-              {item.barcordeno}
+              {item.deliveryDateStr}
             </Text>
           </View>
           <View
             style={{flex: 0.7, justifyContent: 'center'}}>
             <Text style={[CommonStyles.tylesTextStyle, {textAlign: 'center'}]}>
-              {item.barcordeno}
+              {item.orderNo}
             </Text>
           </View>
         </View>

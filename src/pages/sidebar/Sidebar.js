@@ -293,55 +293,55 @@ const Sidebar = ({navigation}) => {
         },
       ],
     },
-    // reports: {
-    //   label: 'Reports',
-    //   menu_id: 100,
-    //   icon: require('../../../assets/images/png/sales.png'),
-    //   style: [
-    //     {
-    //       label: 'Inventory Consumption Report',
-    //       route: 'InventoryConsumptionReport',
-    //       menu_id: 118,
-    //       src: require('../../../assets/images/png/report.png'),
-    //     },
-    //     {
-    //       label: 'Sales Order Report',
-    //       route: 'SalesOrderReport',
-    //       menu_id: 101,
-    //       src: require('../../../assets/images/png/report.png'),
-    //     },
-    //     {
-    //       label: 'Production Process Report',
-    //       route: 'ProductionProcessReport',
-    //       menu_id: 127,
-    //       src: require('../../../assets/images/png/report.png'),
-    //     },
-    //     {
-    //       label: 'Style Bom Report',
-    //       route: 'StyleBomReport',
-    //       menu_id: 423,
-    //       src: require('../../../assets/images/png/report.png'),
-    //     },
-    //     {
-    //       label: 'Worker Wages Report',
-    //       route: 'WorkerWagesReport',
-    //       menu_id: 743,
-    //       src: require('../../../assets/images/png/report.png'),
-    //     },
-    //     {
-    //       label: 'Cutting Report',
-    //       route: 'CuttingReport',
-    //       menu_id: 743,
-    //       src: require('../../../assets/images/png/report.png'),
-    //     },
-    //     // {
-    //     //   label: 'Batch Wise Production Process Report',
-    //     //   route: 'BatchWiseReport',
-    //     //   menu_id: 743,
-    //     //   src: require('../../../assets/images/png/report.png'),
-    //     // },
-    //   ],
-    // },
+    reports: {
+      label: 'Reports',
+      menu_id: 100,
+      icon: require('../../../assets/images/png/sales.png'),
+      style: [
+        {
+          label: 'Inventory Consumption Report',
+          route: 'InventoryConsumptionReport',
+          menu_id: 118,
+          src: require('../../../assets/images/png/report.png'),
+        },
+        {
+          label: 'Sales Order Report',
+          route: 'SalesOrderReport',
+          menu_id: 101,
+          src: require('../../../assets/images/png/report.png'),
+        },
+        {
+          label: 'Production Process Report',
+          route: 'ProductionProcessReport',
+          menu_id: 127,
+          src: require('../../../assets/images/png/report.png'),
+        },
+        {
+          label: 'Style Bom Report',
+          route: 'StyleBomReport',
+          menu_id: 423,
+          src: require('../../../assets/images/png/report.png'),
+        },
+        {
+          label: 'Worker Wages Report',
+          route: 'WorkerWagesReport',
+          menu_id: 743,
+          src: require('../../../assets/images/png/report.png'),
+        },
+        {
+          label: 'Cutting Report',
+          route: 'CuttingReport',
+          menu_id: 743,
+          src: require('../../../assets/images/png/report.png'),
+        },
+        // {
+        //   label: 'Batch Wise Production Process Report',
+        //   route: 'BatchWiseReport',
+        //   menu_id: 743,
+        //   src: require('../../../assets/images/png/report.png'),
+        // },
+      ],
+    },
   };
 
   const filteredMenus = Object.fromEntries(
