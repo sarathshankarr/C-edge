@@ -21,7 +21,8 @@ const CreateStyleTransferOut = ({route}) => {
   const [popUpRBtnTitle, set_popUpRBtnTitle] = useState(undefined);
   const [isPopupLeft, set_isPopupLeft] = useState(false);
   const [lists, set_lists] = useState([]);
-  const [quality, set_quality] = useState([]);
+  const [stylesList, set_stylesList] = useState([]);
+  const [sizesList, set_sizesList] = useState([]);
 
   const backBtnAction = () => {
     navigation.goBack();
@@ -49,11 +50,11 @@ const CreateStyleTransferOut = ({route}) => {
     let obj = {
       username: userName,
       password: userPsd,
-      menuId: 384,
       compIds: usercompanyId,
       company: JSON.parse(companyObj),
+      dataFilter: '',
     };
-    let LISTAPIOBJ = await APIServiceCall.getMasterBoxPackingCreate(obj);
+    let LISTAPIOBJ = await APIServiceCall.getStyleTransferOutCreate(obj);
     set_isLoading(false);
 
     if (LISTAPIOBJ && LISTAPIOBJ.statusData) {
@@ -170,7 +171,7 @@ const CreateStyleTransferOut = ({route}) => {
     }
   };
 
-  const getData = async (tempObj, idx) => {
+  const getStylesList = async (id, radioID) => {
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
@@ -183,15 +184,70 @@ const CreateStyleTransferOut = ({route}) => {
       menuId: 384,
       compIds: usercompanyId,
       company: JSON.parse(companyObj),
-      styleId: tempObj.sId,
-      buyerpoId: tempObj.bId,
+      fromLoc: id,
     };
-    let LISTAPIOBJ = await APIServiceCall.getMasterBoxPackingCreateQuality(obj);
+    console.log("get style list ==> radio id is ", radioID)
+    let LISTAPIOBJ;
+    if(radioID===1){
+      LISTAPIOBJ = await APIServiceCall.getCreateStyleTOStyleListFromMultiColor(obj);
+    }else if(radioID===2){
+      LISTAPIOBJ = await APIServiceCall.getCreateStyleTOStyleListFromCustomer(obj);
+    }else{
+      LISTAPIOBJ = await APIServiceCall.getCreateStyleTOStyleList(obj);
+    }
+
+
     set_isLoading(false);
 
     if (LISTAPIOBJ && LISTAPIOBJ.statusData) {
       if (LISTAPIOBJ && LISTAPIOBJ.responseData) {
-        set_quality(LISTAPIOBJ.responseData);
+        set_stylesList(LISTAPIOBJ.responseData);
+      }
+    } else {
+      popUpAction(
+        Constant.SERVICE_FAIL_MSG,
+        Constant.DefaultAlert_MSG,
+        'OK',
+        true,
+        false,
+      );
+    }
+
+    if (LISTAPIOBJ && LISTAPIOBJ.error) {
+      popUpAction(
+        Constant.SERVICE_FAIL_MSG,
+        Constant.DefaultAlert_MSG,
+        'OK',
+        true,
+        false,
+      );
+    }
+  };
+
+  const getSizesList = async tempObj => {
+    let userName = await AsyncStorage.getItem('userName');
+    let userPsd = await AsyncStorage.getItem('userPsd');
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
+
+    set_isLoading(true);
+    let obj = {
+      username: userName,
+      password: userPsd,
+      compIds: usercompanyId,
+      company: JSON.parse(companyObj),
+      styleId: tempObj.sId,
+      fromLoc: tempObj.fromId,
+      isMulti: tempObj.multiple,
+      iswoOrWos: '0',
+    };
+    console.log(" req getSizesList ===> ",)
+    let LISTAPIOBJ = await APIServiceCall.getCreateSizesList(obj);
+    set_isLoading(false);
+
+    if (LISTAPIOBJ && LISTAPIOBJ.statusData) {
+      if (LISTAPIOBJ && LISTAPIOBJ.responseData) {
+        set_sizesList(LISTAPIOBJ.responseData);
       }
     } else {
       popUpAction(
@@ -226,8 +282,10 @@ const CreateStyleTransferOut = ({route}) => {
       isPopUp={isPopUp}
       lists={lists}
       submitAction={submitAction}
-      getData={getData}
-      quality={quality}
+      getStylesList={getStylesList}
+      getSizesList={getSizesList}
+      stylesList={stylesList}
+      sizesList={sizesList}
       backBtnAction={backBtnAction}
       popOkBtnAction={popOkBtnAction}
     />

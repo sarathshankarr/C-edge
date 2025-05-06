@@ -4568,6 +4568,45 @@ export async function getMasterBoxPackingCreate(jsonValue) {
     obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet }
     return obj;
 };
+export async function getStyleTransferOutCreate(jsonValue) {
+
+    let returnError = undefined;
+    let statusData = undefined;
+    let responseData = undefined;
+    let logoutData = false;
+    let obj = undefined;
+
+    let internet = await internetCheck();
+    if (!internet) {
+        obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
+        return obj;
+    }
+    console.log("URL", Environment.uri + "styletransferapi/createStyleTransfer");
+    await fetch(Environment.uri + "styletransferapi/createStyleTransfer",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            },
+            body: JSON.stringify(jsonValue),
+        }
+    ).then((response) => response.json()).then(async (data) => {
+        if (data) {
+            statusData = true;
+            responseData = data
+        } else {
+            statusData = undefined;
+        }
+
+    }).catch((error) => {
+        console.log('getPartsProcessingCreateList error ', error)
+        returnError = error;
+    });
+
+    obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet }
+    return obj;
+};
 export async function getWorkOrderStyleCreate(jsonValue) {
 
     let returnError = undefined;
@@ -4640,6 +4679,162 @@ export async function getMasterBoxPackingCreateQuality(jsonValue) {
 
     }).catch((error) => {
         console.log('getPartsProcessingCreateList error ', error)
+        returnError = error;
+    });
+
+    obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet }
+    return obj;
+};
+export async function getCreateStyleTOStyleList(jsonValue) {
+
+    let returnError = undefined;
+    let statusData = undefined;
+    let responseData = undefined;
+    let logoutData = false;
+    let obj = undefined;
+
+    let internet = await internetCheck();
+    if (!internet) {
+        obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
+        return obj;
+    }
+    console.log("URL", Environment.uri + "styletransferapi/getStylesFromLocation");
+    await fetch(Environment.uri + "styletransferapi/getStylesFromLocation",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            },
+            body: JSON.stringify(jsonValue),
+        }
+    ).then((response) => response.json()).then(async (data) => {
+        if (data) {
+            statusData = true;
+            responseData = data
+        } else {
+            statusData = undefined;
+        }
+
+    }).catch((error) => {
+        console.log('getPartsProcessingCreateList error ', error)
+        returnError = error;
+    });
+
+    obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet }
+    return obj;
+};
+export async function getCreateStyleTOStyleListFromCustomer(jsonValue) {
+
+    let returnError = undefined;
+    let statusData = undefined;
+    let responseData = undefined;
+    let logoutData = false;
+    let obj = undefined;
+
+    let internet = await internetCheck();
+    if (!internet) {
+        obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
+        return obj;
+    }
+    console.log("URL", Environment.uri + "styletransferapi/getCustomerStylewise");
+    await fetch(Environment.uri + "styletransferapi/getCustomerStylewise",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            },
+            body: JSON.stringify(jsonValue),
+        }
+    ).then((response) => response.json()).then(async (data) => {
+        if (data) {
+            statusData = true;
+            responseData = data
+        } else {
+            statusData = undefined;
+        }
+
+    }).catch((error) => {
+        console.log('getCreateStyleTOStyleListFromCustomer error ', error)
+        returnError = error;
+    });
+
+    obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet }
+    return obj;
+};
+export async function getCreateStyleTOStyleListFromMultiColor(jsonValue) {
+
+    let returnError = undefined;
+    let statusData = undefined;
+    let responseData = undefined;
+    let logoutData = false;
+    let obj = undefined;
+
+    let internet = await internetCheck();
+    if (!internet) {
+        obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
+        return obj;
+    }
+    console.log("URL", Environment.uri + "styletransferapi/getStyleMultiColor");
+    await fetch(Environment.uri + "styletransferapi/getStyleMultiColor",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            },
+            body: JSON.stringify(jsonValue),
+        }
+    ).then((response) => response.json()).then(async (data) => {
+        if (data) {
+            statusData = true;
+            responseData = data
+        } else {
+            statusData = undefined;
+        }
+
+    }).catch((error) => {
+        console.log('getPartsProcessingCreateList error ', error)
+        returnError = error;
+    });
+
+    obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet }
+    return obj;
+};
+export async function getCreateSizesList(jsonValue) {
+
+    let returnError = undefined;
+    let statusData = undefined;
+    let responseData = undefined;
+    let logoutData = false;
+    let obj = undefined;
+
+    let internet = await internetCheck();
+    if (!internet) {
+        obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
+        return obj;
+    }
+    console.log("URL", Environment.uri + "styletransferapi/populateSizes");
+    await fetch(Environment.uri + "styletransferapi/populateSizes",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            },
+            body: JSON.stringify(jsonValue),
+        }
+    ).then((response) => response.json()).then(async (data) => {
+        if (data) {
+            statusData = true;
+            responseData = data
+        } else {
+            statusData = undefined;
+        }
+
+    }).catch((error) => {
+        console.log('getCreateSizesList error ', error)
         returnError = error;
     });
 
@@ -6490,6 +6685,10 @@ export const downloadProductionProcessReport =()=>{
 } 
 export const downloadStyleBomReport =()=>{
     const URL=Environment.uri + "stylebom/styleBomPdfReport";
+    return URL;
+} 
+export const downloadCuttingReport =()=>{
+    const URL=Environment.uri + "cuttingApi/cuttingReport";
     return URL;
 } 
 
