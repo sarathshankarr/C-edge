@@ -65,40 +65,15 @@ const CuttingReportUI = ({route, ...props}) => {
   const ApproveAction = () => {
     console.log('Approved');
 
-    const requestDetails = rows.map(detail => ({
-      stockType: detail.stockTypeId,
-      stockTypeName: detail.stockType,
-      stock: detail.stockId,
-      stock_rm_lot: 0,
-      stockLocationId: 1,
-      styleRmSizeId: detail.size,
-      inputQty: detail.inputQty,
-      uomstock: detail.uom,
-    }));
-
-    let tempObj = {
-      processId: processId,
-      woStyleId: stylesId,
-      trimId: fabricId,
-      locationId: locationId,
-      unitMasterId: unitMasterId,
-      comments: remarks,
-      general: generalRadio === 'Yes' ? '1' : '0',
-      styleWise: displayStyleRadio === 'Yes' ? '1' : '0',
-      fabricQty: enteredFabQty,
-      uom: itemsObj?.uomfabric,
-      rmDetails: requestDetails,
-    };
-
-    // console.log("SAVING OBJ=====>   ", tempObj);
-    props.submitAction(tempObj);
+    const ids = selectedIndices.join(',');
+    props.submitAction(ids);
   };
 
   const RejectAction = remarks => {
     console.log('Rejected');
   };
 
-  const actionOnStyles = (item) => {
+  const actionOnStyles = item => {
     set_stylesId(item.id);
     set_stylesName(item.name);
     // set_showStylesList(false);
@@ -152,8 +127,6 @@ const CuttingReportUI = ({route, ...props}) => {
             width: '90%',
             marginHorizontal: wp('5%'),
           }}>
-          {/* drop down lists */}
-
           <View
             style={{
               alignItems: 'center',

@@ -65,7 +65,7 @@ const StyleTransferOutListUI = ({route, navigation, ...props}) => {
     if (props.itemsArray) {
       set_filterArray(props.itemsArray);
       set_ItemsArray(props.itemsArray);
-      console.log("list , ",props.itemsArray)
+      // console.log("list , ",props.itemsArray)
     }
     // getRequestBody();
 
@@ -161,27 +161,27 @@ const StyleTransferOutListUI = ({route, navigation, ...props}) => {
         style={[CommonStyles.cellBackViewStyle, {marginBottom: 3}]}>
         <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
           <View
-            style={{flex: 1, justifyContent: 'center'}}>
+            style={{flex: 0.5, justifyContent: 'center'}}>
             <Text style={[CommonStyles.tylesTextStyle, {textAlign: 'center'}]}>
-              {item.fromLocIdStr}
+              {item.idstr}
             </Text>
           </View>
           <View
             style={{flex: 0.7, justifyContent: 'center'}}>
             <Text style={[CommonStyles.tylesTextStyle, {textAlign: 'center'}]}>
-              {item.toLocIdStr}
+              {item.styleno}
             </Text>
           </View>
           <View
             style={{flex: 0.5, justifyContent: 'center'}}>
             <Text style={[CommonStyles.tylesTextStyle, {textAlign: 'center'}]}>
-              {item.deliveryDateStr}
+              {item.toLocIdStr}
             </Text>
           </View>
           <View
             style={{flex: 0.7, justifyContent: 'center'}}>
             <Text style={[CommonStyles.tylesTextStyle, {textAlign: 'center'}]}>
-              {item.orderNo}
+              {item.username}
             </Text>
           </View>
         </View>
@@ -316,30 +316,30 @@ const StyleTransferOutListUI = ({route, navigation, ...props}) => {
             <Text
               style={[
                 CommonStyles.tylesHeaderTextStyle,
-                {flex: 1, textAlign: 'center'},
+                {flex: 0.5, textAlign: 'center'},
               ]}>
-              {'Master Box Name'}
+              {'ST NO'}
             </Text>
             <Text
               style={[
                 CommonStyles.tylesHeaderTextStyle,
                 {flex: 0.7, textAlign: 'center'},
               ]}>
-              {'Box Names'}
+              {'Style (Color) '}
             </Text>
             <Text
               style={[
                 CommonStyles.tylesHeaderTextStyle,
                 {flex: 0.5, textAlign: 'center'},
               ]}>
-              {'Barcode'}
+              {'To Location'}
             </Text>
             <Text
               style={[
                 CommonStyles.tylesHeaderTextStyle,
                 {flex: 0.7, textAlign: 'center'},
               ]}>
-              {'Total Scanned Barcodes'}
+              {'Requested By'}
             </Text>
           </View>
         ) : (
@@ -392,7 +392,7 @@ const StyleTransferOutListUI = ({route, navigation, ...props}) => {
         reqBody={filterReqBody}
       />
 
-      <AddNewItem navItem={'SaveStyleTransferOut'} />
+      <AddNewItem navItem={'CreateStyleTransferOut'} />
 
       {props.isPopUp ? (
         <View style={CommonStyles.customPopUpStyle}>

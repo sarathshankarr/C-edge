@@ -6,6 +6,8 @@ import StyleBomReportUI from './StyleBomReportUI';
 import {Alert, PermissionsAndroid, Platform} from 'react-native';
 import axios from 'axios';
 import XLSX from 'xlsx';
+import { Buffer } from 'buffer';
+
 import ReactNativeBlobUtil from 'react-native-blob-util';
 
 const StyleBomReport = ({navigation, route, ...props}) => {
@@ -184,7 +186,7 @@ const StyleBomReport = ({navigation, route, ...props}) => {
     }
   };
 
-  const submitAction = async tempObj => {
+  const submitAction1 = async tempObj => {
     try {
       let userName = await AsyncStorage.getItem('userName');
       let userPsd = await AsyncStorage.getItem('userPsd');
@@ -217,8 +219,10 @@ const StyleBomReport = ({navigation, route, ...props}) => {
       // Convert the received binary data into a readable format
       // let workbook = XLSX.read(response.data, {type: 'array'});
       // let excelData = XLSX.write(workbook, {bookType: 'xlsx', type: 'base64'});
+      let excelData = Buffer.from(response.data, 'binary').toString('base64');
 
-      let excelData = ReactNativeBlobUtil.base64.encode(response.data);
+
+      // let excelData = ReactNativeBlobUtil.base64.encode(response.data);
       // await ReactNativeBlobUtil.fs.writeFile(filePath, excelData, 'base64');
 
 
@@ -266,6 +270,71 @@ const StyleBomReport = ({navigation, route, ...props}) => {
       set_isLoading(false);
     }
   };
+
+  const submitAction = async (tempObj) => {
+    try {
+    let userName = await AsyncStorage.getItem('userName');
+    let userPsd = await AsyncStorage.getItem('userPsd');
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
+    set_isLoading(true);
+
+    let obj = {
+      username: userName,
+      password: userPsd,
+      compIds: usercompanyId,
+      company: JSON.parse(companyObj),
+      multistyle: tempObj.multistyle,
+      QtyVal: tempObj.QtyVal,
+      soId: tempObj.soId,
+    };
+
+    const apiUrl = APIServiceCall.downloadStyleBomReport(); 
+
+        console.log("API URL:", apiUrl);
+    
+          const response = await axios.post(apiUrl, obj, {
+              headers: {
+                  'Content-Type': 'application/json',
+              },
+              responseType: 'arraybuffer', 
+          });
+    
+          console.log("Response received, processing file...");
+          
+          // Convert the received binary data into a readable format
+          let workbook = XLSX.read(response.data, { type: 'array' });
+          let excelData = XLSX.write(workbook, { bookType: 'xlsx', type: 'base64' });
+    
+          // Request storage permission on Android
+          if (Platform.OS === 'android') {
+              const hasPermission = await requestStoragePermission();
+              if (!hasPermission) {
+                  Alert.alert('Permission Denied', 'Storage permission is required to save the XLSX file.');
+                  return;
+              }
+          }
+    
+          // Define the file path for saving the Excel file
+          const filePath1 = `/storage/emulated/0/Download/${Date.now()}.xlsx`;
+    
+           const filePath = Platform.OS === 'android' 
+              ? `/storage/emulated/0/Download/${Date.now()}.xlsx` 
+              : `${ReactNativeBlobUtil.fs.dirs.DocumentDir}/${Date.now()}}.xlsx`;
+          
+          // Save the file using ReactNativeBlobUtil
+          await ReactNativeBlobUtil.fs.writeFile(filePath, excelData, 'base64');
+    
+          // Show success message
+          popUpAction(`Excel file saved successfully at ${filePath}`, Constant.DefaultAlert_MSG, 'OK', true, false);
+      } catch (error) {
+          console.error('Error generating or saving Excel file:', error);
+          popUpAction(Constant.SERVICE_FAIL_PDF_MSG, Constant.DefaultAlert_MSG, 'OK', true, false);
+      } finally {
+          set_isLoading(false);
+      }
+    };
+
 
   return (
     <StyleBomReportUI

@@ -90,7 +90,7 @@ const StyleTransferOutList = ({route}) => {
         // "days":"0",
       };
 
-      console.log("req body ===> ", obj)
+      // console.log("req body ===> ", obj)
       let LISTAPIOBJ = await APIServiceCall.LoadAllStyleTransferOutList(obj);
       set_isLoading(false);
 
@@ -194,7 +194,7 @@ const StyleTransferOutList = ({route}) => {
   };
 
   const actionOnRow = (item, index) => {
-    navigation.navigate('SaveMasterBoxPacking', {item: item});
+    navigation.navigate('SaveStyleTransferOut', {item: item});
   };
 
   const handleNavigation = () => {
