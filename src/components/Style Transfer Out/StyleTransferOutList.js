@@ -197,9 +197,153 @@ const StyleTransferOutList = ({route}) => {
     navigation.navigate('SaveStyleTransferOut', {item: item});
   };
 
-  const handleNavigation = () => {
-    navigation.navigate('SavePartProcessing');
+  const handlePdf = async (item, id) => {
+    set_isLoading(true);
+    let userName = await AsyncStorage.getItem('userName');
+    let userPsd = await AsyncStorage.getItem('userPsd');
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
+
+    let obj = {
+      hiddenTransferId: item.styletransferId,
+      typeofPdf: id,
+      username: userName,
+      password: userPsd,
+      compIds: usercompanyId,
+      company: JSON.parse(companyObj),
+    };
+
+    const apiUrl = APIServiceCall.downloadPdfStyleTransferOut();
+
+    try {
+      const response = await axios.post(apiUrl, obj, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        responseType: 'arraybuffer',
+      });
+
+      console.log(
+        'Response for pdf API ==> ',
+        typeof response?.request?._response,
+      );
+
+      // Ensure the data is in binary form
+      let base64Data = response?.request?._response;
+
+      if (Platform.OS === 'android') {
+        const hasPermission = await requestStoragePermission();
+        if (!hasPermission) {
+          Alert.alert(
+            'Permission Denied',
+            'Storage permission is required to save the PDF.',
+          );
+          return;
+        }
+      }
+
+      const downloadFolder =
+        Platform.OS === 'android'
+          ? ReactNativeBlobUtil.fs.dirs.DownloadDir
+          : ReactNativeBlobUtil.fs.dirs.DocumentDir;
+      // const pdfPath = `${downloadFolder}/${item.so_style_id}.pdf`;
+      // const pdfPath = `/storage/emulated/0/Download/${item.so_style_id}_${Date.now()}.pdf`;
+      const fileType = id === 1 ? 'Indc' : id === 2 ? 'Outdc' : 'Unknown';
+      const pdfPath =
+        Platform.OS === 'android'
+          ? `/storage/emulated/0/Download/${fileType}_${Date.now()}.pdf`
+          : `${
+              ReactNativeBlobUtil.fs.dirs.DocumentDir
+            }/${fileType}_${Date.now()}.pdf`;
+
+      await ReactNativeBlobUtil.fs.writeFile(pdfPath, base64Data, 'base64');
+
+      // Alert.alert('PDF Downloaded', `PDF saved successfully at ${pdfPath}`);
+      // popUpAction(`PDF saved successfully at ${pdfPath}`,Constant.DefaultAlert_MSG,'OK', true,false)
+
+      if (Platform.OS === 'android') {
+        popUpAction(
+          `PDF saved successfully at ${pdfPath}`,
+          Constant.DefaultAlert_MSG,
+          'OK',
+          true,
+          false,
+        );
+      } else {
+        popUpAction(
+          'PDF saved successfully',
+          Constant.DefaultAlert_MSG,
+          'OK',
+          true,
+          false,
+        );
+      }
+    } catch (error) {
+      console.error('Error generating or saving PDF:', error);
+      // Alert.alert('Error', `Failed to generate or save PDF: ${error.message}`);
+      popUpAction(
+        Constant.SERVICE_FAIL_PDF_MSG,
+        Constant.DefaultAlert_MSG,
+        'OK',
+        true,
+        false,
+      );
+    } finally {
+      set_isLoading(false);
+    }
   };
+
+   const requestStoragePermission = async () => {
+      try {
+        if (Platform.OS === 'android') {
+          if (Platform.Version >= 33) {
+            // Android 13 and above
+            const granted = await PermissionsAndroid.request(
+              PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES,
+              {
+                title: 'Storage Permission Required',
+                message: 'This app needs access to your storage to download PDF',
+                buttonNeutral: 'Ask Me Later',
+                buttonNegative: 'Cancel',
+                buttonPositive: 'OK',
+              },
+            );
+            return granted === PermissionsAndroid.RESULTS.GRANTED;
+          } else if (Platform.Version >= 30) {
+            // Android 11 - 12 (Scoped Storage)
+            const granted = await PermissionsAndroid.request(
+              PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+              {
+                title: 'Storage Permission Required',
+                message: 'This app needs access to your storage to download PDF',
+                buttonNeutral: 'Ask Me Later',
+                buttonNegative: 'Cancel',
+                buttonPositive: 'OK',
+              },
+            );
+            return granted === PermissionsAndroid.RESULTS.GRANTED;
+          } else {
+            // Below Android 11
+            const granted = await PermissionsAndroid.request(
+              PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+                  PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+              {
+                title: 'Storage Permission Required',
+                message: 'This app needs access to your storage to download PDF',
+                buttonNeutral: 'Ask Me Later',
+                buttonNegative: 'Cancel',
+                buttonPositive: 'OK',
+              },
+            );
+            return granted === PermissionsAndroid.RESULTS.GRANTED;
+          }
+        }
+        return false;
+      } catch (err) {
+        console.warn('Error requesting storage permission:', err);
+        return false;
+      }
+    };
 
   return (
     <StyleTransferOutListUI
@@ -215,8 +359,8 @@ const StyleTransferOutList = ({route}) => {
       backBtnAction={backBtnAction}
       popOkBtnAction={popOkBtnAction}
       fetchMore={fetchMore}
+      handlePdf={handlePdf}
       applyFilterFxn={getFilteredList}
-      handleNavigation={handleNavigation}
     />
   );
 };

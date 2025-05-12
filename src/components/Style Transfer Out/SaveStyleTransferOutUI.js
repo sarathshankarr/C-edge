@@ -34,13 +34,14 @@ let downArrowImg = require('./../../../assets/images/png/dropDownImg.png');
 let closeImg = require('./../../../assets/images/png/close1.png');
 
 const SaveStyleTransferOutUI = ({route, navigation, ...props}) => {
-  const [masterBoxName, setMasterBoxName] = useState('');
+  const [masterStyleName, setMasterStyleName] = useState('');
   const [rows, setRows] = useState([]);
   const [buyerName, setbuyerName] = React.useState('');
   const [barcode, setBarcode] = React.useState('');
-  const [lastestBoxId, setLastestBoxId] = React.useState(0);
+  const [lastestStyleId, setLastestStyleId] = React.useState(0);
   const [lastestBuyerPoId, setLastestBuyerPoId] = React.useState(0);
-  const [lastestBoxList, setLastestBoxList] = React.useState('');
+  const [lastestStyleList, setLastestStyleList] = React.useState('');
+  const [stylesList, set_stylesList] = useState([]);
 
   const [inHouse, setInHouse] = useState('Yes');
   const [customer, setCustomer] = useState('No');
@@ -64,95 +65,188 @@ const SaveStyleTransferOutUI = ({route, navigation, ...props}) => {
   };
 
   useEffect(() => {
-    if (props.lists) {
-      if (props.lists.buyerMap) {
-        const buyerMapList = Object.keys(props.lists.buyerMap).map(key => ({
-          id: key,
-          name: props.lists.buyerMap[key],
-        }));
-        setFilteredBuyerPo(buyerMapList);
-        setBuyerPoList(buyerMapList);
-      }
-      if (props.lists.boxid) {
-        const boxidList = Object.keys(props.lists.boxid).map(key => ({
-          id: key,
-          name: props.lists.boxid[key],
-        }));
-        setLastestBoxList(boxidList);
-        setRows([
-          ...rows,
-          {
-            id: Date.now(),
-            BoxName: '',
-            BoxId: '',
-            showBoxList: false,
-            BoxList: boxidList || [],
-            filteredBoxList: boxidList || [],
-            CustomerStyleName: '',
-            size: '',
-            Qty: '',
-            childTable: [],
-            PbuyerPoID: '',
-          },
-        ]);
-      }
-    }
-  }, [props.lists]);
-
-  useEffect(() => {
-    if (props.quality) {
-      console.log('quality ====> ', props.quality);
-
-      if (props?.quality?.selectedSizeCodesJson) {
-        let parsedData = JSON.parse(props?.quality?.selectedSizeCodesJson);
-
-        let updatedData = parsedData.map(item => ({
-          ...item,
-          checked: false,
-        }));
-
-        setRows(prevRows =>
-          prevRows.map(row =>
-            row.BoxId === lastestBoxId
-              ? {
-                  ...row,
-                  size: props.quality.size,
-                  Qty: props.quality.qty,
-                  CustomerStyleName: props.quality.style,
-                  childTable: updatedData,
-                  PbuyerPoID: lastestBuyerPoId,
-                }
-              : row,
-          ),
+    if (props.itemsObj) {
+      // console.log(
+      //   'styleTransferDetails lists ===> ',
+      //   props.itemsObj?.styleTransferDetails,
+      // );
+      // console.log(
+      //   'tsyle tarnsfer particulars ===> ',
+      //   props.itemsObj?.styleTransferDetails?.particulars,
+      // );
+      if (props.itemsObj.locationsMap) {
+        const locationsMapList = Object.keys(props.itemsObj.locationsMap).map(
+          key => ({
+            id: key,
+            name: props.itemsObj.locationsMap[key],
+          }),
         );
+        setFilteredFromLocation(locationsMapList);
+        setFromLocationList(locationsMapList);
+        setFilteredToLocation(locationsMapList);
+        setToLocationList(locationsMapList);
+      }
+
+      if (props.itemsObj.vendorsCustomersMap) {
+        const vendorsCustomersMapList = Object.keys(
+          props.itemsObj.vendorsCustomersMap,
+        ).map(key => ({
+          id: key,
+          name: props.itemsObj.vendorsCustomersMap[key],
+        }));
+        setFilteredToCustomer(vendorsCustomersMapList);
+        setToCustomerList(vendorsCustomersMapList);
+      }
+
+      if (props.itemsObj.styleTransferDetails) {
+        if (props.itemsObj.styleTransferDetails.fromLocId) {
+          setFromLocationId(props.itemsObj.styleTransferDetails.fromLocId);
+          setFromLocationName(
+            props.itemsObj.locationsMap[
+              props.itemsObj.styleTransferDetails.fromLocId
+            ],
+          );
+        }
+        if (props.itemsObj.styleTransferDetails.toLocId) {
+          setToLocationId(props.itemsObj.styleTransferDetails.toLocId);
+          setToLocationName(
+            props.itemsObj.locationsMap[
+              props.itemsObj.styleTransferDetails.toLocId
+            ],
+          );
+        }
+        if (props.itemsObj.styleTransferDetails.isMulti) {
+          const value = props.itemsObj.styleTransferDetails.isMulti;
+          if (value === 1) {
+            setSingleColor('Yes');
+            setMultiColor('No');
+            setCustomerStyle('No');
+          } else if (value === 2) {
+            setSingleColor('No');
+            setMultiColor('Yes');
+            setCustomerStyle('No');
+          } else if (value === 3) {
+            setSingleColor('No');
+            setMultiColor('No');
+            setCustomerStyle('Yes');
+          }
+        }
+
+        if (props.itemsObj.styleTransferDetails.deliveryDateStr) {
+          setDate(props.itemsObj.styleTransferDetails.deliveryDateStr);
+          
+        }
+
+        if (props.itemsObj.styleTransferDetails.particulars) {
+          const data = props.itemsObj.styleTransferDetails.particulars;
+
+          const newRows = data.map((item, index) => {
+            const receivedSizesArr = item.receivedsizes.split(',');
+            const sizeQtyArr = item.sizeQty.split(',');
+            const sizeReceivedQtyArr = item.sizereceviedqty;
+            const sizeNames = item.sizenames;
+
+            const maxLength = sizeNames.length;
+            const childTable = Array.from({length: maxLength}).map((_, i) => ({
+              _id: i,
+              sizeDesc: sizeNames[i] || '',
+              receivedsizes: receivedSizesArr[i] || '0',
+              sizeQty: sizeQtyArr[i] || '0',
+              sizereceviedqty: sizeReceivedQtyArr[i] || '0',
+              enteredInput: '0',
+            }));
+
+            return {
+              id: index,
+              StyleName: props.itemsObj.styleMap[item.styleID],
+              StyleId: item.styleID,
+              showStyleList: false,
+              StyleList: stylesList || [],
+              filteredStyleList: stylesList || [],
+              totalQty: '',
+              styleCost: item.style_cost,
+              goodsValue: item.total_goods,
+              processQty: item.process_quantity,
+              sendQty: item.sendQty,
+              receivedsizes: item.receivedsizes,
+              childTable: childTable,
+              showSampleProcessList: false,
+              SampleProcessList: [],
+              filteredSampleProcess: [],
+              selectedIndices: item.process_ids
+                ? item.process_ids.split(',')
+                : [],
+              processNames: item.process_ids
+                ? item.process_ids
+                    .split(',')
+                    .map(id => props.itemsObj.sampleProcess[id.trim()])
+                    .filter(Boolean)
+                    .join(', ')
+                : '',
+            };
+          });
+          // console.log('new row ===> ', newRows);
+          setRows(prevRows => [...prevRows, ...newRows]);
+        }
       }
     }
-  }, [props.quality]);
+  }, [props.itemsObj]);
 
   const backAction = async () => {
     props.backBtnAction();
   };
 
+  function formatDateIntoDMY(inp) {
+    const [d, m, y] = inp.split('/');
+    let ans = [y, m, d];
+    ans = ans.join('-');
+    return ans;
+  }
+
   const submitAction = async () => {
-    const mappedRows = rows.flatMap(row => {
-      const barcodeString = row.childTable?.length
-        ? Array(row.childTable.length).fill(row.barcode).join(',')
+    const mappedRows = rows.map(row => {
+      const updatedReceivedSizes = row.childTable.map(child => {
+        const entered = parseFloat(child.enteredInput || '0');
+        const received = parseFloat(child.receivedsizes || '0');
+        return received + entered;
+      });
+
+      const receivedsizes = updatedReceivedSizes.length
+        ? updatedReceivedSizes.join(',') + ','
         : '';
 
-      return (
-        row.childTable?.map(child => ({
-          masterboxId: row.BoxId,
-          barcode: barcodeString,
-          boxId: child.SIZE_VAL,
-          m_buyerpo_id: row.PbuyerPoID,
-        })) || []
+      const totalsizeValues = updatedReceivedSizes.reduce(
+        (sum, val) => sum + val,
+        0,
       );
+
+      const sizeQtyJoined = row.childTable.length
+        ? row.childTable.map(child => child.enteredInput || '0').join(',') + ','
+        : '';
+
+      return {
+        styleID: row.StyleId,
+        sendQty: row.sendQty,
+        sizeQty: sizeQtyJoined,
+        receivedsizes: receivedsizes,
+        totalsizeValues: totalsizeValues,
+        loss: '0',
+        missedQty: '0',
+        msunitQty: '0',
+      };
     });
 
+    // console.log('mappedRows obj ===> ', mappedRows);
+
     const tempObj = {
-      boxId: 0,
-      masterBox: masterBoxName,
-      buyerpoId: buyerPoId,
+      companyLocationId: fromLocationId,
+      isMulti: singleColor === 'Yes' ? 1 : multiColor === 'Yes' ? 2 : 3,
+      iswoOrWos: '0',
+      refDate: formatDateIntoDMY(date),
+      hiddenDate: formatDateIntoDMY(date),
+      receivedLocationId: toLocationId,
+      locName: toLocationName,
+      customerOrInhouse: inHouse === 'Yes' ? 'inhouse' : 'customer',
       particulars: mappedRows || [],
     };
 
@@ -166,13 +260,13 @@ const SaveStyleTransferOutUI = ({route, navigation, ...props}) => {
     setRows(filtered);
   };
 
-  const handleSearchboxName = async (text, rowId) => {
+  const handleSearchStyleName = async (text, rowId) => {
     setRows(
       rows.map(r =>
         r.id === rowId
           ? {
               ...r,
-              filteredBoxList: r.BoxList?.filter(item =>
+              filteredStyleList: r.StyleList?.filter(item =>
                 item.name.toLowerCase().includes(text.toLowerCase()),
               ),
             }
@@ -181,63 +275,27 @@ const SaveStyleTransferOutUI = ({route, navigation, ...props}) => {
     );
   };
 
-  const actionOnboxName = async (item, rowId) => {
+  const actionOnStyleName = async (item, rowId) => {
     setRows(
       rows.map(row =>
         row.id === rowId
           ? {
               ...row,
-              BoxName: item?.name,
-              BoxId: item?.id,
-              showBoxList: false,
+              StyleName: item?.name,
+              StyleId: item?.id,
+              showStyleList: false,
             }
           : row,
       ),
     );
-    setLastestBoxId(item.id);
+    setLastestStyleId(item.id);
 
     const tempObj = {
       sId: item.id,
-      bId: buyerPoId,
+      fromId: fromLocationId,
+      multiple: singleColor === 'Yes' ? 1 : multiColor === 'Yes' ? 2 : 3,
     };
-    await props.getData(tempObj, 1);
-  };
-  const actionOnCheckBox = async (rowId, idx) => {
-    setRows(prevRows =>
-      prevRows.map(row =>
-        row.id === rowId
-          ? {
-              ...row,
-              childTable: row.childTable.map((item, index) =>
-                index === idx ? {...item, checked: !item.checked} : item,
-              ),
-            }
-          : row,
-      ),
-    );
-  };
-
-  const addRow = () => {
-    setRows([
-      ...rows,
-      {
-        id: Date.now(),
-        BoxName: '',
-        BoxId: '',
-        showBoxList: false,
-        BoxList: lastestBoxList || [],
-        filteredBoxList: lastestBoxList || [],
-        CustomerStyleName: '',
-        size: '',
-        Qty: '',
-        childTable: [{SIZE_VAL:205, SIZE_SIZE_ID:1},{SIZE_VAL:205, SIZE_SIZE_ID:2},{SIZE_VAL:205, SIZE_SIZE_ID:3}],
-        PbuyerPoID: lastestBuyerPoId || '',
-        showColorList: false,
-        colorList: [],
-        filteredColor: [],
-        selectedIndices: [],
-      },
-    ]);
+    await props.getSizesList(tempObj);
   };
 
   // From Location
@@ -261,10 +319,14 @@ const SaveStyleTransferOutUI = ({route, navigation, ...props}) => {
   const [toCustomerName, setToCustomerName] = useState('');
   const [toCustomerId, setToCustomerId] = useState('');
 
-  const actionOnFromLocation = item => {
+  const actionOnFromLocation = async item => {
     setFromLocationId(item.id);
     setFromLocationName(item.name);
     setShowFromLocationList(false);
+
+    const radioID = singleColor === 'Yes' ? 3 : multiColor === 'Yes' ? 1 : 2;
+
+    await props.getStylesList(item.id, radioID);
   };
 
   const actionOnToLocation = item => {
@@ -373,22 +435,7 @@ const SaveStyleTransferOutUI = ({route, navigation, ...props}) => {
   };
 
   const handleColorStyleChange = selectedId => {
-    const selectedOption = colorStyleRadioButtons.find(
-      button => button.id === selectedId,
-    );
-    if (selectedOption.value === 'Single Color') {
-      setSingleColor('Yes');
-      setMultiColor('No');
-      setCustomerStyle('No');
-    } else if (selectedOption.value === 'Multi Color') {
-      setSingleColor('No');
-      setMultiColor('Yes');
-      setCustomerStyle('No');
-    } else if (selectedOption.value === 'Customer Style') {
-      setSingleColor('No');
-      setMultiColor('No');
-      setCustomerStyle('Yes');
-    }
+    return;
   };
 
   const handleConfirm = d => {
@@ -405,15 +452,15 @@ const SaveStyleTransferOutUI = ({route, navigation, ...props}) => {
     setDatePickerVisibility(false);
   };
 
-  const actionOnColor = (colorId, rowId) => {
+  const actionOnSampleProcess = (SampleProcessId, rowId) => {
     setRows(prevRows =>
       prevRows.map(row =>
         row.id === rowId
           ? {
               ...row,
-              selectedIndices: row.selectedIndices.includes(colorId)
-                ? row.selectedIndices.filter(id => id !== colorId)
-                : [...row.selectedIndices, colorId],
+              selectedIndices: row.selectedIndices.includes(SampleProcessId)
+                ? row.selectedIndices.filter(id => id !== SampleProcessId)
+                : [...row.selectedIndices, SampleProcessId],
               // showColorList: false,
             }
           : row,
@@ -421,13 +468,13 @@ const SaveStyleTransferOutUI = ({route, navigation, ...props}) => {
     );
   };
 
-  const handleSearchColor = async (text, rowId) => {
+  const handleSearchSampleProcess = async (text, rowId) => {
     setRows(
       rows.map(r =>
         r.id === rowId
           ? {
               ...r,
-              filteredColor: r.colorList?.filter(item =>
+              filteredSampleProcess: r.SampleProcessList?.filter(item =>
                 item.name.toLowerCase().includes(text.toLowerCase()),
               ),
             }
@@ -436,7 +483,6 @@ const SaveStyleTransferOutUI = ({route, navigation, ...props}) => {
     );
   };
 
-  // check for create box packing ...
   const updateChildInput = (rowId, sizeId, text) => {
     setRows(prevRows =>
       prevRows.map(row =>
@@ -444,17 +490,13 @@ const SaveStyleTransferOutUI = ({route, navigation, ...props}) => {
           ? {
               ...row,
               childTable: row.childTable.map(child =>
-                child.SIZE_ID === sizeId
-                  ? {...child, enteredInput: text}
-                  : child,
+                child._id === sizeId ? {...child, enteredInput: text} : child,
               ),
             }
           : row,
       ),
     );
   };
-
-
 
   return (
     <View style={[CommonStyles.mainComponentViewStyle]}>
@@ -496,25 +538,6 @@ const SaveStyleTransferOutUI = ({route, navigation, ...props}) => {
               )?.id
             }
           />
-          <RadioGroup
-            style={{flexDirection: 'row'}}
-            radioButtons={colorStyleRadioButtons}
-            onPress={handleColorStyleChange}
-            layout="row"
-            selectedId={
-              colorStyleRadioButtons.find(
-                item =>
-                  item.value ===
-                  (singleColor === 'Yes'
-                    ? 'Single Color'
-                    : multiColor === 'Yes'
-                    ? 'Multi Color'
-                    : customerStyle === 'Yes'
-                    ? 'Customer Style'
-                    : ''),
-              )?.id
-            }
-          />
 
           <DateTimePickerModal
             isVisible={isDatePickerVisible}
@@ -535,7 +558,7 @@ const SaveStyleTransferOutUI = ({route, navigation, ...props}) => {
             <View style={{width: '85%', paddingHorizontal: 10}}>
               <TextInput
                 label="Date"
-                value={date ? Constant.formatDateIntoDMY(date) : ''}
+                value={date ? date : ''}
                 mode="outlined"
                 color="#000"
               />
@@ -546,33 +569,6 @@ const SaveStyleTransferOutUI = ({route, navigation, ...props}) => {
                 style={{width: 40, height: 40}}
               />
             </TouchableOpacity>
-          </View>
-
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              marginTop: hp('4%'),
-              width: '100%',
-            }}>
-            <View
-              style={{
-                width: 100,
-                margin: 5,
-                alignItems: 'center',
-                padding: 10,
-                borderRadius: 5,
-                flexDirection: 'row',
-              }}>
-              <CustomCheckBox
-                isChecked={true}
-                onToggle={() => console.log('hi')}
-              />
-            </View>
-            <Text style={{width: '50%', fontWeight: 'bold', color: '#000'}}>
-              Returnable
-            </Text>
           </View>
 
           <View
@@ -649,210 +645,219 @@ const SaveStyleTransferOutUI = ({route, navigation, ...props}) => {
             )}
           </View>
 
-          <View
-            style={{
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: '#fff',
-              marginTop: hp('2%'),
-            }}>
-            <TouchableOpacity
+          {inHouse === 'Yes' && (
+            <View
               style={{
-                flexDirection: 'row',
-                borderWidth: 0.5,
-                borderColor: '#D8D8D8',
-                borderRadius: hp('0.5%'),
-                width: '100%',
-                justifyContent: 'space-between',
-              }}
-              onPress={() => {
-                setShowToLocationList(!showToLocationList);
-              }}>
-              <View>
-                <View style={[styles.SectionStyle1, {}]}>
-                  <View style={{flexDirection: 'column'}}>
-                    <Text
-                      style={
-                        toLocationId
-                          ? [styles.dropTextLightStyle]
-                          : [styles.dropTextInputStyle]
-                      }>
-                      {'To Location '}
-                    </Text>
-                    {toLocationId ? (
-                      <Text style={[styles.dropTextInputStyle]}>
-                        {toLocationName}
-                      </Text>
-                    ) : null}
-                  </View>
-                </View>
-              </View>
-
-              <View style={{justifyContent: 'center'}}>
-                <Image source={downArrowImg} style={styles.imageStyle} />
-              </View>
-            </TouchableOpacity>
-
-            {showToLocationList && (
-              <View style={styles.dropdownContent1}>
-                <TextInput
-                  style={styles.searchInput}
-                  placeholder="Search "
-                  onChangeText={handleSearchToLocation}
-                  placeholderTextColor="#000"
-                />
-                <ScrollView
-                  style={styles.scrollView}
-                  nestedScrollEnabled={true}>
-                  {filteredToLocation.length === 0 ? (
-                    <Text style={styles.noCategoriesText}>
-                      Sorry, no results found!
-                    </Text>
-                  ) : (
-                    filteredToLocation.map((item, index) => (
-                      <TouchableOpacity
-                        key={index}
-                        style={styles.dropdownOption}
-                        onPress={() => actionOnToLocation(item)}>
-                        <Text style={{color: '#000'}}>{item.name}</Text>
-                      </TouchableOpacity>
-                    ))
-                  )}
-                </ScrollView>
-              </View>
-            )}
-          </View>
-
-          <View
-            style={{
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: '#fff',
-              marginTop: hp('2%'),
-            }}>
-            <TouchableOpacity
-              style={{
-                flexDirection: 'row',
-                borderWidth: 0.5,
-                borderColor: '#D8D8D8',
-                borderRadius: hp('0.5%'),
-                width: '100%',
-                justifyContent: 'space-between',
-              }}
-              onPress={() => {
-                setShowToCustomerList(!showToCustomerList);
-              }}>
-              <View>
-                <View style={[styles.SectionStyle1, {}]}>
-                  <View style={{flexDirection: 'column'}}>
-                    <Text
-                      style={
-                        toCustomerId
-                          ? [styles.dropTextLightStyle]
-                          : [styles.dropTextInputStyle]
-                      }>
-                      {'To Customer '}
-                    </Text>
-                    {toCustomerId ? (
-                      <Text style={[styles.dropTextInputStyle]}>
-                        {toCustomerName}
-                      </Text>
-                    ) : null}
-                  </View>
-                </View>
-              </View>
-
-              <View style={{justifyContent: 'center'}}>
-                <Image source={downArrowImg} style={styles.imageStyle} />
-              </View>
-            </TouchableOpacity>
-
-            {showToCustomerList && (
-              <View style={styles.dropdownContent1}>
-                <TextInput
-                  style={styles.searchInput}
-                  placeholder="Search "
-                  onChangeText={handleSearchToCustomer}
-                  placeholderTextColor="#000"
-                />
-                <ScrollView
-                  style={styles.scrollView}
-                  nestedScrollEnabled={true}>
-                  {filteredToCustomer.length === 0 ? (
-                    <Text style={styles.noCategoriesText}>
-                      Sorry, no results found!
-                    </Text>
-                  ) : (
-                    filteredToCustomer.map((item, index) => (
-                      <TouchableOpacity
-                        key={index}
-                        style={styles.dropdownOption}
-                        onPress={() => actionOnToCustomer(item)}>
-                        <Text style={{color: '#000'}}>{item.name}</Text>
-                      </TouchableOpacity>
-                    ))
-                  )}
-                </ScrollView>
-              </View>
-            )}
-          </View>
-
-          <View style={{marginTop: hp('2%')}}>
-            <TextInput
-              label="Buyer Name"
-              value={buyerName}
-              mode="outlined"
-              onChangeText={text => setbuyerName(text)}
-            />
-          </View>
-
-          <View style={{marginTop: hp('2%')}}>
-            <TextInput
-              label="Barcode"
-              value={barcode}
-              mode="outlined"
-              onChangeText={text => setBarcode(text)}
-            />
-          </View>
-
-          <View
-            style={{
-              // width: '90%',
-              marginTop: 20,
-              marginBottom: 30,
-              // marginHorizontal: 15,
-            }}>
-            <TouchableOpacity
-              onPress={addRow}
-              style={{
-                backgroundColor: colors.color2,
-                paddingVertical: 10,
-                paddingHorizontal: 20,
-                borderRadius: 5,
                 alignItems: 'center',
                 justifyContent: 'center',
+                backgroundColor: '#fff',
+                marginTop: hp('2%'),
               }}>
-              <Text style={{color: '#fff', fontSize: 16, fontWeight: 'bold'}}>
-                Add Stock
+              <TouchableOpacity
+                style={{
+                  flexDirection: 'row',
+                  borderWidth: 0.5,
+                  borderColor: '#D8D8D8',
+                  borderRadius: hp('0.5%'),
+                  width: '100%',
+                  justifyContent: 'space-between',
+                }}
+                onPress={() => {
+                  setShowToLocationList(!showToLocationList);
+                }}>
+                <View>
+                  <View style={[styles.SectionStyle1, {}]}>
+                    <View style={{flexDirection: 'column'}}>
+                      <Text
+                        style={
+                          toLocationId
+                            ? [styles.dropTextLightStyle]
+                            : [styles.dropTextInputStyle]
+                        }>
+                        {'To Location '}
+                      </Text>
+                      {toLocationId ? (
+                        <Text style={[styles.dropTextInputStyle]}>
+                          {toLocationName}
+                        </Text>
+                      ) : null}
+                    </View>
+                  </View>
+                </View>
+
+                <View style={{justifyContent: 'center'}}>
+                  <Image source={downArrowImg} style={styles.imageStyle} />
+                </View>
+              </TouchableOpacity>
+
+              {showToLocationList && (
+                <View style={styles.dropdownContent1}>
+                  <TextInput
+                    style={styles.searchInput}
+                    placeholder="Search "
+                    onChangeText={handleSearchToLocation}
+                    placeholderTextColor="#000"
+                  />
+                  <ScrollView
+                    style={styles.scrollView}
+                    nestedScrollEnabled={true}>
+                    {filteredToLocation.length === 0 ? (
+                      <Text style={styles.noCategoriesText}>
+                        Sorry, no results found!
+                      </Text>
+                    ) : (
+                      filteredToLocation.map((item, index) => (
+                        <TouchableOpacity
+                          key={index}
+                          style={styles.dropdownOption}
+                          onPress={() => actionOnToLocation(item)}>
+                          <Text style={{color: '#000'}}>{item.name}</Text>
+                        </TouchableOpacity>
+                      ))
+                    )}
+                  </ScrollView>
+                </View>
+              )}
+            </View>
+          )}
+
+          {customer === 'Yes' && (
+            <View
+              style={{
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: '#fff',
+                marginTop: hp('2%'),
+              }}>
+              <TouchableOpacity
+                style={{
+                  flexDirection: 'row',
+                  borderWidth: 0.5,
+                  borderColor: '#D8D8D8',
+                  borderRadius: hp('0.5%'),
+                  width: '100%',
+                  justifyContent: 'space-between',
+                }}
+                onPress={() => {
+                  setShowToCustomerList(!showToCustomerList);
+                }}>
+                <View>
+                  <View style={[styles.SectionStyle1, {}]}>
+                    <View style={{flexDirection: 'column'}}>
+                      <Text
+                        style={
+                          toCustomerId
+                            ? [styles.dropTextLightStyle]
+                            : [styles.dropTextInputStyle]
+                        }>
+                        {'To Customer '}
+                      </Text>
+                      {toCustomerId ? (
+                        <Text style={[styles.dropTextInputStyle]}>
+                          {toCustomerName}
+                        </Text>
+                      ) : null}
+                    </View>
+                  </View>
+                </View>
+
+                <View style={{justifyContent: 'center'}}>
+                  <Image source={downArrowImg} style={styles.imageStyle} />
+                </View>
+              </TouchableOpacity>
+
+              {showToCustomerList && (
+                <View style={styles.dropdownContent1}>
+                  <TextInput
+                    style={styles.searchInput}
+                    placeholder="Search "
+                    onChangeText={handleSearchToCustomer}
+                    placeholderTextColor="#000"
+                  />
+                  <ScrollView
+                    style={styles.scrollView}
+                    nestedScrollEnabled={true}>
+                    {filteredToCustomer.length === 0 ? (
+                      <Text style={styles.noCategoriesText}>
+                        Sorry, no results found!
+                      </Text>
+                    ) : (
+                      filteredToCustomer.map((item, index) => (
+                        <TouchableOpacity
+                          key={index}
+                          style={styles.dropdownOption}
+                          onPress={() => actionOnToCustomer(item)}>
+                          <Text style={{color: '#000'}}>{item.name}</Text>
+                        </TouchableOpacity>
+                      ))
+                    )}
+                  </ScrollView>
+                </View>
+              )}
+            </View>
+          )}
+
+          <View style={{marginTop: hp('4%')}} />
+          <RadioGroup
+            style={{flexDirection: 'row'}}
+            radioButtons={colorStyleRadioButtons}
+            onPress={handleColorStyleChange}
+            layout="row"
+            selectedId={
+              colorStyleRadioButtons.find(
+                item =>
+                  item.value ===
+                  (singleColor === 'Yes'
+                    ? 'Single Color'
+                    : multiColor === 'Yes'
+                    ? 'Multi Color'
+                    : customerStyle === 'Yes'
+                    ? 'Customer Style'
+                    : ''),
+              )?.id
+            }
+          />
+
+          {customer === 'Yes' && (
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginTop: hp('2%'),
+                width: '100%',
+              }}>
+              <View
+                style={{
+                  width: 100,
+                  margin: 5,
+                  alignItems: 'center',
+                  padding: 10,
+                  borderRadius: 5,
+                  flexDirection: 'row',
+                }}>
+                <CustomCheckBox
+                  isChecked={true}
+                  onToggle={() => console.log('hi')}
+                />
+              </View>
+              <Text style={{width: '50%', fontWeight: 'bold', color: '#000'}}>
+                Returnable
               </Text>
-            </TouchableOpacity>
-          </View>
+            </View>
+          )}
 
           <View style={styles.wrapper}>
             <ScrollView nestedScrollEnabled={true} horizontal>
               <View style={styles.table}>
                 {/* Table Head */}
                 <View style={styles.table_head}>
-                  <View style={{width: 60}}>
+                  {/* <View style={{width: 60}}>
                     <Text style={styles.table_head_captions}>Action</Text>
-                  </View>
-                  <View style={{width: 5}}></View>
+                  </View> */}
+                  {/* <View style={{width: 5}}></View> */}
                   <View style={{width: 200}}>
                     <Text style={styles.table_head_captions}>Style</Text>
-                  </View>
-                  <View style={{width: 5}}></View>
-                  <View style={{width: 100}}>
-                    <Text style={styles.table_head_captions}>Total Qty</Text>
                   </View>
                   <View style={{width: 5}}></View>
                   <View style={{width: 100}}>
@@ -861,6 +866,10 @@ const SaveStyleTransferOutUI = ({route, navigation, ...props}) => {
                   <View style={{width: 5}}></View>
                   <View style={{width: 100}}>
                     <Text style={styles.table_head_captions}>Goods Value</Text>
+                  </View>
+                  <View style={{width: 5}}></View>
+                  <View style={{width: 100}}>
+                    <Text style={styles.table_head_captions}>Send Qty</Text>
                   </View>
                   <View style={{width: 5}}></View>
                   <View style={{width: 200}}>
@@ -875,17 +884,17 @@ const SaveStyleTransferOutUI = ({route, navigation, ...props}) => {
                 </View>
 
                 {/* Table Body - Rows */}
-                {rows.map(row => (
-                  <View key={row.id}>
+                {rows.map((row, index) => (
+                  <View key={index}>
                     <View style={styles.table_body_single_row}>
-                      <View style={{width: 60}}>
+                      {/* <View style={{width: 60}}>
                         <TouchableOpacity
                           style={{alignItems: '', justifyContent: ''}}
                           onPress={() => handleRemoveRow(row.id)}>
                           <Image source={closeImg} style={styles.imageStyle1} />
                         </TouchableOpacity>
-                      </View>
-                      <View style={{width: 5}}></View>
+                      </View> */}
+                      {/* <View style={{width: 5}}></View> */}
                       <View style={{width: 200}}>
                         <View
                           style={{
@@ -903,30 +912,39 @@ const SaveStyleTransferOutUI = ({route, navigation, ...props}) => {
                               width: '100%',
                               overflow: 'hidden',
                             }}
+                            // onPress={() => {
+                            //   setRows(
+                            //     rows.map(r =>
+                            //       r.id === row.id
+                            //         ? {
+                            //             ...r,
+                            //             showStyleList: !r.showStyleList,
+                            //           }
+                            //         : {...r, showStyleList: false},
+                            //     ),
+                            //   );
+                            // }}
                             onPress={() => {
-                              setRows(
-                                rows.map(r =>
-                                  r.id === row.id
-                                    ? {
-                                        ...r,
-                                        showBoxList: !r.showBoxList,
-                                      }
-                                    : {...r, showBoxList: false},
-                                ),
+                              setRows(rows =>
+                                rows.map(r => ({
+                                  ...r,
+                                  showStyleList:
+                                    r.id === row.id ? !r.showStyleList : false,
+                                })),
                               );
                             }}>
                             <View style={[styles.SectionStyle1]}>
                               <View style={{flexDirection: 'column'}}>
                                 <Text
                                   style={
-                                    row.BoxId
+                                    row.StyleId
                                       ? styles.dropTextLightStyle
                                       : styles.dropTextInputStyle
                                   }>
-                                  {'Box Name  '}
+                                  {'Style Name  '}
                                 </Text>
                                 <Text style={styles.dropTextInputStyle}>
-                                  {row.BoxId ? row.BoxName : 'Select '}
+                                  {row.StyleId ? row.StyleName : 'Select '}
                                 </Text>
                               </View>
                             </View>
@@ -944,27 +962,27 @@ const SaveStyleTransferOutUI = ({route, navigation, ...props}) => {
                               />
                             </View>
                           </TouchableOpacity>
-                          {row.showBoxList && (
+                          {row.showStyleList && (
                             <View style={styles.dropdownContent2}>
                               <TextInput
                                 style={styles.searchInput}
                                 placeholder="Search "
                                 onChangeText={text =>
-                                  handleSearchboxName(text, row.id)
+                                  handleSearchStyleName(text, row.id)
                                 }
                                 placeholderTextColor="#000"
                               />
                               <ScrollView nestedScrollEnabled={true}>
-                                {row.filteredBoxList.length === 0 ? (
+                                {row.filteredStyleList.length === 0 ? (
                                   <Text style={styles.noCategoriesText}>
                                     Sorry, no results found!
                                   </Text>
                                 ) : (
-                                  row.filteredBoxList.map(item => (
+                                  row.filteredStyleList.map(item => (
                                     <TouchableOpacity
                                       key={item?.id}
                                       onPress={() =>
-                                        actionOnboxName(item, row.id)
+                                        actionOnStyleName(item, row.id)
                                       }>
                                       <View style={styles.dropdownOption}>
                                         <Text style={{color: '#000'}}>
@@ -979,18 +997,17 @@ const SaveStyleTransferOutUI = ({route, navigation, ...props}) => {
                           )}
                         </View>
                       </View>
+
                       <View style={{width: 5}}></View>
                       <View style={{width: 100}}>
                         <TextInput
                           style={styles.table_data_input}
-                          value={row.CustomerStyleName}
+                          value={row.styleCost.toString()}
                           editable={false}
                           onChangeText={text => {
                             setRows(
                               rows.map(r =>
-                                r.id === row.id
-                                  ? {...r, CustomerStyleName: text}
-                                  : r,
+                                r.id === row.id ? {...r, styleCost: text} : r,
                               ),
                             );
                           }}
@@ -1001,15 +1018,15 @@ const SaveStyleTransferOutUI = ({route, navigation, ...props}) => {
                       <View style={{width: 100}}>
                         <TextInput
                           style={styles.table_data_input}
-                          value={row.size}
-                          editable={false}
+                          value={row.goodsValue.toString()}
                           onChangeText={text => {
                             setRows(
                               rows.map(r =>
-                                r.id === row.id ? {...r, size: text} : r,
+                                r.id === row.id ? {...r, goodsValue: text} : r,
                               ),
                             );
                           }}
+                          editable={false}
                         />
                       </View>
 
@@ -1017,15 +1034,15 @@ const SaveStyleTransferOutUI = ({route, navigation, ...props}) => {
                       <View style={{width: 100}}>
                         <TextInput
                           style={styles.table_data_input}
-                          value={row.Qty.toString()}
+                          value={row.sendQty.toString()}
+                          editable={false}
                           onChangeText={text => {
                             setRows(
                               rows.map(r =>
-                                r.id === row.id ? {...r, Qty: text} : r,
+                                r.id === row.id ? {...r, sendQty: text} : r,
                               ),
                             );
                           }}
-                          editable={false}
                         />
                       </View>
 
@@ -1053,9 +1070,10 @@ const SaveStyleTransferOutUI = ({route, navigation, ...props}) => {
                                   r.id === row.id
                                     ? {
                                         ...r,
-                                        showColorList: !r.showColorList,
+                                        showSampleProcessList:
+                                          !r.showSampleProcessList,
                                       }
-                                    : {...r, showColorList: false},
+                                    : {...r, showSampleProcessList: false},
                                 ),
                               );
                             }}>
@@ -1068,18 +1086,11 @@ const SaveStyleTransferOutUI = ({route, navigation, ...props}) => {
                                         ? [styles.dropTextLightStyle]
                                         : [styles.dropTextInputStyle]
                                     }>
-                                    {'Color *'}
+                                    {'Sample Process *'}
                                   </Text>
                                   {row.selectedIndices.length > 0 ? (
                                     <Text style={[styles.dropTextInputStyle]}>
-                                      {row.colorList
-                                        .filter(color =>
-                                          row.selectedIndices.includes(
-                                            color.id,
-                                          ),
-                                        )
-                                        .map(color => color.name)
-                                        .join(', ')}
+                                      {row.processNames}
                                     </Text>
                                   ) : null}
                                 </View>
@@ -1094,44 +1105,49 @@ const SaveStyleTransferOutUI = ({route, navigation, ...props}) => {
                             </View>
                           </TouchableOpacity>
 
-                          {row.showColorList && (
+                          {row.showSampleProcessList && (
                             <View style={styles.dropdownContent1}>
                               <TextInput
                                 style={styles.searchInput}
                                 placeholder="Search "
                                 onChangeText={text =>
-                                  handleSearchColor(text, row.id)
+                                  handleSearchSampleProcess(text, row.id)
                                 }
                                 placeholderTextColor="#000"
                               />
                               <ScrollView
                                 style={styles.scrollView}
                                 nestedScrollEnabled={true}>
-                                {row?.filteredColor?.length === 0 ? (
+                                {row?.filteredSampleProcess?.length === 0 ? (
                                   <Text style={styles.noCategoriesText}>
                                     Sorry, no results found!
                                   </Text>
                                 ) : (
-                                  row?.filteredColor?.map((item, index) => (
-                                    <TouchableOpacity
-                                      key={index}
-                                      style={styles.itemContainer}
-                                      onPress={() =>
-                                        actionOnColor(item.id, row.id)
-                                      }>
-                                      <CustomCheckBox
-                                        isChecked={row.selectedIndices.includes(
-                                          item.id,
-                                        )}
-                                        onToggle={() =>
-                                          actionOnColor(item.id, row.id)
-                                        }
-                                      />
-                                      <Text style={{color: '#000'}}>
-                                        {item.name}
-                                      </Text>
-                                    </TouchableOpacity>
-                                  ))
+                                  row?.filteredSampleProcess?.map(
+                                    (item, index) => (
+                                      <TouchableOpacity
+                                        key={index}
+                                        style={styles.itemContainer}
+                                        onPress={() =>
+                                          actionOnSampleProcess(item.id, row.id)
+                                        }>
+                                        <CustomCheckBox
+                                          isChecked={row.selectedIndices.includes(
+                                            item.id,
+                                          )}
+                                          onToggle={() =>
+                                            actionOnSampleProcess(
+                                              item.id,
+                                              row.id,
+                                            )
+                                          }
+                                        />
+                                        <Text style={{color: '#000'}}>
+                                          {item.name}
+                                        </Text>
+                                      </TouchableOpacity>
+                                    ),
+                                  )
                                 )}
                               </ScrollView>
                             </View>
@@ -1143,14 +1159,12 @@ const SaveStyleTransferOutUI = ({route, navigation, ...props}) => {
                       <View style={{width: 100}}>
                         <TextInput
                           style={styles.table_data_input}
-                          value={row.CustomerStyleName}
+                          value={row.processQty}
                           editable={false}
                           onChangeText={text => {
                             setRows(
                               rows.map(r =>
-                                r.id === row.id
-                                  ? {...r, CustomerStyleName: text}
-                                  : r,
+                                r.id === row.id ? {...r, processQty: text} : r,
                               ),
                             );
                           }}
@@ -1169,31 +1183,31 @@ const SaveStyleTransferOutUI = ({route, navigation, ...props}) => {
                           }}>
                           {row?.childTable?.map((item, index) => (
                             <View
-                              key={item?.SIZE_ID}
+                              key={item?._id}
                               style={{
                                 width: 100,
-                                  margin: 5,
-                                  alignItems: 'center',
-                                  padding: 10,
-                                  borderRadius: 5,
+                                margin: 5,
+                                alignItems: 'center',
+                                padding: 10,
+                                borderRadius: 5,
                               }}>
-                                 <Text style={{marginTop: 5, color: '#000'}}>
-                                {item.SIZE_VAL}
+                              <Text style={{marginTop: 5, color: '#000'}}>
+                                {item.sizeDesc}
                               </Text>
                               <TextInput
                                 style={styles.table_data_input1}
-                                label={item.SIZE_VAL}
+                                label={`${item.sizereceviedqty} (${item.sizeQty})`}
                                 value={item.enteredInput}
                                 mode="outlined"
                                 onChangeText={text =>
-                                  updateChildInput(row.id, item.SIZE_ID, text)
+                                  updateChildInput(row.id, item._id, text)
                                 }
                               />
                             </View>
                           ))}
                         </View>
                       </View>
-                     )} 
+                    )}
                   </View>
                 ))}
               </View>
@@ -1393,7 +1407,7 @@ const getStyles = colors =>
       backgroundColor: '#fff',
     },
 
-    checkbox_container: {
+    checkStyle_container: {
       justifyContent: 'center',
       alignItems: 'center',
     },

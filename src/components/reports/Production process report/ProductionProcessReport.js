@@ -7,6 +7,7 @@ import axios from 'axios';
 import { Alert, PermissionsAndroid, Platform } from 'react-native';
 import ReactNativeBlobUtil from 'react-native-blob-util';
 import XLSX from 'xlsx';
+import { Buffer } from 'buffer';
 
 const ProductionProcessReport = ({navigation, route, ...props}) => {
   const [itemsObj, set_itemsObj] = useState([]);
@@ -261,49 +262,64 @@ const submitAction = async (tempObj) => {
       };
 
       const apiUrl = APIServiceCall.downloadProductionProcessReport();
-      console.log("API URL:", apiUrl);
-
+      console.log('API URL:', apiUrl);
+  
       const response = await axios.post(apiUrl, obj, {
-          headers: {
-              'Content-Type': 'application/json',
-          },
-          responseType: 'arraybuffer', 
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        responseType: 'arraybuffer', // Get binary Excel file
       });
-
-      console.log("Response received, processing file...");
-      
-      // Convert the received binary data into a readable format
-      let workbook = XLSX.read(response.data, { type: 'array' });
-      let excelData = XLSX.write(workbook, { bookType: 'xlsx', type: 'base64' });
-
-      // Request storage permission on Android
+  
+      console.log('Binary Excel file received, converting to base64...');
+  
+      // Convert binary response to base64
+      const base64Excel = Buffer.from(response.data).toString('base64');
+  
+      // Android storage permission
       if (Platform.OS === 'android') {
-          const hasPermission = await requestStoragePermission();
-          if (!hasPermission) {
-              Alert.alert('Permission Denied', 'Storage permission is required to save the XLSX file.');
-              return;
-          }
+        const hasPermission = await requestStoragePermission();
+        if (!hasPermission) {
+          Alert.alert(
+            'Permission Denied',
+            'Storage permission is required to save the XLSX file.'
+          );
+          return;
+        }
       }
-
-      // Define the file path for saving the Excel file
-      const filePath1 = `/storage/emulated/0/Download/${Date.now()}.xlsx`;
-
-       const filePath = Platform.OS === 'android' 
-          ? `/storage/emulated/0/Download/${Date.now()}.xlsx` 
-          : `${ReactNativeBlobUtil.fs.dirs.DocumentDir}/${Date.now()}}.xlsx`;
-      
-      // Save the file using ReactNativeBlobUtil
-      await ReactNativeBlobUtil.fs.writeFile(filePath, excelData, 'base64');
-
-      // Show success message
-      popUpAction(`Excel file saved successfully at ${filePath}`, Constant.DefaultAlert_MSG, 'OK', true, false);
-  } catch (error) {
+  
+      // File path
+      const filePath =
+        Platform.OS === 'android'
+          ? `/storage/emulated/0/Download/ProductionProcessReport_${Date.now()}.xlsx`
+          : `${ReactNativeBlobUtil.fs.dirs.DocumentDir}/ProductionProcessReport_${Date.now()}.xlsx`;
+  
+      // Save base64 file
+      await ReactNativeBlobUtil.fs.writeFile(filePath, base64Excel, 'base64');
+  
+      // Success
+      popUpAction(
+        `Excel file saved successfully at ${filePath}`,
+        Constant.DefaultAlert_MSG,
+        'OK',
+        true,
+        false
+      );
+    } catch (error) {
       console.error('Error generating or saving Excel file:', error);
-      popUpAction(Constant.SERVICE_FAIL_PDF_MSG, Constant.DefaultAlert_MSG, 'OK', true, false);
-  } finally {
+      popUpAction(
+        Constant.SERVICE_FAIL_PDF_MSG,
+        Constant.DefaultAlert_MSG,
+        'OK',
+        true,
+        false
+      );
+    } finally {
       set_isLoading(false);
-  }
-};
+    }
+  };
+
+
 
 
 

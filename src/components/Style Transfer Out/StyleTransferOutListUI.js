@@ -31,7 +31,6 @@ let addImg1 = require('./../../../assets/images/png/add.png');
 let filterImg = require('./../../../assets/images/png/setting.png');
 let filterImg1 = require('./../../../assets/images/png/filter.png');
 
-
 const StyleTransferOutListUI = ({route, navigation, ...props}) => {
   const [isListOpen, set_ListOpen] = useState(false);
   const [refreshing, set_refreshing] = useState(false);
@@ -68,7 +67,6 @@ const StyleTransferOutListUI = ({route, navigation, ...props}) => {
       // console.log("list , ",props.itemsArray)
     }
     // getRequestBody();
-
   }, [props?.itemsArray]);
 
   const getRequestBody = async () => {
@@ -92,6 +90,14 @@ const StyleTransferOutListUI = ({route, navigation, ...props}) => {
 
   const popOkBtnAction = () => {
     props.popOkBtnAction();
+  };
+
+  
+  const handlePdf1 = async(item) => {
+    props.handlePdf(item, 1);
+  };
+  const handlePdf2 = async(item) => {
+    props.handlePdf(item, 2);
   };
 
   const applyFilterFxn = (types, Ids, count) => {
@@ -120,8 +126,8 @@ const StyleTransferOutListUI = ({route, navigation, ...props}) => {
         (item?.toLocIdStr !== '' &&
           item?.toLocIdStr?.toLowerCase().includes(searchTerm)) ||
         (item?.orderNo !== '' &&
-          item?.orderNo?.toLowerCase().includes(searchTerm)) 
-      )
+          item?.orderNo?.toLowerCase().includes(searchTerm))
+      );
     });
 
     set_filterArray(styleArray || []);
@@ -153,44 +159,57 @@ const StyleTransferOutListUI = ({route, navigation, ...props}) => {
     setIsFiltering(false);
   };
 
-
   const renderItem = ({item, index}) => {
     return (
       <TouchableOpacity
         onPress={() => actionOnRow(item, index)}
         style={[CommonStyles.cellBackViewStyle, {marginBottom: 3}]}>
         <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-          <View
-            style={{flex: 0.5, justifyContent: 'center'}}>
+          <View style={{flex: 0.5, justifyContent: 'center'}}>
             <Text style={[CommonStyles.tylesTextStyle, {textAlign: 'center'}]}>
               {item.idstr}
             </Text>
           </View>
-          <View
-            style={{flex: 0.7, justifyContent: 'center'}}>
+          <View style={{flex: 0.7, justifyContent: 'center'}}>
             <Text style={[CommonStyles.tylesTextStyle, {textAlign: 'center'}]}>
               {item.styleno}
             </Text>
           </View>
-          <View
-            style={{flex: 0.5, justifyContent: 'center'}}>
+          <View style={{flex: 0.5, justifyContent: 'center'}}>
             <Text style={[CommonStyles.tylesTextStyle, {textAlign: 'center'}]}>
               {item.toLocIdStr}
             </Text>
           </View>
-          <View
+          {/* <View
             style={{flex: 0.7, justifyContent: 'center'}}>
             <Text style={[CommonStyles.tylesTextStyle, {textAlign: 'center'}]}>
               {item.username}
             </Text>
+          </View> */}
+          <View
+            style={{
+              flex: 0.7,
+              alignItems: 'center',
+              flexDirection: 'column',
+              justifyContent: 'space-around',
+            }}>
+            <TouchableOpacity onPress={() => handlePdf1(item)}>
+              <Text
+                style={[CommonStyles.tylesTextStyle, {textAlign: 'center'}]}>
+                {'OUT DC'}
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={() => handlePdf2(item)} style={{}}>
+              <Text
+                style={[CommonStyles.tylesTextStyle, {textAlign: 'center'}]}>
+                {'IN DC'}
+              </Text>
+            </TouchableOpacity>
           </View>
         </View>
       </TouchableOpacity>
     );
-  };
-
-  const handleNavigation = () => {
-    props.handleNavigation();
   };
 
   return (
@@ -312,7 +331,6 @@ const StyleTransferOutListUI = ({route, navigation, ...props}) => {
 
         {filterArray && filterArray.length > 0 ? (
           <View style={CommonStyles.listCommonHeader}>
-           
             <Text
               style={[
                 CommonStyles.tylesHeaderTextStyle,
@@ -339,7 +357,7 @@ const StyleTransferOutListUI = ({route, navigation, ...props}) => {
                 CommonStyles.tylesHeaderTextStyle,
                 {flex: 0.7, textAlign: 'center'},
               ]}>
-              {'Requested By'}
+              {'PDF'}
             </Text>
           </View>
         ) : (
@@ -447,7 +465,3 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 });
-
-
-
-

@@ -217,81 +217,81 @@ const CuttingReport = ({navigation, route, ...props}) => {
     }
   };
 
-  // const submitAction = async (ids) => {
-  //   try {
-  //     const userName = await AsyncStorage.getItem('userName');
-  //     const userPsd = await AsyncStorage.getItem('userPsd');
-  //     const usercompanyId = await AsyncStorage.getItem('companyId');
-  //     const companyObjRaw = await AsyncStorage.getItem('companyObj');
-  //     const companyObj = companyObjRaw ? JSON.parse(companyObjRaw) : {};
+  const submitAction = async (ids) => {
+    try {
+      const userName = await AsyncStorage.getItem('userName');
+      const userPsd = await AsyncStorage.getItem('userPsd');
+      const usercompanyId = await AsyncStorage.getItem('companyId');
+      const companyObjRaw = await AsyncStorage.getItem('companyObj');
+      const companyObj = companyObjRaw ? JSON.parse(companyObjRaw) : {};
   
-  //     set_isLoading(true);
+      set_isLoading(true);
   
-  //     const obj = {
-  //       username: userName,
-  //       password: userPsd,
-  //       compIds: usercompanyId,
-  //       company: companyObj,
-  //       styleIds: ids,
-  //     };
+      const obj = {
+        username: userName,
+        password: userPsd,
+        compIds: usercompanyId,
+        company: companyObj,
+        styleIds: ids,
+      };
   
-  //     const apiUrl = APIServiceCall.downloadCuttingReport();
-  //     console.log('API URL:', apiUrl);
+      const apiUrl = APIServiceCall.downloadCuttingReport();
+      console.log('API URL:', apiUrl);
   
-  //     const response = await axios.post(apiUrl, obj, {
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //       responseType: 'arraybuffer', // Get binary Excel file
-  //     });
+      const response = await axios.post(apiUrl, obj, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        responseType: 'arraybuffer', // Get binary Excel file
+      });
   
-  //     console.log('Binary Excel file received, converting to base64...');
+      console.log('Binary Excel file received, converting to base64...');
   
-  //     // Convert binary response to base64
-  //     const base64Excel = Buffer.from(response.data).toString('base64');
+      // Convert binary response to base64
+      const base64Excel = Buffer.from(response.data).toString('base64');
   
-  //     // Android storage permission
-  //     if (Platform.OS === 'android') {
-  //       const hasPermission = await requestStoragePermission();
-  //       if (!hasPermission) {
-  //         Alert.alert(
-  //           'Permission Denied',
-  //           'Storage permission is required to save the XLSX file.'
-  //         );
-  //         return;
-  //       }
-  //     }
+      // Android storage permission
+      if (Platform.OS === 'android') {
+        const hasPermission = await requestStoragePermission();
+        if (!hasPermission) {
+          Alert.alert(
+            'Permission Denied',
+            'Storage permission is required to save the XLSX file.'
+          );
+          return;
+        }
+      }
   
-  //     // File path
-  //     const filePath =
-  //       Platform.OS === 'android'
-  //         ? `/storage/emulated/0/Download/CuttingReport_${Date.now()}.xlsx`
-  //         : `${ReactNativeBlobUtil.fs.dirs.DocumentDir}/CuttingReport_${Date.now()}.xlsx`;
+      // File path
+      const filePath =
+        Platform.OS === 'android'
+          ? `/storage/emulated/0/Download/CuttingReport_${Date.now()}.xlsx`
+          : `${ReactNativeBlobUtil.fs.dirs.DocumentDir}/CuttingReport_${Date.now()}.xlsx`;
   
-  //     // Save base64 file
-  //     await ReactNativeBlobUtil.fs.writeFile(filePath, base64Excel, 'base64');
+      // Save base64 file
+      await ReactNativeBlobUtil.fs.writeFile(filePath, base64Excel, 'base64');
   
-  //     // Success
-  //     popUpAction(
-  //       `Excel file saved successfully at ${filePath}`,
-  //       Constant.DefaultAlert_MSG,
-  //       'OK',
-  //       true,
-  //       false
-  //     );
-  //   } catch (error) {
-  //     console.error('Error generating or saving Excel file:', error);
-  //     popUpAction(
-  //       Constant.SERVICE_FAIL_PDF_MSG,
-  //       Constant.DefaultAlert_MSG,
-  //       'OK',
-  //       true,
-  //       false
-  //     );
-  //   } finally {
-  //     set_isLoading(false);
-  //   }
-  // };
+      // Success
+      popUpAction(
+        `Excel file saved successfully at ${filePath}`,
+        Constant.DefaultAlert_MSG,
+        'OK',
+        true,
+        false
+      );
+    } catch (error) {
+      console.error('Error generating or saving Excel file:', error);
+      popUpAction(
+        Constant.SERVICE_FAIL_PDF_MSG,
+        Constant.DefaultAlert_MSG,
+        'OK',
+        true,
+        false
+      );
+    } finally {
+      set_isLoading(false);
+    }
+  };
 
   const setLoad = val => {
     set_isLoading(val);
