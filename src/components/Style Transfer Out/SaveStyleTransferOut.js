@@ -14,10 +14,12 @@ const SaveStyleTransferOut = ({navigation, route, ...props}) => {
   const [popUpAlert, set_popUpAlert] = useState(undefined);
   const [popUpRBtnTitle, set_popUpRBtnTitle] = useState(undefined);
   const [isPopupLeft, set_isPopupLeft] = useState(false);
-  const [fptid, set_fptid] = useState(0);
+  const [transferId, set_transferId] = useState(0);
 
   React.useEffect(() => {
-    // getInitialData( route.params?.item.id);
+    getInitialData(route.params?.item.styletransferId);
+    console.log('props ===> ', route.params?.item.styletransferId);
+    set_transferId(route.params?.item.styletransferId);
   }, [route.params]);
 
   const backBtnAction = () => {
@@ -35,13 +37,12 @@ const SaveStyleTransferOut = ({navigation, route, ...props}) => {
       password: userPsd,
       compIds: usercompanyId,
       company: JSON.parse(companyObj),
-      menuId: 345,
-      masterboxId: id,
+      hiddenTransferId: id,
     };
     let EditFabricProcessInObj =
-      await APIServiceCall.getEditDetailsMasterBoxPacking(obj);
+      await APIServiceCall.getEditDetailsStyleTransferOut(obj);
     set_isLoading(false);
-
+    // console.log("req details ===> ",obj)
     if (EditFabricProcessInObj && EditFabricProcessInObj.statusData) {
       set_itemsObj(EditFabricProcessInObj.responseData);
     } else {
@@ -81,6 +82,73 @@ const SaveStyleTransferOut = ({navigation, route, ...props}) => {
     popUpAction(undefined, undefined, '', false, false);
   };
 
+  const submitAction = async tempObj => {
+    // const validateRMT = await ValidateAction();
+
+    // if (validateRMT === 'no') {
+    //   console.log('failed  saving =====> ');
+    //   popUpAction(
+    //     Constant.Fail_Validate_RMT_MSG,
+    //     Constant.DefaultAlert_MSG,
+    //     'OK',
+    //     true,
+    //     false,
+    //   );
+    //   return;
+    // }
+
+    let userName = await AsyncStorage.getItem('userName');
+    let userPsd = await AsyncStorage.getItem('userPsd');
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
+    let userId = await AsyncStorage.getItem('userId');
+
+    tempObj.username = userName;
+    tempObj.password = userPsd;
+    tempObj.loginUserId = userId;
+    tempObj.compIds = usercompanyId;
+    tempObj.companyLocationId = usercompanyId;
+    tempObj.transferId = transferId;
+    
+    console.log('saving obj ==>', tempObj);
+    tempObj.company = JSON.parse(companyObj);
+
+    set_isLoading(true);
+
+    let SAVEAPIObj = await APIServiceCall.saveEditStyleTransferOut(tempObj);
+    set_isLoading(false);
+
+    console.log('Sucess before returned obj ', SAVEAPIObj);
+
+    if (
+      SAVEAPIObj &&
+      SAVEAPIObj?.statusData &&
+      SAVEAPIObj?.responseData !== 0
+    ) {
+      console.log('Sucessfully saved ===> ');
+      backBtnAction();
+    } else {
+      console.log('failed  saving =====> ');
+      popUpAction(
+        Constant.Fail_Save_Dtls_MSG,
+        Constant.DefaultAlert_MSG,
+        'OK',
+        true,
+        false,
+      );
+    }
+
+    if (SAVEAPIObj && SAVEAPIObj.error) {
+      popUpAction(
+        Constant.SERVICE_FAIL_MSG,
+        Constant.DefaultAlert_MSG,
+        'OK',
+        true,
+        false,
+      );
+    }
+  };
+
   return (
     <SaveStyleTransferOutUI
       itemsObj={itemsObj}
@@ -90,6 +158,7 @@ const SaveStyleTransferOut = ({navigation, route, ...props}) => {
       popUpRBtnTitle={popUpRBtnTitle}
       isPopupLeft={isPopupLeft}
       isPopUp={isPopUp}
+      submitAction={submitAction}
       backBtnAction={backBtnAction}
       actionOnRow={actionOnRow}
       popOkBtnAction={popOkBtnAction}

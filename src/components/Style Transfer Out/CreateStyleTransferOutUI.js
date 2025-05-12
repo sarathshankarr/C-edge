@@ -41,6 +41,7 @@ const CreateStyleTransferOutUI = ({route, navigation, ...props}) => {
   const [lastestBuyerPoId, setLastestBuyerPoId] = React.useState(0);
   const [lastestStyleList, setLastestStyleList] = React.useState('');
   const [stylesList, set_stylesList] = useState([]);
+  const [sampleProcessList, set_sampleProcessList] = useState([]);
 
   const [inHouse, setInHouse] = useState('Yes');
   const [customer, setCustomer] = useState('No');
@@ -88,17 +89,27 @@ const CreateStyleTransferOutUI = ({route, navigation, ...props}) => {
         setFilteredToCustomer(vendorsCustomersMapList);
         setToCustomerList(vendorsCustomersMapList);
       }
+      if (props.lists.sampleProcess) {
+        const sampleProcessMapList = Object.keys(props.lists.sampleProcess).map(
+          key => ({
+            id: key,
+            name: props.lists.sampleProcess[key],
+          }),
+        );
+        set_sampleProcessList(sampleProcessMapList);
+      }
     }
   }, [props.lists]);
 
   useEffect(() => {
     if (props.stylesList) {
-
       if (props.stylesList.styleMap) {
-        const styleMapList = Object.keys(props.stylesList.styleMap).map(key => ({
-          id: key,
-          name: props.stylesList.styleMap[key],
-        }));
+        const styleMapList = Object.keys(props.stylesList.styleMap).map(
+          key => ({
+            id: key,
+            name: props.stylesList.styleMap[key],
+          }),
+        );
         set_stylesList(styleMapList);
       }
     }
@@ -106,67 +117,98 @@ const CreateStyleTransferOutUI = ({route, navigation, ...props}) => {
 
   useEffect(() => {
     if (props.sizesList) {
-      const { availqtylist, sizeWiseList } = props.sizesList;
-  
+      const {availqtylist, sizeWiseList} = props.sizesList;
+      // console.log('lists ===> ', availqtylist, sizeWiseList);
+
       if (availqtylist && sizeWiseList) {
         const mergedList = availqtylist.map((item, index) => {
           const sizeItem = sizeWiseList[index];
-  
+
           return {
             availqty: item.availqty,
             styleid: item.styleid,
             sizeId: sizeItem?.sizeId ?? null,
-            sizeDesc: sizeItem?.sizeDesc ?? null
+            sizeDesc: sizeItem?.sizeDesc ?? null,
+            enteredInput: '',
           };
         });
 
         setRows(prevRows =>
-        prevRows.map(row =>
-          row.StyleId === lastestStyleId
-            ? {
-                ...row,
-                
-                childTable: mergedList || [],
-              }
-            : row,
-        ),
-      );
-  
-        console.log("Merged List =>", mergedList);
+          prevRows.map(row =>
+            row.StyleId === lastestStyleId
+              ? {
+                  ...row,
+
+                  childTable: mergedList || [],
+                }
+              : row,
+          ),
+        );
+
+        console.log('Merged List =>', mergedList);
       }
     }
   }, [props.sizesList]);
-  
-  
+
   const backAction = async () => {
     props.backBtnAction();
   };
 
   const submitAction = async () => {
-    const mappedRows = rows.flatMap(row => {
-      const barcodeString = row.childTable?.length
-        ? Array(row.childTable.length).fill(row.barcode).join(',')
-        : '';
+    if (fromLocationId === toLocationId) {
+      Alert.alert('To Location and From Location should not be same.');
+    }
 
+    const hasEmptyProcessQty = rows.some(
+      item => !item.processQty?.toString().trim(),
+    );
+
+    if (hasEmptyProcessQty) {
+      Alert.alert('Please Enter the Process Quantity');
+      return;
+    }
+
+    const allRowsHaveInput = rows.every(row =>
+      row.childTable.some(child => child.enteredInput?.toString().trim()),
+    );
+
+    if (!allRowsHaveInput) {
+      Alert.lert('Please enter sizes!!!');
+      return;
+    }
+    // console.log('returned ');
+    // return;
+    const mappedRows = rows.flatMap(row => {
       return (
         row.childTable?.map(child => ({
-          masterStyleId: row.StyleId,
-          barcode: barcodeString,
-          StyleId: child.SIZE_VAL,
-          m_buyerpo_id: row.PbuyerPoID,
+          styleID: row.StyleId,
+          sendQty: row.totalQty,
+          sizeQty: child?.enteredInput,
+          style_cost: row.styleCost,
+          total_goods: row.goodsValue,
+          fabric_price: '0',
+          process_ids: row.selectedIndices.join(','),
+          process_quantity: row.processQty,
         })) || []
       );
     });
 
     const tempObj = {
-      StyleId: 0,
-      masterStyle: masterStyleName,
-      buyerpoId: buyerPoId,
+      companyLocationId: fromLocationId,
+      isMulti: singleColor === 'Yes' ? 1 : multiColor === 'Yes' ? 2 : 3,
+      iswoOrWos: '0',
+      refDate: date,
+      hiddenDate: date,
+      hiddenTransferId: '0',
+      receivedLocationId: toLocationId,
+      locName: toLocationName,
+      customerOrInhouse: inHouse === 'Yes' ? 'inhouse' : 'customer',
       particulars: mappedRows || [],
     };
 
-    // console.log('temp obj ===> ', tempObj);
+    console.log('temp obj ===> ', mappedRows);
     props.submitAction(tempObj);
+    // console.log("child table ===> ", rows[0].childTable)
   };
 
   const handleRemoveRow = id => {
@@ -191,6 +233,17 @@ const CreateStyleTransferOutUI = ({route, navigation, ...props}) => {
   };
 
   const actionOnStyleName = async (item, rowId) => {
+    const selectedStyleId = item?.id;
+
+    const isDuplicate = rows.some(
+      row => row.StyleId === selectedStyleId && row.id !== rowId,
+    );
+
+    if (isDuplicate) {
+      Alert.alert('Same Style - Color combo are already selected');
+      return;
+    }
+
     setRows(
       rows.map(row =>
         row.id === rowId
@@ -229,8 +282,8 @@ const CreateStyleTransferOutUI = ({route, navigation, ...props}) => {
         processQty: '',
         childTable: [],
         showSampleProcessList: false,
-        SampleProcessList: [],
-        filteredSampleProcess: [],
+        SampleProcessList: sampleProcessList || [],
+        filteredSampleProcess: sampleProcessList || [],
         selectedIndices: [],
       },
     ]);
@@ -393,6 +446,13 @@ const CreateStyleTransferOutUI = ({route, navigation, ...props}) => {
 
   const handleConfirm = d => {
     const formattedDate = d.toISOString().split('T')[0];
+    const currentDate = new Date().toISOString().split('T')[0];
+
+    if (formattedDate < currentDate) {
+      hideDatePicker();
+      alert('Delivery date should be greater than Current date');
+      return;
+    }
     setDate(formattedDate);
     hideDatePicker();
   };
@@ -443,7 +503,7 @@ const CreateStyleTransferOutUI = ({route, navigation, ...props}) => {
           ? {
               ...row,
               childTable: row.childTable.map(child =>
-                child.SIZE_ID === sizeId
+                child.sizeId === sizeId
                   ? {...child, enteredInput: text}
                   : child,
               ),
@@ -752,23 +812,6 @@ const CreateStyleTransferOutUI = ({route, navigation, ...props}) => {
             </View>
           )}
 
-          <View style={{marginTop: hp('2%')}}>
-            <TextInput
-              label="Buyer Name"
-              value={buyerName}
-              mode="outlined"
-              onChangeText={text => setbuyerName(text)}
-            />
-          </View>
-
-          <View style={{marginTop: hp('2%')}}>
-            <TextInput
-              label="Barcode"
-              value={barcode}
-              mode="outlined"
-              onChangeText={text => setBarcode(text)}
-            />
-          </View>
           <View style={{marginTop: hp('4%')}} />
           <RadioGroup
             style={{flexDirection: 'row'}}
@@ -923,12 +966,11 @@ const CreateStyleTransferOutUI = ({route, navigation, ...props}) => {
                               setRows(rows =>
                                 rows.map(r => ({
                                   ...r,
-                                  showStyleList: r.id === row.id ? !r.showStyleList : false,
-                                }))
+                                  showStyleList:
+                                    r.id === row.id ? !r.showStyleList : false,
+                                })),
                               );
-                            }}
-                            >
-                              
+                            }}>
                             <View style={[styles.SectionStyle1]}>
                               <View style={{flexDirection: 'column'}}>
                                 <Text
@@ -998,13 +1040,11 @@ const CreateStyleTransferOutUI = ({route, navigation, ...props}) => {
                         <TextInput
                           style={styles.table_data_input}
                           value={row.totalQty}
-                          editable={false}
+                          editable={true}
                           onChangeText={text => {
                             setRows(
                               rows.map(r =>
-                                r.id === row.id
-                                  ? {...r, totalQty: text}
-                                  : r,
+                                r.id === row.id ? {...r, totalQty: text} : r,
                               ),
                             );
                           }}
@@ -1016,7 +1056,7 @@ const CreateStyleTransferOutUI = ({route, navigation, ...props}) => {
                         <TextInput
                           style={styles.table_data_input}
                           value={row.styleCost}
-                          editable={false}
+                          editable={true}
                           onChangeText={text => {
                             setRows(
                               rows.map(r =>
@@ -1039,7 +1079,7 @@ const CreateStyleTransferOutUI = ({route, navigation, ...props}) => {
                               ),
                             );
                           }}
-                          editable={false}
+                          editable={true}
                         />
                       </View>
 
@@ -1166,13 +1206,11 @@ const CreateStyleTransferOutUI = ({route, navigation, ...props}) => {
                         <TextInput
                           style={styles.table_data_input}
                           value={row.processQty}
-                          editable={false}
+                          editable={true}
                           onChangeText={text => {
                             setRows(
                               rows.map(r =>
-                                r.id === row.id
-                                  ? {...r, processQty: text}
-                                  : r,
+                                r.id === row.id ? {...r, processQty: text} : r,
                               ),
                             );
                           }}
@@ -1221,7 +1259,6 @@ const CreateStyleTransferOutUI = ({route, navigation, ...props}) => {
               </View>
             </ScrollView>
           </View>
-
         </View>
       </KeyboardAwareScrollView>
 
@@ -1480,5 +1517,13 @@ const getStyles = colors =>
       fontSize: 16,
       fontWeight: '600',
       color: '#000000',
+    },
+    itemContainer: {
+      borderBottomColor: '#e0e0e0',
+      flexDirection: 'row',
+      paddingHorizontal: 15,
+      paddingVertical: 12,
+      borderBottomWidth: 1,
+      borderBottomColor: '#ccc',
     },
   });

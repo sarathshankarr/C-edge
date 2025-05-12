@@ -54,6 +54,7 @@ const CreateStyleTransferOut = ({route}) => {
       company: JSON.parse(companyObj),
       dataFilter: '',
     };
+    // console.log("getInitialData create ", obj)
     let LISTAPIOBJ = await APIServiceCall.getStyleTransferOutCreate(obj);
     set_isLoading(false);
 
@@ -108,36 +109,38 @@ const CreateStyleTransferOut = ({route}) => {
   };
 
   const submitAction = async tempObj => {
-    const validateRMT = await ValidateAction();
+    // const validateRMT = await ValidateAction();
 
-    if (validateRMT === 'no') {
-      console.log('failed  saving =====> ');
-      popUpAction(
-        Constant.Fail_Validate_RMT_MSG,
-        Constant.DefaultAlert_MSG,
-        'OK',
-        true,
-        false,
-      );
-      return;
-    }
+    // if (validateRMT === 'no') {
+    //   console.log('failed  saving =====> ');
+    //   popUpAction(
+    //     Constant.Fail_Validate_RMT_MSG,
+    //     Constant.DefaultAlert_MSG,
+    //     'OK',
+    //     true,
+    //     false,
+    //   );
+    //   return;
+    // }
 
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
     let companyObj = await AsyncStorage.getItem('companyObj');
+    let userId = await AsyncStorage.getItem('userId');
 
-    tempObj.menuId = 384;
     tempObj.username = userName;
     tempObj.password = userPsd;
+    tempObj.loginUserId = userId;
     tempObj.compIds = usercompanyId;
+    tempObj.companyLocationId = usercompanyId;
     tempObj.company = JSON.parse(companyObj);
 
     console.log('saving obj ==>', tempObj);
 
     set_isLoading(true);
 
-    let SAVEAPIObj = await APIServiceCall.saveCreateMasterBoxPacking(tempObj);
+    let SAVEAPIObj = await APIServiceCall.saveCreateStyleTransferOut(tempObj);
     set_isLoading(false);
 
     console.log('Sucess before returned obj ', SAVEAPIObj);
