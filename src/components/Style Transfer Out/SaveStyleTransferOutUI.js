@@ -51,6 +51,7 @@ const SaveStyleTransferOutUI = ({route, navigation, ...props}) => {
   const [customerStyle, setCustomerStyle] = useState('No');
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [date, setDate] = useState('');
+  const [showSave, set_showSave] = useState(true);
 
   const {colors} = useContext(ColorContext);
 
@@ -134,7 +135,21 @@ const SaveStyleTransferOutUI = ({route, navigation, ...props}) => {
 
         if (props.itemsObj.styleTransferDetails.deliveryDateStr) {
           setDate(props.itemsObj.styleTransferDetails.deliveryDateStr);
-          
+        }
+        if (
+          props.itemsObj.styleTransferDetails.isCustomer !== undefined &&
+          props.itemsObj.styleTransferDetails.status !== undefined &&
+          props.itemsObj.styleTransferDetails.returnable !== undefined
+        ) {
+            const details = props.itemsObj.styleTransferDetails;
+
+          const isReceive =
+            (details.status === 0 && details.isCustomer === 0) ||
+            (details.status === 0 &&
+              details.isCustomer === 1 &&
+              details.returnable === 1);
+
+          set_showSave(isReceive);
         }
 
         if (props.itemsObj.styleTransferDetails.particulars) {
@@ -483,18 +498,45 @@ const SaveStyleTransferOutUI = ({route, navigation, ...props}) => {
     );
   };
 
+  // const updateChildInput = (rowId, sizeId, text) => {
+
+  //   setRows(prevRows =>
+  //     prevRows.map(row =>
+  //       row.id === rowId
+  //         ? {
+  //             ...row,
+  //             childTable: row.childTable.map(child =>
+  //               child._id === sizeId   ? {...child, enteredInput: text} : child,
+  //             ),
+  //           }
+  //         : row,
+  //     ),
+  //   );
+  // };
+
   const updateChildInput = (rowId, sizeId, text) => {
     setRows(prevRows =>
-      prevRows.map(row =>
-        row.id === rowId
-          ? {
-              ...row,
-              childTable: row.childTable.map(child =>
-                child._id === sizeId ? {...child, enteredInput: text} : child,
-              ),
-            }
-          : row,
-      ),
+      prevRows.map(row => {
+        if (row.id !== rowId) return row;
+
+        const updatedChildTable = row.childTable.map(child => {
+          if (child._id !== sizeId) return child;
+
+          const sizeQty = parseInt(child.sizeQty, 10);
+          const entered = parseInt(text, 10);
+
+          if (!isNaN(entered) && entered > sizeQty) {
+            Alert.alert(
+              `Entered input (${entered}) must be less than or equal to sizeQty (${sizeQty})`,
+            );
+            return child;
+          }
+
+          return {...child, enteredInput: text};
+        });
+
+        return {...row, childTable: updatedChildTable};
+      }),
     );
   };
 
@@ -507,7 +549,7 @@ const SaveStyleTransferOutUI = ({route, navigation, ...props}) => {
           isChatEnable={false}
           isTImerEnable={false}
           isTitleHeaderEnable={true}
-          title={'Save Style TransferOut UI'}
+          title={'Save Style TransferOut'}
           backBtnAction={() => backBtnAction()}
         />
       </View>
@@ -563,7 +605,11 @@ const SaveStyleTransferOutUI = ({route, navigation, ...props}) => {
                 color="#000"
               />
             </View>
-            <TouchableOpacity onPress={showDatePicker} style={{padding: 5}}>
+            {/* <TouchableOpacity onPress={showDatePicker} style={{padding: 5}}> */}
+
+            <TouchableOpacity
+              onPress={() => console.log('date cant be opened')}
+              style={{padding: 5}}>
               <Image
                 source={require('./../../../assets/images/png/calendar11.png')}
                 style={{width: 40, height: 40}}
@@ -588,7 +634,8 @@ const SaveStyleTransferOutUI = ({route, navigation, ...props}) => {
                 justifyContent: 'space-between',
               }}
               onPress={() => {
-                setShowFromLocationList(!showFromLocationList);
+                // setShowFromLocationList(!showFromLocationList);
+                console.log('location cant be opened');
               }}>
               <View>
                 <View style={[styles.SectionStyle1, {}]}>
@@ -663,7 +710,8 @@ const SaveStyleTransferOutUI = ({route, navigation, ...props}) => {
                   justifyContent: 'space-between',
                 }}
                 onPress={() => {
-                  setShowToLocationList(!showToLocationList);
+                  // setShowToLocationList(!showToLocationList);
+                  console.log('location cant be opened');
                 }}>
                 <View>
                   <View style={[styles.SectionStyle1, {}]}>
@@ -739,7 +787,8 @@ const SaveStyleTransferOutUI = ({route, navigation, ...props}) => {
                   justifyContent: 'space-between',
                 }}
                 onPress={() => {
-                  setShowToCustomerList(!showToCustomerList);
+                  // setShowToCustomerList(!showToCustomerList);
+                  console.log('customer cant be opened');
                 }}>
                 <View>
                   <View style={[styles.SectionStyle1, {}]}>
@@ -912,26 +961,15 @@ const SaveStyleTransferOutUI = ({route, navigation, ...props}) => {
                               width: '100%',
                               overflow: 'hidden',
                             }}
-                            // onPress={() => {
-                            //   setRows(
-                            //     rows.map(r =>
-                            //       r.id === row.id
-                            //         ? {
-                            //             ...r,
-                            //             showStyleList: !r.showStyleList,
-                            //           }
-                            //         : {...r, showStyleList: false},
-                            //     ),
-                            //   );
-                            // }}
                             onPress={() => {
-                              setRows(rows =>
-                                rows.map(r => ({
-                                  ...r,
-                                  showStyleList:
-                                    r.id === row.id ? !r.showStyleList : false,
-                                })),
-                              );
+                              // setRows(rows =>
+                              //   rows.map(r => ({
+                              //     ...r,
+                              //     showStyleList:
+                              //       r.id === row.id ? !r.showStyleList : false,
+                              //   })),
+                              // );
+                              console.log('style list cant be opened');
                             }}>
                             <View style={[styles.SectionStyle1]}>
                               <View style={{flexDirection: 'column'}}>
@@ -1065,17 +1103,18 @@ const SaveStyleTransferOutUI = ({route, navigation, ...props}) => {
                               overflow: 'hidden',
                             }}
                             onPress={() => {
-                              setRows(
-                                rows.map(r =>
-                                  r.id === row.id
-                                    ? {
-                                        ...r,
-                                        showSampleProcessList:
-                                          !r.showSampleProcessList,
-                                      }
-                                    : {...r, showSampleProcessList: false},
-                                ),
-                              );
+                              // setRows(
+                              //   rows.map(r =>
+                              //     r.id === row.id
+                              //       ? {
+                              //           ...r,
+                              //           showSampleProcessList:
+                              //             !r.showSampleProcessList,
+                              //         }
+                              //       : {...r, showSampleProcessList: false},
+                              //   ),
+                              // );
+                              console.log('process  list cant be opened');
                             }}>
                             <View>
                               <View style={[styles.SectionStyle1, {}]}>
@@ -1221,8 +1260,8 @@ const SaveStyleTransferOutUI = ({route, navigation, ...props}) => {
           rightBtnTitle={'Save'}
           leftBtnTitle={'Back'}
           isLeftBtnEnable={true}
-          rigthBtnState={true}
-          isRightBtnEnable={true}
+          rigthBtnState={showSave}
+          isRightBtnEnable={showSave}
           rightButtonAction={async () => submitAction()}
           leftButtonAction={async () => backAction()}
         />

@@ -134,9 +134,9 @@ const CreateStyleTransferOut = ({route}) => {
     tempObj.loginUserId = userId;
     tempObj.compIds = usercompanyId;
     tempObj.companyLocationId = usercompanyId;
-    tempObj.company = JSON.parse(companyObj);
-
+    
     console.log('saving obj ==>', tempObj);
+    tempObj.company = JSON.parse(companyObj);
 
     set_isLoading(true);
 

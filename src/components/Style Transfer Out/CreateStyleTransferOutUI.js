@@ -117,8 +117,8 @@ const CreateStyleTransferOutUI = ({route, navigation, ...props}) => {
 
   useEffect(() => {
     if (props.sizesList) {
-      const {availqtylist, sizeWiseList} = props.sizesList;
-      // console.log('lists ===> ', availqtylist, sizeWiseList);
+      const {availqtylist, sizeWiseList, mrp} = props.sizesList;
+      console.log('sizesList mrp===> ', mrp);
 
       if (availqtylist && sizeWiseList) {
         const mergedList = availqtylist.map((item, index) => {
@@ -140,6 +140,7 @@ const CreateStyleTransferOutUI = ({route, navigation, ...props}) => {
                   ...row,
 
                   childTable: mergedList || [],
+                  styleCost: mrp,
                 }
               : row,
           ),
@@ -158,9 +159,13 @@ const CreateStyleTransferOutUI = ({route, navigation, ...props}) => {
     if (fromLocationId === toLocationId) {
       Alert.alert('To Location and From Location should not be same.');
     }
+    if (!date) {
+      Alert.alert('Please select Delivery Date');
+    }
 
     const hasEmptyProcessQty = rows.some(
-      item => !item.processQty?.toString().trim(),
+      item =>
+        !item.processQty?.toString().trim() && item.selectedIndices.length > 0,
     );
 
     if (hasEmptyProcessQty) {
@@ -497,19 +502,48 @@ const CreateStyleTransferOutUI = ({route, navigation, ...props}) => {
   };
 
   const updateChildInput = (rowId, sizeId, text) => {
+    // setRows(prevRows =>
+    //   prevRows.map(row =>
+    //     row.id === rowId
+    //       ? {
+    //           ...row,
+    //           childTable: row.childTable.map(child =>
+    //             child.sizeId === sizeId
+    //               ? {...child, enteredInput: text}
+    //               : child,
+    //           ),
+    //         }
+    //       : row,
+    //   ),
+    // );
+
     setRows(prevRows =>
-      prevRows.map(row =>
-        row.id === rowId
-          ? {
-              ...row,
-              childTable: row.childTable.map(child =>
-                child.sizeId === sizeId
-                  ? {...child, enteredInput: text}
-                  : child,
-              ),
-            }
-          : row,
-      ),
+      prevRows.map(row => {
+        if (row.id !== rowId) return row;
+
+        const updatedChildTable = row.childTable.map(child => {
+          if (child.sizeId !== sizeId) return child;
+
+          const sizeQty = parseInt(child.availqty, 10);
+          const entered = parseInt(text, 10);
+
+          if (!isNaN(entered) && entered > sizeQty) {
+            Alert.alert(
+              `Entered input (${entered}) must be less than or equal to sizeQty (${sizeQty})`,
+            );
+            return child;
+          }
+
+          return {...child, enteredInput: text};
+        });
+
+        const totalQty = updatedChildTable.reduce((sum, child) => {
+          const value = parseInt(child.enteredInput, 10);
+          return sum + (isNaN(value) ? 0 : value);
+        }, 0);
+
+        return {...row, childTable: updatedChildTable, totalQty :totalQty.toString()};
+      }),
     );
   };
 
@@ -522,7 +556,7 @@ const CreateStyleTransferOutUI = ({route, navigation, ...props}) => {
           isChatEnable={false}
           isTImerEnable={false}
           isTitleHeaderEnable={true}
-          title={'Create Style TransferOut UI'}
+          title={'Create Style TransferOut'}
           backBtnAction={() => backBtnAction()}
         />
       </View>
@@ -880,7 +914,7 @@ const CreateStyleTransferOutUI = ({route, navigation, ...props}) => {
                 justifyContent: 'center',
               }}>
               <Text style={{color: '#fff', fontSize: 16, fontWeight: 'bold'}}>
-                Add Stock
+                Add
               </Text>
             </TouchableOpacity>
           </View>
@@ -1040,7 +1074,7 @@ const CreateStyleTransferOutUI = ({route, navigation, ...props}) => {
                         <TextInput
                           style={styles.table_data_input}
                           value={row.totalQty}
-                          editable={true}
+                          editable={false}
                           onChangeText={text => {
                             setRows(
                               rows.map(r =>
@@ -1055,8 +1089,8 @@ const CreateStyleTransferOutUI = ({route, navigation, ...props}) => {
                       <View style={{width: 100}}>
                         <TextInput
                           style={styles.table_data_input}
-                          value={row.styleCost}
-                          editable={true}
+                          value={row.styleCost.toString()}
+                          editable={false}
                           onChangeText={text => {
                             setRows(
                               rows.map(r =>
@@ -1071,7 +1105,11 @@ const CreateStyleTransferOutUI = ({route, navigation, ...props}) => {
                       <View style={{width: 100}}>
                         <TextInput
                           style={styles.table_data_input}
-                          value={row.goodsValue}
+                          // value={row.goodsValue}
+                          value={(
+                            parseFloat(row.totalQty || 0) *
+                            parseFloat(row.styleCost || 0)
+                          ).toFixed(2)}
                           onChangeText={text => {
                             setRows(
                               rows.map(r =>
@@ -1079,7 +1117,7 @@ const CreateStyleTransferOutUI = ({route, navigation, ...props}) => {
                               ),
                             );
                           }}
-                          editable={true}
+                          editable={false}
                         />
                       </View>
 

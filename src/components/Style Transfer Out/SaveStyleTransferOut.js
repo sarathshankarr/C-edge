@@ -108,7 +108,7 @@ const SaveStyleTransferOut = ({navigation, route, ...props}) => {
     tempObj.loginUserId = userId;
     tempObj.compIds = usercompanyId;
     tempObj.companyLocationId = usercompanyId;
-    tempObj.transferId = transferId;
+    tempObj.hiddenTransferId = transferId;
     
     console.log('saving obj ==>', tempObj);
     tempObj.company = JSON.parse(companyObj);
