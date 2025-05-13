@@ -121,12 +121,12 @@ const StyleTransferOutListUI = ({route, navigation, ...props}) => {
 
     const styleArray = ItemsArray.filter(item => {
       return (
-        (item?.fromLocIdStr !== '' &&
-          item?.fromLocIdStr?.toLowerCase().includes(searchTerm)) ||
         (item?.toLocIdStr !== '' &&
           item?.toLocIdStr?.toLowerCase().includes(searchTerm)) ||
-        (item?.orderNo !== '' &&
-          item?.orderNo?.toLowerCase().includes(searchTerm))
+        (item?.styleno !== '' &&
+          item?.styleno?.toLowerCase().includes(searchTerm)) ||
+        (item?.idstr !== '' &&
+          item?.idstr?.toLowerCase().includes(searchTerm))
       );
     });
 
@@ -195,7 +195,7 @@ const StyleTransferOutListUI = ({route, navigation, ...props}) => {
             }}>
             <TouchableOpacity onPress={() => handlePdf1(item)}>
               <Text
-                style={[CommonStyles.tylesTextStyle, {textAlign: 'center'}]}>
+                style={[CommonStyles.tylesTextStyle, {textAlign: 'center', marginBottom:5}]}>
                 {'OUT DC'}
               </Text>
             </TouchableOpacity>
@@ -221,7 +221,7 @@ const StyleTransferOutListUI = ({route, navigation, ...props}) => {
           isChatEnable={false}
           isTImerEnable={false}
           isTitleHeaderEnable={true}
-          title={'StyleTransferOutListUI'}
+          title={'Style Transfer Out List'}
           backBtnAction={() => backBtnAction()}
         />
       </View>
