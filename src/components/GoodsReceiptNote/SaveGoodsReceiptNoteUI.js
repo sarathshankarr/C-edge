@@ -1,0 +1,872 @@
+import React, {useState, useEffect, useContext} from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  ScrollView,
+  Alert,
+} from 'react-native';
+import {
+  heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
+} from 'react-native-responsive-screen';
+import * as Constant from '../../utils/constants/constant';
+import CommonStyles from '../../utils/commonStyles/commonStyles';
+import HeaderComponent from '../../utils/commonComponents/headerComponent';
+import LoaderComponent from '../../utils/commonComponents/loaderComponent';
+import AlertComponent from '../../utils/commonComponents/alertComponent';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import BottomComponent from '../../utils/commonComponents/bottomComponent';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import {formatDateIntoDMY} from '../../utils/constants/constant';
+import {RadioButton, TextInput} from 'react-native-paper';
+import {ColorContext} from '../colorTheme/colorTheme';
+import ImageCropPicker from 'react-native-image-crop-picker';
+import CustomCheckBox from '../../utils/commonComponents/CustomCheckBox';
+import DocumentPicker from 'react-native-document-picker';
+
+let downArrowImg = require('./../../../assets/images/png/dropDownImg.png');
+let closeImg = require('./../../../assets/images/png/close1.png');
+
+const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
+  const [po, setPo] = useState('');
+  const [rows, setRows] = useState([]);
+  const [date, setDate] = useState('');
+  const [itemOrTrims, setItemOrTrims] = useState('');
+  const [shipTo, setShipTo] = useState('');
+  const [totalTax, set_totaTax] = useState(0);
+  const [selectCheckboxes, set_selectCheckboxes] = useState(false);
+  const [galleryImages, setGalleryImages] = useState([]);
+  const [documents, setDocuments] = useState([]);
+
+  const {colors} = useContext(ColorContext);
+  const styles = getStyles(colors);
+
+  useEffect(() => {
+    if (props.itemsObj) {
+      // console.log('save grn approvve ', props.itemsObj);
+
+      if (props.itemsObj.pomaster) {
+        if (props.itemsObj.pomaster.poNumberWithSymbol) {
+          setPo(props.itemsObj.pomaster.poNumberWithSymbol);
+        }
+
+        if (props.itemsObj.pomaster.createionDateStr) {
+          setDate(props.itemsObj.pomaster.createionDateStr);
+        }
+        if (props.itemsObj.pomaster.itemTrimsType) {
+          setItemOrTrims(props.itemsObj.pomaster.itemTrimsType);
+        }
+        if (props.itemsObj.pomaster.companyName) {
+          setShipTo(props.itemsObj.pomaster.companyName);
+        }
+        if (
+          props.itemsObj.pomaster.transportCost ||
+          props.itemsObj.pomaster.additional_cost ||
+          props.itemsObj.pomaster.poTcs
+        ) {
+          const {transportCost, additional_cost, poTcs} =
+            props.itemsObj.pomaster;
+
+          const total =
+            (parseFloat(transportCost) || 0) +
+            (parseFloat(additional_cost) || 0) +
+            (parseFloat(poTcs) || 0);
+
+          if (total > 0) set_totaTax(total);
+        }
+        if (props.itemsObj.pomaster.poMasterChildMappingDao) {
+          const dataMap = props.itemsObj.pomaster.poMasterChildMappingDao;
+          // console.log('save grn approvve  child ', dataMap);
+
+          const childMap = dataMap.map((item, index) => ({
+            roll: item.rollNo,
+            requiredQty: item.quantitystr,
+            remainingQty: item.remQty,
+            enteredQty: item.recqty,
+            presentReceivedQty: item.receivedQty,
+            fabric: item.fabrecqty,
+            price: item.price,
+            grnNo: item.grnUniqueNo,
+            gstPercent: item.gstper,
+            itemRate: item.itemratestr,
+            discountAccount: item.discAmnt,
+            gst: item.gstamntstr,
+            total: item.totalWithGst,
+            fabric: item.itemdesc,
+          }));
+
+          setRows(childMap);
+        }
+      }
+    }
+  }, [props.itemsObj]);
+
+  const popOkBtnAction = () => {
+    props.popOkBtnAction();
+  };
+
+  const submitAction = async () => {
+    let obj = {
+      vendorId: props.itemsObj.pomaster.vendorId,
+      shiploc: 2,
+      additional_cost: 0,
+      itemTrimsType: itemOrTrims,
+      notes: '',
+      contactId: 0,
+      vendorCustomerId: 2,
+      transportCost: 0,
+      poNumber: 212,
+      posave: 2,
+      p_conv_rate: 0.0,
+      buyerno: '',
+      dispatch: '',
+      roundOff: 0.0,
+      isCustStyleWise: 0,
+      additionalAmount: 0,
+      poTcs: 21.0,
+      seqIdForStyle: '',
+      modify_user: '',
+      styleOrBuyerpo: 0,
+      referenceDateStr: '',
+      referenceDate: '2025-03-06',
+      gateno: '',
+      grn_totamnt: 1071.0,
+      itemStr:
+        '295#100.0#1#477#Fabric##0.0##0#10.0000#0#App#0#0#0#0#5#1000.00#50.00#0#0.00#0##0#0,',
+    };
+    props.submitAction(obj);
+  };
+
+  const backAction = async () => {
+    props.backBtnAction();
+  };
+
+  const totalItemRate = rows.reduce(
+    (sum, item) => sum + parseFloat(item.itemRate || 0),
+    0,
+  );
+  const totalDiscount = rows.reduce(
+    (sum, item) => sum + parseFloat(item.discountAccount || 0),
+    0,
+  );
+  const totalGst = rows.reduce(
+    (sum, item) => sum + parseFloat(item.gst || 0),
+    0,
+  );
+  const totalAmount = rows.reduce(
+    (sum, item) => sum + parseFloat(item.total || 0),
+    0,
+  );
+  const totalpresentReceivedQty = rows.reduce(
+    (sum, item) => sum + parseFloat(item.presentReceivedQty || 0),
+    0,
+  );
+
+  const handleImagePicker = () => {
+    const MAX_IMAGES = 3;
+
+    if (galleryImages.length >= MAX_IMAGES) {
+      Alert.alert(
+        'Limit Reached',
+        `You can only upload up to ${MAX_IMAGES} images.`,
+      );
+      return;
+    }
+    ImageCropPicker.openPicker({
+      multiple: true,
+      mediaType: 'any',
+    })
+      .then(images => {
+        const newImages = images.map(image => ({
+          uri: image.path,
+          width: image.width,
+          height: image.height,
+          mime: image.mime,
+        }));
+
+        // Check if adding these images would exceed the limit
+        if (galleryImages.length + newImages.length > MAX_IMAGES) {
+          Alert.alert(
+            'Limit Exceeded',
+            `You can only upload up to ${MAX_IMAGES} images in total.`,
+          );
+        } else {
+          setGalleryImages(prevImages => [...prevImages, ...newImages]);
+        }
+      })
+      .catch(error => {
+        console.error('Error picking images:', error);
+      });
+  };
+
+  const removeImage = (index, imageType) => {
+    if (imageType === 'selfie') {
+      setSelfieImages(selfieImages.filter((_, i) => i !== index));
+    } else if (imageType === 'gallery') {
+      setGalleryImages(galleryImages.filter((_, i) => i !== index));
+    } else if (imageType === 'document') {
+      setDocuments(documents.filter((_, i) => i !== index));
+    }
+  };
+
+  const handleDocumentPicker = async () => {
+    const MAX_DOCUMENT = 3;
+    // const SUPPORTED_TYPES = ['pdf', 'doc', 'docx'];
+
+    if (documents.length >= MAX_DOCUMENT) {
+      Alert.alert(
+        'Limit Reached',
+        `You can only upload up to ${MAX_DOCUMENT} documents.`,
+      );
+      return;
+    }
+
+    try {
+      const res = await DocumentPicker.pick({
+        type: [
+          DocumentPicker.types.pdf,
+          DocumentPicker.types.doc,
+          DocumentPicker.types.docx,
+          DocumentPicker.types.audio,
+          DocumentPicker.types.allFiles,
+        ],
+      });
+
+      // Process the selected documents
+      const selectedDocs = Array.isArray(res) ? res : [res];
+
+      for (let doc of selectedDocs) {
+        const fileType = doc.name?.split('.').pop()?.toLowerCase();
+
+        // Check if the file type is supported
+        // if (!fileType || !SUPPORTED_TYPES.includes(fileType)) {
+        //   Alert.alert(
+        //     'Unsupported File',
+        //     `The file ${doc.name} is not a supported type. Please upload a PDF, DOC, or DOCX file.`,
+        //   );
+        //   return; // Skip adding unsupported files
+        // }
+      }
+
+      // Check if adding these documents exceeds the limit
+      const newDocuments = [...documents, ...selectedDocs];
+      if (newDocuments.length > MAX_DOCUMENT) {
+        Alert.alert(
+          'Limit Exceeded',
+          `You can only upload up to ${MAX_DOCUMENT} documents.`,
+        );
+        return;
+      }
+
+      // Add documents to state if all files are supported and within limit
+      setDocuments(newDocuments);
+    } catch (error) {
+      if (DocumentPicker.isCancel(error)) {
+        // User canceled the document picker
+      } else {
+        console.error('Error picking document:', error);
+      }
+    }
+  };
+
+  return (
+    <View style={[CommonStyles.mainComponentViewStyle]}>
+      <View style={[CommonStyles.headerView]}>
+        <HeaderComponent
+          isBackBtnEnable={true}
+          isSettingsEnable={false}
+          isChatEnable={false}
+          isTImerEnable={false}
+          isTitleHeaderEnable={true}
+          title={'Edit Goods Receipt Notes'}
+          backBtnAction={() => backAction()}
+        />
+      </View>
+
+      <KeyboardAwareScrollView
+        enableOnAndroid={true}
+        extraHeight={130}
+        extraScrollHeight={130}
+        showsVerticalScrollIndicator={false}
+        style={{marginBottom: hp('15%'), width: '100%'}}>
+        <View
+          style={{
+            marginBottom: hp('5%'),
+            // width: '100%',
+            marginHorizontal: wp('5%'),
+          }}>
+          <View style={{marginTop: hp('2%')}}>
+            <TextInput
+              label="PO#"
+              value={po}
+              mode="outlined"
+              onChangeText={text => console.log(text)}
+            />
+          </View>
+          <View style={{marginTop: hp('2%')}}>
+            <TextInput
+              label="Date"
+              value={date}
+              mode="outlined"
+              onChangeText={text => console.log(text)}
+            />
+          </View>
+          <View style={{marginTop: hp('2%')}}>
+            <TextInput
+              label="ITEM/TRIMS"
+              value={itemOrTrims}
+              mode="outlined"
+              onChangeText={text => console.log(text)}
+            />
+          </View>
+          <View style={{marginTop: hp('2%')}}>
+            <TextInput
+              label="Ship To"
+              value={shipTo}
+              mode="outlined"
+              onChangeText={text => console.log(text)}
+            />
+          </View>
+          <View style={styles.wrapper}>
+            <ScrollView nestedScrollEnabled={true} horizontal>
+              <View style={styles.table}>
+                <View style={styles.table_head}>
+                  <View style={{width: 100}}>
+                    <View
+                      style={[
+                        styles.checkboxItem,
+                        {
+                          // marginTop: hp('2%'),
+                          // marginBottom: hp('2%'),
+                          flex: 0.5,
+                        },
+                      ]}>
+                      <CustomCheckBox
+                        isChecked={selectCheckboxes}
+                        onToggle={() => set_selectCheckboxes(!selectCheckboxes)}
+                      />
+                    </View>
+                  </View>
+                  <View style={{width: 100}}>
+                    <Text style={styles.table_head_captions}>Roll No/Lot.</Text>
+                  </View>
+                  <View style={{width: 100}}>
+                    <Text style={styles.table_head_captions}>Required Qty</Text>
+                  </View>
+                  <View style={{width: 100}}>
+                    <Text style={styles.table_head_captions}>
+                      Rem Qty/Entered Qty
+                    </Text>
+                  </View>
+                  <View style={{width: 100}}>
+                    <Text style={styles.table_head_captions}>
+                      Present Received
+                    </Text>
+                  </View>
+                  <View style={{width: 100}}>
+                    <Text style={styles.table_head_captions}>Fabric</Text>
+                  </View>
+                  <View style={{width: 100}}>
+                    <Text style={styles.table_head_captions}>Price</Text>
+                  </View>
+                  <View style={{width: 100}}>
+                    <Text style={styles.table_head_captions}>GRN No</Text>
+                  </View>
+                  <View style={{width: 100}}>
+                    <Text style={styles.table_head_captions}>GST%</Text>
+                  </View>
+                  <View style={{width: 100}}>
+                    <Text style={styles.table_head_captions}>Item Rate</Text>
+                  </View>
+                  <View style={{width: 100}}>
+                    <Text style={styles.table_head_captions}>Disc. Amount</Text>
+                  </View>
+                  <View style={{width: 100}}>
+                    <Text style={styles.table_head_captions}>GST</Text>
+                  </View>
+                  <View style={{width: 100}}>
+                    <Text style={styles.table_head_captions}>Total</Text>
+                  </View>
+                </View>
+                {rows.map((row, index) => (
+                  <View key={index} style={styles.table_body_single_row}>
+                    <View style={{width: 100}}>
+                      <View
+                        style={[
+                          styles.checkboxItem,
+                          {
+                            // marginTop: hp('1%'),
+                            // marginBottom: hp('2%'),
+                            flex: 0.5,
+                          },
+                        ]}>
+                        <CustomCheckBox
+                          isChecked={false}
+                          // isChecked={selectedIdxs.includes(index)}
+                          onToggle={() => console.log(index)}
+                        />
+                      </View>
+                    </View>
+                    <View style={{width: 100}}>
+                      <Text style={styles.table_data}>{row.roll}</Text>
+                    </View>
+                    <View style={{width: 100}}>
+                      <Text style={styles.table_data}>{row.requiredQty}</Text>
+                    </View>
+                    <View style={{width: 100}}>
+                      <Text style={styles.table_data}>
+                        {row.remainingQty}/{row.enteredQty}
+                      </Text>
+                    </View>
+                    <View style={{width: 100}}>
+                      <Text style={styles.table_data}>
+                        {row.presentReceivedQty}
+                      </Text>
+                    </View>
+                    <View style={{width: 100}}>
+                      <Text style={styles.table_data}>{row.fabric}</Text>
+                    </View>
+                    <View style={{width: 100}}>
+                      <Text style={styles.table_data}>{row.price}</Text>
+                    </View>
+                    <View style={{width: 100}}>
+                      <Text style={styles.table_data}>{row.grnNo}</Text>
+                    </View>
+                    <View style={{width: 100}}>
+                      <Text style={styles.table_data}>{row.gstPercent}</Text>
+                    </View>
+                    <View style={{width: 100}}>
+                      <Text style={styles.table_data}>{row.itemRate}</Text>
+                    </View>
+                    <View style={{width: 100}}>
+                      <Text style={styles.table_data}>
+                        {row.discountAccount}
+                      </Text>
+                    </View>
+                    <View style={{width: 100}}>
+                      <Text style={styles.table_data}>{row.gst}</Text>
+                    </View>
+                    <View style={{width: 100}}>
+                      <Text style={styles.table_data}>{row.total}</Text>
+                    </View>
+                  </View>
+                ))}
+                <View style={styles.table_body_single_row}>
+                  {[...Array(4)].map((_, i) => (
+                    <View key={i} style={{width: 100}} />
+                  ))}
+                  <View style={{width: 100}}>
+                    <Text style={styles.table_data}>
+                      {totalpresentReceivedQty.toFixed(2)}
+                    </Text>
+                  </View>
+                  {[...Array(4)].map((_, i) => (
+                    <View key={i} style={{width: 100}} />
+                  ))}
+                  <View style={{width: 100}}>
+                    <Text style={styles.table_data}>
+                      {totalItemRate.toFixed(2)}
+                    </Text>
+                  </View>
+                  <View style={{width: 100}}>
+                    <Text style={styles.table_data}>
+                      {totalDiscount.toFixed(2)}
+                    </Text>
+                  </View>
+                  <View style={{width: 100}}>
+                    <Text style={styles.table_data}>{totalGst.toFixed(2)}</Text>
+                  </View>
+                  <View style={{width: 100}}>
+                    <Text style={styles.table_data}>
+                      {totalAmount.toFixed(2)}
+                    </Text>
+                  </View>
+                </View>
+
+                <View style={styles.table_body_single_row}>
+                  <View style={{width: 100}}></View>
+                  <View style={{width: 100}}></View>
+                  <View style={{width: 100}}></View>
+                  <View style={{width: 100}}></View>
+                  <View style={{width: 100}}></View>
+                  <View style={{width: 100}}></View>
+                  <View style={{width: 100}}></View>
+                  <View style={{width: 100}}></View>
+                  <View style={{width: 100}}></View>
+                  <View style={{width: 100}}></View>
+                  <View style={{width: 100}}></View>
+                  <View style={{width: 100}}>
+                    <Text style={styles.table_data}>{'Total'}</Text>
+                  </View>
+                  <View style={{width: 100}}>
+                    <Text style={styles.table_data}>
+                      {(
+                        parseFloat(totalAmount || 0) + parseFloat(totalTax || 0)
+                      ).toFixed(2)}
+                    </Text>
+                  </View>
+                </View>
+              </View>
+            </ScrollView>
+          </View>
+
+          {/* <TouchableOpacity onPress={() => console.log('HIii')}> */}
+          {/* <TouchableOpacity onPress={handleImagePicker}> */}
+
+          <TouchableOpacity
+            // onPress={handleDocumentPicker}
+            onPress={handleImagePicker}
+            style={{
+              borderRadius: 12,
+              backgroundColor: '#f8f8f8',
+              paddingVertical: 20,
+              paddingHorizontal: 15,
+              alignItems: 'center',
+              justifyContent: 'center',
+              shadowColor: '#000',
+              shadowOffset: {width: 0, height: 2},
+              shadowOpacity: 0.1,
+              shadowRadius: 5,
+              elevation: 4,
+              marginVertical: 10,
+            }}>
+            <View style={{alignItems: 'center'}}>
+              <Image
+                style={{
+                  width: 60,
+                  height: 60,
+                  resizeMode: 'contain',
+                  marginBottom: 10,
+                }}
+                source={require('./../../../assets/images/png/upload.png')}
+              />
+              <Text
+                style={{
+                  textAlign: 'center',
+                  fontSize: 16,
+                  fontWeight: '600',
+                  color: '#333',
+                }}>
+                Upload Images
+              </Text>
+            </View>
+          </TouchableOpacity>
+
+          <View style={{marginTop: hp('2%')}}>
+            {galleryImages.length > 0 && (
+              <ScrollView horizontal style={styles.imagePreviewContainer}>
+                {galleryImages.map((image, index) => (
+                  <View key={index} style={styles.imageContainer}>
+                    <Image
+                      source={{uri: image.uri}}
+                      style={styles.imagePreview}
+                    />
+                    <TouchableOpacity
+                      style={styles.removeButton}
+                      onPress={() => removeImage(index, 'gallery')}>
+                      <Text style={styles.removeButtonText}>x</Text>
+                    </TouchableOpacity>
+                  </View>
+                ))}
+              </ScrollView>
+            )}
+          </View>
+
+          <View style={styles.uploadSection}>
+            {documents.length > 0 && (
+              <View>
+                {documents.map((doc, index) => (
+                  <View key={index} style={styles.documentItem}>
+                    <Text
+                      style={{
+                        color: '#000',
+                        fontSize: 20,
+                        fontWeight: 'bold',
+                        marginHorizontal: 10,
+                      }}>
+                      {doc.name}
+                    </Text>
+                    <TouchableOpacity
+                      style={styles.removeButton1}
+                      onPress={() => removeImage(index, 'document')}>
+                      <Text>x</Text>
+                    </TouchableOpacity>
+                  </View>
+                ))}
+              </View>
+            )}
+          </View>
+        </View>
+      </KeyboardAwareScrollView>
+
+      <View style={CommonStyles.bottomViewComponentStyle}>
+        <BottomComponent
+          rightBtnTitle={'Save'}
+          leftBtnTitle={'Back'}
+          isLeftBtnEnable={true}
+          rigthBtnState={true}
+          isRightBtnEnable={true}
+          rightButtonAction={async () => submitAction()}
+          leftButtonAction={async () => backAction()}
+        />
+      </View>
+
+      {props.isPopUp ? (
+        <View style={CommonStyles.customPopUpStyle}>
+          <AlertComponent
+            header={props.popUpAlert}
+            message={props.popUpMessage}
+            isLeftBtnEnable={props.isPopLeft}
+            isRightBtnEnable={true}
+            leftBtnTilte={'NO'}
+            rightBtnTilte={props.popUpRBtnTitle}
+            popUpRightBtnAction={() => popOkBtnAction()}
+            popUpLeftBtnAction={() => popCancelBtnAction()}
+          />
+        </View>
+      ) : null}
+
+      {props.isLoading === true ? (
+        <LoaderComponent
+          isLoader={true}
+          loaderText={Constant.LOADER_MESSAGE}
+          isButtonEnable={false}
+        />
+      ) : null}
+    </View>
+  );
+};
+
+export default SaveGoodsReceiptNoteUI;
+
+const getStyles = colors =>
+  StyleSheet.create({
+    popSearchViewStyle: {
+      height: hp('40%'),
+      width: wp('90%'),
+      backgroundColor: '#f0f0f0',
+      // bottom: 220,
+      // position: 'absolute',
+      // flex:1,
+      alignSelf: 'center',
+      // borderTopRightRadius: 15,
+      // borderTopLeftRadius: 15,
+      alignItems: 'center',
+    },
+    popSearchViewStyle1: {
+      width: wp('90%'),
+      backgroundColor: '#f0f0f0',
+      // bottom: 220,
+      // position: 'absolute',
+      // flex:1,
+      alignSelf: 'center',
+      alignItems: 'center',
+    },
+
+    flatcontainer: {
+      flex: 1,
+    },
+
+    flatview: {
+      height: hp('8%'),
+      marginBottom: hp('0.3%'),
+      alignContent: 'center',
+      justifyContent: 'center',
+      borderBottomColor: 'black',
+      borderBottomWidth: wp('0.1%'),
+      width: wp('80%'),
+      alignItems: 'center',
+    },
+
+    SectionStyle1: {
+      flexDirection: 'row',
+      // justifyContent: "center",
+      alignItems: 'center',
+      height: hp('7%'),
+      width: wp('75%'),
+      borderRadius: hp('0.5%'),
+      // alignSelf: "center",
+      // backgroundColor: "grey",
+    },
+
+    imageStyle: {
+      // margin: "4%",
+      height: wp('12%'),
+      aspectRatio: 1,
+      marginRight: wp('8%'),
+      resizeMode: 'stretch',
+    },
+
+    dropTextInputStyle: {
+      fontWeight: 'normal',
+      fontSize: 18,
+      marginLeft: wp('4%'),
+      color: 'black',
+      width: wp('80%'),
+    },
+
+    dropTextLightStyle: {
+      fontWeight: 300,
+      fontSize: 12,
+      width: wp('60%'),
+      alignSelf: 'flex-start',
+      marginTop: hp('1%'),
+      marginLeft: wp('4%'),
+      color: '#000',
+    },
+    wrapper: {
+      justifyContent: 'center',
+      alignItems: 'center',
+      // flex: 1,
+      marginTop: hp('2%'),
+      width: '100%',
+      // paddingHorizontal: 10,
+    },
+    table_head: {
+      flexDirection: 'row',
+      borderBottomWidth: 1,
+      borderColor: '#ddd',
+      padding: 7,
+      backgroundColor: colors.color2,
+      alignItems: 'center',
+    },
+    table_head_captions: {
+      fontSize: 15,
+      color: 'white',
+      alignItems: 'center',
+    },
+
+    table_body_single_row: {
+      backgroundColor: '#fff',
+      flexDirection: 'row',
+      borderBottomWidth: 1,
+      borderColor: '#ddd',
+      padding: 7,
+      alignItems: 'center',
+    },
+    table_data: {
+      fontSize: 11,
+      color: '#000',
+      alignItems: 'center',
+    },
+    table: {
+      // margin: 15,
+      width: '100%',
+      justifyContent: 'center',
+      alignItems: 'center',
+      elevation: 1,
+      backgroundColor: '#fff',
+    },
+    searchInput: {
+      marginTop: 10,
+      borderRadius: 10,
+      height: 40,
+      borderColor: 'gray',
+      borderWidth: 1,
+      marginHorizontal: 10,
+      paddingLeft: 10,
+      marginBottom: 10,
+      color: '#000000',
+    },
+    scrollView: {
+      maxHeight: 150,
+    },
+    dropdownOption: {
+      paddingHorizontal: 10,
+      paddingVertical: 12,
+      borderBottomWidth: 1,
+      borderBottomColor: '#ccc',
+    },
+    dropdownContent1: {
+      elevation: 5,
+      // height: 220,
+      maxHeight: 220,
+      alignSelf: 'center',
+      width: '98%',
+      backgroundColor: '#fff',
+      borderRadius: 10,
+      borderColor: 'lightgray', // Optional: Adds subtle border (for effect)
+      borderWidth: 1,
+      marginTop: 3,
+    },
+    noCategoriesText: {
+      textAlign: 'center',
+      marginTop: 20,
+      fontSize: 16,
+      fontWeight: '600',
+      color: '#000000',
+    },
+    checkboxItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      width: '45%', // Adjust width for better alignment
+      marginVertical: 5,
+      marginHorizontal: 5,
+    },
+    checkboxLabel: {
+      marginLeft: 8,
+      fontSize: 14,
+      color: '#000',
+    },
+    imageStyle1: {
+      height: 30,
+      aspectRatio: 1,
+      resizeMode: 'contain',
+      tintColor: 'red',
+      alignSelf: 'center',
+    },
+    uploadanyimg: {
+      width: 65,
+      height: 65,
+      marginLeft: 10,
+    },
+    imagePreviewContainer: {
+      flexDirection: 'row',
+      marginVertical: 5,
+    },
+    imagePreview: {
+      width: 70,
+      height: 70,
+      marginHorizontal: 5,
+      borderRadius: 10,
+      backgroundColor: '#f0f0f0',
+    },
+    removeButtonText: {
+      color: '#fff',
+      fontWeight: 'bold',
+      fontSize: 14,
+    },
+    removeButton: {
+      position: 'absolute',
+      top: 0, // Position the button at the top edge of the image
+      right: 0, // Align the button to the right edge
+      backgroundColor: 'gray',
+      borderRadius: 15,
+      width: 25,
+      height: 25,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    uploadSection: {
+      marginTop: 16,
+      marginBottom: 20,
+      marginHorizontal: 10,
+    },
+    documentItem: {
+      justifyContent: 'center',
+    },
+    removeButton1: {
+      position: 'absolute',
+      top: 0, // Position the button at the top edge of the image
+      right: 5, // Align the button to the right edge
+      backgroundColor: 'gray',
+      borderRadius: 15,
+      width: 25,
+      height: 25,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+  });

@@ -71,8 +71,8 @@ const Sidebar = ({navigation}) => {
         //   src: require('../../../assets/images/png/stamp.png'),
         // },
         {
-          label: 'GRN Approve',
-          route: 'GrnApproveList',
+          label: 'Goods Receipt Note (GRN)',
+          route: 'GoodsReceiptNoteList',
           menu_id: 4,
           src: require('../../../assets/images/png/stamp.png'),
         },

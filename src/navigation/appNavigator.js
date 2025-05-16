@@ -132,6 +132,8 @@ import SaveWorkOrderBuyerPo from '../components/Work Order Buyer Po/SaveWorkOrde
 import SaveStyleTransferOut from '../components/Style Transfer Out/SaveStyleTransferOut';
 import CreateStyleTransferOut from '../components/Style Transfer Out/CreateStyleTransferOut';
 import StyleTransferOutList from '../components/Style Transfer Out/StyleTransferOutList';
+import GoodsReceiptNoteList from '../components/GoodsReceiptNote/GoodsReceiptNoteList';
+import SaveGoodsReceiptNote from '../components/GoodsReceiptNote/SaveGoodsReceiptNote';
 
 
 const Stack = createNativeStackNavigator();
@@ -267,6 +269,8 @@ const AppStack = () => {
       <Stack.Screen name="NewProcessOutList" component={NewProcessOutList} options={{ headerShown: false }} /> 
       <Stack.Screen name="StyleTransferOutList" component={StyleTransferOutList} options={{ headerShown: false }} /> 
       <Stack.Screen name="SaveStyleTransferOut" component={SaveStyleTransferOut} options={{ headerShown: false }} /> 
+      <Stack.Screen name="GoodsReceiptNoteList" component={GoodsReceiptNoteList} options={{ headerShown: false }} /> 
+      <Stack.Screen name="SaveGoodsReceiptNote" component={SaveGoodsReceiptNote} options={{ headerShown: false }} /> 
     </Stack.Navigator>
   );
 };
