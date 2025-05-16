@@ -7,6 +7,7 @@ import {
   Image,
   ScrollView,
   Alert,
+  Linking,
 } from 'react-native';
 import {
   heightPercentageToDP as hp,
@@ -24,8 +25,8 @@ import {formatDateIntoDMY} from '../../utils/constants/constant';
 import {RadioButton, TextInput} from 'react-native-paper';
 import {ColorContext} from '../colorTheme/colorTheme';
 import ImageCropPicker from 'react-native-image-crop-picker';
-import CustomCheckBox from '../../utils/commonComponents/CustomCheckBox';
 import DocumentPicker from 'react-native-document-picker';
+import CustomCheckBox from '../../utils/commonComponents/CustomCheckBox';
 
 let downArrowImg = require('./../../../assets/images/png/dropDownImg.png');
 let closeImg = require('./../../../assets/images/png/close1.png');
@@ -166,7 +167,7 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
   );
 
   const handleImagePicker = () => {
-    const MAX_IMAGES = 3;
+    const MAX_IMAGES = 10;
 
     if (galleryImages.length >= MAX_IMAGES) {
       Alert.alert(
@@ -213,7 +214,7 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
   };
 
   const handleDocumentPicker = async () => {
-    const MAX_DOCUMENT = 3;
+    const MAX_DOCUMENT = 10;
     // const SUPPORTED_TYPES = ['pdf', 'doc', 'docx'];
 
     if (documents.length >= MAX_DOCUMENT) {
@@ -271,6 +272,37 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
       }
     }
   };
+
+  const handleUpload = () => {
+    Alert.alert(
+      'Upload File',
+      'What would you like to upload?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Documents/Audio',
+          onPress: handleDocumentPicker,
+        },
+        {
+          text: 'Images/Videos',
+          onPress: handleImagePicker,
+        },
+      ],
+      {cancelable: true},
+    );
+  };
+
+  const downloadFile = (file) => {
+  if (file.uri) {
+    Linking.openURL(file.uri);
+  } else {
+    Alert.alert('Download Error', 'File URI is invalid.');
+  }
+};
+
 
   return (
     <View style={[CommonStyles.mainComponentViewStyle]}>
@@ -518,7 +550,7 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
 
           <TouchableOpacity
             // onPress={handleDocumentPicker}
-            onPress={handleImagePicker}
+            onPress={handleUpload}
             style={{
               borderRadius: 12,
               backgroundColor: '#f8f8f8',
@@ -555,50 +587,181 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
             </View>
           </TouchableOpacity>
 
+          
+
           <View style={{marginTop: hp('2%')}}>
             {galleryImages.length > 0 && (
-              <ScrollView horizontal style={styles.imagePreviewContainer}>
-                {galleryImages.map((image, index) => (
-                  <View key={index} style={styles.imageContainer}>
-                    <Image
-                      source={{uri: image.uri}}
-                      style={styles.imagePreview}
-                    />
-                    <TouchableOpacity
-                      style={styles.removeButton}
-                      onPress={() => removeImage(index, 'gallery')}>
-                      <Text style={styles.removeButtonText}>x</Text>
-                    </TouchableOpacity>
-                  </View>
-                ))}
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                style={{paddingLeft: 10}}>
+                {galleryImages.map((item, index) => {
+                  const isVideo =
+                    item.mime?.startsWith('video/') ||
+                    item.uri?.endsWith('.mp4');
+
+                  return (
+                    <View
+                      key={index}
+                      style={{
+                        marginRight: 10,
+                        position: 'relative',
+                        borderRadius: 10,
+                        overflow: 'hidden',
+                        width: 100,
+                        height: 130, // space for download icon
+                        alignItems: 'center',
+                      }}>
+                      {/* Thumbnail */}
+                      <View style={{width: 100, height: 100}}>
+                        <Image
+                          source={{uri: item.uri}}
+                          style={{width: 100, height: 100, resizeMode: 'cover'}}
+                        />
+                        {isVideo && (
+                          <Image
+                            source={require('./../../../assets/images/png/play.png')}
+                            style={{
+                              position: 'absolute',
+                              top: '35%',
+                              left: '35%',
+                              width: 30,
+                              height: 30,
+                              opacity: 0.8,
+                              resizeMode: 'contain',
+                            }}
+                          />
+                        )}
+                      </View>
+
+                      {/* Download Icon (uses paper-pin.png) */}
+                      <TouchableOpacity
+                        onPress={() => downloadFile(item)}
+                        style={{
+                          marginTop: 5,
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}>
+                        <Image
+                          source={require('./../../../assets/images/png/download.png')}
+                          style={{
+                            width: 20,
+                            height: 20,
+                            resizeMode: 'contain',
+                            opacity: 0.8,
+                          }}
+                        />
+                      </TouchableOpacity>
+
+                      {/* Remove Button (X) */}
+                      <TouchableOpacity
+                        onPress={() => removeImage(index, 'gallery')}
+                        style={{
+                          position: 'absolute',
+                          top: 5,
+                          right: 5,
+                          backgroundColor: 'rgba(0,0,0,0.6)',
+                          borderRadius: 12,
+                          width: 24,
+                          height: 24,
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}>
+                        <Text
+                          style={{
+                            color: '#fff',
+                            fontSize: 14,
+                            fontWeight: 'bold',
+                          }}>
+                          ✕
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                  );
+                })}
               </ScrollView>
             )}
           </View>
 
-          <View style={styles.uploadSection}>
+          <View style={{marginVertical: 10, paddingHorizontal: 10}}>
             {documents.length > 0 && (
               <View>
                 {documents.map((doc, index) => (
-                  <View key={index} style={styles.documentItem}>
-                    <Text
+                  <View
+                    key={index}
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      backgroundColor: '#fff',
+                      borderRadius: 12,
+                      padding: 15,
+                      marginVertical: 6,
+                      shadowColor: '#000',
+                      shadowOffset: {width: 0, height: 2},
+                      shadowOpacity: 0.1,
+                      shadowRadius: 5,
+                      elevation: 3,
+                    }}>
+                    {/* Left Section: Icon + File Name */}
+                    <View
                       style={{
-                        color: '#000',
-                        fontSize: 20,
-                        fontWeight: 'bold',
-                        marginHorizontal: 10,
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        flex: 1,
+                        marginRight: 10,
                       }}>
-                      {doc.name}
-                    </Text>
-                    <TouchableOpacity
-                      style={styles.removeButton1}
-                      onPress={() => removeImage(index, 'document')}>
-                      <Text>x</Text>
-                    </TouchableOpacity>
+                      <Image
+                        source={require('./../../../assets/images/png/paper-pin.png')}
+                        style={{width: 28, height: 28, resizeMode: 'contain'}}
+                      />
+                      <Text
+                        numberOfLines={1}
+                        style={{
+                          marginLeft: 10,
+                          fontSize: 16,
+                          fontWeight: '500',
+                          color: '#333',
+                          flexShrink: 1,
+                        }}>
+                        {doc.name}
+                      </Text>
+                    </View>
+
+                    {/* Right Section: Download + Remove */}
+                    <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                      <TouchableOpacity onPress={() => downloadFile(doc)}>
+                        <Image
+                          source={require('./../../../assets/images/png/download.png')}
+                          style={{
+                            width: 20,
+                            height: 20,
+                            resizeMode: 'contain',
+                            marginHorizontal: 5,
+                          }}
+                        />
+                      </TouchableOpacity>
+
+                      <TouchableOpacity
+                        onPress={() => removeImage(index, 'document')}>
+                        <Image
+                          source={require('./../../../assets/images/png/close.png')}
+                          style={{
+                            width: 20,
+                            height: 20,
+                            resizeMode: 'contain',
+                            marginHorizontal: 5,
+                          }}
+                        />
+                      </TouchableOpacity>
+                    </View>
                   </View>
                 ))}
               </View>
             )}
           </View>
+
+          
         </View>
       </KeyboardAwareScrollView>
 
@@ -870,3 +1033,49 @@ const getStyles = colors =>
       alignItems: 'center',
     },
   });
+
+          {/* <View style={styles.uploadSection}>
+            {documents.length > 0 && (
+              <View>
+                {documents.map((doc, index) => (
+                  <View key={index} style={styles.documentItem}>
+                    <Text
+                      style={{
+                        color: '#000',
+                        fontSize: 20,
+                        fontWeight: 'bold',
+                        marginHorizontal: 10,
+                      }}>
+                      {doc.name}
+                    </Text>
+                    <TouchableOpacity
+                      style={styles.removeButton1}
+                      onPress={() => removeImage(index, 'document')}>
+                      <Text>x</Text>
+                    </TouchableOpacity>
+                  </View>
+                ))}
+              </View>
+            )}
+          </View> */}
+
+
+          {/* <View style={{marginTop: hp('2%')}}>
+            {galleryImages.length > 0 && (
+              <ScrollView horizontal style={styles.imagePreviewContainer}>
+                {galleryImages.map((image, index) => (
+                  <View key={index} style={styles.imageContainer}>
+                    <Image
+                      source={{uri: image.uri}}
+                      style={styles.imagePreview}
+                    />
+                    <TouchableOpacity
+                      style={styles.removeButton}
+                      onPress={() => removeImage(index, 'gallery')}>
+                      <Text style={styles.removeButtonText}>x</Text>
+                    </TouchableOpacity>
+                  </View>
+                ))}
+              </ScrollView>
+            )}
+          </View> */}
