@@ -32,6 +32,7 @@ export const noNotifications = 'You have no notifications !';
 export const validate_Fields_Msg = 'Please fill all the mandatory field before submitting';
 export const validate_Fields_ = 'Please fill atleast one size field before submitting';
 export const validate_total_consump_ = 'Total consumption should be less than the fabric Issued';
+export const validate_total_consump_fabNfoRecQty = 'Total consumption should be less than the Fab NFO Rec Qty';
 export const validate_location_ = 'Please select the location before submitting !';
 export const validate_EnterQty =(check)=> `Please enter the quantity of ${check} less than remaining quantity`;
 export const Wrong_Code_Msg="Invalid Code', 'Please enter a valid customer code."

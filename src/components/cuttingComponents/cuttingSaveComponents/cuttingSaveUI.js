@@ -61,6 +61,7 @@ const CuttingSaveUI = ({route, ...props}) => {
   const [employeesList, set_employeesList] = useState([]);
   const [filteredEmployees, set_filteredEmployees] = useState([]);
 
+  const [fabNfoRecQty, set_fabNfoRecQty] = useState('');
 
   // const [searchText, set_searchText] = useState('');
 
@@ -72,6 +73,7 @@ const CuttingSaveUI = ({route, ...props}) => {
       set_fabricReturn(props.itemsObj.fabricReturn);
       set_enterSizesArray(props.itemsObj.sizeDetails);
       set_actualConsumption(props.itemsObj.actualConsumption);
+      set_fabNfoRecQty(props.itemsObj.nfoQty);
       set_approvedConsumption(props.itemsObj.approvedConsumption);
       set_unitPrice(props.itemsObj?.unitprice || '0');
       if (props.itemsObj.companyLocation) {
@@ -87,7 +89,7 @@ const CuttingSaveUI = ({route, ...props}) => {
         set_filteredLocations(Object.keys(props?.itemsObj?.locationMap || {}));
       }
 
-      // console.log('props.itemOBj==> ', props.itemsObj);
+      console.log('Fab NFO Rec Qty ==> ', props.itemsObj.nfoQty);
 
       set_batchMapArr(props?.itemsObj?.batchMap);
       set_filteredBatchTypes(Object.keys(props?.itemsObj?.batchMap));
@@ -95,7 +97,6 @@ const CuttingSaveUI = ({route, ...props}) => {
     }
   }, [props.itemsObj]);
 
-  
   const backBtnAction = () => {
     props.backBtnAction();
   };
@@ -115,7 +116,7 @@ const CuttingSaveUI = ({route, ...props}) => {
 
     for (let i = 0; i < enterSizesArray.length; i++) {
       if (enterSizesArray[i].enterQty && enterSizesArray[i].enterQty !== '') {
-        if(Number(enterSizesArray[i].enterQty)>0){
+        if (Number(enterSizesArray[i].enterQty) > 0) {
           temValid = true;
         }
       } else {
@@ -135,19 +136,32 @@ const CuttingSaveUI = ({route, ...props}) => {
       return;
     }
 
-    if (
-      props.itemsObj.fabricIssued &&
-      Number(props.itemsObj.fabricIssued) > 0
-    ) {
-      if (dailyConsumption > Number(props.itemsObj.fabricIssued)) {
+    if (fabNfoRecQty && Number(fabNfoRecQty || '0') > 0) {
+      if (dailyConsumption > Number(fabNfoRecQty)) {
         props.popUpAction(
-          Constant.validate_total_consump_,
+          Constant.validate_total_consump_fabNfoRecQty,
           Constant.DefaultAlert_MSG,
           'OK',
           true,
           false,
         );
         return;
+      }
+    } else {
+      if (
+        props.itemsObj.fabricIssued &&
+        Number(props.itemsObj.fabricIssued) > 0
+      ) {
+        if (dailyConsumption > Number(props.itemsObj.fabricIssued)) {
+          props.popUpAction(
+            Constant.validate_total_consump_,
+            Constant.DefaultAlert_MSG,
+            'OK',
+            true,
+            false,
+          );
+          return;
+        }
       }
     }
 
@@ -206,31 +220,30 @@ const CuttingSaveUI = ({route, ...props}) => {
   const untiPriceValue = (value, index) => {
     set_enterSizesArray(prevArray => {
       // Create a new array instead of modifying state directly
-      const updatedArray = prevArray.map((item, i) => 
-        i === index ? { ...item, enterQty: value ? value : '' } : item
+      const updatedArray = prevArray.map((item, i) =>
+        i === index ? {...item, enterQty: value ? value : ''} : item,
       );
-  
+
       console.log(index, '-------->', updatedArray[index].enterQty);
-  
+
       let tempDaily = 0;
       let totalSum = 0;
       const approvedQty =
         props.routeParams.fabricType == 'Main Fabric'
           ? approvedConsumption?.toString()
           : props?.itemsObj?.trimApprovedconsumption?.toString();
-          
+
       for (let i = 0; i < updatedArray.length; i++) {
         tempDaily += Number(updatedArray[i].enterQty) * Number(approvedQty);
         totalSum += Number(updatedArray[i].enterQty);
       }
-  
+
       set_dailyConsumption(tempDaily);
       set_actualConsumption(totalSum ? tempDaily / totalSum : 0);
-  
-      return updatedArray; 
+
+      return updatedArray;
     });
   };
-  
 
   const actionOnLocation = (locationId, locationName) => {
     set_locationId(locationId);
@@ -273,7 +286,7 @@ const CuttingSaveUI = ({route, ...props}) => {
     set_employeeId(key);
     set_showEmployeeList(false);
   };
-  
+
   const handleSearchEmployees = text => {
     if (text.trim().length > 0) {
       const filtered = Object.keys(employeesList).filter(key =>
@@ -284,8 +297,6 @@ const CuttingSaveUI = ({route, ...props}) => {
       set_filteredEmployees(Object.keys(employeesList));
     }
   };
-
-
 
   return (
     <View style={[CommonStyles.mainComponentViewStyle]}>
@@ -353,8 +364,8 @@ const CuttingSaveUI = ({route, ...props}) => {
               justifyContent: 'center',
               marginTop: hp('2%'),
               backgroundColor: '#f8f8f8',
-              width: '90%',  
-              alignSelf: 'center', 
+              width: '90%',
+              alignSelf: 'center',
             }}>
             <TouchableOpacity
               style={{
@@ -362,7 +373,7 @@ const CuttingSaveUI = ({route, ...props}) => {
                 borderWidth: 0.5,
                 borderColor: '#D8D8D8',
                 borderRadius: hp('0.5%'),
-                width: '100%', 
+                width: '100%',
               }}
               onPress={() => {
                 set_isBatchType(!isBatchType);
@@ -433,8 +444,8 @@ const CuttingSaveUI = ({route, ...props}) => {
               justifyContent: 'center',
               marginTop: hp('1%'),
               backgroundColor: editLocation ? '#ffffff' : '#dedede',
-              width: '90%',  
-              alignSelf: 'center', 
+              width: '90%',
+              alignSelf: 'center',
             }}>
             {/* Dropdown button */}
             <TouchableOpacity
@@ -443,7 +454,7 @@ const CuttingSaveUI = ({route, ...props}) => {
                 borderWidth: 0.5,
                 borderColor: '#D8D8D8',
                 borderRadius: hp('0.5%'),
-                width: '100%', 
+                width: '100%',
               }}
               onPress={() => {
                 set_showLocationList(!showLocationList);
@@ -719,6 +730,25 @@ const CuttingSaveUI = ({route, ...props}) => {
               marginTop: hp('1%'),
             }}>
             <TextInputComponent
+              inputText={fabNfoRecQty.toString()}
+              labelText={'Fab NFO Rec Qty '}
+              isEditable={false}
+              maxLengthVal={10}
+              autoCapitalize={'none'}
+              keyboardType={'numeric'}
+              setValue={textAnswer => {
+                set_fabNfoRecQty(textAnswer.toString());
+              }}
+            />
+          </View>
+
+          <View
+            style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginTop: hp('1%'),
+            }}>
+            <TextInputComponent
               inputText={fabricReturn.toString()}
               labelText={'Fabric Returned'}
               isEditable={false}
@@ -787,9 +817,9 @@ const CuttingSaveUI = ({route, ...props}) => {
                           value={item.enterQty}
                           mode="outlined"
                           editable={true}
-                           keyboardType="numeric"
-                           onChangeText={textAnswer => {
-                            console.log("text answer ", textAnswer, index)
+                          keyboardType="numeric"
+                          onChangeText={textAnswer => {
+                            console.log('text answer ', textAnswer, index);
                             untiPriceValue(textAnswer, index);
                           }}
                         />
@@ -825,7 +855,6 @@ const CuttingSaveUI = ({route, ...props}) => {
               ))}
             <View style={{height: 180}} />
           </View>
-       
         </KeyboardAwareScrollView>
       </View>
 
@@ -953,10 +982,10 @@ const styles = StyleSheet.create({
     elevation: 5,
     height: 220,
     alignSelf: 'center',
-    width: '100%',  
+    width: '100%',
     backgroundColor: '#fff',
     borderRadius: 10,
-    borderColor: 'lightgray', 
+    borderColor: 'lightgray',
     borderWidth: 1,
     marginTop: 3,
   },
