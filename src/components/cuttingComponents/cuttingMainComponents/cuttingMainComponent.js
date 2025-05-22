@@ -68,7 +68,7 @@ const CuttingMainComponent = ({ navigation, route, ...props }) => {
         "password" : userPsd
     }
 
-    // console.log("load all for ctr req ==> ", obj)
+    console.log("load all for ctr req ==> ", obj)
     let poEditAPIObj = await APIServiceCall.allCuttingStyles(obj);
     set_isLoading(false);
     

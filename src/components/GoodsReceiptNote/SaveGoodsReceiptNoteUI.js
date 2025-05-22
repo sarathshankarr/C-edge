@@ -8,6 +8,8 @@ import {
   ScrollView,
   Alert,
   Linking,
+  Platform,
+  PermissionsAndroid,
 } from 'react-native';
 import {
   heightPercentageToDP as hp,
@@ -27,6 +29,7 @@ import {ColorContext} from '../colorTheme/colorTheme';
 import ImageCropPicker from 'react-native-image-crop-picker';
 import DocumentPicker from 'react-native-document-picker';
 import CustomCheckBox from '../../utils/commonComponents/CustomCheckBox';
+import ReactNativeBlobUtil from 'react-native-blob-util';
 
 let downArrowImg = require('./../../../assets/images/png/dropDownImg.png');
 let closeImg = require('./../../../assets/images/png/close1.png');
@@ -215,7 +218,6 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
 
   const handleDocumentPicker = async () => {
     const MAX_DOCUMENT = 10;
-    // const SUPPORTED_TYPES = ['pdf', 'doc', 'docx'];
 
     if (documents.length >= MAX_DOCUMENT) {
       Alert.alert(
@@ -242,14 +244,7 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
       for (let doc of selectedDocs) {
         const fileType = doc.name?.split('.').pop()?.toLowerCase();
 
-        // Check if the file type is supported
-        // if (!fileType || !SUPPORTED_TYPES.includes(fileType)) {
-        //   Alert.alert(
-        //     'Unsupported File',
-        //     `The file ${doc.name} is not a supported type. Please upload a PDF, DOC, or DOCX file.`,
-        //   );
-        //   return; // Skip adding unsupported files
-        // }
+       
       }
 
       // Check if adding these documents exceeds the limit
@@ -295,13 +290,213 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
     );
   };
 
-  const downloadFile = (file) => {
-  if (file.uri) {
-    Linking.openURL(file.uri);
-  } else {
-    Alert.alert('Download Error', 'File URI is invalid.');
+  // const downloadFile = file => {
+  //   if (file.uri) {
+  //     Linking.openURL(file.uri);
+  //   } else {
+  //     Alert.alert('Download Error', 'File URI is invalid.');
+  //   }
+  // };
+
+//
+
+
+  //  const requestStoragePermission = async () => {
+  //   try {
+  //     if (Platform.OS === 'android') {
+  //       if (Platform.Version >= 33) {
+  //         // Android 13 and above
+  //         const granted = await PermissionsAndroid.request(
+  //           PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES,
+  //           {
+  //             title: 'Storage Permission Required',
+  //             message: 'This app needs access to your storage to download PDF',
+  //             buttonNeutral: 'Ask Me Later',
+  //             buttonNegative: 'Cancel',
+  //             buttonPositive: 'OK',
+  //           },
+  //         );
+  //         return granted === PermissionsAndroid.RESULTS.GRANTED;
+  //       } else if (Platform.Version >= 30) {
+  //         // Android 11 - 12 (Scoped Storage)
+  //         const granted = await PermissionsAndroid.request(
+  //           PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+  //           {
+  //             title: 'Storage Permission Required',
+  //             message: 'This app needs access to your storage to download PDF',
+  //             buttonNeutral: 'Ask Me Later',
+  //             buttonNegative: 'Cancel',
+  //             buttonPositive: 'OK',
+  //           },
+  //         );
+  //         return granted === PermissionsAndroid.RESULTS.GRANTED;
+  //       } else {
+  //         // Below Android 11
+  //         const granted = await PermissionsAndroid.request(
+  //           PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+  //           PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+  //           {
+  //             title: 'Storage Permission Required',
+  //             message: 'This app needs access to your storage to download PDF',
+  //             buttonNeutral: 'Ask Me Later',
+  //             buttonNegative: 'Cancel',
+  //             buttonPositive: 'OK',
+  //           },
+  //         );
+  //         return granted === PermissionsAndroid.RESULTS.GRANTED;
+  //       }
+  //     }
+  //     return false;
+  //   } catch (err) {
+  //     console.warn('Error requesting storage permission:', err);
+  //     return false;
+  //   }
+  // };
+
+  // const downloadFile = async (url, fileName) => {
+  //   try {
+  //     const hasPermission =
+  //       Platform.OS === 'android' ? await requestStoragePermission() : true;
+  //     if (!hasPermission) return;
+
+  //     const {fs} = ReactNativeBlobUtil;
+  //     const fileExtension = fileName.split('.').pop().toLowerCase();
+  //     const filePath = `${fs.dirs.DownloadDir}/${fileName}`;
+
+  //     const res = await ReactNativeBlobUtil.config({
+  //       path: filePath,
+  //       fileCache: true,
+  //       appendExt: fileExtension,
+  //       addAndroidDownloads: {
+  //         useDownloadManager: true,
+  //         notification: true,
+  //         path: filePath,
+  //         description: `Downloading ${fileName}`,
+  //         mime:
+  //           fileExtension === 'pdf'
+  //             ? 'application/pdf'
+  //             : fileExtension === 'doc' || fileExtension === 'docx'
+  //             ? 'application/msword'
+  //             : 'image/*',
+  //       },
+  //     }).fetch('GET', url);
+
+  //     Alert.alert('Download Success', `File downloaded to: ${filePath}`);
+
+  //     if (Platform.OS === 'android' || Platform.OS === 'ios') {
+  //       Linking.openURL(`file://${filePath}`);
+  //     }
+  //   } catch (error) {
+  //     console.error('Error downloading file:', error);
+  //     Alert.alert('Error', `Failed to download file: ${error.message}`);
+  //   }
+  // };
+
+const requestStoragePermission = async () => {
+  try {
+    if (Platform.OS === 'android') {
+      if (Platform.Version >= 33) {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES,
+          {
+            title: 'Storage Permission Required',
+            message: 'This app needs access to your media to download files',
+            buttonNeutral: 'Ask Me Later',
+            buttonNegative: 'Cancel',
+            buttonPositive: 'OK',
+          }
+        );
+        return granted === PermissionsAndroid.RESULTS.GRANTED;
+      } else if (Platform.Version >= 30) {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+          {
+            title: 'Storage Permission Required',
+            message: 'This app needs access to your storage to download files',
+            buttonNeutral: 'Ask Me Later',
+            buttonNegative: 'Cancel',
+            buttonPositive: 'OK',
+          }
+        );
+        return granted === PermissionsAndroid.RESULTS.GRANTED;
+      } else {
+        const granted = await PermissionsAndroid.requestMultiple([
+          PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+          PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+        ]);
+        return (
+          granted['android.permission.WRITE_EXTERNAL_STORAGE'] === PermissionsAndroid.RESULTS.GRANTED &&
+          granted['android.permission.READ_EXTERNAL_STORAGE'] === PermissionsAndroid.RESULTS.GRANTED
+        );
+      }
+    }
+    return true;
+  } catch (err) {
+    console.warn('Error requesting storage permission:', err);
+    return false;
   }
 };
+
+
+  const getMimeType = (extension) => {
+  const mimeTypes = {
+    pdf: 'application/pdf',
+    doc: 'application/msword',
+    docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    jpg: 'image/jpeg',
+    jpeg: 'image/jpeg',
+    png: 'image/png',
+    mp3: 'audio/mpeg',
+    wav: 'audio/wav',
+    mp4: 'video/mp4',
+    mov: 'video/quicktime',
+    zip: 'application/zip',
+    txt: 'text/plain',
+    csv: 'text/csv',
+    // Add more types as needed
+  };
+  return mimeTypes[extension.toLowerCase()] || 'application/octet-stream';
+};
+
+const downloadFile = async (doc) => {
+  try {
+    const hasPermission =
+      Platform.OS === 'android' ? await requestStoragePermission() : true;
+    if (!hasPermission) return;
+
+    const { fs } = ReactNativeBlobUtil;
+    const fileName = doc.name || 'downloaded_file';
+    const url = doc.url || doc.uri; // Adjust depending on your data
+    const fileExtension = fileName.split('.').pop();
+    const filePath = `${fs.dirs.DownloadDir}/${fileName}`;
+
+    const mimeType = getMimeType(fileExtension);
+
+    const res = await ReactNativeBlobUtil.config({
+      path: filePath,
+      fileCache: true,
+      appendExt: fileExtension,
+      addAndroidDownloads: {
+        useDownloadManager: true,
+        notification: true,
+        path: filePath,
+        description: `Downloading ${fileName}`,
+        mime: mimeType,
+        mediaScannable: true,
+      },
+    }).fetch('GET', url);
+
+    Alert.alert('Download Success', `File downloaded to: ${filePath}`);
+
+    if (Platform.OS === 'android' || Platform.OS === 'ios') {
+      Linking.openURL(`file://${filePath}`);
+    }
+  } catch (error) {
+    console.error('Error downloading file:', error);
+    Alert.alert('Error', `Failed to download file: ${error.message}`);
+  }
+};
+
 
 
   return (
@@ -587,8 +782,6 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
             </View>
           </TouchableOpacity>
 
-          
-
           <View style={{marginTop: hp('2%')}}>
             {galleryImages.length > 0 && (
               <ScrollView
@@ -761,7 +954,41 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
             )}
           </View>
 
-          
+          {/* <TouchableOpacity
+            onPress={() => {
+              Linking.openURL('mailto:abc@gmail.com');
+            }}>
+            <Image
+              style={{
+                width: 25,
+                height: 25,
+                resizeMode: 'contain',
+                marginBottom: 10,
+              }}
+              source={require('./../../../assets/images/png/gmail.png')}
+            />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => {
+              const phoneNumber = '919999999999'; 
+              const url = `whatsapp://send?phone=${phoneNumber}`;
+
+              Linking.openURL(url).catch(() => {
+                alert('Make sure WhatsApp is installed on your device');
+              });
+            }}>
+            <Image
+              style={{
+                width: 25,
+                height: 25,
+                resizeMode: 'contain',
+                marginBottom: 10,
+              }}
+              source={require('./../../../assets/images/png/whatsapp.png')}
+            />
+          </TouchableOpacity> */}
+
         </View>
       </KeyboardAwareScrollView>
 
@@ -1034,7 +1261,8 @@ const getStyles = colors =>
     },
   });
 
-          {/* <View style={styles.uploadSection}>
+{
+  /* <View style={styles.uploadSection}>
             {documents.length > 0 && (
               <View>
                 {documents.map((doc, index) => (
@@ -1057,10 +1285,11 @@ const getStyles = colors =>
                 ))}
               </View>
             )}
-          </View> */}
+          </View> */
+}
 
-
-          {/* <View style={{marginTop: hp('2%')}}>
+{
+  /* <View style={{marginTop: hp('2%')}}>
             {galleryImages.length > 0 && (
               <ScrollView horizontal style={styles.imagePreviewContainer}>
                 {galleryImages.map((image, index) => (
@@ -1078,4 +1307,5 @@ const getStyles = colors =>
                 ))}
               </ScrollView>
             )}
-          </View> */}
+          </View> */
+}

@@ -37,7 +37,7 @@ const POApprovalComponent = ({ navigation, route, ...props }) => {
 
     if (route.params?.item) {
       getInitialData(route.params?.item.poNumber);
-      console.log('route params from list page==> ', route.params?.item);
+      // console.log('route params from list page==> ', route.params?.item);
       getGSTorTaxAmount(route.params?.item?.price);
     }
 
@@ -77,7 +77,7 @@ const POApprovalComponent = ({ navigation, route, ...props }) => {
     }
     // console.log("req body for edit", obj);
     let poEditAPIObj = await APIServiceCall.poApproveEditAPIService(obj);
-    console.log('poNumber edit details', poEditAPIObj, poEditAPIObj?.responseData?.poChildResponseList);
+    // console.log('poNumber edit details', poEditAPIObj, poEditAPIObj?.responseData?.poChildResponseList);
     set_isLoading(false);
 
     if (poEditAPIObj && poEditAPIObj.statusData) {

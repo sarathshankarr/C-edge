@@ -73,6 +73,8 @@ const StichingOutComponent = ({ navigation, route, ...props }) => {
       "password" : userPsd
   }
 
+  console.log("req body for sticthing out ==> ", obj);
+
     let stichingOutAPIObj = await APIServiceCall.stichingOutDetails(obj);
     // set_isLoading(false);
     if(stichingOutAPIObj && stichingOutAPIObj.statusData){
