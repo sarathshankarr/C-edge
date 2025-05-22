@@ -17,6 +17,7 @@ export const SET_NEW_PASSWORD_LABEL = "Set New Password";
 export const LOADER_MESSAGE = 'Please wait..'
 export const SERVICE_FAIL_MSG = "Woof! There seems to be a problem. Please try after sometime.";
 export const SERVICE_FAIL_PDF_MSG = "Failed to generate or save PDF";
+export const SERVICE_FAIL_XL_MSG = "Failed to generate or save EXCEL";
 export const LOGIN_FAIL_MSG = "Please check your username or password and try again!";
 export const DefaultAlert_MSG = 'Alert';
 export const Fail_Save_Dtls_MSG = 'Unable to save the details at this moment! Please try after sometime.';

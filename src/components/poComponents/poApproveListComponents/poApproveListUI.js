@@ -9,6 +9,8 @@ import {
   TextInput,
   RefreshControl,
   ActivityIndicator,
+  Modal,
+  TouchableWithoutFeedback,
 } from 'react-native';
 import {
   heightPercentageToDP as hp,
@@ -25,6 +27,7 @@ import FilterModal from '../../../utils/commonComponents/FilterModal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {ColorContext} from '../../colorTheme/colorTheme';
 import AddNewItem from '../../../utils/commonComponents/AddNewItem';
+import CustomCheckBox from '../../../utils/commonComponents/CustomCheckBox';
 
 let searchImg = require('./../../../../assets/images/png/searchIcon.png');
 let filterImg = require('./../../../../assets/images/png/setting.png');
@@ -44,18 +47,36 @@ const POApproveUI = ({route, ...props}) => {
   const [isFilterVisible, setFilterVisible] = useState(false);
   const [filterReqBody, setfilterReqBody] = useState({});
 
+  const [showModal, setShowmodal] = useState(false);
+  const [companyList, setcompanyList] = useState();
+  const [query, setquery] = useState('');
+  const [latestPo, setLatestPO] = useState('');
+  const [selectedIdxs, setSelectedIdxs] = useState([]);
+  const [selectAllCheckBox, setSelectAllCheckBox] = useState(false);
+  const [modalLists, setModalLists] = useState([]);
+
   const [categories, set_categories] = useState([
     {id: 'Vendor', fid: 'vendorName', value: 'Vendor', idxId: 'vendorId'},
     {id: 'Rm/Fabric', fid: 'rmFabric', value: 'Rm/Fabric', idxId: 'rmFabric'},
   ]);
+
+  const styles = getStyles(colors);
 
   React.useEffect(() => {
     if (props.itemsArray) {
       set_filterArray(props.itemsArray);
       set_ItemsArray(props.itemsArray);
     }
-    getRequestBody();
+    // getRequestBody();
   }, [props.itemsArray]);
+
+  React.useEffect(() => {
+    // console.log("modal list ==> ",props.modalList )
+    if (props.modalList) {
+      setModalLists(props.modalList);
+      setcompanyList(props.modalList);
+    }
+  }, [props.modalList]);
 
   const getRequestBody = async () => {
     let userName = await AsyncStorage.getItem('userName');
@@ -155,16 +176,13 @@ const POApproveUI = ({route, ...props}) => {
         )}
         <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
           <Text
-            style={[
-              CommonStyles.tylesTextStyle,
-              {flex: 1.5, textAlign: 'left'},
-            ]}>
+            style={[CommonStyles.tylesTextStyle, {flex: 1, textAlign: 'left'}]}>
             {item.poNumberWithPrefix}
           </Text>
           <Text
             style={[
               CommonStyles.tylesTextStyle,
-              {flex: 1.5, textAlign: 'center'},
+              {flex: 1.3, textAlign: 'center'},
             ]}>
             {item.vendorName}
           </Text>
@@ -178,10 +196,89 @@ const POApproveUI = ({route, ...props}) => {
           <Text
             style={[
               CommonStyles.tylesTextStyle,
+              {flex: 1, textAlign: 'center'},
+            ]}>
+            {item.approvalStatus}
+          </Text>
+          {/* <Text
+            style={[
+              CommonStyles.tylesTextStyle,
               {flex: 1.2, textAlign: 'right', marginRight: wp('2%')},
             ]}>
             {formatPrice(item.price)}
-          </Text>
+          </Text> */}
+          <View
+            style={{
+              flex: 1.2,
+              flexDirection: 'column',
+              justifyContent: 'center',
+              alignItems: 'center',
+              gap: 8,
+            }}>
+            <View
+              style={{
+                flex: 1.2,
+                flexDirection: 'row',
+                justifyContent: 'center',
+                alignItems: 'center',
+                gap: 8,
+                // marginRight: wp('2%'),
+              }}>
+              <TouchableOpacity
+                // onPress={() => Linking.openURL('mailto:abc@gmail.com')}>
+                onPress={() => handleOpenModal(item)}>
+                <Image
+                  style={{
+                    width: 15,
+                    height: 15,
+                    resizeMode: 'contain',
+                  }}
+                  source={require('./../../../../assets/images/png/gmail.png')}
+                />
+              </TouchableOpacity>
+
+              <TouchableOpacity onPress={() => handleSendWhatsApp(item)}>
+                <Image
+                  style={{
+                    width: 15,
+                    height: 15,
+                    resizeMode: 'contain',
+                  }}
+                  source={require('./../../../../assets/images/png/whatsapp.png')}
+                />
+              </TouchableOpacity>
+            </View>
+            <View
+              style={{
+                flex: 1.2,
+                flexDirection: 'row',
+                justifyContent: 'flex-start',
+                alignItems: 'center',
+                gap: 8,
+              }}>
+              <TouchableOpacity onPress={() => handlePdf(item)}>
+                <Image
+                  style={{
+                    width: 15,
+                    height: 15,
+                    resizeMode: 'contain',
+                  }}
+                  source={require('./../../../../assets/images/png/pdf2.png')}
+                />
+              </TouchableOpacity>
+
+              <TouchableOpacity onPress={() => handleExcel(item)}>
+                <Image
+                  style={{
+                    width: 15,
+                    height: 15,
+                    resizeMode: 'contain',
+                  }}
+                  source={require('./../../../../assets/images/png/sheets.png')}
+                />
+              </TouchableOpacity>
+            </View>
+          </View>
         </View>
       </TouchableOpacity>
     );
@@ -216,6 +313,60 @@ const POApproveUI = ({route, ...props}) => {
     setIsFiltering(false);
   };
 
+  const filteredCompanyList = modalLists.filter(item =>
+    item?.vendor_name?.toLowerCase().includes(query.toLowerCase()),
+  );
+
+  const handleSelectFromModal = () => {
+    console.log('selecetdIndexes ===> ', selectedIdxs);
+    const ans = modalLists
+      .filter(item => selectedIdxs.includes(item.vendorId))
+      .map(
+        item =>
+          `${item.vendorId}_!${item.vendor_name}_!${item.ph}_!${item.email_id}_!${item.dba}`,
+      )
+      .join(',');
+
+    console.log('result ===> ', ans);
+    props.sendMail(ans, latestPo);
+    setShowmodal(false);
+  };
+
+  const updateAllIndexes = () => {
+    setSelectedIdxs(
+      selectAllCheckBox ? [] : filteredCompanyList.map((_, index) => index),
+    );
+    setSelectAllCheckBox(!selectAllCheckBox);
+  };
+
+  const toggleSelection = Id => {
+    setSelectedIdxs(prevSelected => {
+      const exists = prevSelected.includes(Id);
+      if (exists) {
+        return prevSelected.filter(i => i !== Id);
+      } else {
+        return [...prevSelected, Id];
+      }
+    });
+  };
+
+  const handleOpenModal = item => {
+    setModalLists([]);
+    props.getModalList(item);
+    setLatestPO(item.poNumber);
+    setShowmodal(!showModal);
+  };
+
+  const handleSendWhatsApp = item => {
+    props.sendWhatsApp(item);
+  };
+  const handlePdf = item => {
+    props.handlePdf(item);
+  };
+  const handleExcel = item => {
+    props.handleExcel(item);
+  };
+
   return (
     <View style={[CommonStyles.mainComponentViewStyle]}>
       <View style={[CommonStyles.headerView]}>
@@ -231,23 +382,6 @@ const POApproveUI = ({route, ...props}) => {
       </View>
 
       <View style={CommonStyles.headerStyle}>
-        {/* {filterArray ? <View style={CommonStyles.searchBarStyle}>
-
-          <View style={[CommonStyles.searchInputContainerStyle]}>
-            <Image source={searchImg} style={CommonStyles.searchImageStyle} />
-            <TextInput style={CommonStyles.searchTextInputStyle}
-              underlineColorAndroid="transparent"
-              placeholder="Search by Vendor"
-              placeholderTextColor="#7F7F81"
-              autoCapitalize="none"
-              value={recName}
-              onFocus={() => isKeyboard.current = true}
-              onChangeText={(name) => { filterPets(name) }}
-            />
-          </View>
-
-        </View> : null} */}
-
         {filterArray ? (
           <View
             style={{
@@ -354,14 +488,14 @@ const POApproveUI = ({route, ...props}) => {
             <Text
               style={[
                 CommonStyles.tylesHeaderTextStyle,
-                {flex: 1.5, textAlign: 'left'},
+                {flex: 1, textAlign: 'center'},
               ]}>
               {'PO'}
             </Text>
             <Text
               style={[
                 CommonStyles.tylesHeaderTextStyle,
-                {flex: 1.5, textAlign: 'center'},
+                {flex: 1.3, textAlign: 'center'},
               ]}>
               {'Vendor'}
             </Text>
@@ -375,9 +509,16 @@ const POApproveUI = ({route, ...props}) => {
             <Text
               style={[
                 CommonStyles.tylesHeaderTextStyle,
-                {flex: 1.2, textAlign: 'right', marginRight: wp('2%')},
+                {flex: 1, textAlign: 'center'},
               ]}>
-              {'Total Price'}
+              {'PO Status'}
+            </Text>
+            <Text
+              style={[
+                CommonStyles.tylesHeaderTextStyle,
+                {flex: 1.2, textAlign: 'center', marginRight: wp('2%')},
+              ]}>
+              {'Action'}
             </Text>
           </View>
         ) : (
@@ -420,6 +561,133 @@ const POApproveUI = ({route, ...props}) => {
         </View>
       </View>
 
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={showModal}
+        onRequestClose={() => setShowmodal(false)}>
+        <TouchableWithoutFeedback onPress={() => setShowmodal(false)}>
+          <View style={styles.companyModalOverlay} />
+        </TouchableWithoutFeedback>
+        <View style={styles.companyModalContainer}>
+          <View style={styles.companyModalHeader}>
+            <View />
+            <Text style={styles.companyModalHeaderText}>{'Style Pop Up'}</Text>
+            <TouchableOpacity
+              onPress={() => {
+                setShowmodal(false);
+                setquery('');
+              }}>
+              <Image
+                source={require('./../../../../assets/images/png/close.png')}
+                style={{width: 30, height: 30, tintColor: colors.color2}}
+              />
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.companyModalSearchBarContainer}>
+            <View style={styles.companyModalSearchBarContainer}>
+              <View style={{flex: 1, marginRight: 10}}>
+                <TextInput
+                  style={styles.companyModalSearchBar}
+                  placeholder="Search ..."
+                  placeholderTextColor="#aaa"
+                  onChangeText={text => setquery(text)}
+                />
+              </View>
+
+              <TouchableOpacity
+                style={styles.searchButton1}
+                onPress={handleSelectFromModal}>
+                <Text style={styles.searchbuttonText}>Select</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          <View style={styles.companyModalItemContentHeader}>
+            <View
+              style={[
+                styles.checkboxItem,
+                {marginTop: hp('2%'), marginBottom: hp('2%'), flex: 0.5},
+              ]}>
+              <CustomCheckBox
+                isChecked={false}
+                onToggle={() => console.log('hi')}
+              />
+            </View>
+
+            <Text style={styles.companyModalDropdownItemTextHeader}>Name</Text>
+            <View style={{flex: 0.2}} />
+
+            <Text style={styles.companyModalDropdownItemTextHeader}>
+              Contacts
+            </Text>
+            <View style={{flex: 0.2}} />
+
+            <Text style={styles.companyModalDropdownItemTextHeader}>
+              Email Id
+            </Text>
+            <View style={{flex: 0.2}} />
+            <Text style={styles.companyModalDropdownItemTextHeader}>Dept</Text>
+          </View>
+
+          <View style={styles.companyModalListContainer}>
+            {filteredCompanyList.length === 0 ? (
+              <Text style={styles.companyModalNoResultsText}>
+                No results found
+              </Text>
+            ) : (
+              <FlatList
+                data={filteredCompanyList}
+                keyExtractor={(_, index) => index.toString()}
+                renderItem={({item, index}) => (
+                  <TouchableOpacity
+                    style={styles.companyModalDropdownItem}
+                    onPress={() => toggleSelection(item.vendorId)}>
+                    <View style={styles.companyModalItemContent}>
+                      <View
+                        style={[
+                          styles.checkboxItem,
+                          {
+                            marginTop: hp('2%'),
+                            marginBottom: hp('2%'),
+                            flex: 0.5,
+                          },
+                        ]}>
+                        <CustomCheckBox
+                          isChecked={selectedIdxs.includes(item.vendorId)}
+                          onToggle={() => toggleSelection(item.vendorId)}
+                        />
+                      </View>
+
+                      <Text style={styles.companyModalDropdownItemText}>
+                        {item.vendor_name}
+                      </Text>
+                      <View style={{flex: 0.2}} />
+                      <Text style={styles.companyModalDropdownItemText}>
+                        {item.ph}
+                      </Text>
+                      <View style={{flex: 0.2}} />
+                      <Text style={styles.companyModalDropdownItemText}>
+                        {item.email_id}
+                      </Text>
+                      <View style={{flex: 0.2}} />
+                      <Text style={styles.companyModalDropdownItemText}>
+                        {item.dba}
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                )}
+                ItemSeparatorComponent={() => (
+                  <View style={styles.companyModalSeparator} />
+                )}
+                contentContainerStyle={styles.companyModalFlatListContent}
+              />
+            )}
+          </View>
+        </View>
+      </Modal>
+
       <FilterModal
         isVisible={isFilterVisible}
         categoriesList={categories}
@@ -459,3 +727,125 @@ const POApproveUI = ({route, ...props}) => {
 };
 
 export default POApproveUI;
+
+const getStyles = colors =>
+  StyleSheet.create({
+    companyModalOverlay: {
+      flex: 1,
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    companyModalContainer: {
+      backgroundColor: 'white',
+      borderTopLeftRadius: 20,
+      borderTopRightRadius: 20,
+      padding: 10,
+      height: '70%',
+      paddingVertical: 8,
+      position: 'absolute',
+      bottom: 0,
+      width: '100%',
+    },
+
+    companyModalHeader: {
+      paddingVertical: 12,
+      borderBottomWidth: 1,
+      borderBottomColor: '#ddd',
+      alignItems: 'center',
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+    },
+    companyModalHeaderText: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      color: '#333',
+    },
+    companyModalSearchBarContainer: {
+      marginVertical: 10,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+    },
+    companyModalSearchBar: {
+      height: 40,
+      backgroundColor: '#f2f2f2',
+      borderRadius: 8,
+      paddingHorizontal: 12,
+      fontSize: 16,
+      color: '#333',
+      borderWidth: 1,
+      borderColor: '#ddd',
+      flex: 1,
+    },
+    searchButton1: {
+      height: 40,
+      backgroundColor: colors.color2,
+      borderRadius: 8,
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingHorizontal: 16,
+      marginLeft: 10,
+    },
+    searchbuttonText: {
+      color: 'white',
+      fontSize: 16,
+      fontWeight: 'bold',
+    },
+
+    companyModalSearchBar: {
+      height: 40,
+      backgroundColor: '#f2f2f2',
+      borderRadius: 8,
+      paddingHorizontal: 12,
+      fontSize: 16,
+      color: '#333',
+      borderWidth: 1,
+      borderColor: '#ddd',
+    },
+    companyModalListContainer: {
+      flex: 1,
+      marginTop: 8,
+    },
+    companyModalFlatListContent: {
+      paddingVertical: 4,
+    },
+    companyModalNoResultsText: {
+      color: '#888',
+      textAlign: 'center',
+      padding: 10,
+      fontSize: 16,
+    },
+    companyModalDropdownItem: {
+      paddingVertical: 10,
+      backgroundColor: '#f9f9f9',
+      borderRadius: 8,
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: 4,
+    },
+    companyModalItemContent: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginHorizontal: 4,
+      paddingHorizontal: 12,
+    },
+    companyModalItemContentHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginHorizontal: 4,
+      paddingHorizontal: 12,
+      backgroundColor: '#d8d8d8',
+    },
+    companyModalDropdownItemText: {
+      fontSize: 15,
+      color: '#333',
+      flex: 1,
+      textAlign: 'center',
+    },
+    companyModalDropdownItemTextHeader: {
+      fontSize: 16,
+      color: '#333',
+      flex: 1,
+      fontWeight: 'bold',
+      textAlign: 'center',
+    },
+  });

@@ -6856,6 +6856,27 @@ export const downloadCuttingReport =()=>{
     return URL;
 } 
 
+export const downloadPoPdf1 =()=>{
+    const URL= Environment.uri + "po/poPdf1";
+    return URL;
+} 
+export const downloadPoPdfFg =()=>{
+    const URL= Environment.uri + "po/poPdfFg";
+    return URL;
+} 
+export const downloadPoPdfgeneratePdf =()=>{
+    const URL= Environment.uri + "po/generatePdf";
+    return URL;
+} 
+export const downloadPOExcel =()=>{
+    const URL= Environment.uri + "po/getPOExcel";
+    return URL;
+} 
+export const downloadPOFGExcel =()=>{
+    const URL= Environment.uri + "po/getPOFGExcel";
+    return URL;
+} 
+
 export async function getBatchListAfterPriniting(jsonValue) {
 
     let returnError = undefined;
@@ -8245,6 +8266,123 @@ export async function getFiltered_poApproval(jsonValue) {
     }
     console.log("URL", Environment.uri + "po/loadAllPOsSearchCategoryType");
     await fetch(Environment.uri + "po/loadAllPOsSearchCategoryType",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            },
+            body: JSON.stringify(jsonValue),
+        }
+    ).then((response) => response.json()).then(async (data) => {
+        if (data) {
+            statusData = true;
+            responseData = data
+        } else {
+            statusData = undefined;
+        }
+
+    }).catch((error) => {
+        console.log('finshing out search  error ', error)
+        returnError = error;
+    });
+
+    obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet }
+    return obj;
+};
+export async function getModalListPoComponent(jsonValue) {
+
+    let returnError = undefined;
+    let statusData = undefined;
+    let responseData = undefined;
+    let logoutData = false;
+    let obj = undefined;
+
+    let internet = await internetCheck();
+    if (!internet) {
+        obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
+        return obj;
+    }
+    console.log("URL", Environment.uri + "po/poVendorMailDetails");
+    await fetch(Environment.uri + "po/poVendorMailDetails",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            },
+            body: JSON.stringify(jsonValue),
+        }
+    ).then((response) => response.json()).then(async (data) => {
+        if (data) {
+            statusData = true;
+            responseData = data
+        } else {
+            statusData = undefined;
+        }
+
+    }).catch((error) => {
+        console.log('finshing out search  error ', error)
+        returnError = error;
+    });
+
+    obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet }
+    return obj;
+};
+export async function sendMailPoComponent(jsonValue) {
+
+    let returnError = undefined;
+    let statusData = undefined;
+    let responseData = undefined;
+    let logoutData = false;
+    let obj = undefined;
+
+    let internet = await internetCheck();
+    if (!internet) {
+        obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
+        return obj;
+    }
+    console.log("URL", Environment.uri + "po/sendMail");
+    await fetch(Environment.uri + "po/sendMail",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            },
+            body: JSON.stringify(jsonValue),
+        }
+    ).then((response) => response.json()).then(async (data) => {
+        if (data) {
+            statusData = true;
+            responseData = data
+        } else {
+            statusData = undefined;
+        }
+
+    }).catch((error) => {
+        console.log('finshing out search  error ', error)
+        returnError = error;
+    });
+
+    obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet }
+    return obj;
+};
+export async function sendWhatsAppPoComponent(jsonValue) {
+
+    let returnError = undefined;
+    let statusData = undefined;
+    let responseData = undefined;
+    let logoutData = false;
+    let obj = undefined;
+
+    let internet = await internetCheck();
+    if (!internet) {
+        obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
+        return obj;
+    }
+    console.log("URL", Environment.uri + "po/sendWhatsapp");
+    await fetch(Environment.uri + "po/sendWhatsapp",
         {
             method: "POST",
             headers: {
