@@ -37,7 +37,8 @@ const POApprovalComponent = ({ navigation, route, ...props }) => {
 
     if (route.params?.item) {
       getInitialData(route.params?.item.poNumber);
-      // console.log('route params from list page==> ', route.params?.item);
+      set_poNumber(route.params?.item.poNumber);
+      console.log('route params from po list page==> ', route.params?.item.poNumber);
       getGSTorTaxAmount(route.params?.item?.price);
     }
 
@@ -87,7 +88,7 @@ const POApprovalComponent = ({ navigation, route, ...props }) => {
         set_itemsArray(poEditAPIObj.responseData.poChildResponseList);
         set_sdeliveryDate(poEditAPIObj.responseData.deliveryDateStr);
         set_startDate(poEditAPIObj.responseData.issueDateStr);
-        set_poNumber(poEditAPIObj.responseData.poNumber);
+        // set_poNumber(poEditAPIObj.responseData.poNumber);
         setItemDetails({
           ...itemDetails,
           totalAmountIncludingGST: poEditAPIObj.responseData.totalgst || '0',
@@ -174,6 +175,71 @@ const POApprovalComponent = ({ navigation, route, ...props }) => {
 
   };
 
+   const uploadMedia = async formData => {
+    if (!poNumber) {
+      popUpAction(
+        Constant.SERVICE_FAIL_MSG,
+        Constant.DefaultAlert_MSG,
+        'OK',
+        true,
+        false,
+      );
+      return;
+    }
+    let userName = await AsyncStorage.getItem('userName');
+    let userPsd = await AsyncStorage.getItem('userPsd');
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
+
+    set_isLoading(true);
+    formData.append('username', userName || '');
+    formData.append('password', userPsd || '');
+    formData.append('menuId', '4');
+    // formData.append('poNumber', poNumber || '');
+    // formData.append('compIds', usercompanyId || '');
+    // formData.append('company', JSON.parse(companyObj) || '');
+
+    console.log('req body upload ==> ', formData);
+
+    let poApproveAPIObj = await APIServiceCall.poAllUploadMedia(
+      formData,poNumber,usercompanyId
+    );
+    set_isLoading(false);
+
+    if (poApproveAPIObj && poApproveAPIObj.statusData) {
+       popUpAction(
+              "Uploaded Succesfully",
+              Constant.DefaultAlert_MSG,
+              'OK',
+              true,
+              false,
+              1,
+            );
+            console.log("sucess resp ==> ", poApproveAPIObj.responseData)
+      
+    } else {
+      popUpAction(
+        Constant.SERVICE_FAIL_MSG,
+        Constant.DefaultAlert_MSG,
+        'OK',
+        true,
+        false,
+        1,
+      );
+    }
+
+    if (poApproveAPIObj && poApproveAPIObj.error) {
+      popUpAction(
+        Constant.SERVICE_FAIL_MSG,
+        Constant.DefaultAlert_MSG,
+        'OK',
+        true,
+        false,
+        1,
+      );
+    }
+  };
+
   const popUpAction = (popMsg, popAlert, rBtnTitle, isPopup, isPopLeft, id) => {
     set_popUpMessage(popMsg);
     set_popUpAlert(popAlert);
@@ -213,6 +279,7 @@ const POApprovalComponent = ({ navigation, route, ...props }) => {
       backBtnAction={backBtnAction}
       approveAction={approveAction}
       popOkBtnAction={popOkBtnAction}
+      uploadMedia={uploadMedia}
     />
 
   );

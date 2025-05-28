@@ -186,7 +186,7 @@ const StyleTransferOutListUI = ({route, navigation, ...props}) => {
               {item.username}
             </Text>
           </View> */}
-          <View
+          {/* <View
             style={{
               flex: 0.7,
               alignItems: 'center',
@@ -206,7 +206,54 @@ const StyleTransferOutListUI = ({route, navigation, ...props}) => {
                 {'IN DC'}
               </Text>
             </TouchableOpacity>
-          </View>
+          </View> */}
+          <View
+                    style={{
+                      flex: 0.7,
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      // gap: 10,
+                    }}>
+                    {/* PDF buttons */}
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        width: '80%',
+                      }}>
+                      {/* OUT DC */}
+                      <TouchableOpacity
+                        onPress={() => handlePdf1(item)}
+                        style={{alignItems: 'center', flex: 1}}>
+                        <Image
+                          source={require('./../../../assets/images/png/pdf2.png')}
+                          style={{width: 18, height: 18, resizeMode: 'contain'}}
+                        />
+                        <Text style={{fontSize: 8,  fontWeight: 'bold'}}>
+                          OUT DC
+                        </Text>
+                      </TouchableOpacity>
+          
+                      {/* IN DC */}
+                      <TouchableOpacity
+                        onPress={() => handlePdf2(item)}
+                        style={{alignItems: 'center', flex: 1}}>
+                        <Image
+                          source={require('./../../../assets/images/png/pdf2.png')}
+                          style={{
+                            width: 18,
+                            height: 18,
+                            resizeMode: 'contain',
+                            marginBottom: 2,
+                          }}
+                        />
+                        <Text style={{fontSize: 8,  fontWeight: 'bold'}}>
+                          IN DC
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+          
+                  </View>
         </View>
       </TouchableOpacity>
     );

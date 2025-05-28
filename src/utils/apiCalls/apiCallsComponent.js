@@ -189,7 +189,6 @@ export async function poApproveAPIService(jsonValue) {
             body: JSON.stringify(jsonValue),
         }
     ).then((response) => response.json()).then(async (data) => {
-        console.log('Po poApprove Code1 ', data)
 
         if (data) {
             statusData = data;
@@ -200,6 +199,87 @@ export async function poApproveAPIService(jsonValue) {
 
     }).catch((error) => {
         console.log('Po poApprove Code Error ', error)
+        returnError = error;
+    });
+
+    obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet }
+    return obj;
+};
+
+export async function GoodsReceiptNotesUploadMedia(formData, poNumber, usercompanyId) {
+
+    let returnError = undefined;
+    let statusData = undefined;
+    let responseData = undefined;
+    let logoutData = false;
+    let obj = undefined;
+
+    let internet = await internetCheck();
+    if (!internet) {
+        obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
+        return obj;
+    }
+    console.log('api ==>', Environment.uri + "grn/grnUploadFiles/"+poNumber+"/"+usercompanyId, formData);
+    await fetch(Environment.uri + "grn/grnUploadFiles/"+poNumber+"/"+usercompanyId,
+        {
+            method: "POST",
+            headers: {
+                // "Content-Type": "multipart/form-data",
+                "Accept": "application/json",
+            },
+            body:formData,
+        }
+    ).then((response) => response.json()).then((data) => {
+console.log("data ==> ", data)
+        if (data) {
+            statusData = data;
+            responseData = data
+        } else {
+            statusData = undefined;
+        }
+
+    }).catch((error) => {
+        console.log('GoodsReceiptNotesUploadMedia Error ', error)
+        returnError = error;
+    });
+
+    obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet }
+    return obj;
+};
+export async function poAllUploadMedia(formData, poNumber, usercompanyId) {
+
+    let returnError = undefined;
+    let statusData = undefined;
+    let responseData = undefined;
+    let logoutData = false;
+    let obj = undefined;
+
+    let internet = await internetCheck();
+    if (!internet) {
+        obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
+        return obj;
+    }
+    console.log('api ', Environment.uri + "po/poUploadFiles/"+poNumber+"/"+usercompanyId)
+    await fetch(Environment.uri + "po/poUploadFiles/"+poNumber+"/"+usercompanyId,
+        {
+            method: "POST",
+            headers: {
+                // "Content-Type": "multipart/form-data",
+                "Accept": "application/json",
+            },
+            body: formData,
+        }
+    ).then((response) => response.json()).then(async (data) => {
+
+        if (data) {
+            statusData = data;
+            responseData = data
+        } else {
+            statusData = undefined;
+        }
+
+    }).catch((error) => {
+        console.log('GoodsReceiptNotesUploadMedia Error ', error)
         returnError = error;
     });
 
@@ -1544,6 +1624,47 @@ export async function loadAllVendorMastersList(jsonValue) {
 
     console.log('url ', 'vendor/loadAllVendors');
     await fetch(Environment.uri + "vendor/loadAllVendors",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            },
+            body: JSON.stringify(jsonValue),
+        }
+    ).then((response) => response.json()).then(async (data) => {
+
+        if (data) {
+            statusData = true;
+            responseData = data
+        } else {
+            statusData = undefined;
+        }
+
+    }).catch((error) => {
+        console.log('loadAllVendorMastersList error ', error)
+        returnError = error;
+    });
+
+    obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet }
+    return obj;
+};
+export async function loadAllNewInOutProcessList(jsonValue) {
+
+    let returnError = undefined;
+    let statusData = undefined;
+    let responseData = undefined;
+    let logoutData = false;
+    let obj = undefined;
+
+    let internet = await internetCheck();
+    if (!internet) {
+        obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
+        return obj;
+    }
+
+    console.log('url ', 'outprocess/loadAllOutprocessStyles');
+    await fetch(Environment.uri + "outprocess/loadAllOutprocessStyles",
         {
             method: "POST",
             headers: {
