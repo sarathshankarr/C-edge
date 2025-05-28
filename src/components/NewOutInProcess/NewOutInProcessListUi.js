@@ -23,11 +23,10 @@ import * as Constant from './../../utils/constants/constant';
 import FilterModal from './../../utils/commonComponents/FilterModal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import AddNewItem from './../../utils/commonComponents/AddNewItem';
-import { ColorContext } from '../colorTheme/colorTheme';
+import {ColorContext} from '../colorTheme/colorTheme';
 let searchImg = require('./../../../assets/images/png/searchIcon.png');
 let exampleImage = require('./../../../assets/images/png/img4.jpg');
 let filterImg = require('./../../../assets/images/png/setting.png');
-
 
 const NewOutInProcessListUi = ({route, ...props}) => {
   const {colors} = useContext(ColorContext);
@@ -128,9 +127,9 @@ const NewOutInProcessListUi = ({route, ...props}) => {
 
     const styleArray = ItemsArray.filter(
       style =>
-        style.vendor_name?.toUpperCase().includes(name.toUpperCase()) ||
-        style.user_type?.toUpperCase().includes(name.toUpperCase()) ||
-        style.city?.toUpperCase().includes(name.toUpperCase()),
+        style.vendorLocation?.toUpperCase().includes(name.toUpperCase()) ||
+        style.styleNo?.toUpperCase().includes(name.toUpperCase()) ||
+        style.processName?.toUpperCase().includes(name.toUpperCase()),
     );
     if (styleArray && styleArray.length > 0) {
       set_filterArray(styleArray);
@@ -175,18 +174,132 @@ const NewOutInProcessListUi = ({route, ...props}) => {
       <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
         <Text
           style={[CommonStyles.tylesTextStyle, {textAlign: 'center', flex: 1}]}>
-          {item.vendor_name}
+          {item.dcId}
         </Text>
         <Text
           style={[CommonStyles.tylesTextStyle, {textAlign: 'center', flex: 1}]}>
-          {item.user_type}
+          {item.vendorLocation}
         </Text>
+        {/* <Text
+          style={[CommonStyles.tylesTextStyle, {textAlign: 'center', flex: 1}]}>
+          {item.styleNo}
+        </Text> */}
         <Text
           style={[CommonStyles.tylesTextStyle, {textAlign: 'center', flex: 1}]}>
-          {item.city}
+          {item.processName}
         </Text>
-       
 
+        {/* <View
+          style={{
+            flex: 1.2,
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            gap: 8,
+          }}>
+          <View
+            style={{
+              flex: 0.7,
+              alignItems: 'center',
+              flexDirection: 'column',
+              justifyContent: 'space-around',
+            }}>
+            <TouchableOpacity onPress={() => handlePdf1(item)}>
+              <Text
+                style={[
+                  CommonStyles.tylesTextStyle,
+                  {textAlign: 'center', marginBottom: 5},
+                ]}>
+                {'OUT DC'}
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={() => handlePdf2(item)} style={{}}>
+              <Text
+                style={[CommonStyles.tylesTextStyle, {textAlign: 'center'}]}>
+                {'IN DC'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <View
+            style={{
+              flex: 1.2,
+              flexDirection: 'row',
+              justifyContent: 'center',
+              alignItems: 'center',
+              gap: 8,
+              // marginRight: wp('2%'),
+            }}>
+            <TouchableOpacity onPress={() => handleSendWhatsApp(item)}>
+              <Image
+                style={{
+                  width: 15,
+                  height: 15,
+                  resizeMode: 'contain',
+                }}
+                source={require('./../../../assets/images/png/whatsapp.png')}
+              />
+            </TouchableOpacity>
+          </View>
+        </View> */}
+
+        <View
+          style={{
+            flex: 1.5,
+            flexDirection: 'column',
+            alignItems: 'center',
+            // gap: 10,
+          }}>
+          {/* PDF buttons */}
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              width: '80%',
+            }}>
+            {/* OUT DC */}
+            <TouchableOpacity
+              onPress={() => handlePdf1(item)}
+              style={{alignItems: 'center', flex: 1}}>
+              <Image
+                source={require('./../../../assets/images/png/pdf2.png')}
+                style={{width: 18, height: 18, resizeMode: 'contain'}}
+              />
+              <Text style={{fontSize: 8,  fontWeight: 'bold'}}>
+                OUT DC
+              </Text>
+            </TouchableOpacity>
+
+            {/* IN DC */}
+            <TouchableOpacity
+              onPress={() => handlePdf2(item)}
+              style={{alignItems: 'center', flex: 1, marginRight:2}}>
+              <Image
+                source={require('./../../../assets/images/png/pdf2.png')}
+                style={{
+                  width: 18,
+                  height: 18,
+                  resizeMode: 'contain',
+                  marginBottom: 2,
+                }}
+              />
+              <Text style={{fontSize: 8,  fontWeight: 'bold'}}>
+                IN DC
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => handleSendWhatsApp(item)}
+              style={{marginTop: 6}}>
+              <Image
+                style={{width: 16, height: 16, resizeMode: 'contain'}}
+                source={require('./../../../assets/images/png/whatsapp.png')}
+              />
+            </TouchableOpacity>
+          </View>
+
+          {/* WhatsApp Icon */}
+        </View>
+        
       </View>
     </TouchableOpacity>
   );
@@ -309,21 +422,36 @@ const NewOutInProcessListUi = ({route, ...props}) => {
                 CommonStyles.tylesHeaderTextStyle,
                 {textAlign: 'center', flex: 1},
               ]}>
-              Vendor Name
+              ID
             </Text>
             <Text
               style={[
                 CommonStyles.tylesHeaderTextStyle,
                 {textAlign: 'center', flex: 1},
               ]}>
-              Type
+              Vendor/Location
             </Text>
+            {/* <Text
+              style={[
+                CommonStyles.tylesHeaderTextStyle,
+                {textAlign: 'center', flex: 1},
+              ]}>
+              Style No(Color)
+            </Text> */}
             <Text
               style={[
                 CommonStyles.tylesHeaderTextStyle,
                 {textAlign: 'center', flex: 1},
               ]}>
-              City
+              Process
+            </Text>
+
+            <Text
+              style={[
+                CommonStyles.tylesHeaderTextStyle,
+                {flex: 1.2, textAlign: 'center', marginRight: wp('2%')},
+              ]}>
+              {'Action'}
             </Text>
           </View>
         ) : (
@@ -335,7 +463,6 @@ const NewOutInProcessListUi = ({route, ...props}) => {
             ) : null}
           </View>
         )}
-
 
         <View style={CommonStyles.listStyle}>
           {showFilteredList ? (
@@ -440,5 +567,3 @@ const styles = StyleSheet.create({
 });
 
 export default NewOutInProcessListUi;
-
-

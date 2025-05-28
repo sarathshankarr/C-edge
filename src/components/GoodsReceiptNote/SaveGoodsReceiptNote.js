@@ -15,12 +15,14 @@ const SaveGoodsReceiptNote = ({navigation, route, ...props}) => {
   const [popUpRBtnTitle, set_popUpRBtnTitle] = useState(undefined);
   const [isPopupLeft, set_isPopupLeft] = useState(false);
   const [fptid, set_fptid] = useState(0);
+  const [poNumber, set_poNumber] = useState(0);
 
   React.useEffect(() => {
     if (route.params) {
       if (route.params?.item) {
         console.log('Route Params ===> ', route.params?.item?.poNumber);
         getInitialData(route.params?.item?.poNumber);
+        set_poNumber(route.params?.item?.poNumber);
       }
     }
   }, [route.params]);
@@ -101,7 +103,7 @@ const SaveGoodsReceiptNote = ({navigation, route, ...props}) => {
     let usercompanyId = await AsyncStorage.getItem('companyId');
     let companyObj = await AsyncStorage.getItem('companyObj');
     let userId = await AsyncStorage.getItem('userId');
-    
+
     tempObj.userName = userName;
     tempObj.userPwd = userPsd;
     tempObj.userId = userId;
@@ -114,7 +116,9 @@ const SaveGoodsReceiptNote = ({navigation, route, ...props}) => {
 
     set_isLoading(true);
 
-    let SAVEAPIObj = await APIServiceCall.saveEditGoodsTransportReceipt(tempObj);
+    let SAVEAPIObj = await APIServiceCall.saveEditGoodsTransportReceipt(
+      tempObj,
+    );
     set_isLoading(false);
 
     console.log('Sucess before returned obj ', SAVEAPIObj);
@@ -148,6 +152,75 @@ const SaveGoodsReceiptNote = ({navigation, route, ...props}) => {
     }
   };
 
+  const uploadMedia = async formData => {
+    if (!poNumber) {
+      popUpAction(
+        Constant.SERVICE_FAIL_MSG,
+        Constant.DefaultAlert_MSG,
+        'OK',
+        true,
+        false,
+      );
+      return;
+    }
+    let userName = await AsyncStorage.getItem('userName');
+    let userPsd = await AsyncStorage.getItem('userPsd');
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
+
+    set_isLoading(true);
+    formData.append('username', userName || '');
+    formData.append('password', userPsd || '');
+    formData.append('menuId', '5');
+    formData.append('poNumber', poNumber || '');
+    formData.append('companyIds', usercompanyId || '' );
+
+
+    // formData.append('compIds', usercompanyId || '');
+    // formData.append('companyId', usercompanyId || '' );
+    // formData.append('company', JSON.parse(companyObj) || '');
+
+    
+    // console.log('req body upload ==> ', formData);
+
+    let poApproveAPIObj = await APIServiceCall.GoodsReceiptNotesUploadMedia(
+      formData,poNumber, usercompanyId
+    );
+    set_isLoading(false);
+
+    if (poApproveAPIObj && poApproveAPIObj.statusData) {
+     popUpAction(
+        "Uploaded Succesfully",
+        Constant.DefaultAlert_MSG,
+        'OK',
+        true,
+        false,
+        1,
+      );
+      console.log("sucess resp ==> ", poApproveAPIObj.responseData)
+    } else {
+      popUpAction(
+        Constant.SERVICE_FAIL_MSG,
+        Constant.DefaultAlert_MSG,
+        'OK',
+        true,
+        false,
+        1,
+      );
+    }
+
+    if (poApproveAPIObj && poApproveAPIObj.error) {
+      popUpAction(
+        Constant.SERVICE_FAIL_MSG,
+        Constant.DefaultAlert_MSG,
+        'OK',
+        true,
+        false,
+        1,
+      );
+    }
+  };
+
   return (
     <SaveGoodsReceiptNoteUI
       itemsObj={itemsObj}
@@ -161,6 +234,7 @@ const SaveGoodsReceiptNote = ({navigation, route, ...props}) => {
       actionOnRow={actionOnRow}
       popOkBtnAction={popOkBtnAction}
       submitAction={submitAction}
+      uploadMedia={uploadMedia}
     />
   );
 };
