@@ -22,6 +22,7 @@ const POApprovalComponent = ({ navigation, route, ...props }) => {
   const [pId, set_pId] = useState(1);
   const [remarks, set_remarks] = useState("");
   const [gstAmount, set_gstAmount]=useState(0);
+  const [itemsObj, set_itemsObj] = useState([]);
 
 
   const [gstName, set_gstName]=useState(true);
@@ -85,6 +86,7 @@ const POApprovalComponent = ({ navigation, route, ...props }) => {
 
       if (poEditAPIObj && poEditAPIObj.responseData) {
         getTotalFare(poEditAPIObj.responseData);
+        set_itemsObj(poEditAPIObj.responseData);
         set_itemsArray(poEditAPIObj.responseData.poChildResponseList);
         set_sdeliveryDate(poEditAPIObj.responseData.deliveryDateStr);
         set_startDate(poEditAPIObj.responseData.issueDateStr);
@@ -280,6 +282,8 @@ const POApprovalComponent = ({ navigation, route, ...props }) => {
       approveAction={approveAction}
       popOkBtnAction={popOkBtnAction}
       uploadMedia={uploadMedia}
+      itemsObj={itemsObj}
+
     />
 
   );
