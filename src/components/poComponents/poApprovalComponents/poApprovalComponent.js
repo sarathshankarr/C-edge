@@ -90,6 +90,7 @@ const POApprovalComponent = ({ navigation, route, ...props }) => {
         set_itemsArray(poEditAPIObj.responseData.poChildResponseList);
         set_sdeliveryDate(poEditAPIObj.responseData.deliveryDateStr);
         set_startDate(poEditAPIObj.responseData.issueDateStr);
+        set_remarks(poEditAPIObj.responseData.statusRemarks)
         // set_poNumber(poEditAPIObj.responseData.poNumber);
         setItemDetails({
           ...itemDetails,
@@ -152,7 +153,7 @@ const POApprovalComponent = ({ navigation, route, ...props }) => {
       "userName": userName,  // mandatory
       "userPwd": userPsd, // mandatory
       "compIds": usercompanyId,
-     "company":JSON.parse(companyObj),
+      "company":JSON.parse(companyObj),
     }
 
     let poApproveAPIObj = await APIServiceCall.poApproveAPIService(obj);

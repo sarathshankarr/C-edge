@@ -288,7 +288,7 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
     }
   };
 
-  const handleUpload = () => {
+  const handleUploa1 = () => {
     Alert.alert(
       'Upload File',
       'What would you like to upload?',
@@ -345,6 +345,56 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
       }
     }
   };
+
+const handleupload = async () => {
+  const MAX_DOCUMENT = 10;
+  const MAX_FILE_SIZE_MB = 1;
+
+  try {
+    const res = await DocumentPicker.pick({
+      type: [
+        DocumentPicker.types.pdf,
+        DocumentPicker.types.doc,
+        DocumentPicker.types.docx,
+        DocumentPicker.types.audio,
+        DocumentPicker.types.allFiles,
+      ],
+      allowMultiSelection: true,
+    });
+
+    const selectedDocs = Array.isArray(res) ? res : [res];
+
+    const oversizedFiles = selectedDocs.filter(
+      file => file.size && file.size > MAX_FILE_SIZE_MB * 1024 * 1024
+    );
+
+    if (oversizedFiles.length > 0) {
+      Alert.alert(
+        'File Too Large',
+        `Each file must be less than ${MAX_FILE_SIZE_MB}MB. Please remove large files and try again.`
+      );
+      return;
+    }
+
+    const totalDocs = uploadedMediaFiles.length + selectedDocs.length;
+    if (totalDocs > MAX_DOCUMENT) {
+      Alert.alert(
+        'Limit Exceeded',
+        `You can only upload up to ${MAX_DOCUMENT} documents.`
+      );
+      return;
+    }
+
+    setUploadedMediaFiles(prev => [...prev, ...selectedDocs]);
+  } catch (error) {
+    if (DocumentPicker.isCancel(error)) {
+      // User cancelled the picker, do nothing
+    } else {
+      console.error('Error picking documents:', error);
+      Alert.alert('Error', 'Something went wrong while picking documents.');
+    }
+  }
+};
 
   const openFile = file => {
     if (file.url) {
@@ -781,7 +831,7 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
           </View>
 
           <TouchableOpacity
-            onPress={handleupload2}
+            onPress={handleupload}
             style={{
               borderRadius: 12,
               backgroundColor: '#f8f8f8',

@@ -17,15 +17,11 @@ const CreateNewOutInProcess = ({ route }) => {
   const [popUpRBtnTitle, set_popUpRBtnTitle] = useState(undefined);
   const [isPopupLeft, set_isPopupLeft] = useState(false);
   
-  const [lists, set_lists] = useState({
-    currencys: [],
-    stateMap:[],
-    countryMap:[]
-  });
+  const [itemsObj, set_itemsObj] = useState([]);
 
 
   React.useEffect(() => {
-    // getInitialData();
+    getInitialData();
   }, []);
 
 
@@ -44,39 +40,17 @@ const CreateNewOutInProcess = ({ route }) => {
     let obj = {
       "username": userName,
       "password": userPsd,
-      "menuId": 587,
       "compIds": usercompanyId,
       "company":JSON.parse(companyObj),
 
     }
-    let LISTAPIOBJ = await APIServiceCall.GetCreateVendorsMastersList(obj);
+    let LISTAPIOBJ = await APIServiceCall.GetCreateNewOutInProcess(obj);
     set_isLoading(false);
 
     if (LISTAPIOBJ && LISTAPIOBJ.statusData) {
       if (LISTAPIOBJ && LISTAPIOBJ.responseData) {
-        if (LISTAPIOBJ?.responseData?.currencys) {
-          const currencysList = Object.keys(LISTAPIOBJ.responseData.currencys).map(key => ({
-            id: key,
-            name: LISTAPIOBJ.responseData.currencys[key]
-          }));
-          set_lists(prevLists => ({
-            ...prevLists,
-            currencys: currencysList
-          }));
-        }
-        if (LISTAPIOBJ?.responseData?.countryMap) {
-          const countryMapList = Object.keys(LISTAPIOBJ.responseData.countryMap).map(key => ({
-            id: key,
-            name: LISTAPIOBJ.responseData.countryMap[key]
-          }));
-          const prioritized = { id: "ADD_NEW_COUNTRY", name: "Add New Country" }; 
-          const updatedCountryList = [prioritized, ...countryMapList];
-          set_lists(prevLists => ({
-            ...prevLists,
-            countryMap: updatedCountryList
-          }));
-        }
-        
+        console.log("resp from ai ===> ", LISTAPIOBJ.responseData)
+       set_itemsObj(LISTAPIOBJ.responseData);
       }
     }
     else {
@@ -250,7 +224,7 @@ const CreateNewOutInProcess = ({ route }) => {
   return (
 
     <CreateNewOutInProcessUI
-      itemsArray={lists}
+      itemsObj={itemsObj}
       isLoading={isLoading}
       popUpAction={popUpAction}
       set_isLoading={set_isLoading}

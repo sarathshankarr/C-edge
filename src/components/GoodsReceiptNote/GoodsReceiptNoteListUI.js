@@ -330,7 +330,7 @@ const GoodsReceiptNoteListUI = ({route, navigation, ...props}) => {
                 CommonStyles.tylesHeaderTextStyle,
                 {flex: 0.5, textAlign: 'center'},
               ]}>
-              {'Style'}
+              {'Type'}
             </Text>
             <Text
               style={[

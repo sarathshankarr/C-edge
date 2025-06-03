@@ -204,8 +204,16 @@ const POApproveListComponent = ({navigation, route, ...props}) => {
       compIds: usercompanyId,
       company: JSON.parse(companyObj),
     };
-    console.log('modal req body ===> ', obj);
-    let stichingOutAPIObj = await APIServiceCall.getModalListPoComponent(obj);
+    // console.log('modal req body ===> ', obj);
+
+    let stichingOutAPIObj;
+    if (item.approvalStatus === 'Approved') {
+      stichingOutAPIObj = await APIServiceCall.getModalListPoComponent(obj);
+    } else {
+      stichingOutAPIObj =
+        await APIServiceCall.getModalListPoComponentNotApproved(obj);
+        console.log("calling not approved" ,stichingOutAPIObj)
+    }
     set_MainLoading(false);
 
     if (stichingOutAPIObj && stichingOutAPIObj.statusData) {
@@ -523,9 +531,9 @@ const POApproveListComponent = ({navigation, route, ...props}) => {
 
     let apiUrl;
     if (po.rmFabric === 'FG') {
-      apiUrl = await APIServiceCall.downloadPoPdf1();
-    } else if (companyObj.popdf === 4) {
       apiUrl = await APIServiceCall.downloadPoPdfFg();
+    } else if (companyObj.popdf === 4) {
+      apiUrl = await APIServiceCall.downloadPoPdf1();
     } else {
       apiUrl = await APIServiceCall.downloadPoPdfgeneratePdf();
     }

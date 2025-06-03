@@ -237,7 +237,7 @@ const POApproveUI = ({route, ...props}) => {
                 />
               </TouchableOpacity>
 
-              <TouchableOpacity onPress={() => handleSendWhatsApp(item)}>
+              {item.approvalStatus ==="Approved" && <TouchableOpacity onPress={() => handleSendWhatsApp(item)}>
                 <Image
                   style={{
                     width: 15,
@@ -246,7 +246,7 @@ const POApproveUI = ({route, ...props}) => {
                   }}
                   source={require('./../../../../assets/images/png/whatsapp.png')}
                 />
-              </TouchableOpacity>
+              </TouchableOpacity>}
             </View>
             <View
               style={{
