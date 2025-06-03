@@ -289,6 +289,7 @@ const CreatePurchaseOrderDraft = ({route}) => {
             ...prevLists,
             styleRm: LISTAPIOBJ.responseData,
           }));
+          console.log("rm   ===> ", LISTAPIOBJ.responseData)
         } else if (id === 2) {
           set_modalLists(prevLists => ({
             ...prevLists,
@@ -322,22 +323,22 @@ const CreatePurchaseOrderDraft = ({route}) => {
     }
   };
 
-  const submitAction = async checkedData => {
+  const submitAction = async tempObj => {
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
     let companyObj = await AsyncStorage.getItem('companyObj');
-    const tempObj = {};
 
     tempObj.menuId = 145;
-    tempObj.vendorId = 145;
+    // tempObj.vendorId = 0;
     tempObj.userName = userName;
     tempObj.userPwd = userPsd;
-    tempObj.checkedData = checkedData;
+    // tempObj.checkedData = checkedData;
     tempObj.compIds = usercompanyId;
     tempObj.company = JSON.parse(companyObj);
 
     console.log('saving obj ==>', tempObj);
+    // return;
 
     set_isLoading(true);
 

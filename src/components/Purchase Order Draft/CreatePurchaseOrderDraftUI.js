@@ -92,10 +92,10 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
 
       // console.log('LIst ==> ', props.modalLists.styleFab);
 
-      console.log('StyleFg ==> ', props.modalLists.StyleFg.length);
-      console.log('styleRm ==> ', props.modalLists.styleRm.length);
-      console.log('styleFab ==> ', props.modalLists.styleFab.length);
-      console.log('styleTrimfab ==> ', props.modalLists.styleTrimfab.length);
+      // console.log('StyleFg ==> ', props.modalLists.StyleFg.length);
+      // console.log('styleRm ==> ', props.modalLists.styleRm.length);
+      // console.log('styleFab ==> ', props.modalLists.styleFab.length);
+      // console.log('styleTrimfab ==> ', props.modalLists.styleTrimfab.length);
     }
   }, [props.modalLists]);
 
@@ -147,15 +147,19 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
 
   const handleSearchStyle = text => {
     if (text.trim().length > 0) {
-        const filtered = styleList.filter(
-            item => item.name && item.name.trim() !== '' && item.name.toLowerCase().includes(text.toLowerCase())
-        );
-        setFilteredStyle(filtered);
+      const filtered = styleList.filter(
+        item =>
+          item.name &&
+          item.name.trim() !== '' &&
+          item.name.toLowerCase().includes(text.toLowerCase()),
+      );
+      setFilteredStyle(filtered);
     } else {
-        setFilteredStyle(styleList.filter(item => item.name && item.name.trim() !== ''));
+      setFilteredStyle(
+        styleList.filter(item => item.name && item.name.trim() !== ''),
+      );
     }
-};
-
+  };
 
   const actionOnVendor = item => {
     setVendorId(item.id);
@@ -213,22 +217,51 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
   };
 
   const submitAction = async () => {
-    // rows.map((row,index)=> (
+
+
     let usercompanyId = await AsyncStorage.getItem('companyId');
+
+    if(!vendorId){
+      Alert.alert("Alert ", "Please Select Vendor");
+      return;
+    }
+    if(!deliveryDate){
+      Alert.alert("Alert ", "Please Select Delivery Date");
+      return;
+    }
+    if(rows.length<1){
+      Alert.alert("Alert ", "Please add RM/Fabric/Trim Fabric to continue..");
+      return;
+    }
+    if(!shipLocationId || ! shipToId || !orderDate){
+      Alert.alert("Alert ", "Please fill all Mandaory fields");
+      return;
+    }
+    for (let i = 0; i < rows.length; i++) {
+    const item = rows[i];
+    if (!item.input_Qty || parseFloat(item.input_Qty) <= 0) {
+      Alert.alert("Alert", `Please enter valid quantity for item ${item.styleNameALL || i + 1}`);
+      return;
+    }
+    if (!item.input_UnitPrice || parseFloat(item.input_UnitPrice) <= 0) {
+      Alert.alert("Alert", `Please enter valid price for item ${item.styleNameALL || i + 1}`);
+      return;
+    }
+  }
 
     const checkedData = [];
     rows.forEach((item, index) => {
       const tempObj = {
-        itemId: 477,
-        itemQty: 100,
-        itemTrimsType: 'Fabric',
-        itemdesc: 'RAYON PLAIN12',
+        itemId: 0,
+        itemQty: item.input_Qty,
+        itemTrimsType: selectedradiooption2 ,
+        itemdesc: item.trimName,
         sizeCapacity: '',
         gsCode: '',
-        gstAmount: '5',
-        price: 1,
-        pml_gst: 5,
-        uom: 'MTRS',
+        gstAmount:item.input_Gst,
+        price: item.input_UnitPrice,
+        pml_gst: item.input_Gst,
+        uom: item.uomTypeDescription,
         discountAmount: 0,
         styleId: 0,
         buyer_Po_Id: 0,
@@ -242,16 +275,16 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
         weight: '',
         po_rib_id: '0',
         processid: '0',
-        description: '',
+        description: item.description,
       };
       checkedData.push(tempObj);
     });
 
-    const Obj = {
-      deliveryDate: deliveryDate,
+    const tempObj = {
+      deliveryDate: formatDateIntoDMY(deliveryDate),
       shiploc: shipLocationId,
-      orderDate: orderDate,
-      itemTrimsType: 'Fabric', // Rm //
+      orderDate: formatDateIntoDMY(orderDate),
+      itemTrimsType: selectedradiooption2,
       issueDate: '',
       shipcancelDate: '',
       preferredDate: '',
@@ -262,7 +295,8 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
       codeType: '',
       contactId: 0,
       cf_gst: 0,
-      vendorCustomerId: vendorId,
+      vendorCustomerId: shipToId,
+      vendorId: vendorId,
       transportCost: 0,
       additional_cost: 0,
       costfoc: 0,
@@ -271,7 +305,7 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
       suffix: '',
       qtys: 0,
       poNumber: 0,
-      posave: 0,
+      posave: 2,
       p_conv_rate: 0.0,
       pocancel: '',
       tc_gst: 0,
@@ -293,12 +327,11 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
       seqIdForStyle: '',
       modify_user: '',
       styleOrBuyerpo: 0,
-      lineItemsSet:checkedData
+      lineItemsSet: checkedData,
     };
 
-    console.log('checkedData ==> ', checkedData);
 
-    props.submitAction(checkedData);
+    props.submitAction(tempObj);
   };
 
   const handleRemoveRow = id => {
@@ -354,12 +387,17 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
   );
 
   const handleOptionChange = selectedId => {
+    if (rows.length > 0) return;
+
     const selected = radiogroup1.find(button => button.id === selectedId);
     if (selected) {
       setSelectedradiooption1(selected.value);
       if (selected.value === 'Style (FG)') {
         setSelectedradiooption2('');
-      } else setSelectedradiooption2('RM');
+      } else {
+        setSelectedradiooption2('RM');
+      }
+      setSelectedIdxs([]);
     }
   };
 
@@ -391,9 +429,11 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
   );
 
   const handleOptionChange2 = selectedId => {
+    if (rows.length > 0) return;
     const selected = radiogroup2.find(button => button.id === selectedId);
     if (selected) {
       setSelectedradiooption2(selected.value);
+      setSelectedIdxs([]);
     }
   };
 
@@ -504,6 +544,13 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
     0,
   );
   const totalTotalAmount = totalNetAmount + totalGstAmount;
+
+     function formatDateIntoDMY(inp) {
+    const [y, m, d] = inp.split('-');
+    let ans = [d, m, y];
+    ans = ans.join('-');
+    return ans;
+  }
 
   return (
     <View style={[CommonStyles.mainComponentViewStyle]}>
@@ -768,7 +815,7 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
             }}>
             <View style={{width: '85%'}}>
               <TextInput
-                label="Order Date"
+                label="Order Date *"
                 value={orderDate ? orderDate : ''}
                 placeholder="Order Date"
                 placeholderTextColor="#000"
@@ -797,7 +844,7 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
             }}>
             <View style={{width: '85%'}}>
               <TextInput
-                label="Delivery Date"
+                label="Delivery Date *"
                 value={deliveryDate ? deliveryDate : ''}
                 placeholder="Delivery Date"
                 placeholderTextColor="#000"
@@ -1333,7 +1380,7 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
                   <View style={{flex: 1, marginRight: 10}}>
                     <TextInput
                       style={styles.companyModalSearchBar}
-                      placeholder="Search companies..."
+                      placeholder="Search"
                       placeholderTextColor="#aaa"
                       onChangeText={text => setquery(text)}
                     />

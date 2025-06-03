@@ -59,7 +59,7 @@ const Sidebar = ({navigation}) => {
       icon: require('../../../assets/images/png/orderrr.png'),
       style: [
         {
-          label: 'PO Approval',
+          label: 'Purchase Order',
           route: 'POApproveListComponent',
           menu_id: 4,
           src: require('../../../assets/images/png/stamp.png'),
