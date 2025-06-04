@@ -268,7 +268,7 @@ const CreatePurchaseOrderDraft = ({route}) => {
       withAllowance: 0,
       rmId: 0,
     };
-    // console.log('modal list ===> , calling 1, id, req body ===> ', id);
+    // console.log('modal list fabObj ===> req body ===> ',TrimfabObj);
 
     let LISTAPIOBJ;
 
@@ -289,7 +289,7 @@ const CreatePurchaseOrderDraft = ({route}) => {
             ...prevLists,
             styleRm: LISTAPIOBJ.responseData,
           }));
-          console.log("rm   ===> ", LISTAPIOBJ.responseData)
+          // console.log("rm   ===> ", LISTAPIOBJ.responseData)
         } else if (id === 2) {
           set_modalLists(prevLists => ({
             ...prevLists,
