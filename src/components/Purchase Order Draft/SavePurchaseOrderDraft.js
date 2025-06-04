@@ -89,13 +89,13 @@ const SavePurchaseOrderDraft = ({navigation, route, ...props}) => {
     popUpAction(undefined, undefined, '', false, false);
   };
 
-  const submitAction = async () => {
+  const submitAction = async (remarks) => {
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
     let companyObj = await AsyncStorage.getItem('companyObj');
-    const tempObj = {};
-
+    const tempObj = itemsObj;
+    tempObj.notes = remarks;
     tempObj.userName = userName;
     tempObj.userPwd = userPsd;
     tempObj.compIds = usercompanyId;
