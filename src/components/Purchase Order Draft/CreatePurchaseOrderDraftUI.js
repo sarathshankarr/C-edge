@@ -264,17 +264,32 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
       const netAmount =
         Number(item.input_Qty || 0) * Number(item.input_UnitPrice || 0);
       const gstAmount = (netAmount * Number(item.input_Gst || 0)) / 100;
+      let itemId = '';
+      if (selectedradiooption2 === 'RM') {
+        itemId = item.trimTypeId;
+        itemName = item.trimName;
+        itemDescription = item.description;
+      } else if (selectedradiooption2 === 'Fabric') {
+        itemId = item.fabricId;
+        itemName = item.fabricNo;
+        itemDescription = item.colorName;
+      } else if (selectedradiooption2 === 'Trim Fabric(RM)') {
+        itemId = item.trimconstruction_id;
+        itemName = item.trimName;
+        itemDescription = item.description;
+      }
       const tempObj = {
-        itemId: item.trimTypeId,
+        itemId: itemId || 0,
         itemQty: item.input_Qty,
         itemTrimsType: selectedradiooption2,
-        itemdesc: item.trimName,
+        itemdesc: itemName || '',
         sizeCapacity: '',
         gsCode: '',
         gstAmount: gstAmount,
         price: item.input_UnitPrice,
         gstper: item.input_Gst,
-        uom: item.uomTypeDescription,
+        pml_gst: item.input_Gst,
+        uom: item.uomTypeDescription || '',
         discountAmount: 0,
         styleId: 0,
         buyer_Po_Id: 0,
@@ -288,14 +303,19 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
         weight: '',
         po_rib_id: '0',
         processid: '0',
-        description: item.description,
+        description: itemDescription || '',
       };
       checkedData.push(tempObj);
     });
+
     let companyObj = await AsyncStorage.getItem('companyObj');
     const objj = JSON.parse(companyObj);
     console.log('companyObj po suf ==> ', objj.posuffix);
 
+ const totalInputQty = rows.reduce(
+    (sum, item) => sum + parseFloat(item.input_Qty || 0),
+    0,
+  );
     const tempObj = {
       deliveryDate: formatDateIntoDMY(deliveryDate),
       shiploc: shipLocationId,
@@ -344,8 +364,15 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
       modify_user: '',
       styleOrBuyerpo: 0,
       lineItemsSet: checkedData,
+
+      totalQty: totalInputQty,
+      subTotal: totalNetAmount,
+      totalPrice:totalNetAmount,
+      gstAmount: totalGstAmount,
+      gst_prct: '0',
+      totalDiscountAmount: '0',
     };
-    console.log('sub obj ===> ', tempObj);
+    // console.log('sub obj ===> ', tempObj);
     // return;
 
     props.submitAction(tempObj);

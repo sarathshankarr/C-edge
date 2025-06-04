@@ -37,6 +37,9 @@ const SavePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
   const [rows, setRows] = React.useState([]);
   const [selectedradiooption1, setSelectedradiooption1] = useState('StyleWise');
   const [selectedradiooption2, setSelectedradiooption2] = useState('RM');
+  const [totalObj, set_totalObj] = useState('');
+  const [poNumber, set_poNumber] = useState(0);
+
   const [remarks, setRemarks] = useState('');
   const {colors} = useContext(ColorContext);
 
@@ -52,37 +55,81 @@ const SavePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
 
   useEffect(() => {
     if (props.itemsObj) {
+
+      set_totalObj(props.itemsObj)
       // console.log('data need to set ==> ', props.itemsObj);
       if (props.itemsObj.vendorsMap) {
         const menuId = props.itemsObj.vendorId;
         setVendorId(menuId);
         setVendorName(props.itemsObj.vendorsMap[menuId]);
+        const stylespList = Object.keys(props.itemsObj.vendorsMap).map(key => ({
+          id: key,
+          name: props.itemsObj.vendorsMap[key],
+        }));
+        setFilteredVendor(stylespList);
+        setVendorList(stylespList);
       }
       if (props.itemsObj.locationsMap) {
         const menuId = props.itemsObj.shiptoLoationId;
         setShipToId(menuId);
         setShipToName(props.itemsObj.locationsMap[menuId]);
+        const stylespList = Object.keys(props.itemsObj.locationsMap).map(
+          key => ({
+            id: key,
+            name: props.itemsObj.locationsMap[key],
+          }),
+        );
+        setShipToList(stylespList);
+        setFilteredShipTo(stylespList);
       }
       if (props.itemsObj.locationsMap1) {
-        // ship location
         const menuId = props.itemsObj.shiplocationId;
         setShipLocationId(menuId);
         setShipLocationName(props.itemsObj.locationsMap1[menuId]);
+        const stylespList = Object.keys(props.itemsObj.locationsMap1).map(
+          key => ({
+            id: key,
+            name: props.itemsObj.locationsMap1[key],
+          }),
+        );
+        setShipLocationList(stylespList);
+        setFilteredShipLocation(stylespList);
       }
       if (props.itemsObj.deliveryDateStr) {
-        setDeliveryDate(props.itemsObj.deliveryDateStr);
+        const formatted =props.itemsObj.deliveryDateStr ? formatD(props.itemsObj.deliveryDateStr) : "";
+        setDeliveryDate(formatted);
       }
       if (props.itemsObj.orderDateStr) {
-        setOrderDate(props.itemsObj.orderDateStr);
+        const formatted =props.itemsObj.orderDateStr ? formatD(props.itemsObj.orderDateStr) : "";
+        setOrderDate(formatted);
       }
       if (props.itemsObj.poChildResponseList) {
-        setRows(props.itemsObj.poChildResponseList);
+        // console.log("from abopve ==> ", props.itemsObj.poChildResponseList);
+        const updatedRows = props.itemsObj.poChildResponseList.map(row => ({
+        ...row,
+        itemQty: Number(row.itemQty) || 0,
+        gstper: Number(row.pml_gst) || 0,
+        price: Number(row.price) || 0
+      }));
+      setSelectedradiooption2(props.itemsObj.poChildResponseList[0]?.itemTrimsType || '')
+      setRows(updatedRows);
       }
       if (props.itemsObj.notes) {
         setRemarks(props.itemsObj.notes || '');
       }
+      if (props.itemsObj.poNumber) {
+        set_poNumber(props.itemsObj.poNumber || '');
+      }
+
     }
   }, [props.itemsObj]);
+
+  const formatD=(inp)=>{
+    const [d, m, y] = inp.split('/');
+    let ans = [d, m, y];
+    ans = ans.join('-');
+    return ans;
+  }
 
   // Process
   // Vendor state variables
@@ -201,8 +248,125 @@ const SavePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
     props.backBtnAction();
   };
 
+   const totalInputQty = rows.reduce(
+    (sum, item) => sum + parseFloat(item.itemQty || 0),
+    0,
+  );
+
   const submitAction = async () => {
-    props.submitAction(remarks);
+     const checkedData = [];
+        rows.forEach((item, index) => {
+          const netAmount =
+            Number(item.itemQty || 0) * Number(item.price || 0);
+          const gstAmount = (netAmount * Number(item.gstper || 0)) / 100;
+
+          // console.log("globall ==> ", totalObj.poChildResponseList)
+
+          const tempObj = {
+            gstAmount: gstAmount,
+            itemQty: item.itemQty || 0,
+            price: item.price || 0,
+            gstper: item.gstper|| 0,
+            pml_gst: item.gstper|| 0,
+            itemId: item.itemId || 0,
+            itemTrimsType: item.itemTrimsType || '',
+            description: item.description || '',
+            uom:item.uom || '',
+            itemdesc: item.itemdesc || '',
+            sizeCapacity: '',
+            gsCode: '',
+            discountAmount: 0,
+            styleId: 0,
+            buyer_Po_Id: 0,
+            grnAllow: '0',
+            style_size_id: 0,
+            pml_fab_width: 0,
+            buyerNo: 0,
+            batchid: 0,
+            withAllowance: 0,
+            po_gsm: '',
+            weight: '',
+            po_rib_id: '0',
+            processid: '0',
+          };
+          checkedData.push(tempObj);
+        });
+
+    // const updatedRows = rows.map(item => {
+    //   const netAmount =
+    //     Number(item.input_Qty || 0) * Number(item.input_UnitPrice || 0);
+    //   const gstAmount = (netAmount * Number(item.input_Gst || 0)) / 100;
+
+    //   return {
+    //     ...item,
+    //     gstAmount: gstAmount.toFixed(2),
+    //   };
+    // });
+
+    let companyObj = await AsyncStorage.getItem('companyObj');
+    const objj = JSON.parse(companyObj);
+    console.log('companyObj po suf ==> ', objj.posuffix);
+
+    const tempObj = {
+      deliveryDate: formatDateIntoDMY(deliveryDate),
+      shiploc: shipLocationId,
+      orderDate: formatDateIntoDMY(orderDate),
+      itemTrimsType: rows[0].itemTrimsType || totalObj. itemTrimsType || '',
+      issueDate: '',
+      shipcancelDate: '',
+      preferredDate: '',
+      shipextDate: '',
+      completionDate: '',
+      availDate: '',
+      notes: remarks,
+      codeType: '',
+      contactId: 0,
+      cf_gst: 0,
+      vendorCustomerId: shipToId,
+      vendorId: vendorId,
+      transportCost: 0,
+      additional_cost: 0,
+      costfoc: 0,
+      hsn: '0',
+      companySymbol: objj.companySymbol,
+      suffix: objj.posuffix,
+      qtys: 0,
+      poNumber: poNumber,
+      posave: 2,
+      p_conv_rate: 0.0,
+      pocancel: '',
+      tc_gst: 0,
+      tc_hsn: 0,
+      ac_gst: 0,
+      ac_hsn: 0,
+      cf_hsn: '0',
+      financialYear: 0,
+      yearwiseId: 0,
+      termofpayment: '',
+      otherReference: '',
+      destination: '',
+      buyerno: '',
+      dispatch: '',
+      roundOff: 0.0,
+      isCustStyleWise: 0,
+      additionalAmount: 0,
+      poTcs: 0,
+      seqIdForStyle: '',
+      modify_user: '',
+      styleOrBuyerpo: 0,
+      lineItemsSet: checkedData,
+
+      totalQty: totalInputQty,
+      subTotal: totalNetAmount,
+      totalPrice:totalNetAmount,
+      gstAmount: totalGstAmount,
+      gst_prct: '0',
+      totalDiscountAmount: '0',
+    };
+
+    // console.log('temp save req body ===>   ', tempObj);
+    // return;
+    props.submitAction(tempObj);
   };
 
   const handleRemoveRow = id => {
@@ -232,11 +396,14 @@ const SavePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
   };
 
   function formatDateIntoDMY(inp) {
+    console.log("formatting d ==> ", inp)
     const [y, m, d] = inp.split('-');
     let ans = [d, m, y];
     ans = ans.join('-');
     return ans;
   }
+
+
   const radiogroup1 = useMemo(
     () => [
       {
@@ -454,7 +621,7 @@ const SavePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
                 justifyContent: 'space-between',
               }}
               onPress={() => {
-                console.log("!showVendorList");
+                setShowVendorList(!showVendorList);
               }}>
               <View>
                 <View style={[styles.SectionStyle1, {}]}>
@@ -528,8 +695,7 @@ const SavePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
                 justifyContent: 'space-between',
               }}
               onPress={() => {
-                // setShowShipLocationList(!showShipLocationList);
-                console.log(!showShipLocationList);
+                setShowShipLocationList(!showShipLocationList);
               }}>
               <View>
                 <View style={[styles.SectionStyle1, {}]}>
@@ -603,8 +769,7 @@ const SavePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
                 justifyContent: 'space-between',
               }}
               onPress={() => {
-                // setShowShipToList(!showShipToList);
-                console.log("!showShipToList")
+                setShowShipToList(!showShipToList);
               }}>
               <View>
                 <View style={[styles.SectionStyle1, {}]}>
@@ -667,23 +832,62 @@ const SavePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
             onConfirm={handleConfirm}
             onCancel={hideDatePicker}
           />
-          <View style={{marginTop: hp('2%')}}>
-            <TextInput
-              label="Order Date   "
-              value={orderDate}
-              mode="outlined"
-              onChangeText={text => console.log(text)}
-              editable={false}
-            />
+          <View
+            style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginTop: hp('2%'),
+              flexDirection: 'row',
+            }}>
+            <View style={{width: '85%'}}>
+              <TextInput
+                label="Order Date *"
+                value={orderDate ? orderDate : ''}
+                placeholder="Order Date"
+                placeholderTextColor="#000"
+                mode="outlined"
+                color="#000"
+              />
+            </View>
+            <TouchableOpacity
+              onPress={() => {
+                showDatePicker('orderDate');
+              }}
+              style={{padding: 5}}>
+              <Image
+                source={require('./../../../assets/images/png/calendar11.png')}
+                style={{width: 40, height: 40}}
+              />
+            </TouchableOpacity>
           </View>
-          <View style={{marginTop: hp('2%')}}>
-            <TextInput
-              label="Delivery Date   "
-              value={deliveryDate}
-              mode="outlined"
-              editable={false}
-              onChangeText={text => console.log(text)}
-            />
+
+          <View
+            style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginTop: hp('2%'),
+              flexDirection: 'row',
+            }}>
+            <View style={{width: '85%'}}>
+              <TextInput
+                label="Delivery Date *"
+                value={deliveryDate ? deliveryDate : ''}
+                placeholder="Delivery Date"
+                placeholderTextColor="#000"
+                mode="outlined"
+                color="#000"
+              />
+            </View>
+            <TouchableOpacity
+              onPress={() => {
+                showDatePicker('deliveryDate');
+              }}
+              style={{padding: 5}}>
+              <Image
+                source={require('./../../../assets/images/png/calendar11.png')}
+                style={{width: 40, height: 40}}
+              />
+            </TouchableOpacity>
           </View>
 
           <View style={{marginBottom: 20}} />
@@ -706,7 +910,7 @@ const SavePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
             <ScrollView nestedScrollEnabled={true} horizontal>
               <View style={styles.table}>
                 <View style={styles.table_head}>
-                  <View style={{width: 60}}>
+                  <View style={{width: 90}}>
                     <Text style={styles.table_head_captions}>Qty</Text>
                   </View>
                   <View style={{width: 10}} />
@@ -736,11 +940,11 @@ const SavePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
                   </View>
 
                   <View style={{width: 5}} />
-                  <View style={{width: 60}}>
+                  <View style={{width: 90}}>
                     <Text style={styles.table_head_captions}>Unit Price </Text>
                   </View>
                   <View style={{width: 5}} />
-                  <View style={{width: 60}}>
+                  <View style={{width: 90}}>
                     <Text style={styles.table_head_captions}>GST %</Text>
                   </View>
 
@@ -759,12 +963,12 @@ const SavePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
                   </View>
                 </View>
 
-                {rows.length > 0 &&
+                {/* {rows.length > 0 &&
                   rows.map((row, index) => {
                     return (
                       <View key={index} style={styles.table_body_single_row}>
                         <View style={{width: 60}}>
-                          <Text style={styles.table_data}>{row.itemQty}</Text>
+                          <Text style={styles.table_data}>{(row.itemQty).toFixed(2)}</Text>
                         </View>
                         <View style={{width: 10}} />
 
@@ -782,12 +986,12 @@ const SavePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
 
                         <View style={{width: 5}} />
                         <View style={{width: 60}}>
-                          <Text style={styles.table_data}>{row.price}</Text>
+                          <Text style={styles.table_data}>{(row.price).toFixed(2)}</Text>
                         </View>
                         <View style={{width: 5}} />
                         <View style={{width: 60}}>
                           <Text style={styles.table_data}>
-                            {(row.gstAmount * 100) / row.amount}
+                            {row.pml_gst || 0}
                           </Text>
                         </View>
 
@@ -798,29 +1002,129 @@ const SavePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
 
                         <View style={{width: 5}} />
                         <View style={{width: 60}}>
-                          <Text style={styles.table_data}>{row.gstAmount}</Text>
+                          <Text style={styles.table_data}>{(row.gstAmount).toFixed(2)}</Text>
                         </View>
 
                         <View style={{width: 5}} />
                         <View style={{width: 60}}>
                           <Text style={styles.table_data}>
-                            {Number(row.amount) + Number(row.gstAmount)}
+                            {(Number(row.amount) + Number(row.gstAmount)).toFixed(2)}
                           </Text>
                         </View>
                       </View>
                     );
-                  })}
+                  })
+                  } */}
+                {rows.length > 0 &&
+                  rows.map((row, index) => (
+                    <View key={index} style={styles.table_body_single_row}>
+                      <View style={{width: 90}}>
+                        <TextInput
+                          style={styles.table_data}
+                          keyboardType="numeric"
+                          value={row.itemQty.toString()}
+                          onChangeText={value => {
+                            const updatedRows = [...rows];
+                            updatedRows[index].itemQty = parseFloat(value) || 0;
+                            const amount =
+                              updatedRows[index].itemQty *
+                              updatedRows[index].price;
+                            updatedRows[index].amount = amount.toFixed(2);
+                            const gstAmount =
+                              (amount * updatedRows[index].gstper) / 100;
+                            updatedRows[index].gstAmount = gstAmount.toFixed(2);
+                            setRows(updatedRows);
+                          }}
+                        />
+                      </View>
+
+                      <View style={{width: 10}} />
+
+                      <View style={{width: 100}}>
+                        {selectedradiooption1 === 'Style (FG)' && (
+                          <Text style={styles.table_data}>{row.styleName}</Text>
+                        )}
+                      </View>
+
+                      <View style={{width: 100}}>
+                        <Text style={styles.table_data}>{row.itemdesc}</Text>
+                      </View>
+
+                      <View style={{width: 5}} />
+
+                      <View style={{width: 90}}>
+                        <TextInput
+                          style={styles.table_data}
+                          keyboardType="numeric"
+                          value={row.price.toString()}
+                          onChangeText={value => {
+                            const updatedRows = [...rows];
+                            updatedRows[index].price = parseFloat(value) || 0;
+                            const amount =
+                              updatedRows[index].itemQty *
+                              updatedRows[index].price;
+                            updatedRows[index].amount = amount.toFixed(2);
+                            const gstAmount =
+                              (amount * updatedRows[index].gstper) / 100;
+                            updatedRows[index].gstAmount = gstAmount.toFixed(2);
+                            setRows(updatedRows);
+                          }}
+                        />
+                      </View>
+
+                      <View style={{width: 5}} />
+
+                      <View style={{width: 90}}>
+                        <TextInput
+                          style={styles.table_data}
+                          keyboardType="numeric"
+                          value={row.gstper.toString()}
+                          onChangeText={value => {
+                            const updatedRows = [...rows];
+                            updatedRows[index].gstper = parseFloat(value) || 0;
+                            const amount =
+                              updatedRows[index].itemQty *
+                              updatedRows[index].price;
+                            updatedRows[index].amount = amount.toFixed(2);
+                            const gstAmount =
+                              (amount * updatedRows[index].gstper) / 100;
+                            updatedRows[index].gstAmount = gstAmount.toFixed(2);
+                            setRows(updatedRows);
+                          }}
+                        />
+                      </View>
+
+                      <View style={{width: 5}} />
+                      <View style={{width: 60}}>
+                        <Text style={styles.table_data}>{row.amount}</Text>
+                      </View>
+
+                      <View style={{width: 5}} />
+                      <View style={{width: 60}}>
+                        <Text style={styles.table_data}>{row.gstAmount}</Text>
+                      </View>
+
+                      <View style={{width: 5}} />
+                      <View style={{width: 60}}>
+                        <Text style={styles.table_data}>
+                          {(
+                            parseFloat(row.amount) + parseFloat(row.gstAmount)
+                          ).toFixed(2)}
+                        </Text>
+                      </View>
+                    </View>
+                  ))}
 
                 <View
                   style={[styles.table_body_single_row, {paddingVertical: 12}]}>
-                  <View style={{width: 60}}></View>
+                  <View style={{width: 90}}></View>
                   <View style={{width: 10}} />
                   <View style={{width: 100}}></View>
                   <View style={{width: 100}}></View>
                   <View style={{width: 5}} />
-                  <View style={{width: 60}}></View>
+                  <View style={{width: 90}}></View>
                   <View style={{width: 5}} />
-                  <View style={{width: 60}}></View>
+                  <View style={{width: 90}}></View>
                   <View style={{width: 5}} />
                   <View style={{width: 60}}>
                     <Text style={styles.table_data}>
@@ -843,14 +1147,14 @@ const SavePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
 
                 <View
                   style={[styles.table_body_single_row, {paddingVertical: 12}]}>
-                  <View style={{width: 60}}></View>
+                  <View style={{width: 90}}></View>
                   <View style={{width: 10}} />
                   <View style={{width: 100}}></View>
                   <View style={{width: 100}}></View>
                   <View style={{width: 5}} />
-                  <View style={{width: 60}}></View>
+                  <View style={{width: 90}}></View>
                   <View style={{width: 5}} />
-                  <View style={{width: 60}}></View>
+                  <View style={{width: 90}}></View>
                   <View style={{width: 5}} />
                   <View style={{width: 60}}></View>
                   <View style={{width: 5}} />

@@ -15,12 +15,14 @@ const SavePurchaseOrderDraft = ({navigation, route, ...props}) => {
   const [popUpRBtnTitle, set_popUpRBtnTitle] = useState(undefined);
   const [isPopupLeft, set_isPopupLeft] = useState(false);
   const [fptid, set_fptid] = useState(0);
+  const [poPrefix, set_poPrefix] = useState('');
 
   React.useEffect(() => {
     if (route.params) {
       if (route.params?.item) {
         console.log('Route Params ===> ', route.params?.item);
         getInitialData(route.params?.item?.poNumber);
+        set_poPrefix(route.params?.item?.poNumberWithPrefix);
       }
     }
   }, [route.params]);
@@ -42,7 +44,6 @@ const SavePurchaseOrderDraft = ({navigation, route, ...props}) => {
       company: JSON.parse(companyObj),
       menuId: 145,
       poNumber: id,
-      // poNumber: 471,
     };
     console.log("poNumber   ===> ", id)
     let EditFabricProcessInObj =
@@ -89,16 +90,15 @@ const SavePurchaseOrderDraft = ({navigation, route, ...props}) => {
     popUpAction(undefined, undefined, '', false, false);
   };
 
-  const submitAction = async (remarks) => {
+  const submitAction = async (tempObj) => {
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
     let companyObj = await AsyncStorage.getItem('companyObj');
-    const tempObj = itemsObj;
-    tempObj.notes = remarks;
     tempObj.userName = userName;
     tempObj.userPwd = userPsd;
     tempObj.compIds = usercompanyId;
+    tempObj.poNumberWithPrefix = poPrefix;
     tempObj.company = JSON.parse(companyObj);
 
     console.log('saving obj ==>', tempObj);
