@@ -46,6 +46,9 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
   const [documents, setDocuments] = useState([]);
   const [loadMedia, setLoadMedia] = useState([]);
   const [uploadedMediaFiles, setUploadedMediaFiles] = useState([]);
+  const [selectedIdxs, setSelectedIdxs] = useState([]);
+  const [selectAllCheckBox, setSelectAllCheckBox] = useState(false);
+  
 
   const {colors} = useContext(ColorContext);
   const styles = getStyles(colors);
@@ -164,6 +167,9 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
       itemStr:
         '295#100.0#1#477#Fabric##0.0##0#10.0000#0#App#0#0#0#0#5#1000.00#50.00#0#0.00#0##0#0,',
     };
+
+    console.log("submit temp obj ===> ", obj)
+    return;
     props.submitAction(obj);
   };
 
@@ -585,6 +591,25 @@ const handleupload = async () => {
     props.uploadMedia(formData);
   };
 
+    const updateAllIndexes = () => {
+    setSelectedIdxs(
+      selectAllCheckBox ? [] : rows.map((_, index) => index),
+    );
+    setSelectAllCheckBox(!selectAllCheckBox);
+  };
+
+  const toggleSelection = item => {
+    setSelectedIdxs(prevSelected => {
+      const exists = prevSelected.some(index => index === item);
+
+      if (exists) {
+        return prevSelected.filter(i => i !== item);
+      } else {
+        return [...prevSelected, item];
+      }
+    });
+  };
+
   const removeUploadedMedia = indexToRemove => {
     setUploadedMediaFiles(prev => prev.filter((_, i) => i !== indexToRemove));
   };
@@ -662,8 +687,8 @@ const handleupload = async () => {
                         },
                       ]}>
                       <CustomCheckBox
-                        isChecked={selectCheckboxes}
-                        onToggle={() => set_selectCheckboxes(!selectCheckboxes)}
+                         isChecked={selectAllCheckBox}
+                    onToggle={updateAllIndexes}
                       />
                     </View>
                   </View>
@@ -721,9 +746,8 @@ const handleupload = async () => {
                           },
                         ]}>
                         <CustomCheckBox
-                          isChecked={false}
-                          // isChecked={selectedIdxs.includes(index)}
-                          onToggle={() => console.log(index)}
+                          isChecked={selectedIdxs.includes(index)}
+                          onToggle={() => toggleSelection(index)}
                         />
                       </View>
                     </View>

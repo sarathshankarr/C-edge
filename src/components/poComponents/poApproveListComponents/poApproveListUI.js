@@ -256,7 +256,7 @@ const POApproveUI = ({route, ...props}) => {
                 alignItems: 'center',
                 gap: 8,
               }}>
-              <TouchableOpacity onPress={() => handlePdf(item)}>
+             {item.approvalStatus ==="Approved" && <TouchableOpacity onPress={() => handlePdf(item)}>
                 <Image
                   style={{
                     width: 15,
@@ -265,7 +265,7 @@ const POApproveUI = ({route, ...props}) => {
                   }}
                   source={require('./../../../../assets/images/png/pdf2.png')}
                 />
-              </TouchableOpacity>
+              </TouchableOpacity>}
 
               <TouchableOpacity onPress={() => handleExcel(item)}>
                 <Image

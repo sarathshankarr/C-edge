@@ -38,6 +38,7 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
   const [selectedradiooption1, setSelectedradiooption1] = useState('StyleWise');
   const [selectedradiooption2, setSelectedradiooption2] = useState('RM');
   const [totalQty, setTotalQty] = useState(false);
+  const [remarks, set_remarks] = useState('');
   const {colors} = useContext(ColorContext);
 
   const styles = getStyles(colors);
@@ -98,6 +99,11 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
       // console.log('styleTrimfab ==> ', props.modalLists.styleTrimfab.length);
     }
   }, [props.modalLists]);
+
+  useEffect(() => {
+    console.log('setting data ===> ', new Date());
+    handleConfirm(new Date(), 1);
+  }, []);
 
   // Process
   // Vendor state variables
@@ -217,50 +223,57 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
   };
 
   const submitAction = async () => {
-
-
     let usercompanyId = await AsyncStorage.getItem('companyId');
 
-    if(!vendorId){
-      Alert.alert("Alert ", "Please Select Vendor");
+    if (!vendorId) {
+      Alert.alert('Alert ', 'Please Select Vendor');
       return;
     }
-    if(!deliveryDate){
-      Alert.alert("Alert ", "Please Select Delivery Date");
+    if (!deliveryDate) {
+      Alert.alert('Alert ', 'Please Select Delivery Date');
       return;
     }
-    if(rows.length<1){
-      Alert.alert("Alert ", "Please add RM/Fabric/Trim Fabric to continue..");
+    if (rows.length < 1) {
+      Alert.alert('Alert ', 'Please add RM/Fabric/Trim Fabric to continue..');
       return;
     }
-    if(!shipLocationId || ! shipToId || !orderDate){
-      Alert.alert("Alert ", "Please fill all Mandaory fields");
-      return;
-    }
+    // if (!shipLocationId || !shipToId || !orderDate) {
+    //   Alert.alert('Alert ', 'Please fill all Mandaory fields');
+    //   return;
+    // }
     for (let i = 0; i < rows.length; i++) {
-    const item = rows[i];
-    if (!item.input_Qty || parseFloat(item.input_Qty) <= 0) {
-      Alert.alert("Alert", `Please enter valid quantity for item ${item.styleNameALL || i + 1}`);
-      return;
+      const item = rows[i];
+      if (!item.input_Qty || parseFloat(item.input_Qty) <= 0) {
+        Alert.alert(
+          'Alert',
+          `Please enter valid quantity for item ${item.styleNameALL || i + 1}`,
+        );
+        return;
+      }
+      if (!item.input_UnitPrice || parseFloat(item.input_UnitPrice) <= 0) {
+        Alert.alert(
+          'Alert',
+          `Please enter valid price for item ${item.styleNameALL || i + 1}`,
+        );
+        return;
+      }
     }
-    if (!item.input_UnitPrice || parseFloat(item.input_UnitPrice) <= 0) {
-      Alert.alert("Alert", `Please enter valid price for item ${item.styleNameALL || i + 1}`);
-      return;
-    }
-  }
 
     const checkedData = [];
     rows.forEach((item, index) => {
+      const netAmount =
+        Number(item.input_Qty || 0) * Number(item.input_UnitPrice || 0);
+      const gstAmount = (netAmount * Number(item.input_Gst || 0)) / 100;
       const tempObj = {
-        itemId: 0,
+        itemId: item.trimTypeId,
         itemQty: item.input_Qty,
-        itemTrimsType: selectedradiooption2 ,
+        itemTrimsType: selectedradiooption2,
         itemdesc: item.trimName,
         sizeCapacity: '',
         gsCode: '',
-        gstAmount:item.input_Gst,
+        gstAmount: gstAmount,
         price: item.input_UnitPrice,
-        pml_gst: item.input_Gst,
+        gstper: item.input_Gst,
         uom: item.uomTypeDescription,
         discountAmount: 0,
         styleId: 0,
@@ -279,6 +292,9 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
       };
       checkedData.push(tempObj);
     });
+    let companyObj = await AsyncStorage.getItem('companyObj');
+    const objj = JSON.parse(companyObj);
+    console.log('companyObj po suf ==> ', objj.posuffix);
 
     const tempObj = {
       deliveryDate: formatDateIntoDMY(deliveryDate),
@@ -291,7 +307,7 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
       shipextDate: '',
       completionDate: '',
       availDate: '',
-      notes: '',
+      notes: remarks,
       codeType: '',
       contactId: 0,
       cf_gst: 0,
@@ -301,8 +317,8 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
       additional_cost: 0,
       costfoc: 0,
       hsn: '0',
-      companySymbol: '',
-      suffix: '',
+      companySymbol: objj.companySymbol,
+      suffix: objj.posuffix,
       qtys: 0,
       poNumber: 0,
       posave: 2,
@@ -329,7 +345,8 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
       styleOrBuyerpo: 0,
       lineItemsSet: checkedData,
     };
-
+    console.log('sub obj ===> ', tempObj);
+    // return;
 
     props.submitAction(tempObj);
   };
@@ -338,14 +355,17 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
     setRows(prev => prev.filter((_, index) => index !== id));
   };
 
-  const handleConfirm = date => {
+  const handleConfirm = (date, initial = 0) => {
     const extractedDate = date.toISOString().split('T')[0];
     const formattedDate = formatDateIntoDMY(extractedDate);
-
-    if (activeField === 'deliveryDate') {
-      setDeliveryDate(formattedDate);
-    } else if (activeField === 'orderDate') {
+    if (initial === 1) {
       setOrderDate(formattedDate);
+    } else {
+      if (activeField === 'deliveryDate') {
+        setDeliveryDate(formattedDate);
+      } else if (activeField === 'orderDate') {
+        setOrderDate(formattedDate);
+      }
     }
     hideDatePicker();
   };
@@ -545,7 +565,7 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
   );
   const totalTotalAmount = totalNetAmount + totalGstAmount;
 
-     function formatDateIntoDMY(inp) {
+  function formatDateIntoDMY(inp) {
     const [y, m, d] = inp.split('-');
     let ans = [d, m, y];
     ans = ans.join('-');
@@ -1593,6 +1613,52 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
               </View>
             </View>
           </Modal>
+
+          {/* <View
+            style={{
+              paddingHorizontal: 10,
+              marginTop: 10,
+              marginBottom: 30,
+              width: '90%',
+            }}> */}
+          <Text
+            style={[
+              CommonStyles.tylesHeaderTextStyle,
+              {
+                alignItems: 'center',
+                marginLeft: 10,
+                marginTop: 20,
+
+                // backgroundColor: 'white',
+              },
+            ]}>
+            {'Notes / Comments  '}
+          </Text>
+
+          <View
+            style={{
+              borderWidth: 1,
+              borderColor: 'black',
+              marginHorizontal: 10,
+              marginTop: 15,
+              // borderRadius: 10,
+              backgroundColor: 'white',
+            }}>
+            <TextInput
+              placeholder="Notes / Comments"
+              autoCapitalize="none"
+              multiline
+              numberOfLines={3}
+              value={remarks}
+              onChangeText={text => set_remarks(text)}
+              style={[
+                {color: 'black', backgroundColor: 'white'},
+                Platform.OS === 'ios' && {paddingVertical: 20},
+              ]}
+            />
+          </View>
+
+          {/* </View> */}
         </View>
       </KeyboardAwareScrollView>
 

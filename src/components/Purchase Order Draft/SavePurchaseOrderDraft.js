@@ -44,6 +44,7 @@ const SavePurchaseOrderDraft = ({navigation, route, ...props}) => {
       poNumber: id,
       // poNumber: 471,
     };
+    console.log("poNumber   ===> ", id)
     let EditFabricProcessInObj =
       await APIServiceCall.getEditDetailsPurchaseOrderDraft(obj);
     set_isLoading(false);
