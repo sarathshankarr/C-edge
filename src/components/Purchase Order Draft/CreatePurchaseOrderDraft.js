@@ -330,10 +330,8 @@ const CreatePurchaseOrderDraft = ({route}) => {
     let companyObj = await AsyncStorage.getItem('companyObj');
 
     tempObj.menuId = 145;
-    // tempObj.vendorId = 0;
     tempObj.userName = userName;
     tempObj.userPwd = userPsd;
-    // tempObj.checkedData = checkedData;
     tempObj.compIds = usercompanyId;
     tempObj.company = JSON.parse(companyObj);
 

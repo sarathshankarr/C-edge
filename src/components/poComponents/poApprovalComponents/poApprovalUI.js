@@ -36,6 +36,7 @@ const POApprovalUI = ({route, ...props}) => {
   const [uploadedMediaFiles, setUploadedMediaFiles] = useState([]);
   const [loadMedia, setLoadMedia] = useState([]);
   const [showApporve, setShowApprove] = useState(true);
+  const [poNumber, setPoNumber] = useState('');
 
   const backBtnAction = () => {
     props.backBtnAction();
@@ -59,6 +60,7 @@ const POApprovalUI = ({route, ...props}) => {
 
   useEffect(() => {
     if (props.itemsObj) {
+      console.log('po ===> ', props.itemsObj);
       if (props?.itemsObj?.poFiles) {
         const filenames = props.itemsObj.poFiles.replace(/,+$/, '').split(',');
 
@@ -75,6 +77,10 @@ const POApprovalUI = ({route, ...props}) => {
         setLoadMedia(result);
       }
 
+      if (props.itemsObj.poNumberWithPrefix) {
+        // console.log('apporval ===> ', props.itemsObj.poNumberWithPrefix);
+        setPoNumber(props.itemsObj.poNumberWithPrefix);
+      }
       if (props.itemsObj.approval) {
         console.log('apporval ===> ', props.itemsObj.approval);
         setShowApprove(props.itemsObj.approval === 0 ? true : false);
@@ -520,6 +526,29 @@ const POApprovalUI = ({route, ...props}) => {
         style={{backgroundColor: 'white'}}>
         <View style={{flex: 1, alignItems: 'center', width: '100%'}}>
           <View style={CommonStyles.headerStyle}>
+            {/* <View style={{marginTop: hp('2%')}}>
+              <Text
+                style={{textAlign: 'left', fontWeight: '700', color: '#000'}}>
+                {'PO# : '}
+              </Text>
+              <Text
+                style={{fontWeight: '400', color: 'black', textAlign: 'left'}}>
+                {poNumber || ''}
+              </Text>
+            </View> */}
+            <View
+              style={{
+                marginTop: hp('2%'),
+                marginBottom: hp('2%'),
+                flexDirection: 'row',
+                alignItems: 'center',
+              }}>
+              <Text style={{fontWeight: '700', color: '#000'}}>{'PO# : '}</Text>
+              <Text style={{fontWeight: '400', color: 'black'}}>
+                {poNumber || ''}
+              </Text>
+            </View>
+
             <View
               style={{
                 flexDirection: 'row',

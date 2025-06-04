@@ -430,7 +430,7 @@ const POApproveListComponent = ({navigation, route, ...props}) => {
   };
 
   const handleExcel = async po => {
-    set_isLoading(true);
+    set_MainLoading(true);
     console.log('handleExcel');
 
     const userName = await AsyncStorage.getItem('userName');
@@ -510,7 +510,7 @@ const POApproveListComponent = ({navigation, route, ...props}) => {
         false,
       );
     } finally {
-      set_isLoading(false);
+      set_MainLoading(false);
     }
   };
 
@@ -519,7 +519,7 @@ const POApproveListComponent = ({navigation, route, ...props}) => {
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
     let companyObj = await AsyncStorage.getItem('companyObj');
-    set_isLoading(true);
+    set_MainLoading(true);
 
     let obj = {
       poNumber: po.poNumber,
@@ -533,10 +533,11 @@ const POApproveListComponent = ({navigation, route, ...props}) => {
     if (po.rmFabric === 'FG') {
       apiUrl = await APIServiceCall.downloadPoPdfFg();
     } else if (companyObj.popdf === 4) {
-      apiUrl = await APIServiceCall.downloadPoPdf1();
-    } else {
       apiUrl = await APIServiceCall.downloadPoPdfgeneratePdf();
+    } else {
+      apiUrl = await APIServiceCall.downloadPoPdf1();
     }
+    console.log("apiUrl =====> ", apiUrl,obj );
 
     try {
       const response = await axios.post(apiUrl, obj, {
@@ -612,7 +613,7 @@ const POApproveListComponent = ({navigation, route, ...props}) => {
         false,
       );
     } finally {
-      set_isLoading(false);
+      set_MainLoading(false);
     }
   };
 
