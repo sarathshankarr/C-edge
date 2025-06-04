@@ -202,7 +202,7 @@ const SavePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
   };
 
   const submitAction = async () => {
-    props.submitAction();
+    props.submitAction(remarks);
   };
 
   const handleRemoveRow = id => {
@@ -695,8 +695,8 @@ const SavePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
               mode="outlined"
               numberOfLines={3}
               multiline
-              editable={false}
-              onChangeText={text => console.log(text)}
+              editable={true}
+              onChangeText={text => setRemarks(text)}
             />
           </View>
 
