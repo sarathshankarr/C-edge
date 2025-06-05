@@ -101,8 +101,8 @@ const SavePurchaseOrderDraft = ({navigation, route, ...props}) => {
     tempObj.poNumberWithPrefix = poPrefix;
     tempObj.company = JSON.parse(companyObj);
 
-    console.log('saving obj ==>', tempObj);
-
+    console.log('edit saving obj ==>', tempObj);
+// return;
     set_isLoading(true);
 
     let SAVEAPIObj = await APIServiceCall.saveCreatePODraft(tempObj);
