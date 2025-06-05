@@ -39,6 +39,7 @@ const SavePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
   const [selectedradiooption2, setSelectedradiooption2] = useState('RM');
   const [totalObj, set_totalObj] = useState('');
   const [poNumber, set_poNumber] = useState(0);
+  const [yearwiseId, set_yearwiseId] = useState(0);
 
   const [remarks, setRemarks] = useState('');
   const {colors} = useContext(ColorContext);
@@ -119,6 +120,10 @@ const SavePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
       }
       if (props.itemsObj.poNumber) {
         set_poNumber(props.itemsObj.poNumber || '');
+      }
+      if (props.itemsObj.yearwiseId) {
+        set_yearwiseId(props.itemsObj.yearwiseId || '');
+        console.log("yearwise setting ===> ", props.itemsObj.yearwiseId)
       }
 
     }
@@ -341,7 +346,7 @@ const SavePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
       ac_hsn: 0,
       cf_hsn: '0',
       financialYear: 0,
-      yearwiseId: 0,
+      yearwiseId: yearwiseId,
       termofpayment: '',
       otherReference: '',
       destination: '',
