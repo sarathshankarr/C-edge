@@ -222,7 +222,7 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
     props.backBtnAction();
   };
 
-  const submitAction = async () => {
+  const submitAction = async (draft) => {
     let usercompanyId = await AsyncStorage.getItem('companyId');
 
     if (!vendorId) {
@@ -341,7 +341,7 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
       suffix: objj.posuffix,
       qtys: 0,
       poNumber: 0,
-      posave: 2,
+      posave: draft ? 2 : 1,
       p_conv_rate: 0.0,
       pocancel: '',
       tc_gst: 0,
@@ -372,7 +372,7 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
       gst_prct: '0',
       totalDiscountAmount: '0',
     };
-    // console.log('sub obj ===> ', tempObj);
+    // console.log('sub obj  po save ===> ', tempObj.posave);
     // return;
 
     props.submitAction(tempObj);
@@ -1685,6 +1685,14 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
             />
           </View>
 
+           <TouchableOpacity
+            style={styles.searchButton}
+            onPress={()=> submitAction(true)}>
+            <Text style={styles.searchbuttonText}>
+              Save as Draft
+            </Text>
+          </TouchableOpacity>
+
           {/* </View> */}
         </View>
       </KeyboardAwareScrollView>
@@ -1696,7 +1704,7 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
           isLeftBtnEnable={true}
           rigthBtnState={true}
           isRightBtnEnable={true}
-          rightButtonAction={async () => submitAction()}
+          rightButtonAction={async () => submitAction(false)}
           leftButtonAction={async () => backAction()}
         />
       </View>
@@ -1876,7 +1884,8 @@ const getStyles = colors =>
       alignSelf: 'center',
       alignItems: 'center',
       justifyContent: 'center',
-      padding: 10,
+      paddingHorizontal: 5,
+      paddingVertical: 15,
       borderWidth: 0.5,
       borderColor: '#D8D8D8',
       borderRadius: hp('0.5%'),

@@ -337,7 +337,7 @@ const SavePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
       suffix: objj.posuffix,
       qtys: 0,
       poNumber: poNumber,
-      posave: 2,
+      posave: 1,
       p_conv_rate: 0.0,
       pocancel: '',
       tc_gst: 0,
