@@ -121,12 +121,12 @@ const CreatePurchaseOrderDraft = ({route}) => {
           }));
         }
         if (LISTAPIOBJ?.responseData?.styleMap) {
-          const styleMapList = Object.keys(LISTAPIOBJ.responseData.styleMap).map(
-            key => ({
-              id: key,
-              name: LISTAPIOBJ.responseData.styleMap[key],
-            }),
-          );
+          const styleMapList = Object.keys(
+            LISTAPIOBJ.responseData.styleMap,
+          ).map(key => ({
+            id: key,
+            name: LISTAPIOBJ.responseData.styleMap[key],
+          }));
           styleMapList.reverse();
           set_lists(prevLists => ({
             ...prevLists,
@@ -155,12 +155,12 @@ const CreatePurchaseOrderDraft = ({route}) => {
     }
   };
   const getModalStyleFgList = async () => {
+    set_isLoading(true);
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
     let companyObj = await AsyncStorage.getItem('companyObj');
 
-    set_isLoading(true);
     let obj = {
       fromRecord: 0,
       userName: userName,
@@ -171,7 +171,7 @@ const CreatePurchaseOrderDraft = ({route}) => {
       compIds: usercompanyId,
       company: JSON.parse(companyObj),
     };
-    console.log('modal lsit ===>  req body ===> ', obj);
+    // console.log('modal lsit ===>  req body ===> ', obj);
 
     let LISTAPIOBJ = await APIServiceCall.getPODStyeleFogDetails(obj);
     set_isLoading(false);
@@ -204,6 +204,57 @@ const CreatePurchaseOrderDraft = ({route}) => {
       );
     }
   };
+
+  const getModalPrices = async (itemObj) => {
+    set_isLoading(true);
+    let userName = await AsyncStorage.getItem('userName');
+    let userPsd = await AsyncStorage.getItem('userPsd');
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
+
+    let obj = {
+      userName: userName,
+      userPwd: userPsd,
+      menuId: 247,
+      compIds: usercompanyId,
+      company: JSON.parse(companyObj),
+      itemTrimsType: itemObj.type,
+      itemStr: itemObj.type==="TRIMFABRIC" ? itemObj.type : '',
+      itemId: itemObj.id,
+    };
+
+
+    // console.log("req body for prices  ==> ", obj)
+
+    let LISTAPIOBJ = await APIServiceCall.getPODModalPricesList(obj);
+    set_isLoading(false);
+
+    if (LISTAPIOBJ && LISTAPIOBJ.statusData) {
+      if (LISTAPIOBJ && LISTAPIOBJ.responseData) {
+        //  console.log("modal prices lsit ===> ",  LISTAPIOBJ.responseData)
+        return LISTAPIOBJ;
+      }
+    } else {
+      popUpAction(
+        Constant.SERVICE_FAIL_MSG,
+        Constant.DefaultAlert_MSG,
+        'OK',
+        true,
+        false,
+      );
+    }
+
+    if (LISTAPIOBJ && LISTAPIOBJ.error) {
+      popUpAction(
+        Constant.SERVICE_FAIL_MSG,
+        Constant.DefaultAlert_MSG,
+        'OK',
+        true,
+        false,
+      );
+    }
+  };
+
   const getModalLists = async id => {
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
@@ -387,6 +438,7 @@ const CreatePurchaseOrderDraft = ({route}) => {
       lists={lists}
       modalLists={modalLists}
       getModalLists={getModalLists}
+      getModalPrices={getModalPrices}
       getModalStyleFgList={getModalStyleFgList}
       submitAction={submitAction}
       backBtnAction={backBtnAction}
