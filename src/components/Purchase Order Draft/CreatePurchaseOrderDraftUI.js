@@ -11,6 +11,7 @@ import {
   Alert,
   Modal,
   TouchableWithoutFeedback,
+  ActivityIndicator,
 } from 'react-native';
 import {
   heightPercentageToDP as hp,
@@ -40,6 +41,12 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
   const [totalQty, setTotalQty] = useState(false);
   const [remarks, set_remarks] = useState('');
   const {colors} = useContext(ColorContext);
+  const [cachedModalLists, setCachedModalLists] = useState({
+    StyleFg: [],
+    RM: [],
+    Fabric: [],
+    TrimFabricRM: [],
+  });
 
   const styles = getStyles(colors);
 
@@ -73,30 +80,61 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
     }
   }, [props.lists]);
 
+  // useEffect(() => {
+  //   // props.set_isLoading(true);
+  //   if (props.modalLists) {
+  //     if (props.modalLists.StyleFg && selectedradiooption1 === 'Style (FG)') {
+  //       setModalLists(props.modalLists.StyleFg);
+  //     }
+  //     if (
+  //       props.modalLists.styleTrimfab &&
+  //       selectedradiooption2 === 'Trim Fabric(RM)'
+  //     ) {
+  //       setModalLists(props.modalLists.styleTrimfab);
+  //     }
+  //     if (props.modalLists.styleRm && selectedradiooption2 === 'RM') {
+  //       setModalLists(props.modalLists.styleRm);
+  //     }
+  //     if (props.modalLists.styleFab && selectedradiooption2 === 'Fabric') {
+  //       setModalLists(props.modalLists.styleFab);
+  //     }
+  //   }
+  //   // props.set_isLoading(false);
+  // }, [props.modalLists]);
+
   useEffect(() => {
     if (props.modalLists) {
-      if (props.modalLists.StyleFg && selectedradiooption1 === 'Style (FG)') {
+      if (selectedradiooption1 === 'Style (FG)' && props.modalLists.StyleFg) {
         setModalLists(props.modalLists.StyleFg);
+        setCachedModalLists(prev => ({
+          ...prev,
+          StyleFg: props.modalLists.StyleFg,
+        }));
       }
+
       if (
-        props.modalLists.styleTrimfab &&
-        selectedradiooption2 === 'Trim Fabric(RM)'
+        selectedradiooption2 === 'Trim Fabric(RM)' &&
+        props.modalLists.styleTrimfab
       ) {
         setModalLists(props.modalLists.styleTrimfab);
+        setCachedModalLists(prev => ({
+          ...prev,
+          TrimFabricRM: props.modalLists.styleTrimfab,
+        }));
       }
-      if (props.modalLists.styleRm && selectedradiooption2 === 'RM') {
+
+      if (selectedradiooption2 === 'RM' && props.modalLists.styleRm) {
         setModalLists(props.modalLists.styleRm);
+        setCachedModalLists(prev => ({...prev, RM: props.modalLists.styleRm}));
       }
-      if (props.modalLists.styleFab && selectedradiooption2 === 'Fabric') {
+
+      if (selectedradiooption2 === 'Fabric' && props.modalLists.styleFab) {
         setModalLists(props.modalLists.styleFab);
+        setCachedModalLists(prev => ({
+          ...prev,
+          Fabric: props.modalLists.styleFab,
+        }));
       }
-
-      // console.log('LIst ==> ', props.modalLists.styleFab);
-
-      // console.log('StyleFg ==> ', props.modalLists.StyleFg.length);
-      // console.log('styleRm ==> ', props.modalLists.styleRm.length);
-      // console.log('styleFab ==> ', props.modalLists.styleFab.length);
-      // console.log('styleTrimfab ==> ', props.modalLists.styleTrimfab.length);
     }
   }, [props.modalLists]);
 
@@ -509,10 +547,93 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
     return false;
   });
 
-  const handleSelectFromModal = () => {
+  // const handleSelectFromModal = async () => {
+  //   setRows([]);
+  //   const list = selectedIdxs.map(index => {
+  //     const item = {...modalLists[index]};
+
+  //     if (
+  //       selectedradiooption1 === 'Style (FG)' &&
+  //       selectedradiooption2 === ''
+  //     ) {
+  //       item.styleNameALL = item.styleName || '';
+  //     } else if (selectedradiooption2 === 'RM') {
+  //       item.styleNameALL = item.trimName || '';
+  //     } else if (selectedradiooption2 === 'Fabric') {
+  //       item.styleNameALL = item.fabricNo || '';
+  //     } else if (selectedradiooption2 === 'Trim Fabric(RM)') {
+  //       item.styleNameALL = item.trimName || '';
+  //     }
+
+  //     item.input_UnitPrice = item.unitPrice || '';
+  //     item.input_Qty = '';
+  //     item.input_Gst = '';
+  //     item.input_NetAmount = '';
+  //     item.input_GstAmount = '';
+  //     item.input_TotalAmount = '';
+
+  //     return item;
+  //   });
+  //   const itemObj = {
+  //     type:
+  //       selectedradiooption2 === 'RM'
+  //         ? 'Trims'
+  //         : selectedradiooption2 === 'Fabric'
+  //         ? 'Fabric'
+  //         : 'TRIMFABRIC',
+  //     id:
+  //       selectedradiooption2 === 'RM'
+  //         ? list[0].trimTypeId
+  //         : selectedradiooption2 === 'Fabric'
+  //         ? list[0].fabricId
+  //         : list[0].trimconstruction_id,
+  //   };
+
+  //   await props.getModalPrices(itemObj);
+
+  //   console.log('Updated list ===>', list);
+  //   setRows(list);
+  //   setShowmodal(false);
+  // };
+
+  const handleSelectFromModal = async () => {
+    setShowmodal(false);
     setRows([]);
-    const list = selectedIdxs.map(index => {
+    props.set_isLoading(true);
+
+    const newList = [];
+
+    for (const index of selectedIdxs) {
       const item = {...modalLists[index]};
+      const itemObj = {
+        type:
+          selectedradiooption2 === 'RM'
+            ? 'Trims'
+            : selectedradiooption2 === 'Fabric'
+            ? 'Fabric'
+            : 'TRIMFABRIC',
+        id:
+          selectedradiooption2 === 'RM'
+            ? item.trimTypeId
+            : selectedradiooption2 === 'Fabric'
+            ? item.fabricId
+            : item.trimconstruction_id,
+      };
+
+      const priceData = await props.getModalPrices(itemObj);
+
+      let unitPrice = '';
+      if (
+        priceData &&
+        priceData.responseData &&
+        priceData.responseData.myArrayList
+      ) {
+        const mapData = priceData.responseData.myArrayList[0].map;
+        console.log('mapdata ===> ', mapData);
+        unitPrice = mapData?.Price ? (mapData?.Price).toString() : '0';
+      }
+
+      console.log('unit price set ===> ', unitPrice);
 
       if (
         selectedradiooption1 === 'Style (FG)' &&
@@ -527,26 +648,19 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
         item.styleNameALL = item.trimName || '';
       }
 
-      item.input_UnitPrice = item.unitPrice || '';
+      item.input_UnitPrice = unitPrice;
       item.input_Qty = '';
       item.input_Gst = '';
       item.input_NetAmount = '';
       item.input_GstAmount = '';
       item.input_TotalAmount = '';
 
-      return item;
-    });
+      newList.push(item);
+    }
 
-    // list.input_UnitPrice = '';
-    // list.input_Qty = '';
-    // list.input_Gst = '';
-    // list.input_NetAmount = '';
-    // list.input_GstAmount = '';
-    // list.input_TotalAmount = '';
-
-    console.log('Updated list ===>', list);
-    setRows(list);
-    setShowmodal(false);
+    setRows(newList);
+    // setShowmodal(false);
+    props.set_isLoading(false);
   };
 
   const updateAllIndexes = () => {
@@ -568,18 +682,50 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
     });
   };
 
+  // const handleOpenModal = () => {
+  //   if (selectedradiooption1 === 'Style (FG)') {
+  //     props.getModalStyleFgList();
+  //   } else {
+  //     if (selectedradiooption2 === 'RM') {
+  //       props.getModalLists(1);
+  //     } else if (selectedradiooption2 === 'Fabric') {
+  //       props.getModalLists(2);
+  //     } else {
+  //       props.getModalLists(3);
+  //     }
+  //   }
+  //   setShowmodal(!showModal);
+  // };
+
   const handleOpenModal = () => {
     if (selectedradiooption1 === 'Style (FG)') {
-      props.getModalStyleFgList();
+      if (cachedModalLists.StyleFg.length === 0) {
+        props.getModalStyleFgList();
+      } else {
+        setModalLists(cachedModalLists.StyleFg);
+      }
     } else {
       if (selectedradiooption2 === 'RM') {
-        props.getModalLists(1);
+        if (cachedModalLists.RM.length === 0) {
+          props.getModalLists(1);
+        } else {
+          setModalLists(cachedModalLists.RM);
+        }
       } else if (selectedradiooption2 === 'Fabric') {
-        props.getModalLists(2);
+        if (cachedModalLists.Fabric.length === 0) {
+          props.getModalLists(2);
+        } else {
+          setModalLists(cachedModalLists.Fabric);
+        }
       } else {
-        props.getModalLists(3);
+        if (cachedModalLists.TrimFabricRM.length === 0) {
+          props.getModalLists(3);
+        } else {
+          setModalLists(cachedModalLists.TrimFabricRM);
+        }
       }
     }
+
     setShowmodal(!showModal);
   };
 
@@ -1536,7 +1682,13 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
               </View>
 
               <View style={styles.companyModalListContainer}>
-                {filteredCompanyList.length === 0 ? (
+                {props.isLoading ? (
+                  <ActivityIndicator
+                    size="small"
+                    color="#000"
+                    style={{marginVertical: 20}}
+                  />
+                ) : filteredCompanyList.length === 0 ? (
                   <Text style={styles.companyModalNoResultsText}>
                     No results found
                   </Text>
