@@ -110,13 +110,12 @@ const SaveGoodsReceiptNote = ({navigation, route, ...props}) => {
     tempObj.compIds = usercompanyId;
     tempObj.companyLocationId = usercompanyId;
     tempObj.menuId = 145;
-
-    console.log('saving obj ==>', tempObj);
     tempObj.company = JSON.parse(companyObj);
+    console.log('saving obj ==>', tempObj);
 
     set_isLoading(true);
 
-    let SAVEAPIObj = await APIServiceCall.saveEditGoodsTransportReceipt(
+    let SAVEAPIObj = await APIServiceCall.saveEditGoodsReceiptNotes(
       tempObj,
     );
     set_isLoading(false);

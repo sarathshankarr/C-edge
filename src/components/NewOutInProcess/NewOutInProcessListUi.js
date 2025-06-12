@@ -95,25 +95,16 @@ const NewOutInProcessListUi = ({route, ...props}) => {
     props.handleNavigation();
   };
 
-  // const filterPets = (recName) => {
-
-  //   if (isKeyboard.current === true) {
-
-  //     set_recName(recName)
-  //     let nestedFilter = props.itemsArray;
-  //     const styleArray = nestedFilter.filter(style =>
-  //       style.designName?.toUpperCase().includes(recName.toUpperCase()) ||
-  //       style.designType?.toUpperCase().includes(recName.toUpperCase())
-  //     );
-
-  //     if (styleArray && styleArray.length > 0) {
-  //       set_filterArray(styleArray);
-  //     } else {
-  //       set_filterArray([]);
-  //     }
-  //   }
-
-  // };
+  const handleSendWhatsApp = item => {
+    props.sendWhatsApp(item);
+  };
+  const handlePdf = (item, type) => {
+    if (type === 'IN') {
+      props.handleInDcPdf(item);
+    } else {
+      props.handleOutDcPdf(item);
+    }
+  };
 
   const filterPets = name => {
     const searchTerm = name.toString().toLowerCase().trim();
@@ -259,21 +250,19 @@ const NewOutInProcessListUi = ({route, ...props}) => {
             }}>
             {/* OUT DC */}
             <TouchableOpacity
-              onPress={() => handlePdf1(item)}
+              onPress={() => handlePdf(item, "OUT")}
               style={{alignItems: 'center', flex: 1}}>
               <Image
                 source={require('./../../../assets/images/png/pdf2.png')}
                 style={{width: 18, height: 18, resizeMode: 'contain'}}
               />
-              <Text style={{fontSize: 8,  fontWeight: 'bold'}}>
-                OUT DC
-              </Text>
+              <Text style={{fontSize: 8, fontWeight: 'bold'}}>OUT DC</Text>
             </TouchableOpacity>
 
             {/* IN DC */}
             <TouchableOpacity
-              onPress={() => handlePdf2(item)}
-              style={{alignItems: 'center', flex: 1, marginRight:2}}>
+              onPress={() => handlePdf(item, "IN")}
+              style={{alignItems: 'center', flex: 1, marginRight: 2}}>
               <Image
                 source={require('./../../../assets/images/png/pdf2.png')}
                 style={{
@@ -283,9 +272,7 @@ const NewOutInProcessListUi = ({route, ...props}) => {
                   marginBottom: 2,
                 }}
               />
-              <Text style={{fontSize: 8,  fontWeight: 'bold'}}>
-                IN DC
-              </Text>
+              <Text style={{fontSize: 8, fontWeight: 'bold'}}>IN DC</Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => handleSendWhatsApp(item)}
@@ -299,7 +286,6 @@ const NewOutInProcessListUi = ({route, ...props}) => {
 
           {/* WhatsApp Icon */}
         </View>
-        
       </View>
     </TouchableOpacity>
   );

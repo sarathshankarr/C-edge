@@ -222,7 +222,7 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
     props.backBtnAction();
   };
 
-  const submitAction = async (draft) => {
+  const submitAction = async draft => {
     let usercompanyId = await AsyncStorage.getItem('companyId');
 
     if (!vendorId) {
@@ -312,10 +312,10 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
     const objj = JSON.parse(companyObj);
     console.log('companyObj po suf ==> ', objj.posuffix);
 
- const totalInputQty = rows.reduce(
-    (sum, item) => sum + parseFloat(item.input_Qty || 0),
-    0,
-  );
+    const totalInputQty = rows.reduce(
+      (sum, item) => sum + parseFloat(item.input_Qty || 0),
+      0,
+    );
     const tempObj = {
       deliveryDate: formatDateIntoDMY(deliveryDate),
       shiploc: shipLocationId,
@@ -367,7 +367,7 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
 
       totalQty: totalInputQty,
       subTotal: totalNetAmount,
-      totalPrice:totalNetAmount,
+      totalPrice: totalNetAmount,
       gstAmount: totalGstAmount,
       gst_prct: '0',
       totalDiscountAmount: '0',
@@ -527,17 +527,24 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
         item.styleNameALL = item.trimName || '';
       }
 
+      item.input_UnitPrice = item.unitPrice || '';
+      item.input_Qty = '';
+      item.input_Gst = '';
+      item.input_NetAmount = '';
+      item.input_GstAmount = '';
+      item.input_TotalAmount = '';
+
       return item;
     });
 
-    list.input_Qty = '';
-    list.input_UnitPrice = '';
-    list.input_Gst = '';
-    list.input_NetAmount = '';
-    list.input_GstAmount = '';
-    list.input_TotalAmount = '';
+    // list.input_UnitPrice = '';
+    // list.input_Qty = '';
+    // list.input_Gst = '';
+    // list.input_NetAmount = '';
+    // list.input_GstAmount = '';
+    // list.input_TotalAmount = '';
 
-    // console.log('Updated list ===>', list);
+    console.log('Updated list ===>', list);
     setRows(list);
     setShowmodal(false);
   };
@@ -1685,12 +1692,10 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
             />
           </View>
 
-           <TouchableOpacity
+          <TouchableOpacity
             style={styles.searchButton}
-            onPress={()=> submitAction(true)}>
-            <Text style={styles.searchbuttonText}>
-              Save as Draft
-            </Text>
+            onPress={() => submitAction(true)}>
+            <Text style={styles.searchbuttonText}>Save as Draft</Text>
           </TouchableOpacity>
 
           {/* </View> */}

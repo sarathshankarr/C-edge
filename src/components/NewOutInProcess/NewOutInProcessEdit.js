@@ -15,15 +15,15 @@ const NewOutInProcessEdit = ({ navigation, route, ...props }) => {
   const [popUpAlert, set_popUpAlert] = useState(undefined);
   const [popUpRBtnTitle, set_popUpRBtnTitle] = useState(undefined);
   const [isPopupLeft, set_isPopupLeft] = useState(false);
-  const [vendorId, set_vendorId]=useState('');
+  const [outprocessId, set_outprocessId]=useState('');
 
 
   React.useEffect(() => {
 
     if (route.params?.item) {
-      // getInitialData(route.params?.item.vendorId);
-      set_vendorId(route.params?.item.vendorId)
-      console.log("route.params?.item===========> ", route.params?.item.vendorId);
+      getInitialData(route.params?.item.outprocessId);
+      set_outprocessId(route.params?.item.outprocessId)
+      console.log("route.params?.item===========> ", route.params?.item);
     }
 
   }, [route.params]);
@@ -44,14 +44,14 @@ const NewOutInProcessEdit = ({ navigation, route, ...props }) => {
 
     set_isLoading(true);
     let obj = {
-      "vendor_id": id,
+      "outprocessId": id,
       "menuId":17,
       "username": userName,
       "password": userPsd,
       "compIds": usercompanyId,
       "company":JSON.parse(companyObj),
     }
-    let EditDDAAPIObj = await APIServiceCall.EditVendorMasters(obj);
+    let EditDDAAPIObj = await APIServiceCall.EditNewOutInProcess(obj);
     set_isLoading(false);
 
     if (EditDDAAPIObj && EditDDAAPIObj.statusData) {

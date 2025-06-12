@@ -175,51 +175,7 @@ const CreateNewOutInProcess = ({ route }) => {
 
   };
 
-  const ValidateVendorName = async (v_name) => {
-    let userName = await AsyncStorage.getItem('userName');
-    let userPsd = await AsyncStorage.getItem('userPsd');
-    let usercompanyId = await AsyncStorage.getItem('companyId');
-    let companyObj = await AsyncStorage.getItem('companyObj');
 
-    let Obj={
-    "username": userName,
-    "password": userPsd,
-    "vendor_name": v_name,
-    "compIds" : usercompanyId,
-    "company" :JSON.parse(companyObj),
-    }
-    set_isLoading(true);
-
-    let SAVEAPIObj = await APIServiceCall.validateVendorMastersName(Obj);
-    set_isLoading(false);
-
-    console.log("Sucess before returned obj ", SAVEAPIObj);
-
-    return SAVEAPIObj?.responseData;
-  };
-  const ValidateVendorCode= async () => {
-    let userName = await AsyncStorage.getItem('userName');
-    let userPsd = await AsyncStorage.getItem('userPsd');
-    let usercompanyId = await AsyncStorage.getItem('companyId');
-    let companyObj = await AsyncStorage.getItem('companyObj');
-
-    let Obj={
-     "vendor_code":82,
-    "username": userName,
-    "password": userPsd,
-    "compIds" : usercompanyId,
-    "company" :JSON.parse(companyObj),
-    }
-
-    set_isLoading(true);
-
-    let SAVEAPIObj = await APIServiceCall.validateVendorMastersCode(Obj);
-    set_isLoading(false);
-
-    console.log("Sucess before returned obj ", SAVEAPIObj);
-
-    return SAVEAPIObj?.responseData;
-  };
 
   return (
 
