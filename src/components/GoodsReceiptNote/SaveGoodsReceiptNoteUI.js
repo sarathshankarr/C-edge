@@ -36,6 +36,8 @@ let closeImg = require('./../../../assets/images/png/close1.png');
 
 const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
   const [po, setPo] = useState('');
+  const [data, setData] = useState('');
+  const [childData, setChildData] = useState([]);
   const [rows, setRows] = useState([]);
   const [date, setDate] = useState('');
   const [itemOrTrims, setItemOrTrims] = useState('');
@@ -48,7 +50,6 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
   const [uploadedMediaFiles, setUploadedMediaFiles] = useState([]);
   const [selectedIdxs, setSelectedIdxs] = useState([]);
   const [selectAllCheckBox, setSelectAllCheckBox] = useState(false);
-  
 
   const {colors} = useContext(ColorContext);
   const styles = getStyles(colors);
@@ -56,6 +57,7 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
   useEffect(() => {
     if (props.itemsObj) {
       // console.log('save grn approvve ', props.itemsObj);
+      setData(props.itemsObj);
 
       if (props.itemsObj.pomaster) {
         if (props.itemsObj.pomaster.poNumberWithSymbol) {
@@ -77,7 +79,7 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
             .replace(/,+$/, '')
             .split(',');
 
-            const grnUrls = props.itemsObj?.grnImgFile  || [];
+          const grnUrls = props.itemsObj?.grnImgFile || [];
 
           const result = filenames.map((name, index) => ({
             name,
@@ -109,6 +111,7 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
         }
         if (props.itemsObj.pomaster.poMasterChildMappingDao) {
           const dataMap = props.itemsObj.pomaster.poMasterChildMappingDao;
+          setChildData(props.itemsObj.pomaster.poMasterChildMappingDao);
           // console.log('save grn approvve  child ', dataMap);
 
           const childMap = dataMap.map((item, index) => ({
@@ -120,12 +123,14 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
             fabric: item.fabrecqty,
             price: item.price,
             grnNo: item.grnUniqueNo,
+            refNo: item.referenceNo || '',
             gstPercent: item.gstper,
             itemRate: item.itemratestr,
             discountAccount: item.discAmnt,
             gst: item.gstamntstr,
             total: item.totalWithGst,
             fabric: item.itemdesc,
+            quantitystr: item?.quantitystr || 0,
           }));
 
           setRows(childMap);
@@ -139,37 +144,97 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
   };
 
   const submitAction = async () => {
+    const formatChildDataFab =
+      selectedIdxs
+        .map(idx => {
+          const child = childData[idx];
+
+          const {
+            lineItemId,
+            receivedQty,
+            gsCode,
+            itemTrimsType,
+            itemId,
+            rollNo,
+            price,
+            itemdesc,
+            styleId,
+            stylewise_size_id,
+            buyer_Po_Id,
+            buyerNo,
+            gstper,
+            totprice,
+            gstamnt,
+            rejqty,
+            aisleId,
+            binId,
+            missqty,
+            batchid,
+          } = child;
+          //  receivedQty, rollNo
+
+          return (
+            `${lineItemId ?? '0'}#${'10'}#${gsCode ?? '0'}#${
+              itemTrimsType ?? ''
+            }#${itemId ?? '0'}#${'1'}#${price ?? '0'}#${batchid ?? '0'}` +
+            `#${itemdesc ?? ''}#${styleId ?? '0'}#${stylewise_size_id ?? '0'}#${
+              buyer_Po_Id ?? '0'
+            }#${buyerNo ?? '0'}#${gstper ?? '0'}#${totprice ?? ''}#` +
+            `${gstamnt ?? '0'}#${rejqty ?? '0'}#${aisleId ?? '0'}#${
+              binId ?? '0'
+            }#${missqty ?? '0'}#${rejqty ?? '0'}#${missqty ?? '0'}`
+          );
+        })
+        .join(',') + ',';
+
+    //  const {
+    //     lineItemId, receivedQty, gsCode, itemId, rollNo,fabrecqty,description,
+    //     price, styleId, stylewise_size_id, buyer_Po_Id, buyerNo,po_gsm,weight,po_rib_id,
+    //     gstper, totprice, gstamnt, rejqty, aisleId, binId, missqty,batchid,shade,grnwidth
+    //   } = child;
+
+    //   console.log("child items ==> ")
+
+    //   return `${lineItemId ?? '0'}#${fabrecqty ?? '0'}#${rollNo ?? '0'}#${itemId ?? '0'}#${"Fabric"}#${gsCode ?? '0'}#${price ?? '0'}#${batchid ?? '0'}#${receivedQty ?? '0'}` +
+    //          `#${styleId ?? '0'}#${stylewise_size_id ?? '0'}#${buyer_Po_Id ?? '0'}#${buyerNo ?? '0'}#${gstper ?? '0'}#${totprice ?? ''}#` +
+    //          `${gstamnt ?? '0'}#${rejqty ?? '0'}#${missqty ?? '0'}#${aisleId ?? '0'}#${binId ?? '0'}`;
+    // }).join(',') + ',';
+    //   return `${lineItemId ?? '0'}#${'200'}#${'1'}#${itemId ?? '0'}#${"Fabric"}#${gsCode ?? '0'}#${receivedQty ?? '0'}#${shade ?? ''}#${grnwidth ?? ''}#${price ?? '0'}#${batchid ?? '0'}#${"App"}` +
+    //          `#${styleId ?? '0'}#${stylewise_size_id ?? '0'}#${buyer_Po_Id ?? '0'}#${buyerNo ?? '0'}#${gstper ?? '0'}#${totprice ?? ''}#` +
+    //          `${gstamnt ?? '0'}#${po_gsm ?? ''}#${weight ?? '0.0'}#${po_rib_id ?? '0'}#${description ?? '0'}#${aisleId ?? '0'}#${binId ?? '0'}`;
+    // }).join(',') + ',';
+
+    console.log('string is ==> ', formatChildDataFab);
+
     let obj = {
-      vendorId: props.itemsObj.pomaster.vendorId,
-      shiploc: 2,
+      vendorId: data.pomaster.vendorId || '',
+      shiploc: '',
       additional_cost: 0,
-      itemTrimsType: itemOrTrims,
-      notes: '',
+      itemTrimsType: itemOrTrims || '',
+      notes: data.pomaster.notes || '',
       contactId: 0,
-      vendorCustomerId: 2,
+      vendorCustomerId: data?.pomaster.vendorCustomerId || 0,
       transportCost: 0,
-      poNumber: 212,
-      posave: 2,
+      poNumber: data.pomaster?.poNumber || 0,
+      posave: 0,
       p_conv_rate: 0.0,
       buyerno: '',
       dispatch: '',
       roundOff: 0.0,
       isCustStyleWise: 0,
       additionalAmount: 0,
-      poTcs: 21.0,
+      poTcs: data.pomaster.poTcs || 0,
       seqIdForStyle: '',
       modify_user: '',
       styleOrBuyerpo: 0,
-      referenceDateStr: '',
-      referenceDate: '2025-03-06',
+      referenceDateStr: data.pomaster.referenceDateStr || '2025-01-01',
+      referenceDate: data.pomaster.referenceDate,
       gateno: '',
-      grn_totamnt: 1071.0,
-      itemStr:
-        '295#100.0#1#477#Fabric##0.0##0#10.0000#0#App#0#0#0#0#5#1000.00#50.00#0#0.00#0##0#0,',
+      grn_totamnt: data.grn_totamnt || 0,
+      itemStr: formatChildDataFab || '',
     };
 
-    console.log("submit temp obj ===> ", obj)
-    return;
+    // return;
     props.submitAction(obj);
   };
 
@@ -352,55 +417,55 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
     }
   };
 
-const handleupload = async () => {
-  const MAX_DOCUMENT = 10;
-  const MAX_FILE_SIZE_MB = 1;
+  const handleupload = async () => {
+    const MAX_DOCUMENT = 10;
+    const MAX_FILE_SIZE_MB = 1;
 
-  try {
-    const res = await DocumentPicker.pick({
-      type: [
-        DocumentPicker.types.pdf,
-        DocumentPicker.types.doc,
-        DocumentPicker.types.docx,
-        DocumentPicker.types.audio,
-        DocumentPicker.types.allFiles,
-      ],
-      allowMultiSelection: true,
-    });
+    try {
+      const res = await DocumentPicker.pick({
+        type: [
+          DocumentPicker.types.pdf,
+          DocumentPicker.types.doc,
+          DocumentPicker.types.docx,
+          DocumentPicker.types.audio,
+          DocumentPicker.types.allFiles,
+        ],
+        allowMultiSelection: true,
+      });
 
-    const selectedDocs = Array.isArray(res) ? res : [res];
+      const selectedDocs = Array.isArray(res) ? res : [res];
 
-    const oversizedFiles = selectedDocs.filter(
-      file => file.size && file.size > MAX_FILE_SIZE_MB * 1024 * 1024
-    );
-
-    if (oversizedFiles.length > 0) {
-      Alert.alert(
-        'File Too Large',
-        `Each file must be less than ${MAX_FILE_SIZE_MB}MB. Please remove large files and try again.`
+      const oversizedFiles = selectedDocs.filter(
+        file => file.size && file.size > MAX_FILE_SIZE_MB * 1024 * 1024,
       );
-      return;
-    }
 
-    const totalDocs = uploadedMediaFiles.length + selectedDocs.length;
-    if (totalDocs > MAX_DOCUMENT) {
-      Alert.alert(
-        'Limit Exceeded',
-        `You can only upload up to ${MAX_DOCUMENT} documents.`
-      );
-      return;
-    }
+      if (oversizedFiles.length > 0) {
+        Alert.alert(
+          'File Too Large',
+          `Each file must be less than ${MAX_FILE_SIZE_MB}MB. Please remove large files and try again.`,
+        );
+        return;
+      }
 
-    setUploadedMediaFiles(prev => [...prev, ...selectedDocs]);
-  } catch (error) {
-    if (DocumentPicker.isCancel(error)) {
-      // User cancelled the picker, do nothing
-    } else {
-      console.error('Error picking documents:', error);
-      Alert.alert('Error', 'Something went wrong while picking documents.');
+      const totalDocs = uploadedMediaFiles.length + selectedDocs.length;
+      if (totalDocs > MAX_DOCUMENT) {
+        Alert.alert(
+          'Limit Exceeded',
+          `You can only upload up to ${MAX_DOCUMENT} documents.`,
+        );
+        return;
+      }
+
+      setUploadedMediaFiles(prev => [...prev, ...selectedDocs]);
+    } catch (error) {
+      if (DocumentPicker.isCancel(error)) {
+        // User cancelled the picker, do nothing
+      } else {
+        console.error('Error picking documents:', error);
+        Alert.alert('Error', 'Something went wrong while picking documents.');
+      }
     }
-  }
-};
+  };
 
   const openFile = file => {
     if (file.url) {
@@ -591,10 +656,8 @@ const handleupload = async () => {
     props.uploadMedia(formData);
   };
 
-    const updateAllIndexes = () => {
-    setSelectedIdxs(
-      selectAllCheckBox ? [] : rows.map((_, index) => index),
-    );
+  const updateAllIndexes = () => {
+    setSelectedIdxs(selectAllCheckBox ? [] : rows.map((_, index) => index));
     setSelectAllCheckBox(!selectAllCheckBox);
   };
 
@@ -613,6 +676,37 @@ const handleupload = async () => {
   const removeUploadedMedia = indexToRemove => {
     setUploadedMediaFiles(prev => prev.filter((_, i) => i !== indexToRemove));
   };
+
+  // const handleInputChange = (rowIndex, field, value) => {
+  //   const updatedRows = [...rows];
+  //   updatedRows[rowIndex] = {
+  //     ...updatedRows[rowIndex],
+  //     [field]: value,
+  //   };
+  //   setRows(updatedRows);
+  // };
+
+  const handleInputChange = (index, field, value) => {
+  const updatedRows = [...rows];
+  updatedRows[index][field] = value;
+
+  // Recalculate dependent values if Present Received or Price is updated
+  const receivedQty = parseFloat(updatedRows[index].presentReceivedQty || 0);
+  const price = parseFloat(updatedRows[index].price || 0);
+  const discount = parseFloat(updatedRows[index].discountAccount || 0);
+  const gstPercent = parseFloat(updatedRows[index].gstPercent || 0);
+
+  const itemRate = receivedQty * price;
+  const gst = ((itemRate - discount) * gstPercent) / 100;
+  const total = itemRate - discount + gst;
+
+  updatedRows[index].itemRate = itemRate.toFixed(2);
+  updatedRows[index].gst = gst.toFixed(2);
+  updatedRows[index].total = total.toFixed(2);
+
+  setRows(updatedRows);
+};
+
 
   return (
     <View style={[CommonStyles.mainComponentViewStyle]}>
@@ -676,7 +770,7 @@ const handleupload = async () => {
             <ScrollView nestedScrollEnabled={true} horizontal>
               <View style={styles.table}>
                 <View style={styles.table_head}>
-                  <View style={{width: 100}}>
+                  <View style={{width: 70}}>
                     <View
                       style={[
                         styles.checkboxItem,
@@ -687,35 +781,59 @@ const handleupload = async () => {
                         },
                       ]}>
                       <CustomCheckBox
-                         isChecked={selectAllCheckBox}
-                    onToggle={updateAllIndexes}
+                        isChecked={selectAllCheckBox}
+                        onToggle={updateAllIndexes}
                       />
                     </View>
                   </View>
-                  <View style={{width: 100}}>
-                    <Text style={styles.table_head_captions}>Roll No/Lot.</Text>
-                  </View>
-                  <View style={{width: 100}}>
-                    <Text style={styles.table_head_captions}>Required Qty</Text>
-                  </View>
-                  <View style={{width: 100}}>
-                    <Text style={styles.table_head_captions}>
-                      Rem Qty/Entered Qty
-                    </Text>
-                  </View>
+
+                  {itemOrTrims === 'RM' ? (
+                    <View style={{width: 100}}>
+                      <Text style={styles.table_head_captions}>Order Qty</Text>
+                    </View>
+                  ) : (
+                    <View style={{width: 100}}>
+                      <Text style={styles.table_head_captions}>
+                        Roll No/Lot.
+                      </Text>
+                    </View>
+                  )}
+
+                  <View style={{width: 5}}></View>
+
+                  {itemOrTrims === 'Fabric' && (
+                    <>
+                      <View style={{width: 100}}>
+                        <Text style={styles.table_head_captions}>
+                          Required Qty
+                        </Text>
+                      </View>
+
+                      <View style={{width: 100}}>
+                        <Text style={styles.table_head_captions}>
+                          Rem Qty/Entered Qty
+                        </Text>
+                      </View>
+                    </>
+                  )}
+
                   <View style={{width: 100}}>
                     <Text style={styles.table_head_captions}>
                       Present Received
                     </Text>
                   </View>
+                  <View style={{width: 5}}></View>
                   <View style={{width: 100}}>
-                    <Text style={styles.table_head_captions}>Fabric</Text>
+                    <Text style={styles.table_head_captions}>
+                      {itemOrTrims}
+                    </Text>
                   </View>
                   <View style={{width: 100}}>
                     <Text style={styles.table_head_captions}>Price</Text>
                   </View>
+                  <View style={{width: 5}}></View>
                   <View style={{width: 100}}>
-                    <Text style={styles.table_head_captions}>GRN No</Text>
+                    <Text style={styles.table_head_captions}> {itemOrTrims==="RM" ? "Ref No" : "GRN No"}</Text>
                   </View>
                   <View style={{width: 100}}>
                     <Text style={styles.table_head_captions}>GST%</Text>
@@ -735,7 +853,7 @@ const handleupload = async () => {
                 </View>
                 {rows.map((row, index) => (
                   <View key={index} style={styles.table_body_single_row}>
-                    <View style={{width: 100}}>
+                    <View style={{width: 70}}>
                       <View
                         style={[
                           styles.checkboxItem,
@@ -751,30 +869,74 @@ const handleupload = async () => {
                         />
                       </View>
                     </View>
-                    <View style={{width: 100}}>
-                      <Text style={styles.table_data}>{row.roll}</Text>
-                    </View>
-                    <View style={{width: 100}}>
-                      <Text style={styles.table_data}>{row.requiredQty}</Text>
-                    </View>
-                    <View style={{width: 100}}>
-                      <Text style={styles.table_data}>
-                        {row.remainingQty}/{row.enteredQty}
-                      </Text>
-                    </View>
-                    <View style={{width: 100}}>
+                    {itemOrTrims === 'RM' ? (
+                      <View style={{width: 100}}>
+                        <Text style={styles.table_data}>{row.quantitystr}</Text>
+                      </View>
+                    ) : (
+                      <View style={{width: 100}}>
+                        <TextInput
+                          style={styles.table_data}
+                          value={row.roll}
+                          onChangeText={text =>
+                            handleInputChange(index, 'roll', text)
+                          }
+                        />
+                      </View>
+                    )}
+
+                    <View style={{width: 5}}></View>
+
+                    {itemOrTrims === 'Fabric' && (
+                      <>
+                        <View style={{width: 100}}>
+                          <Text style={styles.table_data}>
+                            {row.requiredQty}
+                          </Text>
+                        </View>
+
+                        <View style={{width: 100}}>
+                          <Text style={styles.table_data}>
+                            {row.remainingQty}/{row.enteredQty}
+                          </Text>
+                        </View>
+                      </>
+                    )}
+                    {/* <View style={{width: 100}}>
                       <Text style={styles.table_data}>
                         {row.presentReceivedQty}
                       </Text>
+                    </View> */}
+                    <View style={{width: 100}}>
+                      <TextInput
+                        style={styles.table_data}
+                        value={String(row.presentReceivedQty)}
+                        keyboardType="numeric"
+                        onChangeText={text =>
+                          handleInputChange(index, 'presentReceivedQty', text)
+                        }
+                      />
                     </View>
+                    <View style={{width: 5}}></View>
                     <View style={{width: 100}}>
                       <Text style={styles.table_data}>{row.fabric}</Text>
                     </View>
-                    <View style={{width: 100}}>
+                    {/* <View style={{width: 100}}>
                       <Text style={styles.table_data}>{row.price}</Text>
-                    </View>
+                    </View> */}
                     <View style={{width: 100}}>
-                      <Text style={styles.table_data}>{row.grnNo}</Text>
+                      <TextInput
+                        style={styles.table_data}
+                        value={String(row.price)}
+                        keyboardType="numeric"
+                        onChangeText={text =>
+                          handleInputChange(index, 'price', text)
+                        }
+                      />
+                    </View>
+                    <View style={{width: 5}}></View>
+                    <View style={{width: 100}}>
+                      <Text style={styles.table_data}>{ itemOrTrims==="RM"? row.refNo: row.grnNo}</Text>
                     </View>
                     <View style={{width: 100}}>
                       <Text style={styles.table_data}>{row.gstPercent}</Text>
@@ -796,9 +958,15 @@ const handleupload = async () => {
                   </View>
                 ))}
                 <View style={styles.table_body_single_row}>
-                  {[...Array(4)].map((_, i) => (
+                  {[...Array(2)].map((_, i) => (
                     <View key={i} style={{width: 100}} />
                   ))}
+                  {itemOrTrims === 'Fabric' && (
+                    <>
+                    <View style={{width: 100}}></View>
+                    <View style={{width: 100}}></View>
+                    </>
+                  )}
                   <View style={{width: 100}}>
                     <Text style={styles.table_data}>
                       {totalpresentReceivedQty.toFixed(2)}
@@ -829,8 +997,13 @@ const handleupload = async () => {
 
                 <View style={styles.table_body_single_row}>
                   <View style={{width: 100}}></View>
+                  {itemOrTrims === 'Fabric' && (
+                    <>
+                    <View style={{width: 100}}></View>
                   <View style={{width: 100}}></View>
-                  <View style={{width: 100}}></View>
+                    </>
+                  )}
+
                   <View style={{width: 100}}></View>
                   <View style={{width: 100}}></View>
                   <View style={{width: 100}}></View>
@@ -1058,7 +1231,7 @@ const handleupload = async () => {
               elevation: 4,
               marginVertical: 10,
               marginTop: 30,
-              marginBottom:30
+              marginBottom: 30,
             }}>
             <Text
               style={{
@@ -1293,6 +1466,7 @@ const getStyles = colors =>
       fontSize: 15,
       color: 'white',
       alignItems: 'center',
+      textAlign: 'center',
     },
 
     table_body_single_row: {
@@ -1307,6 +1481,7 @@ const getStyles = colors =>
       fontSize: 11,
       color: '#000',
       alignItems: 'center',
+      textAlign: 'center',
     },
     table: {
       // margin: 15,
@@ -1358,7 +1533,7 @@ const getStyles = colors =>
     checkboxItem: {
       flexDirection: 'row',
       alignItems: 'center',
-      width: '45%', // Adjust width for better alignment
+      width: 50,
       marginVertical: 5,
       marginHorizontal: 5,
     },

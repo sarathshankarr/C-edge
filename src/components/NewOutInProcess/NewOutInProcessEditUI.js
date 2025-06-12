@@ -36,9 +36,149 @@ const NewOutInProcessEditUI = ({route, ...props}) => {
   const [hasFetched, set_hasFetched] = useState(false);
   const [hasFetchedStateId, set_hasFetchedStateId] = useState(false);
   const [hasFetchedStateName, set_hasFetchedStateName] = useState(false);
+  const [garmetList, set_garmetList] = useState([]);
+  const [brandList, set_brandList] = useState([]);
 
   useEffect(() => {
-    // console.log('items obj ===> ', props.itemsObj);
+    if (props.itemsObj) {
+      if (props?.itemsObj.vendorsCustomerMap) {
+        const MapList = Object.keys(props?.itemsObj?.vendorsCustomerMap).map(
+          key => ({
+            id: key,
+            name: props?.itemsObj.vendorsCustomerMap[key],
+          }),
+        );
+        set_filteredVendors(MapList);
+        set_vendorsList(MapList);
+      }
+      if (props?.itemsObj.outprocesslinks) {
+        const MapList = Object.keys(props?.itemsObj?.outprocesslinks).map(
+          key => ({
+            id: key,
+            name: props?.itemsObj.outprocesslinks[key],
+          }),
+        );
+        set_filteredProcess(MapList);
+        setProcessList(MapList);
+      }
+      if (props?.itemsObj.outprocesslinks) {
+        const MapList = Object.keys(props?.itemsObj?.outprocesslinks).map(
+          key => ({
+            id: key,
+            name: props?.itemsObj.outprocesslinks[key],
+          }),
+        );
+        set_filteredProcess(MapList);
+        setProcessList(MapList);
+      }
+      if (props?.itemsObj.locationsMap) {
+        const MapList = Object.keys(props?.itemsObj?.locationsMap).map(key => ({
+          id: key,
+          name: props?.itemsObj.locationsMap[key],
+        }));
+        setFilteredShipFrom(MapList);
+        setFilteredReceivedAt(MapList);
+        setShipFromList(MapList);
+        setReceivedAtList(MapList);
+      }
+      //garmet type
+      if (props?.itemsObj.productsMap) {
+        const MapList = Object.keys(props?.itemsObj?.productsMap).map(key => ({
+          id: key,
+          name: props?.itemsObj.productsMap[key],
+        }));
+        set_garmetList(MapList);
+      }
+      //project  type
+      if (props?.itemsObj.brandsMap) {
+        const MapList = Object.keys(props?.itemsObj?.brandsMap).map(key => ({
+          id: key,
+          name: props?.itemsObj.brandsMap[key],
+        }));
+        set_brandList(MapList);
+      }
+      if (props.itemsObj.outprocessDetails) {
+        if (props.itemsObj.outprocessDetails.vendor) {
+          set_vendorId(props.itemsObj.outprocessDetails.vendor);
+          set_vendorName(
+            props?.itemsObj.vendorsCustomerMap[
+              props.itemsObj.outprocessDetails.vendor
+            ],
+          );
+          // console.log("vendor naem ==> ", props?.itemsObj.vendorsCustomerMap[props.itemsObj.outprocessDetails.vendor])
+        }
+        if (props.itemsObj.outprocessDetails.receivedLocationId) {
+          setReceivedAtId(props.itemsObj.outprocessDetails.receivedLocationId);
+          setReceivedAtName(
+            props?.itemsObj.locationsMap[
+              props.itemsObj.outprocessDetails.receivedLocationId
+            ],
+          );
+        }
+        if (props.itemsObj.outprocessDetails.companyLocationId) {
+          setShipFromId(props.itemsObj.outprocessDetails.companyLocationId);
+          setShipFromName(
+            props?.itemsObj.locationsMap[
+              props.itemsObj.outprocessDetails.companyLocationId
+            ],
+          );
+        }
+        if (props.itemsObj.outprocessDetails.processName) {
+          set_processName(props.itemsObj.outprocessDetails.processName);
+          // setShipFromName(props?.itemsObj.locationsMap[props.itemsObj.outprocessDetails.companyLocationId])
+        }
+        if (props.itemsObj.outprocessDetails.particulars) {
+          const particulars = props.itemsObj.outprocessDetails.particulars;
+          const childArray = particulars.map((item, index) => {
+
+            const garmentTypeMapList = Object.keys(
+              props.itemsObj.productsMap,
+            ).map(key => ({
+              id: key,
+              name: props.itemsObj.productsMap[key],
+            }));
+            const brandTypeMapList = Object.keys(
+              props.itemsObj.brandsMap,
+            ).map(key => ({
+              id: key,
+              name: props.itemsObj.brandsMap[key],
+            }));
+
+
+            return {
+              id: Date.now(),
+
+              garmentTypeName:props.itemsObj.productsMap[(item.garmentTypes).toString()],
+              garmentTypeId: item.garmentTypes,
+              showGarmentTypeList: false,
+              filteredGarmentTypes: garmentTypeMapList || [],
+              garmentTypesList: garmentTypeMapList || [],
+
+              outprocessTypeName: item.outprocessType,
+              outprocessTypeId: item.outprocessType,
+              showOutprocessTypeList: false,
+              filteredOutprocessTypes: [],
+              outprocessTypesList: [],
+
+              projectName: item.outprocessType,
+              projectId: item.brandId,
+              showProjectList: false,
+              filteredProjects:brandTypeMapList ||  [],
+              projectsList: brandTypeMapList || [],
+
+              styleName: item.styleNoStr,
+              styleId: item.styleId,
+              showStyleList: false,
+              filteredStyles: [],
+              stylesList: [],
+            };
+          });
+
+          console.log("child array ", childArray)
+          setRows(childArray);
+        }
+      }
+    }
   }, [props.itemsObj]);
 
   useEffect(() => {
@@ -158,23 +298,23 @@ const NewOutInProcessEditUI = ({route, ...props}) => {
 
   const handleSearchVendor = text => {
     if (text.trim().length > 0) {
-      const filtered = Object.keys(vendorsList).filter(id =>
-        vendorsList[id].toLowerCase().includes(text.toLowerCase()),
+      const filtered = vendorsList.filter(name =>
+        item.name.toLowerCase().includes(text.toLowerCase()),
       );
       set_filteredVendors(filtered);
     } else {
-      set_filteredVendors(Object.keys(vendorsList));
+      set_filteredVendors(vendorsList);
     }
   };
 
   const handleSearchProcess = text => {
     if (text.trim().length > 0) {
-      const filtered = props.lists.getStockProcesses.filter(process =>
+      const filtered = processList.filter(process =>
         process.name.toLowerCase().includes(text.toLowerCase()),
       );
       set_filteredProcess(filtered);
     } else {
-      set_filteredProcess(props.lists.getStockProcesses);
+      set_filteredProcess(processList);
     }
   };
   const backBtnAction = () => {
@@ -339,38 +479,6 @@ const NewOutInProcessEditUI = ({route, ...props}) => {
     return ans;
   }
 
-  const addRow = () => {
-    setRows([
-      ...rows,
-      {
-        id: Date.now(),
-
-        garmentTypeName: '',
-        garmentTypeId: '',
-        showGarmentTypeList: false,
-        filteredGarmentTypes: [],
-        garmentTypesList: [],
-
-        outprocessTypeName: '',
-        outprocessTypeId: '',
-        showOutprocessTypeList: false,
-        filteredOutprocessTypes: [],
-        outprocessTypesList: [],
-
-        projectName: '',
-        projectId: '',
-        showProjectList: false,
-        filteredProjects: [],
-        projectsList: [],
-
-        styleName: '',
-        styleId: '',
-        showStyleList: false,
-        filteredStyles: [],
-        stylesList: [],
-      },
-    ]);
-  };
 
   const RemoveRow = id => {
     console.log('ROW ID ===> ', id);
@@ -405,7 +513,7 @@ const NewOutInProcessEditUI = ({route, ...props}) => {
             marginHorizontal: wp('5%'),
             marginTop: hp('2%'),
           }}>
-          <View style={{marginBottom: 20}}>
+          {/* <View style={{marginBottom: 20}}>
             <RadioGroup
               containerStyle={{
                 width: '100%',
@@ -421,7 +529,7 @@ const NewOutInProcessEditUI = ({route, ...props}) => {
                   ?.id
               }
             />
-          </View>
+          </View> */}
 
           <View
             style={{
@@ -446,13 +554,13 @@ const NewOutInProcessEditUI = ({route, ...props}) => {
                   <View style={{flexDirection: 'column'}}>
                     <Text
                       style={
-                        processId
+                        processName
                           ? [styles.dropTextLightStyle]
                           : [styles.dropTextInputStyle]
                       }>
                       {'Process *'}
                     </Text>
-                    {processId ? (
+                    {processName ? (
                       <Text style={[styles.dropTextInputStyle]}>
                         {processName}
                       </Text>
@@ -466,7 +574,7 @@ const NewOutInProcessEditUI = ({route, ...props}) => {
               </View>
             </TouchableOpacity>
 
-            {showProcessList && (
+            {false && (
               <View style={styles.dropdownContent1}>
                 <TextInput
                   style={styles.searchInput}
@@ -539,7 +647,7 @@ const NewOutInProcessEditUI = ({route, ...props}) => {
               </View>
             </TouchableOpacity>
 
-            {showVendorList && (
+            {false && (
               <View style={styles.dropdownContent1}>
                 <TextInput
                   style={styles.searchInput}
@@ -696,7 +804,7 @@ const NewOutInProcessEditUI = ({route, ...props}) => {
               </View>
             </TouchableOpacity>
 
-            {showShipFromList && (
+            {false && (
               <View style={styles.dropdownContent1}>
                 <TextInput
                   style={styles.searchInput}
@@ -769,7 +877,7 @@ const NewOutInProcessEditUI = ({route, ...props}) => {
               </View>
             </TouchableOpacity>
 
-            {showReceivedAtList && (
+            {false && (
               <View style={styles.dropdownContent1}>
                 <TextInput
                   style={styles.searchInput}
@@ -799,7 +907,7 @@ const NewOutInProcessEditUI = ({route, ...props}) => {
             )}
           </View>
 
-          <View
+          {/* <View
             style={{
               width: '90%',
               marginTop: 20,
@@ -820,7 +928,7 @@ const NewOutInProcessEditUI = ({route, ...props}) => {
                 Add
               </Text>
             </TouchableOpacity>
-          </View>
+          </View> */}
 
           <View style={styles.wrapper}>
             <ScrollView nestedScrollEnabled={true} horizontal>
@@ -886,12 +994,12 @@ const NewOutInProcessEditUI = ({route, ...props}) => {
                                       ...r,
                                       showGarmentTypeList:
                                         !r.showGarmentTypeList,
-                                      filteredStockTypes: r.garmentTypesList,
+                                      filteredGarmentTypes: r.garmentTypesList,
                                     }
                                   : {
                                       ...r,
                                       showGarmentTypeList: false,
-                                      filteredStockTypes: garmentTypesList,
+                                      filteredGarmentTypes: r.garmentTypesList,
                                     },
                               ),
                             );
@@ -900,15 +1008,15 @@ const NewOutInProcessEditUI = ({route, ...props}) => {
                             <View style={{flexDirection: 'column'}}>
                               <Text
                                 style={
-                                  row.stockType
+                                  row.garmentTypeId
                                     ? styles.dropTextLightStyle
                                     : styles.dropTextInputStyle
                                 }>
                                 {'*Types Of Garments '}
                               </Text>
                               <Text style={styles.dropTextLightStyle}>
-                                {row.stockTypeId
-                                  ? row.stockType
+                                {row.garmentTypeId
+                                  ? row.garmentTypeName
                                   : 'Select garmets'}
                               </Text>
                             </View>
@@ -920,7 +1028,7 @@ const NewOutInProcessEditUI = ({route, ...props}) => {
                             />
                           </View>
                         </TouchableOpacity>
-                        {row.showGarmentTypeList && (
+                        {row.showGarmentTypeList && false && (
                           <View style={styles.dropdownContent1}>
                             <TextInput
                               style={styles.searchInput}
@@ -1294,7 +1402,6 @@ const NewOutInProcessEditUI = ({route, ...props}) => {
 
 export default NewOutInProcessEditUI;
 
-
 const getStyles = colors =>
   StyleSheet.create({
     popSearchViewStyle: {
@@ -1405,14 +1512,13 @@ const getStyles = colors =>
       paddingVertical: 7,
       backgroundColor: '#fff',
       paddingHorizontal: 5,
-            alignItems: 'center',
-
+      alignItems: 'center',
     },
     table_data: {
       fontSize: 13,
       color: '#333',
     },
-   searchInput: {
+    searchInput: {
       marginTop: 10,
       borderRadius: 10,
       height: 40,

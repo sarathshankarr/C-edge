@@ -2057,6 +2057,46 @@ export async function EditVendorMasters(jsonValue) {
     obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet }
     return obj;
 };
+export async function EditNewOutInProcess(jsonValue) {
+
+    let returnError = undefined;
+    let statusData = undefined;
+    let responseData = undefined;
+    let logoutData = false;
+    let obj = undefined;
+
+    let internet = await internetCheck();
+    if (!internet) {
+        obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
+        return obj;
+    }
+    await fetch(Environment.uri + "outprocess/editOutProcessData",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            },
+            body: JSON.stringify(jsonValue),
+        }
+    ).then((response) => response.json()).then(async (data) => {
+        // console.log('EditVendorMasters   ==>', '', data.designId)
+
+        if (data) {
+            statusData = true;
+            responseData = data
+        } else {
+            statusData = undefined;
+        }
+
+    }).catch((error) => {
+        console.log('EditNewOutInProcess error ', error)
+        returnError = error;
+    });
+
+    obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet }
+    return obj;
+};
 
 export async function saveDDA(jsonValue) {
 
@@ -5841,7 +5881,7 @@ export async function saveEditStyleTransferOut(jsonValue) {
     obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet }
     return obj;
 };
-export async function saveEditGoodsTransportReceipt(jsonValue) {
+export async function saveEditGoodsReceiptNotes(jsonValue) {
 
     let returnError = undefined;
     let statusData = undefined;
@@ -5874,7 +5914,7 @@ export async function saveEditGoodsTransportReceipt(jsonValue) {
         }
 
     }).catch((error) => {
-        console.log('saveEditGoodsTransportReceipt', error)
+        console.log('saveEditGoodsReceiptNotes', error)
         returnError = error;
     });
 
@@ -7034,6 +7074,18 @@ export const downloadPOExcel =()=>{
 } 
 export const downloadPOFGExcel =()=>{
     const URL= Environment.uri + "po/getPOFGExcel";
+    return URL;
+} 
+export const downloadOutProcessNewInProcessOutDc =()=>{
+    const URL= Environment.uri + "outprocess/OutDcPdf";
+    return URL;
+} 
+export const downloadOutProcessNewInProcessInDcFormat1 =()=>{
+    const URL= Environment.uri + "outprocess/generateInvoiceOut";
+    return URL;
+} 
+export const downloadOutProcessNewInProcessInDcFormat2 =()=>{
+    const URL= Environment.uri + "outprocess/generategodc";
     return URL;
 } 
 
@@ -8600,6 +8652,45 @@ export async function sendWhatsAppPoComponent(jsonValue) {
 
     }).catch((error) => {
         console.log('finshing out search  error ', error)
+        returnError = error;
+    });
+
+    obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet }
+    return obj;
+};
+export async function sendWhatsAppOutProNewInProcessComponent(jsonValue) {
+
+    let returnError = undefined;
+    let statusData = undefined;
+    let responseData = undefined;
+    let logoutData = false;
+    let obj = undefined;
+
+    let internet = await internetCheck();
+    if (!internet) {
+        obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
+        return obj;
+    }
+    console.log("URL", Environment.uri + "outprocess/sendwhatsapp");
+    await fetch(Environment.uri + "outprocess/sendwhatsapp",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            },
+            body: JSON.stringify(jsonValue),
+        }
+    ).then((response) => response.json()).then(async (data) => {
+        if (data) {
+            statusData = true;
+            responseData = data
+        } else {
+            statusData = undefined;
+        }
+
+    }).catch((error) => {
+        console.log('sendWhatsAppOutProNewInProcessComponent  error ', error)
         returnError = error;
     });
 

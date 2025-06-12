@@ -144,15 +144,15 @@ const CreateNewOutInProcessUI = ({route, navigation, ...props}) => {
     setShowReceivedAtList(false);
   };
 
-  const actionOnVendors = (id, name) => {
-    set_vendorId(id);
-    set_vendorName(name);
+  const actionOnVendors = item => {
+    set_vendorId(item.id);
+    set_vendorName(item.name);
     set_showVendorList(false);
   };
 
-  const actionOnProcess = (id, name) => {
-    set_processId(id);
-    set_processName(name);
+  const actionOnProcess = item => {
+    set_processId(item.id);
+    set_processName(item.name);
     set_showProcessList(false);
   };
 
@@ -378,7 +378,7 @@ const CreateNewOutInProcessUI = ({route, navigation, ...props}) => {
         garmentTypeName: '',
         garmentTypeId: '',
         showGarmentTypeList: false,
-        filteredGarmentTypes: [],
+        filteredGarmentTypes: garmetList || [],
         garmentTypesList: garmetList || [],
 
         outprocessTypeName: '',
@@ -391,7 +391,7 @@ const CreateNewOutInProcessUI = ({route, navigation, ...props}) => {
         projectId: '',
         showProjectList: false,
         filteredProjects: brandList || [],
-        projectsList: [],
+        projectsList: brandList || [],
 
         styleName: '',
         styleId: '',
@@ -416,6 +416,64 @@ const CreateNewOutInProcessUI = ({route, navigation, ...props}) => {
       ),
     );
   };
+  const actionOnGarmetTypes = (item, rowId) => {
+    setRows(
+      rows.map(r =>
+        r.id === rowId
+          ? {
+              ...r,
+              garmentTypeName: item.name,
+              garmentTypeId: item.id,
+              showGarmentTypeList: false,
+            }
+          : r,
+      ),
+    );
+  };
+  const actionOnProjects = (item, rowId) => {
+    setRows(
+      rows.map(r =>
+        r.id === rowId
+          ? {
+              ...r,
+              projectName: item.name,
+              projectId: item.id,
+              showProjectList: false,
+            }
+          : r,
+      ),
+    );
+  };
+  const actionOnOutProcessType = (item, rowId) => {
+    setRows(
+      rows.map(r =>
+        r.id === rowId
+          ? {
+              ...r,
+              outprocessTypeName: item.name,
+              outprocessTypeId: item.id,
+              showOutprocessTypeList: false,
+            }
+          : r,
+      ),
+    );
+  };
+  const actionOnStyles = (item, rowId) => {
+    setRows(
+      rows.map(r =>
+        r.id === rowId
+          ? {
+              ...r,
+              styleName: item.name,
+              styleId: item.id,
+              showStyleList: false,
+            }
+          : r,
+      ),
+    );
+  };
+
+
   const handleSearchOutprocessType = (text, rowId) => {
     setRows(
       rows.map(r =>
@@ -988,15 +1046,20 @@ const CreateNewOutInProcessUI = ({route, navigation, ...props}) => {
                             <View style={{flexDirection: 'column'}}>
                               <Text
                                 style={
-                                  row.stockType
+                                  row.garmentTypeId
                                     ? styles.dropTextLightStyle
                                     : styles.dropTextInputStyle
                                 }>
                                 {'*Types Of Garments '}
                               </Text>
-                              <Text style={styles.dropTextLightStyle}>
-                                {row.stockTypeId
-                                  ? row.stockType
+                              <Text
+                                style={
+                                  row.garmentTypeId
+                                    ? styles.dropTextInputStyle
+                                    : styles.dropTextLightStyle
+                                }>
+                                {row.garmentTypeId
+                                  ? row.garmentTypeName
                                   : 'Select garmets'}
                               </Text>
                             </View>
@@ -1080,13 +1143,18 @@ const CreateNewOutInProcessUI = ({route, navigation, ...props}) => {
                             <View style={{flexDirection: 'column'}}>
                               <Text
                                 style={
-                                  row.stockId
+                                  row.outprocessTypeId
                                     ? styles.dropTextLightStyle
                                     : styles.dropTextInputStyle
                                 }>
                                 {'*Outprocess Type '}
                               </Text>
-                              <Text style={styles.dropTextLightStyle}>
+                              <Text
+                                style={
+                                  row.outprocessTypeId
+                                    ? styles.dropTextInputStyle
+                                    : styles.dropTextLightStyle
+                                }>
                                 {row.outprocessTypeId
                                   ? row.outprocessTypeName
                                   : 'Select '}
@@ -1189,7 +1257,12 @@ const CreateNewOutInProcessUI = ({route, navigation, ...props}) => {
                                 }>
                                 {'Project/Brand'}
                               </Text>
-                              <Text style={styles.dropTextLightStyle}>
+                              <Text
+                                style={
+                                  row.projectId
+                                    ? styles.dropTextInputStyle
+                                    : styles.dropTextLightStyle
+                                }>
                                 {row.projectId ? row.projectName : 'Select '}
                               </Text>
                             </View>
@@ -1285,7 +1358,12 @@ const CreateNewOutInProcessUI = ({route, navigation, ...props}) => {
                                 }>
                                 {'*Style'}
                               </Text>
-                              <Text style={styles.dropTextLightStyle}>
+                              <Text
+                                style={
+                                  row.styleId
+                                    ? styles.dropTextInputStyle
+                                    : styles.dropTextLightStyle
+                                }>
                                 {row.styleId ? row.styleName : 'Select '}
                               </Text>
                             </View>
