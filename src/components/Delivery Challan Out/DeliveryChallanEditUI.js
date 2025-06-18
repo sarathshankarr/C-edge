@@ -1,4 +1,4 @@
-import React, {useState, useRef, useEffect, useMemo, useContext} from 'react';
+import React, {useState, useRef, useEffect, useContext, useMemo} from 'react';
 import {
   View,
   FlatList,
@@ -7,35 +7,40 @@ import {
   TouchableOpacity,
   Image,
   ScrollView,
-  Button,
   Alert,
 } from 'react-native';
 import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen';
-import * as Constant from './../../utils/constants/constant';
-import CommonStyles from './../../utils/commonStyles/commonStyles';
-import HeaderComponent from './../../utils/commonComponents/headerComponent';
-import LoaderComponent from './../../utils/commonComponents/loaderComponent';
-import AlertComponent from './../../utils/commonComponents/alertComponent';
+import * as Constant from '../../utils/constants/constant';
+import CommonStyles from '../../utils/commonStyles/commonStyles';
+import HeaderComponent from '../../utils/commonComponents/headerComponent';
+import LoaderComponent from '../../utils/commonComponents/loaderComponent';
+import AlertComponent from '../../utils/commonComponents/alertComponent';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-import BottomComponent from './../../utils/commonComponents/bottomComponent';
-import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import BottomComponent from '../../utils/commonComponents/bottomComponent';
 import {TextInput} from 'react-native-paper';
-import {RadioGroup} from 'react-native-radio-buttons-group';
-import CustomCheckBox from '../../utils/commonComponents/CustomCheckBox';
-import {ColorContext} from '../colorTheme/colorTheme';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
 
+import {RadioGroup} from 'react-native-radio-buttons-group';
+import {ColorContext} from '../colorTheme/colorTheme';
+import CustomCheckBox from '../../utils/commonComponents/CustomCheckBox';
 let downArrowImg = require('./../../../assets/images/png/dropDownImg.png');
 let closeImg = require('./../../../assets/images/png/close1.png');
-const CreateNewOutInProcessUI = ({route, navigation, ...props}) => {
+
+const DeliveryChallanEditUI = ({route, ...props}) => {
   const {colors} = useContext(ColorContext);
   const styles = getStyles(colors);
 
+  const [hasFetched, set_hasFetched] = useState(false);
+  const [hasFetchedStateId, set_hasFetchedStateId] = useState(false);
+  const [hasFetchedStateName, set_hasFetchedStateName] = useState(false);
+  const [garmetList, set_garmetList] = useState([]);
+  const [brandList, set_brandList] = useState([]);
+
   useEffect(() => {
-    if (props?.itemsObj) {
-      // console.log('props from api   =====>  ', props?.itemsObj);
+    if (props.itemsObj) {
       if (props?.itemsObj.vendorsCustomerMap) {
         const MapList = Object.keys(props?.itemsObj?.vendorsCustomerMap).map(
           key => ({
@@ -73,12 +78,8 @@ const CreateNewOutInProcessUI = ({route, navigation, ...props}) => {
         }));
         setFilteredShipFrom(MapList);
         setFilteredReceivedAt(MapList);
-        setFilteredToLocation(MapList);
-        setFilteredFromLocation(MapList);
         setShipFromList(MapList);
         setReceivedAtList(MapList);
-        setFromLocationList(MapList);
-        setToLocationList(MapList);
       }
       //garmet type
       if (props?.itemsObj.productsMap) {
@@ -96,63 +97,138 @@ const CreateNewOutInProcessUI = ({route, navigation, ...props}) => {
         }));
         set_brandList(MapList);
       }
+      if (props.itemsObj.outprocessDetails) {
+        if (props.itemsObj.outprocessDetails.vendor) {
+          set_vendorId(props.itemsObj.outprocessDetails.vendor);
+          set_vendorName(
+            props?.itemsObj.vendorsCustomerMap[
+              props.itemsObj.outprocessDetails.vendor
+            ],
+          );
+          // console.log("vendor naem ==> ", props?.itemsObj.vendorsCustomerMap[props.itemsObj.outprocessDetails.vendor])
+        }
+        if (props.itemsObj.outprocessDetails.receivedLocationId) {
+          setReceivedAtId(props.itemsObj.outprocessDetails.receivedLocationId);
+          setReceivedAtName(
+            props?.itemsObj.locationsMap[
+              props.itemsObj.outprocessDetails.receivedLocationId
+            ],
+          );
+        }
+        if (props.itemsObj.outprocessDetails.companyLocationId) {
+          setShipFromId(props.itemsObj.outprocessDetails.companyLocationId);
+          setShipFromName(
+            props?.itemsObj.locationsMap[
+              props.itemsObj.outprocessDetails.companyLocationId
+            ],
+          );
+        }
+        if (props.itemsObj.outprocessDetails.processName) {
+          set_processName(props.itemsObj.outprocessDetails.processName);
+          // setShipFromName(props?.itemsObj.locationsMap[props.itemsObj.outprocessDetails.companyLocationId])
+        }
+        if (props.itemsObj.outprocessDetails.particulars) {
+          const particulars = props.itemsObj.outprocessDetails.particulars;
+          const childArray = particulars.map((item, index) => {
+            const garmentTypeMapList = Object.keys(
+              props.itemsObj.productsMap,
+            ).map(key => ({
+              id: key,
+              name: props.itemsObj.productsMap[key],
+            }));
+            const brandTypeMapList = Object.keys(props.itemsObj.brandsMap).map(
+              key => ({
+                id: key,
+                name: props.itemsObj.brandsMap[key],
+              }),
+            );
+            let sizesArray = [];
+            if (item.sizenames && item.sizeQuantities && item.sizereceviedqty) {
+              sizesArray = item.sizenames.map((sizeName, idx) => ({
+                sizename: sizeName,
+                sizeqty: item.sizeQuantities[index],
+                sizereceivedqty: item.sizereceviedqty[index],
+                enteredInput: '0',
+                SIZE_ID: Date.now() + idx + 1,
+              }));
+            }
+
+            return {
+              id: Date.now(),
+
+              garmentTypeName:
+                props.itemsObj.productsMap[item.garmentTypes.toString()],
+              garmentTypeId: item.garmentTypes,
+              showGarmentTypeList: false,
+              filteredGarmentTypes: garmentTypeMapList || [],
+              garmentTypesList: garmentTypeMapList || [],
+
+              outprocessTypeName: item.outprocessType,
+              outprocessTypeId: item.outprocessType,
+              showOutprocessTypeList: false,
+              filteredOutprocessTypes: [],
+              outprocessTypesList: [],
+
+              projectName: item.outprocessType,
+              projectId: item.brandId,
+              showProjectList: false,
+              filteredProjects: brandTypeMapList || [],
+              projectsList: brandTypeMapList || [],
+
+              styleName: item.styleNoStr,
+              styleId: item.styleId,
+              showStyleList: false,
+              filteredStyles: [],
+              stylesList: [],
+              childTable: sizesArray || [],
+            };
+          });
+
+          console.log('child array ', childArray[0]?.childTable);
+          setRows(childArray);
+        }
+      }
     }
   }, [props.itemsObj]);
 
   useEffect(() => {
-    if (props?.childObj) {
-      // console.log("child obj ===> ", props?.childObj)
-      if (props?.childObj.styleMap) {
-        const MapList = Object.keys(props?.childObj?.styleMap).map(key => ({
-          id: key,
-          name: props?.childObj.styleMap[key],
-        }));
-        console.log('style list child==> ', MapList);
+    // console.log('props?.itemsObj  ref ==> ', props?.statesList);
 
-        set_childStyleList(MapList);
+    if (props?.itemsObj?.updateVendor) {
+      if (props?.itemsObj?.updateVendor && !hasFetchedStateId) {
+        setStateId(props.itemsObj.updateVendor.state);
       }
-      if (props?.childObj.poMap) {
-        const MapList = Object.keys(props?.childObj?.poMap).map(key => ({
-          id: key,
-          name: props?.childObj.poMap[key],
-        }));
-        set_childOutProcessList(MapList);
-      }
-    }
-  }, [props.childObj]);
 
-  useEffect(() => {
-    if (props?.childObjSizes) {
-      // console.log('child childObjSizes ===> ', props?.childObjSizes);
-      if (props?.childObjSizes?.sizeWiseList) {
-        const data = props?.childObjSizes;
-        const extractedArray = data.sizeWiseList.map((item, index) => ({
-          sizeDesc: item.sizeDesc,
-          sizeId: item.sizeId,
-          totalQty: item.totalQty,
-          enteredInput: data.sizeQuantitie[index] || '',
-        }));
-
-        setRows(
-          rows.map(r =>
-            r.styleId === latestStyleId
-              ? {
-                  ...r,
-                  childTable: extractedArray || [],
-                }
-              : r,
-          ),
+      if (
+        props?.itemsObj?.updateVendor &&
+        props.statesList.stateMap &&
+        !hasFetchedStateName
+      ) {
+        setStateName(
+          props.statesList.stateMap[props.itemsObj.updateVendor.state],
         );
+        set_hasFetchedStateName(true);
+      }
+
+      if (props?.itemsObj?.updateVendor.country && !hasFetched) {
+        props.getStatelist(props.itemsObj.updateVendor.country);
+        set_hasFetched(true);
       }
     }
-  }, [props.childObjSizes]);
+
+    if (props.statesList.stateMap) {
+      const stateMapList = Object.keys(props.statesList.stateMap).map(key => ({
+        id: key,
+        name: props.statesList.stateMap[key],
+      }));
+      setFilteredState(stateMapList);
+      setStateList(stateMapList);
+    }
+  }, [props.itemsObj, props.statesList]);
 
   const [name, setName] = useState('');
   const [parallel, set_parallel] = useState(false);
   const [refNo, set_refNo] = useState('');
-
-  const [garmetList, set_garmetList] = useState([]);
-  const [brandList, set_brandList] = useState([]);
 
   const [shipFromList, setShipFromList] = useState([]);
   const [filteredShipFrom, setFilteredShipFrom] = useState([]);
@@ -184,59 +260,6 @@ const CreateNewOutInProcessUI = ({route, navigation, ...props}) => {
   const [activeField, setActiveField] = useState(null);
   const [rows, setRows] = React.useState([]);
 
-  // From Location
-  const [fromLocationList, setFromLocationList] = useState([]);
-  const [filteredFromLocation, setFilteredFromLocation] = useState([]);
-  const [showFromLocationList, setShowFromLocationList] = useState(false);
-  const [fromLocationName, setFromLocationName] = useState('');
-  const [fromLocationId, setFromLocationId] = useState('');
-
-  // To Location
-  const [toLocationList, setToLocationList] = useState([]);
-  const [filteredToLocation, setFilteredToLocation] = useState([]);
-  const [showToLocationList, setShowToLocationList] = useState(false);
-  const [toLocationName, setToLocationName] = useState('');
-  const [toLocationId, setToLocationId] = useState('');
-
-  const [latestStyleId, setLatestStyleId] = useState('');
-
-  const [childStyleList, set_childStyleList] = useState([]);
-  const [childOutProcessList, set_childOutProcessList] = useState([]);
-
-  const handleSearchFromLocation = text => {
-    if (text.trim().length > 0) {
-      const filtered = fromLocationList.filter(item =>
-        item.name.toLowerCase().includes(text.toLowerCase()),
-      );
-      setFilteredFromLocation(filtered);
-    } else {
-      setFilteredFromLocation(fromLocationList);
-    }
-  };
-
-  const handleSearchToLocation = text => {
-    if (text.trim().length > 0) {
-      const filtered = toLocationList.filter(item =>
-        item.name.toLowerCase().includes(text.toLowerCase()),
-      );
-      setFilteredToLocation(filtered);
-    } else {
-      setFilteredToLocation(toLocationList);
-    }
-  };
-
-  const actionOnFromLocation = async item => {
-    setFromLocationId(item.id);
-    setFromLocationName(item.name);
-    setShowFromLocationList(false);
-  };
-
-  const actionOnToLocation = item => {
-    setToLocationId(item.id);
-    setToLocationName(item.name);
-    setShowToLocationList(false);
-  };
-
   const actionOnShipFrom = item => {
     setShipFromId(item.id);
     setShipFromName(item.name);
@@ -249,23 +272,16 @@ const CreateNewOutInProcessUI = ({route, navigation, ...props}) => {
     setShowReceivedAtList(false);
   };
 
-  const actionOnVendors = item => {
-    set_vendorId(item.id);
-    set_vendorName(item.name);
+  const actionOnVendors = (id, name) => {
+    set_vendorId(id);
+    set_vendorName(name);
     set_showVendorList(false);
   };
 
-  const actionOnProcess = async item => {
-    set_processId(item.id);
-    set_processName(item.name);
+  const actionOnProcess = (id, name) => {
+    set_processId(id);
+    set_processName(name);
     set_showProcessList(false);
-
-    const idx = item.id;
-
-    const splitedId = idx.split('_');
-    console.log('process splitted id ===> ', splitedId, splitedId[0]);
-
-    await props.getStylesList(splitedId[0], 0);
   };
 
   const handleSearchShipFrom = text => {
@@ -292,12 +308,12 @@ const CreateNewOutInProcessUI = ({route, navigation, ...props}) => {
 
   const handleSearchVendor = text => {
     if (text.trim().length > 0) {
-      const filtered = vendorsList.filter(process =>
-        process.name.toLowerCase().includes(text.toLowerCase()),
+      const filtered = vendorsList.filter(name =>
+        item.name.toLowerCase().includes(text.toLowerCase()),
       );
       set_filteredVendors(filtered);
     } else {
-      set_filteredVendors(Object.keys(vendorsList));
+      set_filteredVendors(vendorsList);
     }
   };
 
@@ -308,10 +324,9 @@ const CreateNewOutInProcessUI = ({route, navigation, ...props}) => {
       );
       set_filteredProcess(filtered);
     } else {
-      set_filteredProcess(props.lists.getStockProcesses);
+      set_filteredProcess(processList);
     }
   };
-
   const backBtnAction = () => {
     props.backBtnAction();
   };
@@ -321,188 +336,37 @@ const CreateNewOutInProcessUI = ({route, navigation, ...props}) => {
   };
 
   const submitAction = async () => {
-    const child = rows.map((item, index) => ({
-      outprocessId: 1,
-      shipment: '',
-      workorderno: '',
-      garmentTypes: item.garmentTypeId,
-      outprocessType: item.outprocessId,
-      styleId: item.styleId,
-      color: 0,
-      rejectionreason: 0,
-      sendQty: 10, // total ip qty
-      priceQty: 10.0, //unit price
-      receivedQty: 0,
-      missedQty: 0,
-      receivedPrice: 0.0,
-      loss: 0,
-      missingPrice: 0,
-      sizeQty: '5,5,', // entered
-      totalsizeValues: 0,
-      receivedsizes: '',
-      soNo: 345,
-      style_cost: 0,
-      brandId: item.brandId,
-      nextMenuid: 0,
-      poId: 0,
-      fabOrRm: 0,
-      fabMissedQty: 0.0,
-      uomtype: '',
-      in_price_qty: 0.0,
-      in_style_cost: 0.0,
-      wo_barcode_number: 0,
-      styleStatus: 0,
-      style_mrp: 0.0,
-      fabricQty: 0.0,
-      fabricCon: 0.0,
-      trimId: 0,
-      missedsizeqty: '',
-      missedtotal: 0,
-      paid: 0.0,
-      gst_amt: 0.0,
-      gst_percentage: 0.0,
-      buyerVendorIds: '',
-      fabricOrRm: 0,
-      fabricRecQty: 0.0,
-      opParts: 0,
-      damageqty: 0,
-      handsdate: '2025-06-13',
-      handshake: 0,
-      daywiseqty: '',
-      daytotalqty: 0,
-      partMapId: '',
-      opp_company_id: 1, 
-      fab_issued: 1,
-      fab_used: 0,
-      fab_return: 0,
-      fab_actual_consumption: 0,
-      is_style_cancelled: 0,
-    }));
-
     const tempObj = {
-      refNo: refNo,
-      refDate: deliveryDate,
-      refDateInHouse: '',
-      refDateInHousecont: '',
-      person: '',
-      vehicleNo: '',
-      remarks: '',
-      billno: '',
-      hiddenButtonId: '',
-      hiddenParam: '',
-      hiddenDate: creationDate,
-      vendor: vendorId || '0',
-      outGst: '',
-      gateno: '',
-      gate: '0',
-      location: '',
-      hsn: '',
-      companyLocationId1: fromLocationId, 
-      receivedLocationId1: toLocationId,
-      companyLocationId2: fromLocationId, 
-      receivedLocationId2: toLocationId,
-      currentDate: '2025-06-13', 
-      currentDate1: '2025-06-13', 
-      op_gst: '',
-      op_roundoff: '',
-      reg_vendor: 0,
-      sheteNo: '',
-      hole: '',
-      spot: '',
-      fabric: '',
-      employeewiseRows: '',
-      fabTableValues: '',
-      hiddenProcessName: processName,
-      totalgood: 0,
-      creationDateStr: '2025-06-13',
-      refDateStr: '2025-06-12',
-      handshake: 1,
-      todaysDate: '2025-06-13',
-      selectedstyle: 0,
-      isStyleTotalhidden: 0,
-      outprocessId: processId,
-      serviceType: 'Outward',
-      bothMenuIds: '312_313_0',
-      bothMenuIds1: '0',
-      companyLocationId: shipFromId,
-      receivedLocationId: receivedAtId,
-      rmhiddenstitchingParam: '0,0,0,0,0:',
-      finishingrmhiddenPrintingParam: '',
-      shiddenPrintingParam: '',
-      termscond: ',',
-      buttonId: 0,
-      userId: 0,
-      isNextProcess: parallel ? '1' : '0',
-      powiseOut: 0,
-      isReProcess: 0,
-      particulars: [
-        {
-          outprocessId: 1, // random
-          shipment: '',
-          workorderno: '', // hsn 
-          garmentTypes: garmentTypeId,
-          outprocessType: outprocessId,
-          styleId: styleId, // split[0]
-          color: 0,
-          rejectionreason: 0,
-          sendQty: 10, // total input
-          priceQty: 10.0, // unitprice
-          receivedQty: 0,
-          missedQty: 0,
-          receivedPrice: 0.0,
-          loss: 0,
-          missingPrice: 0,
-          sizeQty: '5,5,', //enterediput 
-          totalsizeValues: 0,
-          receivedsizes: '',
-          soNo: 345, //split[1]
-          style_cost: 0,  //
-          brandId: brandId,
-          nextMenuid: 0,
-          poId: 0,
-          fabOrRm: 0,
-          fabMissedQty: 0.0,
-          uomtype: '',
-          in_price_qty: 0.0,
-          in_style_cost: 0.0,
-          wo_barcode_number: 0,
-          styleStatus: 0,
-          style_mrp: 0.0,
-          fabricQty: 0.0,
-          fabricCon: 0.0,
-          trimId: 0,
-          missedsizeqty: '',
-          missedtotal: 0,
-          paid: 0.0,
-          gst_amt: 0.0,
-          gst_percentage: 0.0,
-          buyerVendorIds: '',
-          fabricOrRm: 0,
-          fabricRecQty: 0.0,
-          opParts: 0,
-          damageqty: 0,
-          handsdate: '',
-          handshake: 0,
-          daywiseqty: '',
-          daytotalqty: 0,
-          partMapId: '',
-          opp_company_id: 1, //company id 
-          fab_issued: 1,
-          fab_used: 0,
-          fab_return: 0,
-          fab_actual_consumption: 0,
-          is_style_cancelled: 0,
-        },
-      ],
+      vendorcontractor: 1,
+      user_type: userType,
+      type_code: type,
+      group_code: group,
+      vendor_code: '',
+      terms_id: '',
+      priceId: '',
+      vendor_name: name,
+      address1: address1,
+      address2: address2,
+      address3: address3,
+      city: city,
+      pin_code: zipPostalCode,
+      mobile: phone,
+      panno: '',
+      gst: gst,
+      whatsapp: whatsappPhone,
+      state: stateId,
+      country: countryId,
+      tax_type: '0',
+      invfrm: '0',
+      ship_mode: '0',
+      region: '0',
+      payment_priority: '',
+      currency: currencyId,
+      location: locationName,
     };
     props.submitAction(tempObj);
   };
 
-  const backAction = async () => {
-    props.backBtnAction();
-  };
-
-  // User Type State
   const [productionType, setProductionType] = useState('2');
   const productionTypeRadios = useMemo(
     () => [
@@ -608,7 +472,6 @@ const CreateNewOutInProcessUI = ({route, navigation, ...props}) => {
     hideDatePicker();
   };
 
-  // console.log('rowss  ', rows);
   const showDatePicker = field => {
     setActiveField(field);
     setDatePickerVisibility(true);
@@ -626,163 +489,6 @@ const CreateNewOutInProcessUI = ({route, navigation, ...props}) => {
     return ans;
   }
 
-  const addRow = () => {
-    setRows([
-      ...rows,
-      {
-        id: Date.now(),
-
-        garmentTypeName: '',
-        garmentTypeId: '',
-        showGarmentTypeList: false,
-        filteredGarmentTypes: garmetList || [],
-        garmentTypesList: garmetList || [],
-
-        outprocessTypeName: '',
-        outprocessTypeId: '',
-        showOutprocessTypeList: false,
-        filteredOutprocessTypes: childOutProcessList || [],
-        outprocessTypesList: childOutProcessList || [],
-
-        projectName: '',
-        projectId: '',
-        showProjectList: false,
-        filteredProjects: brandList || [],
-        projectsList: brandList || [],
-
-        styleName: '',
-        styleId: '',
-        showStyleList: false,
-        filteredStyles: childStyleList || [],
-        stylesList: childStyleList || [],
-        childTable: [],
-      },
-    ]);
-    // console.log("adding child style list ", childStyleList)
-  };
-
-  const handleSearchGarmetType = (text, rowId) => {
-    setRows(
-      rows.map(r =>
-        r.id === rowId
-          ? {
-              ...r,
-              filteredGarmentTypes: garmetList.filter(item =>
-                item.name.toLowerCase().includes(text.toLowerCase()),
-              ),
-            }
-          : r,
-      ),
-    );
-  };
-  const actionOnGarmetTypes = (item, rowId) => {
-    setRows(
-      rows.map(r =>
-        r.id === rowId
-          ? {
-              ...r,
-              garmentTypeName: item.name,
-              garmentTypeId: item.id,
-              showGarmentTypeList: false,
-            }
-          : r,
-      ),
-    );
-  };
-  const actionOnProjects = (item, rowId) => {
-    setRows(
-      rows.map(r =>
-        r.id === rowId
-          ? {
-              ...r,
-              projectName: item.name,
-              projectId: item.id,
-              showProjectList: false,
-            }
-          : r,
-      ),
-    );
-    props.getStylesList(item.id, 1);
-  };
-  const actionOnOutProcessType = (item, rowId) => {
-    setRows(
-      rows.map(r =>
-        r.id === rowId
-          ? {
-              ...r,
-              outprocessTypeName: item.name,
-              outprocessTypeId: item.id,
-              showOutprocessTypeList: false,
-            }
-          : r,
-      ),
-    );
-  };
-  const actionOnStyles = (item, rowId) => {
-    setRows(
-      rows.map(r =>
-        r.id === rowId
-          ? {
-              ...r,
-              styleName: item.name,
-              styleId: item.id,
-              showStyleList: false,
-            }
-          : r,
-      ),
-    );
-    setLatestStyleId(item.id);
-    const tempObj = {
-      Pid: processId.split('_')[0],
-      Sid: item.id,
-    };
-
-    props.getSizesList(tempObj);
-  };
-
-  const handleSearchOutprocessType = (text, rowId) => {
-    setRows(
-      rows.map(r =>
-        r.id === rowId
-          ? {
-              ...r,
-              filteredOutprocessTypes: childOutProcessList.filter(item =>
-                item.name.toLowerCase().includes(text.toLowerCase()),
-              ),
-            }
-          : r,
-      ),
-    );
-  };
-  const handleSearchProject = (text, rowId) => {
-    setRows(
-      rows.map(r =>
-        r.id === rowId
-          ? {
-              ...r,
-              filteredProjects: brandList.filter(item =>
-                item.name.toLowerCase().includes(text.toLowerCase()),
-              ),
-            }
-          : r,
-      ),
-    );
-  };
-  const handleSearchStyle = (text, rowId) => {
-    setRows(
-      rows.map(r =>
-        r.id === rowId
-          ? {
-              ...r,
-              filteredStyles: childStyleList.filter(style =>
-                style.name.toLowerCase().includes(text.toLowerCase()),
-              ),
-            }
-          : r,
-      ),
-    );
-  };
-
   const RemoveRow = id => {
     console.log('ROW ID ===> ', id);
     const filtered = rows.filter(item => item.id !== id);
@@ -796,7 +502,7 @@ const CreateNewOutInProcessUI = ({route, navigation, ...props}) => {
           ? {
               ...row,
               childTable: row.childTable.map(child =>
-                child.sizeId === sizeId
+                child.SIZE_ID === sizeId
                   ? {...child, enteredInput: text}
                   : child,
               ),
@@ -815,7 +521,7 @@ const CreateNewOutInProcessUI = ({route, navigation, ...props}) => {
           isChatEnable={false}
           isTImerEnable={false}
           isTitleHeaderEnable={true}
-          title={'Create New Out In Process'}
+          title={'New Out InProcessEdit UI'}
           backBtnAction={() => backBtnAction()}
         />
       </View>
@@ -833,7 +539,7 @@ const CreateNewOutInProcessUI = ({route, navigation, ...props}) => {
             marginHorizontal: wp('5%'),
             marginTop: hp('2%'),
           }}>
-          <View style={{marginBottom: 20}}>
+          {/* <View style={{marginBottom: 20}}>
             <RadioGroup
               containerStyle={{
                 width: '100%',
@@ -849,7 +555,7 @@ const CreateNewOutInProcessUI = ({route, navigation, ...props}) => {
                   ?.id
               }
             />
-          </View>
+          </View> */}
 
           <View
             style={{
@@ -874,13 +580,13 @@ const CreateNewOutInProcessUI = ({route, navigation, ...props}) => {
                   <View style={{flexDirection: 'column'}}>
                     <Text
                       style={
-                        processId
+                        processName
                           ? [styles.dropTextLightStyle]
                           : [styles.dropTextInputStyle]
                       }>
                       {'Process *'}
                     </Text>
-                    {processId ? (
+                    {processName ? (
                       <Text style={[styles.dropTextInputStyle]}>
                         {processName}
                       </Text>
@@ -894,7 +600,7 @@ const CreateNewOutInProcessUI = ({route, navigation, ...props}) => {
               </View>
             </TouchableOpacity>
 
-            {showProcessList && (
+            {false && (
               <View style={styles.dropdownContent1}>
                 <TextInput
                   style={styles.searchInput}
@@ -915,152 +621,6 @@ const CreateNewOutInProcessUI = ({route, navigation, ...props}) => {
                         key={index}
                         style={styles.dropdownOption}
                         onPress={() => actionOnProcess(item)}>
-                        <Text style={{color: '#000'}}>{item.name}</Text>
-                      </TouchableOpacity>
-                    ))
-                  )}
-                </ScrollView>
-              </View>
-            )}
-          </View>
-
-          <View
-            style={{
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: '#fff',
-              marginTop: hp('2%'),
-            }}>
-            <TouchableOpacity
-              style={{
-                flexDirection: 'row',
-                borderWidth: 0.5,
-                borderColor: '#D8D8D8',
-                borderRadius: hp('0.5%'),
-                width: wp('90%'),
-              }}
-              onPress={() => {
-                setShowFromLocationList(!showFromLocationList);
-              }}>
-              <View>
-                <View style={[styles.SectionStyle1, {}]}>
-                  <View style={{flexDirection: 'column'}}>
-                    <Text
-                      style={
-                        fromLocationId
-                          ? [styles.dropTextLightStyle]
-                          : [styles.dropTextInputStyle]
-                      }>
-                      {'From Location *'}
-                    </Text>
-                    {fromLocationId ? (
-                      <Text style={[styles.dropTextInputStyle]}>
-                        {fromLocationName}
-                      </Text>
-                    ) : null}
-                  </View>
-                </View>
-              </View>
-
-              <View style={{justifyContent: 'center'}}>
-                <Image source={downArrowImg} style={styles.imageStyle} />
-              </View>
-            </TouchableOpacity>
-
-            {showFromLocationList && (
-              <View style={styles.dropdownContent1}>
-                <TextInput
-                  style={styles.searchInput}
-                  placeholder="Search "
-                  onChangeText={handleSearchFromLocation}
-                  placeholderTextColor="#000"
-                />
-                <ScrollView
-                  style={styles.scrollView}
-                  nestedScrollEnabled={true}>
-                  {filteredFromLocation.length === 0 ? (
-                    <Text style={styles.noCategoriesText}>
-                      Sorry, no results found!
-                    </Text>
-                  ) : (
-                    filteredFromLocation.map((item, index) => (
-                      <TouchableOpacity
-                        key={index}
-                        style={styles.dropdownOption}
-                        onPress={() => actionOnFromLocation(item)}>
-                        <Text style={{color: '#000'}}>{item.name}</Text>
-                      </TouchableOpacity>
-                    ))
-                  )}
-                </ScrollView>
-              </View>
-            )}
-          </View>
-
-          <View
-            style={{
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: '#fff',
-              marginTop: hp('2%'),
-            }}>
-            <TouchableOpacity
-              style={{
-                flexDirection: 'row',
-                borderWidth: 0.5,
-                borderColor: '#D8D8D8',
-                borderRadius: hp('0.5%'),
-                width: wp('90%'),
-              }}
-              onPress={() => {
-                setShowToLocationList(!showToLocationList);
-              }}>
-              <View>
-                <View style={[styles.SectionStyle1, {}]}>
-                  <View style={{flexDirection: 'column'}}>
-                    <Text
-                      style={
-                        toLocationId
-                          ? [styles.dropTextLightStyle]
-                          : [styles.dropTextInputStyle]
-                      }>
-                      {'To Location *'}
-                    </Text>
-                    {toLocationId ? (
-                      <Text style={[styles.dropTextInputStyle]}>
-                        {toLocationName}
-                      </Text>
-                    ) : null}
-                  </View>
-                </View>
-              </View>
-
-              <View style={{justifyContent: 'center'}}>
-                <Image source={downArrowImg} style={styles.imageStyle} />
-              </View>
-            </TouchableOpacity>
-
-            {showToLocationList && (
-              <View style={styles.dropdownContent1}>
-                <TextInput
-                  style={styles.searchInput}
-                  placeholder="Search "
-                  onChangeText={handleSearchToLocation}
-                  placeholderTextColor="#000"
-                />
-                <ScrollView
-                  style={styles.scrollView}
-                  nestedScrollEnabled={true}>
-                  {filteredToLocation.length === 0 ? (
-                    <Text style={styles.noCategoriesText}>
-                      Sorry, no results found!
-                    </Text>
-                  ) : (
-                    filteredToLocation.map((item, index) => (
-                      <TouchableOpacity
-                        key={index}
-                        style={styles.dropdownOption}
-                        onPress={() => actionOnToLocation(item)}>
                         <Text style={{color: '#000'}}>{item.name}</Text>
                       </TouchableOpacity>
                     ))
@@ -1113,7 +673,7 @@ const CreateNewOutInProcessUI = ({route, navigation, ...props}) => {
               </View>
             </TouchableOpacity>
 
-            {showVendorList && (
+            {false && (
               <View style={styles.dropdownContent1}>
                 <TextInput
                   style={styles.searchInput}
@@ -1270,7 +830,7 @@ const CreateNewOutInProcessUI = ({route, navigation, ...props}) => {
               </View>
             </TouchableOpacity>
 
-            {showShipFromList && (
+            {false && (
               <View style={styles.dropdownContent1}>
                 <TextInput
                   style={styles.searchInput}
@@ -1343,7 +903,7 @@ const CreateNewOutInProcessUI = ({route, navigation, ...props}) => {
               </View>
             </TouchableOpacity>
 
-            {showReceivedAtList && (
+            {false && (
               <View style={styles.dropdownContent1}>
                 <TextInput
                   style={styles.searchInput}
@@ -1373,7 +933,7 @@ const CreateNewOutInProcessUI = ({route, navigation, ...props}) => {
             )}
           </View>
 
-          <View
+          {/* <View
             style={{
               width: '90%',
               marginTop: 20,
@@ -1394,7 +954,7 @@ const CreateNewOutInProcessUI = ({route, navigation, ...props}) => {
                 Add
               </Text>
             </TouchableOpacity>
-          </View>
+          </View> */}
 
           <View style={styles.wrapper}>
             <ScrollView nestedScrollEnabled={true} horizontal>
@@ -1425,8 +985,8 @@ const CreateNewOutInProcessUI = ({route, navigation, ...props}) => {
                 </View>
 
                 {rows.map(row => (
-                  <View key={row.id}>
-                    <View style={styles.table_body_single_row}>
+                  <>
+                    <View key={row.id} style={styles.table_body_single_row}>
                       <View style={{width: 60}}>
                         <TouchableOpacity
                           style={{alignItems: '', justifyContent: ''}}
@@ -1478,17 +1038,12 @@ const CreateNewOutInProcessUI = ({route, navigation, ...props}) => {
                                 <Text
                                   style={
                                     row.garmentTypeId
-                                      ? styles.dropTextLightStyle
-                                      : styles.dropTextInputStyle
+                                      ? [styles.dropTextLightStyle]
+                                      : [styles.dropTextInputStyle]
                                   }>
                                   {'*Types Of Garments '}
                                 </Text>
-                                <Text
-                                  style={
-                                    row.garmentTypeId
-                                      ? styles.dropTextInputStyle
-                                      : styles.dropTextLightStyle
-                                  }>
+                                <Text style={[styles.dropTextInputStyle]}>
                                   {row.garmentTypeId
                                     ? row.garmentTypeName
                                     : 'Select garmets'}
@@ -1502,7 +1057,7 @@ const CreateNewOutInProcessUI = ({route, navigation, ...props}) => {
                               />
                             </View>
                           </TouchableOpacity>
-                          {row.showGarmentTypeList && (
+                          {row.showGarmentTypeList && false && (
                             <View style={styles.dropdownContent1}>
                               <TextInput
                                 style={styles.searchInput}
@@ -1575,17 +1130,12 @@ const CreateNewOutInProcessUI = ({route, navigation, ...props}) => {
                                 <Text
                                   style={
                                     row.outprocessTypeId
-                                      ? styles.dropTextLightStyle
-                                      : styles.dropTextInputStyle
+                                      ? [styles.dropTextLightStyle]
+                                      : [styles.dropTextInputStyle]
                                   }>
                                   {'*Outprocess Type '}
                                 </Text>
-                                <Text
-                                  style={
-                                    row.outprocessTypeId
-                                      ? styles.dropTextInputStyle
-                                      : styles.dropTextLightStyle
-                                  }>
+                                <Text style={[styles.dropTextInputStyle]}>
                                   {row.outprocessTypeId
                                     ? row.outprocessTypeName
                                     : 'Select '}
@@ -1668,13 +1218,8 @@ const CreateNewOutInProcessUI = ({route, navigation, ...props}) => {
                                     ? {
                                         ...r,
                                         showProjectList: !r.showProjectList,
-                                        filteredProjects: r.projectsList,
                                       }
-                                    : {
-                                        ...r,
-                                        showProjectList: false,
-                                        filteredProjects: r.projectsList,
-                                      },
+                                    : {...r, showProjectList: false},
                                 ),
                               );
                             }}>
@@ -1683,17 +1228,12 @@ const CreateNewOutInProcessUI = ({route, navigation, ...props}) => {
                                 <Text
                                   style={
                                     row.projectId
-                                      ? styles.dropTextLightStyle
-                                      : styles.dropTextInputStyle
+                                      ? [styles.dropTextLightStyle]
+                                      : [styles.dropTextInputStyle]
                                   }>
                                   {'Project/Brand'}
                                 </Text>
-                                <Text
-                                  style={
-                                    row.projectId
-                                      ? styles.dropTextInputStyle
-                                      : styles.dropTextLightStyle
-                                  }>
+                                <Text style={[styles.dropTextInputStyle]}>
                                   {row.projectId ? row.projectName : 'Select '}
                                 </Text>
                               </View>
@@ -1749,7 +1289,7 @@ const CreateNewOutInProcessUI = ({route, navigation, ...props}) => {
                       </View>
 
                       <View style={{width: 5}}></View>
-                      {/* style */}
+                      {/* style*/}
                       <View style={{width: 200}}>
                         <View
                           style={{
@@ -1774,13 +1314,8 @@ const CreateNewOutInProcessUI = ({route, navigation, ...props}) => {
                                     ? {
                                         ...r,
                                         showStyleList: !r.showStyleList,
-                                        filteredStyles: r.stylesList,
                                       }
-                                    : {
-                                        ...r,
-                                        showStyleList: false,
-                                        filteredStyles: r.stylesList,
-                                      },
+                                    : {...r, showStyleList: false},
                                 ),
                               );
                             }}>
@@ -1789,17 +1324,12 @@ const CreateNewOutInProcessUI = ({route, navigation, ...props}) => {
                                 <Text
                                   style={
                                     row.styleId
-                                      ? styles.dropTextLightStyle
-                                      : styles.dropTextInputStyle
+                                      ? [styles.dropTextLightStyle]
+                                      : [styles.dropTextInputStyle]
                                   }>
                                   {'*Style'}
                                 </Text>
-                                <Text
-                                  style={
-                                    row.styleId
-                                      ? styles.dropTextInputStyle
-                                      : styles.dropTextLightStyle
-                                  }>
+                                <Text style={[styles.dropTextInputStyle]}>
                                   {row.styleId ? row.styleName : 'Select '}
                                 </Text>
                               </View>
@@ -1863,7 +1393,7 @@ const CreateNewOutInProcessUI = ({route, navigation, ...props}) => {
                           }}>
                           {row?.childTable?.map((item, index) => (
                             <View
-                              key={item?.sizeId + index}
+                              key={item?.SIZE_ID + index}
                               style={{
                                 width: 100,
                                 margin: 5,
@@ -1873,65 +1403,22 @@ const CreateNewOutInProcessUI = ({route, navigation, ...props}) => {
                               }}>
                               <TextInput
                                 style={styles.table_data_input1}
-                                label={item.sizeDesc}
+                                label={item.sizename}
                                 value={item.enteredInput}
                                 mode="outlined"
                                 onChangeText={text =>
-                                  updateChildInput(row.id, item.sizeId, text)
+                                  updateChildInput(row.id, item.SIZE_ID, text)
                                 }
                               />
-                              {/* <Text style={{marginTop: 5, color: 'gray'}}>
+                              <Text style={{marginTop: 5, color: 'gray'}}>
                                 ( {item.sizereceivedqty} / {item.sizeqty} )
-                              </Text> */}
+                              </Text>
                             </View>
                           ))}
                         </View>
-
-                        <View style={styles.table_body_single_row}>
-                           <View
-                              style={{
-                                width: 100,
-                                margin: 5,
-                                alignItems: 'center',
-                                padding: 10,
-                                borderRadius: 5,
-                              }}>
-                              <TextInput
-                                style={styles.table_data_input1}
-                                label={"TOTALQTY"}
-                                value={"0"}
-                                mode="outlined"
-                                onChangeText={text =>
-                                  updateChildInput(row.id, item.sizeId, text)
-                                }
-                              />
-                            </View>
-                        </View>
-
-                        <View style={styles.table_body_single_row}>
-                           <View
-                              style={{
-                                width: 100,
-                                margin: 5,
-                                alignItems: 'center',
-                                padding: 10,
-                                borderRadius: 5,
-                              }}>
-                              <TextInput
-                                style={styles.table_data_input1}
-                                label={"* UNIT PRICE"}
-                                value={"0"}
-                                mode="outlined"
-                                onChangeText={text =>
-                                  updateChildInput(row.id, item.sizeId, text)
-                                }
-                              />
-                            </View>
-                        </View>
-
                       </View>
                     )}
-                  </View>
+                  </>
                 ))}
               </View>
             </ScrollView>
@@ -1941,13 +1428,13 @@ const CreateNewOutInProcessUI = ({route, navigation, ...props}) => {
 
       <View style={CommonStyles.bottomViewComponentStyle}>
         <BottomComponent
-          rightBtnTitle={'Save'}
+          rightBtnTitle={'Submit'}
           leftBtnTitle={'Back'}
           isLeftBtnEnable={true}
           rigthBtnState={true}
           isRightBtnEnable={true}
+          leftButtonAction={() => backBtnAction()}
           rightButtonAction={async () => submitAction()}
-          leftButtonAction={async () => backAction()}
         />
       </View>
 
@@ -1977,7 +1464,7 @@ const CreateNewOutInProcessUI = ({route, navigation, ...props}) => {
   );
 };
 
-export default CreateNewOutInProcessUI;
+export default DeliveryChallanEditUI;
 
 const getStyles = colors =>
   StyleSheet.create({

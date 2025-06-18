@@ -54,7 +54,7 @@ const DDAEdit = ({ navigation, route, ...props }) => {
       "company":JSON.parse(companyObj),
 
     }
-    console.log(' DDA edit request body --->,',obj);
+    // console.log(' DDA edit request body --->,',obj);
     let EditDDAAPIObj = await APIServiceCall.EditDDA(obj);
     set_isLoading(false);
 

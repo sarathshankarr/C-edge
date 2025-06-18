@@ -76,12 +76,12 @@ const Sidebar = ({navigation}) => {
           menu_id: 4,
           src: require('../../../assets/images/png/stamp.png'),
         },
-        // {
-        //   label: 'Box Packing',
-        //   route: 'BoxPackingList',
-        //   menu_id: 4,
-        //   src: require('../../../assets/images/png/stamp.png'),
-        // },
+        {
+          label: 'Box Packing',
+          route: 'BoxPackingList',
+          menu_id: 4,
+          src: require('../../../assets/images/png/stamp.png'),
+        },
         // {
         //   label: 'Master Box Packing',
         //   route: 'masterBoxPackingList',
@@ -294,6 +294,12 @@ const Sidebar = ({navigation}) => {
         // {
         //   label: 'New In Process',
         //   route: 'NewOutInProcessList',
+        //   menu_id: 49,
+        //   src: require('../../../assets/images/png/acknowledge.png'),
+        // },
+        // {
+        //   label: 'Delivery Challan ',
+        //   route: 'DeliveryChallanList',
         //   menu_id: 49,
         //   src: require('../../../assets/images/png/acknowledge.png'),
         // },

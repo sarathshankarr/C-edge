@@ -3832,6 +3832,162 @@ export async function GetCreateNewOutInProcess(jsonValue) {
     obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet }
     return obj;
 };
+export async function loadOutwardChildList(jsonValue) {
+
+    let returnError = undefined;
+    let statusData = undefined;
+    let responseData = undefined;
+    let logoutData = false;
+    let obj = undefined;
+
+    let internet = await internetCheck();
+    if (!internet) {
+        obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
+        return obj;
+    }
+    console.log("URL", Environment.uri + "outprocess/addOutProcessDetails");
+    await fetch(Environment.uri + "outprocess/addOutProcessDetails",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            },
+            body: JSON.stringify(jsonValue),
+        }
+    ).then((response) => response.json()).then(async (data) => {
+        if (data) {
+            statusData = true;
+            responseData = data
+        } else {
+            statusData = undefined;
+        }
+
+    }).catch((error) => {
+        console.log('loadOutwardChildList error ', error)
+        returnError = error;
+    });
+
+    obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet }
+    return obj;
+};
+export async function loadOutwardChildStyleList(jsonValue) {
+
+    let returnError = undefined;
+    let statusData = undefined;
+    let responseData = undefined;
+    let logoutData = false;
+    let obj = undefined;
+
+    let internet = await internetCheck();
+    if (!internet) {
+        obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
+        return obj;
+    }
+    console.log("URL", Environment.uri + "outprocess/getBrandStyles");
+    await fetch(Environment.uri + "outprocess/getBrandStyles",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            },
+            body: JSON.stringify(jsonValue),
+        }
+    ).then((response) => response.json()).then(async (data) => {
+        if (data) {
+            statusData = true;
+            responseData = data
+        } else {
+            statusData = undefined;
+        }
+
+    }).catch((error) => {
+        console.log('loadOutwardChildStyleList error ', error)
+        returnError = error;
+    });
+
+    obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet }
+    return obj;
+};
+export async function loadOutwardChildSizesList(jsonValue) {
+
+    let returnError = undefined;
+    let statusData = undefined;
+    let responseData = undefined;
+    let logoutData = false;
+    let obj = undefined;
+
+    let internet = await internetCheck();
+    if (!internet) {
+        obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
+        return obj;
+    }
+    console.log("URL", Environment.uri + "outprocess/getSizes");
+    await fetch(Environment.uri + "outprocess/getSizes",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            },
+            body: JSON.stringify(jsonValue),
+        }
+    ).then((response) => response.json()).then(async (data) => {
+        if (data) {
+            statusData = true;
+            responseData = data
+        } else {
+            statusData = undefined;
+        }
+
+    }).catch((error) => {
+        console.log('loadOutwardChildSizesList error ', error)
+        returnError = error;
+    });
+
+    obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet }
+    return obj;
+};
+export async function loadOutwardChildUnitPricesList(jsonValue) {
+
+    let returnError = undefined;
+    let statusData = undefined;
+    let responseData = undefined;
+    let logoutData = false;
+    let obj = undefined;
+
+    let internet = await internetCheck();
+    if (!internet) {
+        obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
+        return obj;
+    }
+    console.log("URL", Environment.uri + "outprocess/getPrice");
+    await fetch(Environment.uri + "outprocess/getPrice",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            },
+            body: JSON.stringify(jsonValue),
+        }
+    ).then((response) => response.json()).then(async (data) => {
+        if (data) {
+            statusData = true;
+            responseData = data
+        } else {
+            statusData = undefined;
+        }
+
+    }).catch((error) => {
+        console.log('loadOutwardChildSizesList error ', error)
+        returnError = error;
+    });
+
+    obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet }
+    return obj;
+};
 export async function GetCreateStyleBomReportList(jsonValue) {
 
     let returnError = undefined;
@@ -5517,7 +5673,7 @@ export async function saveCreateFabricMasters(jsonValue) {
     obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet }
     return obj;
 };
-export async function saveCreateVendorMasters(jsonValue) {
+export async function saveCreateOutwardOutProcess(jsonValue) {
 
     let returnError = undefined;
     let statusData = undefined;
@@ -5530,8 +5686,8 @@ export async function saveCreateVendorMasters(jsonValue) {
         obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
         return obj;
     }
-    // console.log('saveCreateProcessIn ', jsonValue, Environment.uri + "vendor/saveVendor")
-    await fetch(Environment.uri + "vendor/saveVendor",
+    // console.log('saveCreateProcessIn ', jsonValue, Environment.uri + "outprocess/saveNewOutData")
+    await fetch(Environment.uri + "outprocess/saveNewOutData",
         {
             method: "POST",
             headers: {
@@ -5541,7 +5697,7 @@ export async function saveCreateVendorMasters(jsonValue) {
             body: JSON.stringify(jsonValue),
         }
     ).then((response) => response.json()).then(async (data) => {
-        // console.log('saveCreateVendorMasters ', data)
+        // console.log('saveCreateOutwardOutProcess ', data)
 
         if (data) {
             statusData = true;
@@ -5551,7 +5707,7 @@ export async function saveCreateVendorMasters(jsonValue) {
         }
 
     }).catch((error) => {
-        console.log('saveCreateVendorMasters', error)
+        console.log('saveCreateOutwardOutProcess', error)
         returnError = error;
     });
 

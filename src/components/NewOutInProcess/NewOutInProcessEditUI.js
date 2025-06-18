@@ -130,25 +130,34 @@ const NewOutInProcessEditUI = ({route, ...props}) => {
         if (props.itemsObj.outprocessDetails.particulars) {
           const particulars = props.itemsObj.outprocessDetails.particulars;
           const childArray = particulars.map((item, index) => {
-
             const garmentTypeMapList = Object.keys(
               props.itemsObj.productsMap,
             ).map(key => ({
               id: key,
               name: props.itemsObj.productsMap[key],
             }));
-            const brandTypeMapList = Object.keys(
-              props.itemsObj.brandsMap,
-            ).map(key => ({
-              id: key,
-              name: props.itemsObj.brandsMap[key],
-            }));
-
+            const brandTypeMapList = Object.keys(props.itemsObj.brandsMap).map(
+              key => ({
+                id: key,
+                name: props.itemsObj.brandsMap[key],
+              }),
+            );
+            let sizesArray = [];
+            if (item.sizenames && item.sizeQuantities && item.sizereceviedqty) {
+              sizesArray = item.sizenames.map((sizeName, idx) => ({
+                sizename: sizeName,
+                sizeqty: item.sizeQuantities[index],
+                sizereceivedqty: item.sizereceviedqty[index],
+                enteredInput: '0',
+                SIZE_ID: Date.now() + idx + 1,
+              }));
+            }
 
             return {
               id: Date.now(),
 
-              garmentTypeName:props.itemsObj.productsMap[(item.garmentTypes).toString()],
+              garmentTypeName:
+                props.itemsObj.productsMap[item.garmentTypes.toString()],
               garmentTypeId: item.garmentTypes,
               showGarmentTypeList: false,
               filteredGarmentTypes: garmentTypeMapList || [],
@@ -163,7 +172,7 @@ const NewOutInProcessEditUI = ({route, ...props}) => {
               projectName: item.outprocessType,
               projectId: item.brandId,
               showProjectList: false,
-              filteredProjects:brandTypeMapList ||  [],
+              filteredProjects: brandTypeMapList || [],
               projectsList: brandTypeMapList || [],
 
               styleName: item.styleNoStr,
@@ -171,10 +180,11 @@ const NewOutInProcessEditUI = ({route, ...props}) => {
               showStyleList: false,
               filteredStyles: [],
               stylesList: [],
+              childTable: sizesArray || [],
             };
           });
 
-          console.log("child array ", childArray)
+          console.log('child array ', childArray[0]?.childTable);
           setRows(childArray);
         }
       }
@@ -479,11 +489,27 @@ const NewOutInProcessEditUI = ({route, ...props}) => {
     return ans;
   }
 
-
   const RemoveRow = id => {
     console.log('ROW ID ===> ', id);
     const filtered = rows.filter(item => item.id !== id);
     setRows(filtered);
+  };
+
+  const updateChildInput = (rowId, sizeId, text) => {
+    setRows(prevRows =>
+      prevRows.map(row =>
+        row.id === rowId
+          ? {
+              ...row,
+              childTable: row.childTable.map(child =>
+                child.SIZE_ID === sizeId
+                  ? {...child, enteredInput: text}
+                  : child,
+              ),
+            }
+          : row,
+      ),
+    );
   };
 
   return (
@@ -959,402 +985,440 @@ const NewOutInProcessEditUI = ({route, ...props}) => {
                 </View>
 
                 {rows.map(row => (
-                  <View key={row.id} style={styles.table_body_single_row}>
-                    <View style={{width: 60}}>
-                      <TouchableOpacity
-                        style={{alignItems: '', justifyContent: ''}}
-                        onPress={() => RemoveRow(row.id)}>
-                        <Image source={closeImg} style={styles.imageStyle1} />
-                      </TouchableOpacity>
-                    </View>
-
-                    {/* Types Of Garments Dropdown */}
-                    <View style={{width: 200}}>
-                      <View
-                        style={{
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          marginTop: hp('1%'),
-                          backgroundColor: '#ffffff',
-                        }}>
+                  <>
+                    <View key={row.id} style={styles.table_body_single_row}>
+                      <View style={{width: 60}}>
                         <TouchableOpacity
-                          style={{
-                            flexDirection: 'row',
-                            borderWidth: 0.5,
-                            borderColor: '#D8D8D8',
-                            borderRadius: hp('0.5%'),
-                            width: '100%',
-                            overflow: 'hidden',
-                          }}
-                          onPress={() => {
-                            setRows(
-                              rows.map(r =>
-                                r.id === row.id
-                                  ? {
-                                      ...r,
-                                      showGarmentTypeList:
-                                        !r.showGarmentTypeList,
-                                      filteredGarmentTypes: r.garmentTypesList,
-                                    }
-                                  : {
-                                      ...r,
-                                      showGarmentTypeList: false,
-                                      filteredGarmentTypes: r.garmentTypesList,
-                                    },
-                              ),
-                            );
-                          }}>
-                          <View style={[styles.SectionStyle1]}>
-                            <View style={{flexDirection: 'column'}}>
-                              <Text
-                                style={
-                                  row.garmentTypeId
-                                    ? styles.dropTextLightStyle
-                                    : styles.dropTextInputStyle
-                                }>
-                                {'*Types Of Garments '}
-                              </Text>
-                              <Text style={styles.dropTextLightStyle}>
-                                {row.garmentTypeId
-                                  ? row.garmentTypeName
-                                  : 'Select garmets'}
-                              </Text>
-                            </View>
-                          </View>
-                          <View style={{justifyContent: 'center'}}>
-                            <Image
-                              source={downArrowImg}
-                              style={styles.imageStyle}
-                            />
-                          </View>
+                          style={{alignItems: '', justifyContent: ''}}
+                          onPress={() => RemoveRow(row.id)}>
+                          <Image source={closeImg} style={styles.imageStyle1} />
                         </TouchableOpacity>
-                        {row.showGarmentTypeList && false && (
-                          <View style={styles.dropdownContent1}>
-                            <TextInput
-                              style={styles.searchInput}
-                              placeholder="Search"
-                              onChangeText={text =>
-                                handleSearchGarmetType(text, row.id)
-                              }
-                              placeholderTextColor="#000"
-                            />
-                            <ScrollView nestedScrollEnabled={true}>
-                              {row.filteredGarmentTypes.length === 0 ? (
-                                <Text style={styles.noCategoriesText}>
-                                  Sorry, no results found!
+                      </View>
+
+                      {/* Types Of Garments Dropdown */}
+                      <View style={{width: 200}}>
+                        <View
+                          style={{
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            marginTop: hp('1%'),
+                            backgroundColor: '#ffffff',
+                          }}>
+                          <TouchableOpacity
+                            style={{
+                              flexDirection: 'row',
+                              borderWidth: 0.5,
+                              borderColor: '#D8D8D8',
+                              borderRadius: hp('0.5%'),
+                              width: '100%',
+                              overflow: 'hidden',
+                            }}
+                            onPress={() => {
+                              setRows(
+                                rows.map(r =>
+                                  r.id === row.id
+                                    ? {
+                                        ...r,
+                                        showGarmentTypeList:
+                                          !r.showGarmentTypeList,
+                                        filteredGarmentTypes:
+                                          r.garmentTypesList,
+                                      }
+                                    : {
+                                        ...r,
+                                        showGarmentTypeList: false,
+                                        filteredGarmentTypes:
+                                          r.garmentTypesList,
+                                      },
+                                ),
+                              );
+                            }}>
+                            <View style={[styles.SectionStyle1]}>
+                              <View style={{flexDirection: 'column'}}>
+                                <Text
+                                  style={
+                                    row.garmentTypeId
+                                      ? [styles.dropTextLightStyle]
+                                      : [styles.dropTextInputStyle]
+                                  }>
+                                  {'*Types Of Garments '}
                                 </Text>
-                              ) : (
-                                row.filteredGarmentTypes.map(item => (
-                                  <TouchableOpacity
-                                    key={item?.id}
-                                    onPress={() =>
-                                      actionOnGarmetTypes(item, row.id)
-                                    }>
-                                    <View style={styles.dropdownOption}>
-                                      <Text style={{color: '#000'}}>
-                                        {item?.name}
-                                      </Text>
-                                    </View>
-                                  </TouchableOpacity>
-                                ))
-                              )}
-                            </ScrollView>
-                          </View>
-                        )}
+                                <Text style={[styles.dropTextInputStyle]}>
+                                  {row.garmentTypeId
+                                    ? row.garmentTypeName
+                                    : 'Select garmets'}
+                                </Text>
+                              </View>
+                            </View>
+                            <View style={{justifyContent: 'center'}}>
+                              <Image
+                                source={downArrowImg}
+                                style={styles.imageStyle}
+                              />
+                            </View>
+                          </TouchableOpacity>
+                          {row.showGarmentTypeList && false && (
+                            <View style={styles.dropdownContent1}>
+                              <TextInput
+                                style={styles.searchInput}
+                                placeholder="Search"
+                                onChangeText={text =>
+                                  handleSearchGarmetType(text, row.id)
+                                }
+                                placeholderTextColor="#000"
+                              />
+                              <ScrollView nestedScrollEnabled={true}>
+                                {row.filteredGarmentTypes.length === 0 ? (
+                                  <Text style={styles.noCategoriesText}>
+                                    Sorry, no results found!
+                                  </Text>
+                                ) : (
+                                  row.filteredGarmentTypes.map(item => (
+                                    <TouchableOpacity
+                                      key={item?.id}
+                                      onPress={() =>
+                                        actionOnGarmetTypes(item, row.id)
+                                      }>
+                                      <View style={styles.dropdownOption}>
+                                        <Text style={{color: '#000'}}>
+                                          {item?.name}
+                                        </Text>
+                                      </View>
+                                    </TouchableOpacity>
+                                  ))
+                                )}
+                              </ScrollView>
+                            </View>
+                          )}
+                        </View>
+                      </View>
+
+                      <View style={{width: 5}}></View>
+                      {/* Outprocess Type */}
+                      <View style={{width: 200}}>
+                        <View
+                          style={{
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            marginTop: hp('1%'),
+                            backgroundColor: '#ffffff',
+                          }}>
+                          <TouchableOpacity
+                            style={{
+                              flexDirection: 'row',
+                              borderWidth: 0.5,
+                              borderColor: '#D8D8D8',
+                              borderRadius: hp('0.5%'),
+                              width: '100%',
+                              overflow: 'hidden',
+                            }}
+                            onPress={() => {
+                              setRows(
+                                rows.map(r =>
+                                  r.id === row.id
+                                    ? {
+                                        ...r,
+                                        showOutprocessTypeList:
+                                          !r.showOutprocessTypeList,
+                                      }
+                                    : {...r, showOutprocessTypeList: false},
+                                ),
+                              );
+                            }}>
+                            <View style={[styles.SectionStyle1]}>
+                              <View style={{flexDirection: 'column'}}>
+                                <Text
+                                  style={
+                                    row.outprocessTypeId
+                                      ? [styles.dropTextLightStyle]
+                                      : [styles.dropTextInputStyle]
+                                  }>
+                                  {'*Outprocess Type '}
+                                </Text>
+                                <Text style={[styles.dropTextInputStyle]}>
+                                  {row.outprocessTypeId
+                                    ? row.outprocessTypeName
+                                    : 'Select '}
+                                </Text>
+                              </View>
+                            </View>
+                            <View style={{justifyContent: 'center'}}>
+                              <Image
+                                source={downArrowImg}
+                                style={{
+                                  height: 20,
+                                  width: 20,
+                                  tintColor: 'red',
+                                  aspectRatio: 1,
+                                  marginRight: 20,
+                                  resizeMode: 'contain',
+                                }}
+                              />
+                            </View>
+                          </TouchableOpacity>
+                          {row.showOutprocessTypeList && (
+                            <View style={styles.dropdownContent1}>
+                              <TextInput
+                                style={styles.searchInput}
+                                placeholder="Search "
+                                onChangeText={text =>
+                                  handleSearchOutprocessType(text, row.id)
+                                }
+                                placeholderTextColor="#000"
+                              />
+                              <ScrollView nestedScrollEnabled={true}>
+                                {row.filteredOutprocessTypes.length === 0 ? (
+                                  <Text style={styles.noCategoriesText}>
+                                    Sorry, no results found!
+                                  </Text>
+                                ) : (
+                                  row.filteredOutprocessTypes.map(item => (
+                                    <TouchableOpacity
+                                      key={item?.id}
+                                      onPress={() =>
+                                        actionOnOutProcessType(item, row.id)
+                                      }>
+                                      <View style={styles.dropdownOption}>
+                                        <Text style={{color: '#000'}}>
+                                          {item?.name}
+                                        </Text>
+                                      </View>
+                                    </TouchableOpacity>
+                                  ))
+                                )}
+                              </ScrollView>
+                            </View>
+                          )}
+                        </View>
+                      </View>
+
+                      <View style={{width: 5}}></View>
+                      {/* Project/Brand */}
+                      <View style={{width: 200}}>
+                        <View
+                          style={{
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            marginTop: hp('1%'),
+                            backgroundColor: '#ffffff',
+                          }}>
+                          <TouchableOpacity
+                            style={{
+                              flexDirection: 'row',
+                              borderWidth: 0.5,
+                              borderColor: '#D8D8D8',
+                              borderRadius: hp('0.5%'),
+                              width: '100%',
+                              overflow: 'hidden',
+                            }}
+                            onPress={() => {
+                              setRows(
+                                rows.map(r =>
+                                  r.id === row.id
+                                    ? {
+                                        ...r,
+                                        showProjectList: !r.showProjectList,
+                                      }
+                                    : {...r, showProjectList: false},
+                                ),
+                              );
+                            }}>
+                            <View style={[styles.SectionStyle1]}>
+                              <View style={{flexDirection: 'column'}}>
+                                <Text
+                                  style={
+                                    row.projectId
+                                      ? [styles.dropTextLightStyle]
+                                      : [styles.dropTextInputStyle]
+                                  }>
+                                  {'Project/Brand'}
+                                </Text>
+                                <Text style={[styles.dropTextInputStyle]}>
+                                  {row.projectId ? row.projectName : 'Select '}
+                                </Text>
+                              </View>
+                            </View>
+                            <View style={{justifyContent: 'center'}}>
+                              <Image
+                                source={downArrowImg}
+                                style={{
+                                  height: 20,
+                                  width: 20,
+                                  tintColor: 'red',
+                                  aspectRatio: 1,
+                                  marginRight: 20,
+                                  resizeMode: 'contain',
+                                }}
+                              />
+                            </View>
+                          </TouchableOpacity>
+                          {row.showProjectList && (
+                            <View style={styles.dropdownContent1}>
+                              <TextInput
+                                style={styles.searchInput}
+                                placeholder="Search "
+                                onChangeText={text =>
+                                  handleSearchProject(text, row.id)
+                                }
+                                placeholderTextColor="#000"
+                              />
+                              <ScrollView nestedScrollEnabled={true}>
+                                {row.filteredProjects.length === 0 ? (
+                                  <Text style={styles.noCategoriesText}>
+                                    Sorry, no results found!
+                                  </Text>
+                                ) : (
+                                  row.filteredProjects.map(item => (
+                                    <TouchableOpacity
+                                      key={item?.id}
+                                      onPress={() =>
+                                        actionOnProjects(item, row.id)
+                                      }>
+                                      <View style={styles.dropdownOption}>
+                                        <Text style={{color: '#000'}}>
+                                          {item?.name}
+                                        </Text>
+                                      </View>
+                                    </TouchableOpacity>
+                                  ))
+                                )}
+                              </ScrollView>
+                            </View>
+                          )}
+                        </View>
+                      </View>
+
+                      <View style={{width: 5}}></View>
+                      {/* style*/}
+                      <View style={{width: 200}}>
+                        <View
+                          style={{
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            marginTop: hp('1%'),
+                            backgroundColor: '#ffffff',
+                          }}>
+                          <TouchableOpacity
+                            style={{
+                              flexDirection: 'row',
+                              borderWidth: 0.5,
+                              borderColor: '#D8D8D8',
+                              borderRadius: hp('0.5%'),
+                              width: '100%',
+                              overflow: 'hidden',
+                            }}
+                            onPress={() => {
+                              setRows(
+                                rows.map(r =>
+                                  r.id === row.id
+                                    ? {
+                                        ...r,
+                                        showStyleList: !r.showStyleList,
+                                      }
+                                    : {...r, showStyleList: false},
+                                ),
+                              );
+                            }}>
+                            <View style={[styles.SectionStyle1]}>
+                              <View style={{flexDirection: 'column'}}>
+                                <Text
+                                  style={
+                                    row.styleId
+                                      ? [styles.dropTextLightStyle]
+                                      : [styles.dropTextInputStyle]
+                                  }>
+                                  {'*Style'}
+                                </Text>
+                                <Text style={[styles.dropTextInputStyle]}>
+                                  {row.styleId ? row.styleName : 'Select '}
+                                </Text>
+                              </View>
+                            </View>
+                            <View style={{justifyContent: 'center'}}>
+                              <Image
+                                source={downArrowImg}
+                                style={{
+                                  height: 20,
+                                  width: 20,
+                                  tintColor: 'red',
+                                  aspectRatio: 1,
+                                  marginRight: 20,
+                                  resizeMode: 'contain',
+                                }}
+                              />
+                            </View>
+                          </TouchableOpacity>
+                          {row.showStyleList && (
+                            <View style={styles.dropdownContent1}>
+                              <TextInput
+                                style={styles.searchInput}
+                                placeholder="Search "
+                                onChangeText={text =>
+                                  handleSearchStyle(text, row.id)
+                                }
+                                placeholderTextColor="#000"
+                              />
+                              <ScrollView nestedScrollEnabled={true}>
+                                {row.filteredStyles.length === 0 ? (
+                                  <Text style={styles.noCategoriesText}>
+                                    Sorry, no results found!
+                                  </Text>
+                                ) : (
+                                  row.filteredStyles.map(item => (
+                                    <TouchableOpacity
+                                      key={item?.id}
+                                      onPress={() =>
+                                        actionOnStyles(item, row.id)
+                                      }>
+                                      <View style={styles.dropdownOption}>
+                                        <Text style={{color: '#000'}}>
+                                          {item?.name}
+                                        </Text>
+                                      </View>
+                                    </TouchableOpacity>
+                                  ))
+                                )}
+                              </ScrollView>
+                            </View>
+                          )}
+                        </View>
                       </View>
                     </View>
-
-                    <View style={{width: 5}}></View>
-                    {/* Outprocess Type */}
-                    <View style={{width: 200}}>
-                      <View
-                        style={{
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          marginTop: hp('1%'),
-                          backgroundColor: '#ffffff',
-                        }}>
-                        <TouchableOpacity
+                    {row?.childTable?.length > 0 && (
+                      <View style={styles.table_body_single_row}>
+                        <View
                           style={{
+                            width: 470,
                             flexDirection: 'row',
-                            borderWidth: 0.5,
-                            borderColor: '#D8D8D8',
-                            borderRadius: hp('0.5%'),
-                            width: '100%',
-                            overflow: 'hidden',
-                          }}
-                          onPress={() => {
-                            setRows(
-                              rows.map(r =>
-                                r.id === row.id
-                                  ? {
-                                      ...r,
-                                      showOutprocessTypeList:
-                                        !r.showOutprocessTypeList,
-                                    }
-                                  : {...r, showOutprocessTypeList: false},
-                              ),
-                            );
                           }}>
-                          <View style={[styles.SectionStyle1]}>
-                            <View style={{flexDirection: 'column'}}>
-                              <Text
-                                style={
-                                  row.stockId
-                                    ? styles.dropTextLightStyle
-                                    : styles.dropTextInputStyle
-                                }>
-                                {'*Outprocess Type '}
-                              </Text>
-                              <Text style={styles.dropTextLightStyle}>
-                                {row.outprocessTypeId
-                                  ? row.outprocessTypeName
-                                  : 'Select '}
-                              </Text>
-                            </View>
-                          </View>
-                          <View style={{justifyContent: 'center'}}>
-                            <Image
-                              source={downArrowImg}
+                          {row?.childTable?.map((item, index) => (
+                            <View
+                              key={item?.SIZE_ID + index}
                               style={{
-                                height: 20,
-                                width: 20,
-                                tintColor: 'red',
-                                aspectRatio: 1,
-                                marginRight: 20,
-                                resizeMode: 'contain',
-                              }}
-                            />
-                          </View>
-                        </TouchableOpacity>
-                        {row.showOutprocessTypeList && (
-                          <View style={styles.dropdownContent1}>
-                            <TextInput
-                              style={styles.searchInput}
-                              placeholder="Search "
-                              onChangeText={text =>
-                                handleSearchOutprocessType(text, row.id)
-                              }
-                              placeholderTextColor="#000"
-                            />
-                            <ScrollView nestedScrollEnabled={true}>
-                              {row.filteredOutprocessTypes.length === 0 ? (
-                                <Text style={styles.noCategoriesText}>
-                                  Sorry, no results found!
-                                </Text>
-                              ) : (
-                                row.filteredOutprocessTypes.map(item => (
-                                  <TouchableOpacity
-                                    key={item?.id}
-                                    onPress={() =>
-                                      actionOnOutProcessType(item, row.id)
-                                    }>
-                                    <View style={styles.dropdownOption}>
-                                      <Text style={{color: '#000'}}>
-                                        {item?.name}
-                                      </Text>
-                                    </View>
-                                  </TouchableOpacity>
-                                ))
-                              )}
-                            </ScrollView>
-                          </View>
-                        )}
-                      </View>
-                    </View>
-
-                    <View style={{width: 5}}></View>
-                    {/* Project/Brand */}
-                    <View style={{width: 200}}>
-                      <View
-                        style={{
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          marginTop: hp('1%'),
-                          backgroundColor: '#ffffff',
-                        }}>
-                        <TouchableOpacity
-                          style={{
-                            flexDirection: 'row',
-                            borderWidth: 0.5,
-                            borderColor: '#D8D8D8',
-                            borderRadius: hp('0.5%'),
-                            width: '100%',
-                            overflow: 'hidden',
-                          }}
-                          onPress={() => {
-                            setRows(
-                              rows.map(r =>
-                                r.id === row.id
-                                  ? {
-                                      ...r,
-                                      showProjectList: !r.showProjectList,
-                                    }
-                                  : {...r, showProjectList: false},
-                              ),
-                            );
-                          }}>
-                          <View style={[styles.SectionStyle1]}>
-                            <View style={{flexDirection: 'column'}}>
-                              <Text
-                                style={
-                                  row.stockId
-                                    ? styles.dropTextLightStyle
-                                    : styles.dropTextInputStyle
-                                }>
-                                {'Project/Brand'}
-                              </Text>
-                              <Text style={styles.dropTextLightStyle}>
-                                {row.projectId ? row.projectName : 'Select '}
+                                width: 100,
+                                margin: 5,
+                                alignItems: 'center',
+                                padding: 10,
+                                borderRadius: 5,
+                              }}>
+                              <TextInput
+                                style={styles.table_data_input1}
+                                label={item.sizename}
+                                value={item.enteredInput}
+                                mode="outlined"
+                                onChangeText={text =>
+                                  updateChildInput(row.id, item.SIZE_ID, text)
+                                }
+                              />
+                              <Text style={{marginTop: 5, color: 'gray'}}>
+                                ( {item.sizereceivedqty} / {item.sizeqty} )
                               </Text>
                             </View>
-                          </View>
-                          <View style={{justifyContent: 'center'}}>
-                            <Image
-                              source={downArrowImg}
-                              style={{
-                                height: 20,
-                                width: 20,
-                                tintColor: 'red',
-                                aspectRatio: 1,
-                                marginRight: 20,
-                                resizeMode: 'contain',
-                              }}
-                            />
-                          </View>
-                        </TouchableOpacity>
-                        {row.showProjectList && (
-                          <View style={styles.dropdownContent1}>
-                            <TextInput
-                              style={styles.searchInput}
-                              placeholder="Search "
-                              onChangeText={text =>
-                                handleSearchProject(text, row.id)
-                              }
-                              placeholderTextColor="#000"
-                            />
-                            <ScrollView nestedScrollEnabled={true}>
-                              {row.filteredProjects.length === 0 ? (
-                                <Text style={styles.noCategoriesText}>
-                                  Sorry, no results found!
-                                </Text>
-                              ) : (
-                                row.filteredProjects.map(item => (
-                                  <TouchableOpacity
-                                    key={item?.id}
-                                    onPress={() =>
-                                      actionOnProjects(item, row.id)
-                                    }>
-                                    <View style={styles.dropdownOption}>
-                                      <Text style={{color: '#000'}}>
-                                        {item?.name}
-                                      </Text>
-                                    </View>
-                                  </TouchableOpacity>
-                                ))
-                              )}
-                            </ScrollView>
-                          </View>
-                        )}
+                          ))}
+                        </View>
                       </View>
-                    </View>
-
-                    <View style={{width: 5}}></View>
-                    {/* Project/Brand */}
-                    <View style={{width: 200}}>
-                      <View
-                        style={{
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          marginTop: hp('1%'),
-                          backgroundColor: '#ffffff',
-                        }}>
-                        <TouchableOpacity
-                          style={{
-                            flexDirection: 'row',
-                            borderWidth: 0.5,
-                            borderColor: '#D8D8D8',
-                            borderRadius: hp('0.5%'),
-                            width: '100%',
-                            overflow: 'hidden',
-                          }}
-                          onPress={() => {
-                            setRows(
-                              rows.map(r =>
-                                r.id === row.id
-                                  ? {
-                                      ...r,
-                                      showStyleList: !r.showStyleList,
-                                    }
-                                  : {...r, showStyleList: false},
-                              ),
-                            );
-                          }}>
-                          <View style={[styles.SectionStyle1]}>
-                            <View style={{flexDirection: 'column'}}>
-                              <Text
-                                style={
-                                  row.stockId
-                                    ? styles.dropTextLightStyle
-                                    : styles.dropTextInputStyle
-                                }>
-                                {'*Style'}
-                              </Text>
-                              <Text style={styles.dropTextLightStyle}>
-                                {row.styleId ? row.styleName : 'Select '}
-                              </Text>
-                            </View>
-                          </View>
-                          <View style={{justifyContent: 'center'}}>
-                            <Image
-                              source={downArrowImg}
-                              style={{
-                                height: 20,
-                                width: 20,
-                                tintColor: 'red',
-                                aspectRatio: 1,
-                                marginRight: 20,
-                                resizeMode: 'contain',
-                              }}
-                            />
-                          </View>
-                        </TouchableOpacity>
-                        {row.showStyleList && (
-                          <View style={styles.dropdownContent1}>
-                            <TextInput
-                              style={styles.searchInput}
-                              placeholder="Search "
-                              onChangeText={text =>
-                                handleSearchStyle(text, row.id)
-                              }
-                              placeholderTextColor="#000"
-                            />
-                            <ScrollView nestedScrollEnabled={true}>
-                              {row.filteredStyles.length === 0 ? (
-                                <Text style={styles.noCategoriesText}>
-                                  Sorry, no results found!
-                                </Text>
-                              ) : (
-                                row.filteredStyles.map(item => (
-                                  <TouchableOpacity
-                                    key={item?.id}
-                                    onPress={() =>
-                                      actionOnStyles(item, row.id)
-                                    }>
-                                    <View style={styles.dropdownOption}>
-                                      <Text style={{color: '#000'}}>
-                                        {item?.name}
-                                      </Text>
-                                    </View>
-                                  </TouchableOpacity>
-                                ))
-                              )}
-                            </ScrollView>
-                          </View>
-                        )}
-                      </View>
-                    </View>
-                  </View>
+                    )}
+                  </>
                 ))}
               </View>
             </ScrollView>
@@ -1572,5 +1636,14 @@ const getStyles = colors =>
       resizeMode: 'contain',
       tintColor: 'red',
       alignSelf: 'center',
+    },
+    table_data_input1: {
+      fontSize: 16,
+      color: '#000',
+      borderBottomWidth: 1,
+      borderColor: '#ccc',
+      paddingHorizontal: 5,
+      textAlign: 'center',
+      flexDirection: 'row',
     },
   });
