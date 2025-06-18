@@ -79,11 +79,15 @@ const DDAEditUi = ({route, ...props}) => {
   useEffect(() => {
     if (props.itemsObj) {
       set_dataObj(props?.itemsObj);
-
-      if (props?.itemsObj?.color) {
+// console.log("props ===> ", props.itemsObj)
+      if (props?.itemsObj?.color && props?.itemsObj?.colormap) {
+        //maps colormap, colorsMap
         const colorNum = Number(props?.itemsObj?.color);
-        set_colorId(colorNum);
-        set_colorName(props?.itemsObj?.colorsMap[colorNum]);
+        // set_colorId(colorNum);
+        // set_colorName(props?.itemsObj?.colorsMap[colorNum]);
+        // console.log("color is ",props?.itemsObj?.color, props?.itemsObj?.colorsMap) 
+        set_colorId(props?.itemsObj?.color);
+        set_colorName(props?.itemsObj?.colormap[props?.itemsObj?.color]);
       }
 
       if (props?.itemsObj?.uom) {

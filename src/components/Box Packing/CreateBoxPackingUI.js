@@ -842,7 +842,7 @@ const CreateBoxPackingUI = ({route, navigation, ...props}) => {
                                   }
                                 />
                                 <Text style={{marginTop: 5, color: 'gray'}}>
-                                  {'hi'}
+                                  {/* {'hi'} */}
                                 </Text>
                               </View>
                             ))}

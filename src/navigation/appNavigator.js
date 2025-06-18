@@ -137,6 +137,9 @@ import SaveGoodsReceiptNote from '../components/GoodsReceiptNote/SaveGoodsReceip
 import CreateNewOutInProcess from '../components/NewOutInProcess/CreateNewOutInProcess';
 import NewOutInProcessList from '../components/NewOutInProcess/NewOutInProcessList';
 import NewOutInProcessEdit from '../components/NewOutInProcess/NewOutInProcessEdit';
+import CreateDeliveryChallan from '../components/Delivery Challan Out/CreateDeliveryChallan';
+import DeliveryChallanList from '../components/Delivery Challan Out/DeliveryChallanList';
+import DeliveryChallanEdit from '../components/Delivery Challan Out/DeliveryChallanEdit';
 
 
 const Stack = createNativeStackNavigator();
@@ -277,6 +280,9 @@ const AppStack = () => {
       <Stack.Screen name="CreateNewOutInProcess" component={CreateNewOutInProcess} options={{ headerShown: false }} /> 
       <Stack.Screen name="NewOutInProcessList" component={NewOutInProcessList} options={{ headerShown: false }} /> 
       <Stack.Screen name="NewOutInProcessEdit" component={NewOutInProcessEdit} options={{ headerShown: false }} /> 
+      <Stack.Screen name="CreateDeliveryChallan" component={CreateDeliveryChallan} options={{ headerShown: false }} /> 
+      <Stack.Screen name="DeliveryChallanList" component={DeliveryChallanList} options={{ headerShown: false }} /> 
+      <Stack.Screen name="DeliveryChallanEdit" component={DeliveryChallanEdit} options={{ headerShown: false }} /> 
     </Stack.Navigator>
   );
 };
