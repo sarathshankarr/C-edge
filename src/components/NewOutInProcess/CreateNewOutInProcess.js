@@ -20,11 +20,19 @@ const CreateNewOutInProcess = ({route}) => {
   const [itemsObj, set_itemsObj] = useState([]);
   const [childObj, set_childObj] = useState([]);
   const [childObjSizes, set_childObjSizes] = useState([]);
+  const [childPricesObj, set_childPricesObj] = useState([]);
+  const [companyId, set_companyId] = useState('');
+
 
   React.useEffect(() => {
     getInitialData();
+    getCompanyId();
   }, []);
 
+  const getCompanyId = async() => {
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    set_companyId(companyId);
+  };
   const backBtnAction = () => {
     navigation.goBack();
   };
@@ -71,7 +79,7 @@ const CreateNewOutInProcess = ({route}) => {
     }
   };
 
-  const getStylesList = async (idx, type) => {
+  const getStylesList = async (idx, type, brand) => {
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
@@ -89,6 +97,8 @@ const CreateNewOutInProcess = ({route}) => {
     if (type === 0) {
       EditDDAAPIObj = await APIServiceCall.loadOutwardChildList(obj);
     } else {
+      obj.brandId =brand;
+      // console.log("req body style list ===> ", obj)
       EditDDAAPIObj = await APIServiceCall.loadOutwardChildStyleList(obj);
     }
     set_isLoading(false);
@@ -172,22 +182,23 @@ const CreateNewOutInProcess = ({route}) => {
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
     let companyObj = await AsyncStorage.getItem('companyObj');
-    console.log('getSizesList req body ', tempObj);
+    console.log('getPricesList req body 22 ', tempObj);
+    // return;
     set_isLoading(true);
     let obj = {
-      menuId: tempObj.Pid, // process id
-      styleId: tempObj.Oid, // styleid
+      menuId: tempObj.processId, 
+      masterType: tempObj.outId, 
       username: userName,
       password: userPsd,
       compIds: usercompanyId,
       company: JSON.parse(companyObj),
     };
-
+    // return;
     let EditDDAAPIObj = await APIServiceCall.loadOutwardChildUnitPricesList(obj);
     set_isLoading(false);
 
     if (EditDDAAPIObj && EditDDAAPIObj.statusData) {
-      set_childObjSizes(EditDDAAPIObj?.responseData);
+      set_childPricesObj(EditDDAAPIObj?.responseData);
     } else {
       popUpAction(
         Constant.SERVICE_FAIL_MSG,
@@ -222,20 +233,20 @@ const CreateNewOutInProcess = ({route}) => {
   };
 
   const submitAction = async tempObj => {
-    const validateVendorName = await ValidateVendorName(tempObj.vendor_name);
+    // const validateVendorName = await ValidateVendorName(tempObj.vendor_name);
     // console.log("validated value of name ==> ",tempObj.vendor_name, validateVendorName);
 
-    if (validateVendorName === 'true') {
-      console.log('pop up');
-      popUpAction(
-        Constant.Fail_Validate_VENDORMASTER_MSG,
-        Constant.DefaultAlert_MSG,
-        'OK',
-        true,
-        false,
-      );
-      return;
-    }
+    // if (validateVendorName === 'true') {
+    //   console.log('pop up');
+    //   popUpAction(
+    //     Constant.Fail_Validate_VENDORMASTER_MSG,
+    //     Constant.DefaultAlert_MSG,
+    //     'OK',
+    //     true,
+    //     false,
+    //   );
+    //   return;
+    // }
     // console.log("creating new ");
 
     let userName = await AsyncStorage.getItem('userName');
@@ -252,7 +263,6 @@ const CreateNewOutInProcess = ({route}) => {
     tempObj.company = JSON.parse(companyObj);
 
     console.log('saving obj ==>', tempObj);
-
     set_isLoading(true);
 
     let SAVEAPIObj = await APIServiceCall.saveCreateOutwardOutProcess(tempObj);
@@ -307,6 +317,9 @@ const CreateNewOutInProcess = ({route}) => {
       popOkBtnAction={popOkBtnAction}
       getStylesList={getStylesList}
       getSizesList={getSizesList}
+      getPricesList={getPricesList}
+      childPricesObj={childPricesObj}
+      companyId={companyId}
     />
   );
 };

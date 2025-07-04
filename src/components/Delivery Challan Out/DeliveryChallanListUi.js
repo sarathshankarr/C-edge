@@ -55,6 +55,7 @@ const DeliveryChallanListUi = ({route, ...props}) => {
     if (props.itemsArray) {
       set_filterArray(props.itemsArray);
       set_ItemsArray(props.itemsArray);
+      // console.log('delivery ', props.itemsArray);
     }
     // getRequestBody();
   }, [props.itemsArray]);
@@ -118,9 +119,9 @@ const DeliveryChallanListUi = ({route, ...props}) => {
 
     const styleArray = ItemsArray.filter(
       style =>
-        style.vendorLocation?.toUpperCase().includes(name.toUpperCase()) ||
-        style.styleNo?.toUpperCase().includes(name.toUpperCase()) ||
-        style.processName?.toUpperCase().includes(name.toUpperCase()),
+        style.billno?.toUpperCase().includes(name.toUpperCase()) ||
+        style.itemType?.toUpperCase().includes(name.toUpperCase()) ||
+        style.username?.toUpperCase().includes(name.toUpperCase()),
     );
     if (styleArray && styleArray.length > 0) {
       set_filterArray(styleArray);
@@ -163,80 +164,25 @@ const DeliveryChallanListUi = ({route, ...props}) => {
       onPress={() => actionOnRow(item)}
       style={CommonStyles.cellBackViewStyle}>
       <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-        <Text
-          style={[CommonStyles.tylesTextStyle, {textAlign: 'center', flex: 1}]}>
-          {item.dcId}
-        </Text>
-        <Text
-          style={[CommonStyles.tylesTextStyle, {textAlign: 'center', flex: 1}]}>
-          {item.vendorLocation}
-        </Text>
         {/* <Text
           style={[CommonStyles.tylesTextStyle, {textAlign: 'center', flex: 1}]}>
-          {item.styleNo}
+          {item.fromLocIdStr}
         </Text> */}
         <Text
           style={[CommonStyles.tylesTextStyle, {textAlign: 'center', flex: 1}]}>
-          {item.processName}
+          {item.username}
         </Text>
-
-        {/* <View
-          style={{
-            flex: 1.2,
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center',
-            gap: 8,
-          }}>
-          <View
-            style={{
-              flex: 0.7,
-              alignItems: 'center',
-              flexDirection: 'column',
-              justifyContent: 'space-around',
-            }}>
-            <TouchableOpacity onPress={() => handlePdf1(item)}>
-              <Text
-                style={[
-                  CommonStyles.tylesTextStyle,
-                  {textAlign: 'center', marginBottom: 5},
-                ]}>
-                {'OUT DC'}
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity onPress={() => handlePdf2(item)} style={{}}>
-              <Text
-                style={[CommonStyles.tylesTextStyle, {textAlign: 'center'}]}>
-                {'IN DC'}
-              </Text>
-            </TouchableOpacity>
-          </View>
-          <View
-            style={{
-              flex: 1.2,
-              flexDirection: 'row',
-              justifyContent: 'center',
-              alignItems: 'center',
-              gap: 8,
-              // marginRight: wp('2%'),
-            }}>
-            <TouchableOpacity onPress={() => handleSendWhatsApp(item)}>
-              <Image
-                style={{
-                  width: 15,
-                  height: 15,
-                  resizeMode: 'contain',
-                }}
-                source={require('./../../../assets/images/png/whatsapp.png')}
-              />
-            </TouchableOpacity>
-          </View>
-        </View> */}
-
+        <Text
+          style={[CommonStyles.tylesTextStyle, {textAlign: 'center', flex: 0.7}]}>
+          {item.itemType}
+        </Text>
+        <Text
+          style={[CommonStyles.tylesTextStyle, {textAlign: 'center', flex: 1}]}>
+          {item.billno}
+        </Text>
         <View
           style={{
-            flex: 1.5,
+            flex: 0.7,
             flexDirection: 'column',
             alignItems: 'center',
             // gap: 10,
@@ -250,7 +196,7 @@ const DeliveryChallanListUi = ({route, ...props}) => {
             }}>
             {/* OUT DC */}
             <TouchableOpacity
-              onPress={() => handlePdf(item, "OUT")}
+              onPress={() => handlePdf(item, 'OUT')}
               style={{alignItems: 'center', flex: 1}}>
               <Image
                 source={require('./../../../assets/images/png/pdf2.png')}
@@ -261,7 +207,7 @@ const DeliveryChallanListUi = ({route, ...props}) => {
 
             {/* IN DC */}
             <TouchableOpacity
-              onPress={() => handlePdf(item, "IN")}
+              onPress={() => handlePdf(item, 'IN')}
               style={{alignItems: 'center', flex: 1, marginRight: 2}}>
               <Image
                 source={require('./../../../assets/images/png/pdf2.png')}
@@ -274,14 +220,14 @@ const DeliveryChallanListUi = ({route, ...props}) => {
               />
               <Text style={{fontSize: 8, fontWeight: 'bold'}}>IN DC</Text>
             </TouchableOpacity>
-            <TouchableOpacity
+            {/* <TouchableOpacity
               onPress={() => handleSendWhatsApp(item)}
               style={{marginTop: 6}}>
               <Image
                 style={{width: 16, height: 16, resizeMode: 'contain'}}
                 source={require('./../../../assets/images/png/whatsapp.png')}
               />
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </View>
 
           {/* WhatsApp Icon */}
@@ -296,7 +242,7 @@ const DeliveryChallanListUi = ({route, ...props}) => {
         <HeaderComponent
           isBackBtnEnable={true}
           isTitleHeaderEnable={true}
-          title="Create Delivery Challan List Ui "
+          title="Delivery Challan List Ui "
           backBtnAction={backBtnAction}
         />
       </View>
@@ -408,14 +354,14 @@ const DeliveryChallanListUi = ({route, ...props}) => {
                 CommonStyles.tylesHeaderTextStyle,
                 {textAlign: 'center', flex: 1},
               ]}>
-              ID
+              Rquested By
             </Text>
             <Text
               style={[
                 CommonStyles.tylesHeaderTextStyle,
-                {textAlign: 'center', flex: 1},
+                {textAlign: 'center', flex: 0.7},
               ]}>
-              Vendor/Location
+              Type
             </Text>
             {/* <Text
               style={[
@@ -429,13 +375,13 @@ const DeliveryChallanListUi = ({route, ...props}) => {
                 CommonStyles.tylesHeaderTextStyle,
                 {textAlign: 'center', flex: 1},
               ]}>
-              Process
+              Style
             </Text>
 
             <Text
               style={[
                 CommonStyles.tylesHeaderTextStyle,
-                {flex: 1.2, textAlign: 'center', marginRight: wp('2%')},
+                {flex: 0.7, textAlign: 'center', marginRight: wp('2%')},
               ]}>
               {'Action'}
             </Text>
@@ -553,4 +499,3 @@ const styles = StyleSheet.create({
 });
 
 export default DeliveryChallanListUi;
-

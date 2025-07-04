@@ -108,8 +108,22 @@ const CreateNewOutInProcessUI = ({route, navigation, ...props}) => {
           name: props?.childObj.styleMap[key],
         }));
         console.log('style list child==> ', MapList);
-
+        if (latestProjectId) {
+          setRows(
+            rows.map(r =>
+              r.projectId === latestProjectId
+                ? {
+                    ...r,
+                    stylesList: MapList || [],
+                  }
+                : r,
+            ),
+          );
+        }
         set_childStyleList(MapList);
+      } else {
+        set_childStyleList([]);
+        console.log('empty child style list ');
       }
       if (props?.childObj.poMap) {
         const MapList = Object.keys(props?.childObj?.poMap).map(key => ({
@@ -120,6 +134,28 @@ const CreateNewOutInProcessUI = ({route, navigation, ...props}) => {
       }
     }
   }, [props.childObj]);
+
+  useEffect(() => {
+    if (props?.childPricesObj) {
+      console.log(
+        'child childPricesObj ===> ',
+        props?.childPricesObj.price,
+        typeof props?.childPricesObj.price,
+      );
+      if (latestStyleId) {
+        setRows(prevRows =>
+          prevRows.map(row =>
+            row.styleId === latestStyleId
+              ? {
+                  ...row,
+                  unitPrice: props?.childPricesObj.price || '0',
+                }
+              : row,
+          ),
+        );
+      }
+    }
+  }, [props.childPricesObj]);
 
   useEffect(() => {
     if (props?.childObjSizes) {
@@ -143,6 +179,10 @@ const CreateNewOutInProcessUI = ({route, navigation, ...props}) => {
               : r,
           ),
         );
+      }
+
+      if (props?.childObjSizes.buyerpoVendorId) {
+        set_hsn(props?.childObjSizes.buyerpoVendorId);
       }
     }
   }, [props.childObjSizes]);
@@ -199,6 +239,8 @@ const CreateNewOutInProcessUI = ({route, navigation, ...props}) => {
   const [toLocationId, setToLocationId] = useState('');
 
   const [latestStyleId, setLatestStyleId] = useState('');
+  const [latestProjectId, setLatestProjectId] = useState('');
+  const [hsn, set_hsn] = useState('');
 
   const [childStyleList, set_childStyleList] = useState([]);
   const [childOutProcessList, set_childOutProcessList] = useState([]);
@@ -265,7 +307,7 @@ const CreateNewOutInProcessUI = ({route, navigation, ...props}) => {
     const splitedId = idx.split('_');
     console.log('process splitted id ===> ', splitedId, splitedId[0]);
 
-    await props.getStylesList(splitedId[0], 0);
+    await props.getStylesList(splitedId[0], 0, 0);
   };
 
   const handleSearchShipFrom = text => {
@@ -321,28 +363,36 @@ const CreateNewOutInProcessUI = ({route, navigation, ...props}) => {
   };
 
   const submitAction = async () => {
+    //  console.log("creationDate ===> ", creationDate.split('-').join('/'));
+    //   return;
+
     const child = rows.map((item, index) => ({
-      outprocessId: 1,
+      outprocessId: 0, // random
       shipment: '',
-      workorderno: '',
+      workorderno: hsn, // hsn
       garmentTypes: item.garmentTypeId,
-      outprocessType: item.outprocessId,
-      styleId: item.styleId,
+      outprocessType: item.outprocessTypeId,
+      styleId: item.styleId.split('_')[0],
       color: 0,
       rejectionreason: 0,
-      sendQty: 10, // total ip qty
-      priceQty: 10.0, //unit price
+      sendQty: item.childTable?.reduce(
+        (sum, item) => sum + (parseFloat(item.enteredInput) || 0),
+        0,
+      ),
+      priceQty: item.unitPrice || '5',
       receivedQty: 0,
       missedQty: 0,
       receivedPrice: 0.0,
       loss: 0,
       missingPrice: 0,
-      sizeQty: '5,5,', // entered
+      sizeQty: item.childTable
+        ?.map((item, index) => item.enteredInput)
+        .join(','),
       totalsizeValues: 0,
       receivedsizes: '',
-      soNo: 345,
-      style_cost: 0,
-      brandId: item.brandId,
+      soNo: item.styleId.split('_')[1],
+      style_cost: 0, //
+      brandId: item.projectId,
       nextMenuid: 0,
       poId: 0,
       fabOrRm: 0,
@@ -366,12 +416,12 @@ const CreateNewOutInProcessUI = ({route, navigation, ...props}) => {
       fabricRecQty: 0.0,
       opParts: 0,
       damageqty: 0,
-      handsdate: '2025-06-13',
+      handsdate: '',
       handshake: 0,
       daywiseqty: '',
       daytotalqty: 0,
       partMapId: '',
-      opp_company_id: 1, 
+      opp_company_id: props?.companyId || '0',
       fab_issued: 1,
       fab_used: 0,
       fab_return: 0,
@@ -390,19 +440,20 @@ const CreateNewOutInProcessUI = ({route, navigation, ...props}) => {
       billno: '',
       hiddenButtonId: '',
       hiddenParam: '',
-      hiddenDate: creationDate,
+      hiddenDate: creationDate.split('-').join('/'),
+      // hiddenDate: "21/06/2025" || creationDate,
       vendor: vendorId || '0',
       outGst: '',
       gateno: '',
       gate: '0',
       location: '',
       hsn: '',
-      companyLocationId1: fromLocationId, 
+      companyLocationId1: fromLocationId,
       receivedLocationId1: toLocationId,
-      companyLocationId2: fromLocationId, 
+      companyLocationId2: fromLocationId,
       receivedLocationId2: toLocationId,
-      currentDate: '2025-06-13', 
-      currentDate1: '2025-06-13', 
+      currentDate: '20/06/2025',
+      currentDate1: '20/06/2025',
       op_gst: '',
       op_roundoff: '',
       reg_vendor: 0,
@@ -414,15 +465,15 @@ const CreateNewOutInProcessUI = ({route, navigation, ...props}) => {
       fabTableValues: '',
       hiddenProcessName: processName,
       totalgood: 0,
-      creationDateStr: '2025-06-13',
-      refDateStr: '2025-06-12',
+      creationDateStr: '',
+      refDateStr: '',
       handshake: 1,
-      todaysDate: '2025-06-13',
+      todaysDate: '',
       selectedstyle: 0,
       isStyleTotalhidden: 0,
-      outprocessId: processId,
+      outprocessId: processId.split('_')[0],
       serviceType: 'Outward',
-      bothMenuIds: '312_313_0',
+      bothMenuIds: processId,
       bothMenuIds1: '0',
       companyLocationId: shipFromId,
       receivedLocationId: receivedAtId,
@@ -435,66 +486,9 @@ const CreateNewOutInProcessUI = ({route, navigation, ...props}) => {
       isNextProcess: parallel ? '1' : '0',
       powiseOut: 0,
       isReProcess: 0,
-      particulars: [
-        {
-          outprocessId: 1, // random
-          shipment: '',
-          workorderno: '', // hsn 
-          garmentTypes: garmentTypeId,
-          outprocessType: outprocessId,
-          styleId: styleId, // split[0]
-          color: 0,
-          rejectionreason: 0,
-          sendQty: 10, // total input
-          priceQty: 10.0, // unitprice
-          receivedQty: 0,
-          missedQty: 0,
-          receivedPrice: 0.0,
-          loss: 0,
-          missingPrice: 0,
-          sizeQty: '5,5,', //enterediput 
-          totalsizeValues: 0,
-          receivedsizes: '',
-          soNo: 345, //split[1]
-          style_cost: 0,  //
-          brandId: brandId,
-          nextMenuid: 0,
-          poId: 0,
-          fabOrRm: 0,
-          fabMissedQty: 0.0,
-          uomtype: '',
-          in_price_qty: 0.0,
-          in_style_cost: 0.0,
-          wo_barcode_number: 0,
-          styleStatus: 0,
-          style_mrp: 0.0,
-          fabricQty: 0.0,
-          fabricCon: 0.0,
-          trimId: 0,
-          missedsizeqty: '',
-          missedtotal: 0,
-          paid: 0.0,
-          gst_amt: 0.0,
-          gst_percentage: 0.0,
-          buyerVendorIds: '',
-          fabricOrRm: 0,
-          fabricRecQty: 0.0,
-          opParts: 0,
-          damageqty: 0,
-          handsdate: '',
-          handshake: 0,
-          daywiseqty: '',
-          daytotalqty: 0,
-          partMapId: '',
-          opp_company_id: 1, //company id 
-          fab_issued: 1,
-          fab_used: 0,
-          fab_return: 0,
-          fab_actual_consumption: 0,
-          is_style_cancelled: 0,
-        },
-      ],
+      particulars: child || [],
     };
+
     props.submitAction(tempObj);
   };
 
@@ -656,6 +650,7 @@ const CreateNewOutInProcessUI = ({route, navigation, ...props}) => {
         filteredStyles: childStyleList || [],
         stylesList: childStyleList || [],
         childTable: [],
+        unitPrice: '',
       },
     ]);
     // console.log("adding child style list ", childStyleList)
@@ -702,9 +697,10 @@ const CreateNewOutInProcessUI = ({route, navigation, ...props}) => {
           : r,
       ),
     );
-    props.getStylesList(item.id, 1);
+    setLatestProjectId(item.id);
+    props.getStylesList(processId.split('_')[0], 1, item.id);
   };
-  const actionOnOutProcessType = (item, rowId) => {
+  const actionOnOutProcessType = (item, rowId, styleId) => {
     setRows(
       rows.map(r =>
         r.id === rowId
@@ -717,8 +713,17 @@ const CreateNewOutInProcessUI = ({route, navigation, ...props}) => {
           : r,
       ),
     );
+
+    if (styleId) {
+      const tempObj = {
+        // Oid: styleId.split('_')[0],
+        Pid: styleId.split('_')[0],
+        Oid: item.id.split('_')[0],
+      };
+      props.getPricesList(tempObj);
+    }
   };
-  const actionOnStyles = (item, rowId) => {
+  const actionOnStyles = (item, rowId, outId) => {
     setRows(
       rows.map(r =>
         r.id === rowId
@@ -733,11 +738,18 @@ const CreateNewOutInProcessUI = ({route, navigation, ...props}) => {
     );
     setLatestStyleId(item.id);
     const tempObj = {
-      Pid: processId.split('_')[0],
+      Pid: processId.split('_')[0] || '0',
       Sid: item.id,
     };
-
     props.getSizesList(tempObj);
+
+    if (outId) {
+      const tempObj = {
+        processId: processId.split('_')[0] || '0',
+        outId: outId,
+      };
+      props.getPricesList(tempObj);
+    }
   };
 
   const handleSearchOutprocessType = (text, rowId) => {
@@ -800,6 +812,18 @@ const CreateNewOutInProcessUI = ({route, navigation, ...props}) => {
                   ? {...child, enteredInput: text}
                   : child,
               ),
+            }
+          : row,
+      ),
+    );
+  };
+  const updateUnitPrice = (rowId, text) => {
+    setRows(prevRows =>
+      prevRows.map(row =>
+        row.id === rowId
+          ? {
+              ...row,
+              unitPrice: text,
             }
           : row,
       ),
@@ -1145,8 +1169,8 @@ const CreateNewOutInProcessUI = ({route, navigation, ...props}) => {
 
           <View style={styles.checkBoxContainer}>
             <CustomCheckBox
-              isChecked={false}
-              onToggle={() => console.log('hi')}
+              isChecked={parallel}
+              onToggle={() => set_parallel(!parallel)}
             />
             <Text style={styles.checkBoxText}>
               Parallel Flow For Next Process
@@ -1626,7 +1650,11 @@ const CreateNewOutInProcessUI = ({route, navigation, ...props}) => {
                                     <TouchableOpacity
                                       key={item?.id}
                                       onPress={() =>
-                                        actionOnOutProcessType(item, row.id)
+                                        actionOnOutProcessType(
+                                          item,
+                                          row.id,
+                                          row.styleId,
+                                        )
                                       }>
                                       <View style={styles.dropdownOption}>
                                         <Text style={{color: '#000'}}>
@@ -1838,7 +1866,11 @@ const CreateNewOutInProcessUI = ({route, navigation, ...props}) => {
                                     <TouchableOpacity
                                       key={item?.id}
                                       onPress={() =>
-                                        actionOnStyles(item, row.id)
+                                        actionOnStyles(
+                                          item,
+                                          row.id,
+                                          row.outprocessTypeId,
+                                        )
                                       }>
                                       <View style={styles.dropdownOption}>
                                         <Text style={{color: '#000'}}>
@@ -1858,7 +1890,7 @@ const CreateNewOutInProcessUI = ({route, navigation, ...props}) => {
                       <View style={styles.table_body_single_row}>
                         <View
                           style={{
-                            width: 470,
+                            // width: 470,
                             flexDirection: 'row',
                           }}>
                           {row?.childTable?.map((item, index) => (
@@ -1888,47 +1920,51 @@ const CreateNewOutInProcessUI = ({route, navigation, ...props}) => {
                         </View>
 
                         <View style={styles.table_body_single_row}>
-                           <View
-                              style={{
-                                width: 100,
-                                margin: 5,
-                                alignItems: 'center',
-                                padding: 10,
-                                borderRadius: 5,
-                              }}>
-                              <TextInput
-                                style={styles.table_data_input1}
-                                label={"TOTALQTY"}
-                                value={"0"}
-                                mode="outlined"
-                                onChangeText={text =>
-                                  updateChildInput(row.id, item.sizeId, text)
-                                }
-                              />
-                            </View>
+                          <View
+                            style={{
+                              width: 100,
+                              margin: 5,
+                              alignItems: 'center',
+                              padding: 10,
+                              borderRadius: 5,
+                            }}>
+                            <TextInput
+                              style={styles.table_data_input1}
+                              label={'TOTALQTY'}
+                              value={row.childTable
+                                ?.reduce(
+                                  (sum, item) =>
+                                    sum + (parseFloat(item.enteredInput) || 0),
+                                  0,
+                                )
+                                .toString()}
+                              editable={false}
+                              mode="outlined"
+                              onChangeText={text => console.log(text)}
+                            />
+                          </View>
                         </View>
 
                         <View style={styles.table_body_single_row}>
-                           <View
-                              style={{
-                                width: 100,
-                                margin: 5,
-                                alignItems: 'center',
-                                padding: 10,
-                                borderRadius: 5,
-                              }}>
-                              <TextInput
-                                style={styles.table_data_input1}
-                                label={"* UNIT PRICE"}
-                                value={"0"}
-                                mode="outlined"
-                                onChangeText={text =>
-                                  updateChildInput(row.id, item.sizeId, text)
-                                }
-                              />
-                            </View>
+                          <View
+                            style={{
+                              width: 100,
+                              margin: 5,
+                              alignItems: 'center',
+                              padding: 10,
+                              borderRadius: 5,
+                            }}>
+                            <TextInput
+                              style={styles.table_data_input1}
+                              label={'* UNIT PRICE'}
+                              value={ row.unitPrice ? row.unitPrice.toString() : '0'}
+                              mode="outlined"
+                              onChangeText={text =>
+                                updateUnitPrice(row.id, text)
+                              }
+                            />
+                          </View>
                         </View>
-
                       </View>
                     )}
                   </View>

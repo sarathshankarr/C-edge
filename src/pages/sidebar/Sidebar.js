@@ -291,18 +291,18 @@ const Sidebar = ({navigation}) => {
           menu_id: 49,
           src: require('../../../assets/images/png/acknowledge.png'),
         },
-        // {
-        //   label: 'New In Process',
-        //   route: 'NewOutInProcessList',
-        //   menu_id: 49,
-        //   src: require('../../../assets/images/png/acknowledge.png'),
-        // },
-        // {
-        //   label: 'Delivery Challan ',
-        //   route: 'DeliveryChallanList',
-        //   menu_id: 49,
-        //   src: require('../../../assets/images/png/acknowledge.png'),
-        // },
+        {
+          label: 'New In Process',
+          route: 'NewOutInProcessList',
+          menu_id: 49,
+          src: require('../../../assets/images/png/acknowledge.png'),
+        },
+        {
+          label: 'Delivery Challan ',
+          route: 'DeliveryChallanList',
+          menu_id: 49,
+          src: require('../../../assets/images/png/acknowledge.png'),
+        },
       ],
     },
     reports: {

@@ -1690,6 +1690,47 @@ export async function loadAllNewInOutProcessList(jsonValue) {
     obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet }
     return obj;
 };
+export async function loadAllDeliveryChallanList(jsonValue) {
+
+    let returnError = undefined;
+    let statusData = undefined;
+    let responseData = undefined;
+    let logoutData = false;
+    let obj = undefined;
+
+    let internet = await internetCheck();
+    if (!internet) {
+        obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
+        return obj;
+    }
+
+    console.log('url ', 'jobworkAPI/loadAllJobworkAPI');
+    await fetch(Environment.uri + "jobworkAPI/loadAllJobworkAPI",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            },
+            body: JSON.stringify(jsonValue),
+        }
+    ).then((response) => response.json()).then(async (data) => {
+
+        if (data) {
+            statusData = true;
+            responseData = data
+        } else {
+            statusData = undefined;
+        }
+
+    }).catch((error) => {
+        console.log('loadAllVendorMastersList error ', error)
+        returnError = error;
+    });
+
+    obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet }
+    return obj;
+};
 export async function loadVendorMasterStatesList(jsonValue) {
 
     let returnError = undefined;
@@ -3981,7 +4022,7 @@ export async function loadOutwardChildUnitPricesList(jsonValue) {
         }
 
     }).catch((error) => {
-        console.log('loadOutwardChildSizesList error ', error)
+        console.log('loadOutwardChildUnitPricesList error ', error)
         returnError = error;
     });
 
@@ -5686,7 +5727,7 @@ export async function saveCreateOutwardOutProcess(jsonValue) {
         obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
         return obj;
     }
-    // console.log('saveCreateProcessIn ', jsonValue, Environment.uri + "outprocess/saveNewOutData")
+    console.log('saveCreateProcessIn ', Environment.uri + "outprocess/saveNewOutData")
     await fetch(Environment.uri + "outprocess/saveNewOutData",
         {
             method: "POST",
