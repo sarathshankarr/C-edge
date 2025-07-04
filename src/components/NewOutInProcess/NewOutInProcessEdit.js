@@ -122,14 +122,15 @@ const NewOutInProcessEdit = ({ navigation, route, ...props }) => {
     let companyObj = await AsyncStorage.getItem('companyObj');
     let userId = await AsyncStorage.getItem('userId');
 
-    tempObj.menuId=17,
-    tempObj.vendorId=vendorId,
+    tempObj.menuId=247,
     tempObj.username=userName,
     tempObj.password=userPsd,
     tempObj.compIds=usercompanyId,
+    tempObj.id=usercompanyId,
     tempObj.userId=userId,
     tempObj.company=JSON.parse(companyObj)
 
+ console.log("edit save req body ==> ", tempObj)
 
     let saveEditObj = await APIServiceCall.saveEditVendorMasters(tempObj);
     set_isLoading(false);

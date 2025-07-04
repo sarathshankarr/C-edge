@@ -38,9 +38,10 @@ const NewOutInProcessEditUI = ({route, ...props}) => {
   const [hasFetchedStateName, set_hasFetchedStateName] = useState(false);
   const [garmetList, set_garmetList] = useState([]);
   const [brandList, set_brandList] = useState([]);
-
+  const [data, set_data] = useState([]);
   useEffect(() => {
     if (props.itemsObj) {
+      set_data(props.itemsObj);
       if (props?.itemsObj.vendorsCustomerMap) {
         const MapList = Object.keys(props?.itemsObj?.vendorsCustomerMap).map(
           key => ({
@@ -127,6 +128,10 @@ const NewOutInProcessEditUI = ({route, ...props}) => {
           set_processName(props.itemsObj.outprocessDetails.processName);
           // setShipFromName(props?.itemsObj.locationsMap[props.itemsObj.outprocessDetails.companyLocationId])
         }
+        if (props.itemsObj.outprocessDetails.refNo) {
+          set_refNo(props.itemsObj.outprocessDetails.refNo);
+        }
+
         if (props.itemsObj.outprocessDetails.particulars) {
           const particulars = props.itemsObj.outprocessDetails.particulars;
           const childArray = particulars.map((item, index) => {
@@ -146,8 +151,8 @@ const NewOutInProcessEditUI = ({route, ...props}) => {
             if (item.sizenames && item.sizeQuantities && item.sizereceviedqty) {
               sizesArray = item.sizenames.map((sizeName, idx) => ({
                 sizename: sizeName,
-                sizeqty: item.sizeQuantities[index],
-                sizereceivedqty: item.sizereceviedqty[index],
+                sizeqty: item.sizeQuantities[idx],
+                sizereceivedqty: item.sizereceviedqty[idx],
                 enteredInput: '0',
                 SIZE_ID: Date.now() + idx + 1,
               }));
@@ -184,7 +189,7 @@ const NewOutInProcessEditUI = ({route, ...props}) => {
             };
           });
 
-          console.log('child array ', childArray[0]?.childTable);
+          // console.log('child array ', childArray[0]?.childTable);
           setRows(childArray);
         }
       }
@@ -284,6 +289,81 @@ const NewOutInProcessEditUI = ({route, ...props}) => {
     set_showProcessList(false);
   };
 
+  // const generateHiddenParam = data => {
+  //   return data
+  //     .map((item, index) => {
+  //       const childTable = rows[index].childTable;
+
+  //       const receivedQtySum = childTable
+  //         .map(
+  //           child =>
+  //             (parseFloat(child.sizereceivedqty) || 0) +
+  //             (parseFloat(child.sizeqty) || 0),
+  //         )
+  //         .join(',');
+
+  //       const enteredInputs = childTable
+  //         .map(child => child.enteredInput)
+  //         .join(',');
+  //       const enteredInputSum = enteredInputsArr.reduce(
+  //         (sum, val) => sum + (parseFloat(val) || 0),
+  //         0,
+  //       );
+
+  //       // Prepare remarks
+  //       let remarks = `${item.remarksDamaged || ''} ! ${
+  //         item.remarksMissing || ''
+  //       } ! ${item.remarksRejected || ''} !`;
+
+  //       let hiddenParam = `${item.id || ''},${item.style_cost || ''},${
+  //         item.sendQty || ''
+  //       },${item.missedQty || ''},${item.missingPrice || ''},${
+  //         item.loss || ''
+  //       },${item.vendorbalanceqty || ''},${item.styleStatus || ''},${
+  //         item.soNo || ''
+  //       },${item.damageqty || ''},${item.nextMenuid || ''},${item.poId || ''},${
+  //         item.fabOrRm || ''
+  //       },${item.rejectionreason || ''},${item.uomtype || ''},${
+  //         item.priceQty || ''
+  //       }:${receivedQtySum || ''},${enteredInputSum || 0},${
+  //         enteredInputs || ''
+  //       }:${remarks || ''}{''}~`;
+
+  //       return hiddenParam;
+  //     })
+  //     .join('');
+  // };
+
+
+  const generateHiddenParam = data => {
+  return data
+    .map((item, index) => {
+      const childTable = rows[index].childTable;
+
+      const receivedQtySum = childTable
+        .map(
+          child =>
+            (parseFloat(child.sizereceivedqty) || 0) +
+            (parseFloat(child.sizeqty) || 0)
+        )
+        .join(',');
+
+      const enteredInputsArr = childTable.map(child => child.enteredInput);
+      const enteredInputs = enteredInputsArr.join(',');
+      const enteredInputSum = enteredInputsArr.reduce(
+        (sum, val) => sum + (parseFloat(val) || 0),
+        0
+      );
+
+      let remarks = `${item.remarksDamaged || ''} ! ${item.remarksMissing || ''} ! ${item.remarksRejected || ''} !`;
+
+      let hiddenParam = `${item.id || ''},${item.style_cost || ''},${item.sendQty || ''},${item.missedQty || ''},${item.missingPrice || ''},${item.loss || ''},${item.vendorbalanceqty || ''},${item.styleStatus || ''},${item.soNo || ''},${item.damageqty || ''},${item.nextMenuid || ''},${item.poId || ''},${item.fabOrRm || ''},${item.rejectionreason || ''},${item.uomtype || ''},${item.priceQty || ''}:${receivedQtySum || ''},${enteredInputSum || 0},${enteredInputs || ''}:${remarks || ' '}~`;
+
+      return hiddenParam;
+    })
+    .join(' ');
+};
+
   const handleSearchShipFrom = text => {
     if (text.trim().length > 0) {
       const filtered = shipFromList.filter(item =>
@@ -336,33 +416,60 @@ const NewOutInProcessEditUI = ({route, ...props}) => {
   };
 
   const submitAction = async () => {
+
+    const tempObj1 = {
+      id: 1, // company id
+      username: 'superuser@gmail.com',
+      password: 'Codeverse@demo',
+      menuId: 247,
+      isFab: 0, //  is fab
+      refDate: '19/06/2025', // delivery date
+      handoverDate: '19/06/2025', // received data
+      billno: 'BILL-001', //e way bill no
+      vendor: 'VendorName', // vedor
+      person: 'John Doe', // person
+      vehicleNo: 'TN01AB1234', // vechnile no
+      refNo: 'REF-101', // ref
+      gate: 'Main Gate', //gate pass check box  0
+      gateNo: 'G-45', // empy
+      remarks: 'Received properly', // empty
+      opGst: 5.0, // '0
+      opRoundoff: 0.0, //'0'
+      outGst: 18.0, // '0'
+      nxtProcess: 0, // is next pro
+      hiddenButtonId: '276819994', // outprocess id
+      hiddenParam:
+        '177,0.0,12,0,0,0,0,300,0,0,0,0,0,PIECES,1.0:0,0,0,0,1,0,0,0,0,:0,0,2,1,2,0,1,0,1,7,: ! ! !: ~',
+     
+
+      // id, goods value, send qty, missed qty, missed price qty, loss dd, Balance Qty, styleStatus, soNo,
+      //  Damaged Qty, nextMenuid, poId, fabOrRm, Reason For Rejection dd, Unit ="PIECES",Unit Price	(priceQty) : (0/100) sum all sizes , Tot.Rec.Qty : entered inputs(',') : remarks ! *3 : ' ~'
+
+      //
+    };
     const tempObj = {
-      vendorcontractor: 1,
-      user_type: userType,
-      type_code: type,
-      group_code: group,
-      vendor_code: '',
-      terms_id: '',
-      priceId: '',
-      vendor_name: name,
-      address1: address1,
-      address2: address2,
-      address3: address3,
-      city: city,
-      pin_code: zipPostalCode,
-      mobile: phone,
-      panno: '',
-      gst: gst,
-      whatsapp: whatsappPhone,
-      state: stateId,
-      country: countryId,
-      tax_type: '0',
-      invfrm: '0',
-      ship_mode: '0',
-      region: '0',
-      payment_priority: '',
-      currency: currencyId,
-      location: locationName,
+      isFab: data?.outprocessDetails?.isFab || '', //  is fab
+      refDate: '19/06/2025', // delivery date
+      handoverDate: '19/06/2025', // received data
+      billno: data?.outprocessDetails?.billno || '', //e way bill no
+      vendor: data?.outprocessDetails?.vendor || '', // vedor
+      person: data?.outprocessDetails?.person || '', // person
+      vehicleNo: data?.outprocessDetails?.vehicleNo || '', // vechnile no
+      refNo: data?.outprocessDetails?.refNo || '', // ref
+      gate: '0', //gate pass check box  0
+      gateNo: '', // empy
+      remarks: '', // empty
+      opGst: '0', // '0
+      opRoundoff: '0', //'0'
+      outGst: '0', // '0'
+      nxtProcess: data?.outprocessDetails?.isNextProcess || '0', // is next pro
+      hiddenButtonId: data?.outprocessDetails?.outprocessId || '', // outprocess id
+      hiddenParam: generateHiddenParam(data.outprocessDetails.particulars),
+
+      // id, goods value, send qty, missed qty, missed price qty, loss dd, Balance Qty, styleStatus, soNo,
+      //  Damaged Qty, nextMenuid, poId, fabOrRm, Reason For Rejection dd, Unit ="PIECES",Unit Price	(priceQty) : (0/100) sum all sizes , Tot.Rec.Qty : entered inputs(',') : remarks ! *3 : ' ~'
+
+      //
     };
     props.submitAction(tempObj);
   };
@@ -1393,7 +1500,7 @@ const NewOutInProcessEditUI = ({route, ...props}) => {
                           }}>
                           {row?.childTable?.map((item, index) => (
                             <View
-                              key={item?.SIZE_ID + index}
+                              key={index}
                               style={{
                                 width: 100,
                                 margin: 5,
@@ -1411,7 +1518,8 @@ const NewOutInProcessEditUI = ({route, ...props}) => {
                                 }
                               />
                               <Text style={{marginTop: 5, color: 'gray'}}>
-                                ( {item.sizereceivedqty} / {item.sizeqty} )
+                                ( {item.sizereceivedqty || '0'} /{' '}
+                                {item.sizeqty || '0'} )
                               </Text>
                             </View>
                           ))}

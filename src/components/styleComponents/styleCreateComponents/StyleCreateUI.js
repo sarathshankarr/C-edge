@@ -339,12 +339,14 @@ const proceedWithSubmission=()=>{
     const invLimitObj = {};
     const emptyObj1 = {};
     const emptyObj2 = {};
+    const emptyObj3 = {};
 
     scaleTable.forEach(item => {
       consumptionObj[item.id] = item.consumption;
       invLimitObj[item.id] = item.invLimit;
       emptyObj1[item.id] = '';
-      emptyObj2[item.id] = '0';
+      emptyObj2[item.id] = '';
+      emptyObj3[item.id] = '0';
     });
 
     const colorStr = selectedIndices.join(',') + ',';
@@ -377,7 +379,7 @@ const proceedWithSubmission=()=>{
       gscodesizeprice: emptyObj1,
       sizeWiseEAN: emptyObj1,
       sizeCons: consumptionObj,
-      weightMap: emptyObj2,
+      weightMap: emptyObj3,
       sizeWiseInvLimit: invLimitObj,
     };
     props.submitAction(tempObj);

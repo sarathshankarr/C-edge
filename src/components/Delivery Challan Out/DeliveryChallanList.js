@@ -27,7 +27,7 @@ const DeliveryChallanList = ({navigation, route, ...props}) => {
 
   useFocusEffect(
     React.useCallback(() => {
-      // getInitialData(0, true);
+      getInitialData(0, true);
       
     }, []),
   );
@@ -67,10 +67,10 @@ const DeliveryChallanList = ({navigation, route, ...props}) => {
         password: userPsd,
         compIds: usercompanyId,
         company: JSON.parse(companyObj),
-        dataFilter: '60Days',
+        dataFilter: '30',
       };
 
-      let DDAListAPIObj = await APIServiceCall.loadAllNewInOutProcessList(obj);
+      let DDAListAPIObj = await APIServiceCall.loadAllDeliveryChallanList(obj);
 
       if (DDAListAPIObj && DDAListAPIObj.statusData) {
         if (DDAListAPIObj && DDAListAPIObj.responseData) {
