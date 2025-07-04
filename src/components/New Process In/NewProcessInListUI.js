@@ -65,6 +65,7 @@ const NewProcessInListUI = ({route, navigation, ...props}) => {
     if (props.itemsArray) {
       set_filterArray(props.itemsArray);
       set_ItemsArray(props.itemsArray);
+      console.log("answer ===> ", props.itemsArray)
     }
     // getRequestBody();
 
@@ -114,12 +115,12 @@ const NewProcessInListUI = ({route, navigation, ...props}) => {
 
     const styleArray = ItemsArray.filter(item => {
       return (
-        (item?.producttype !== '' &&
-          item?.producttype?.toLowerCase().includes(searchTerm)) ||
-        (item?.styleCode !== '' &&
-          item?.styleCode?.toLowerCase().includes(searchTerm)) ||
-        (item?.processName !== '' &&
-          item?.processName?.toLowerCase().includes(searchTerm)) 
+        (item?.allStyles !== '' &&
+          item?.allStyles?.toLowerCase().includes(searchTerm)) ||
+        (item?.color !== '' &&
+          item?.color?.toLowerCase().includes(searchTerm)) ||
+        (item?.inMenuName !== '' &&
+          item?.inMenuName?.toLowerCase().includes(searchTerm)) 
       )
     });
 
@@ -162,25 +163,31 @@ const NewProcessInListUI = ({route, navigation, ...props}) => {
           <View
             style={{flex: 1, justifyContent: 'center'}}>
             <Text style={[CommonStyles.tylesTextStyle, {textAlign: 'center'}]}>
-              {item.styleCode}
+              {item.allStyles}
             </Text>
           </View>
           <View
             style={{flex: 0.7, justifyContent: 'center'}}>
             <Text style={[CommonStyles.tylesTextStyle, {textAlign: 'center'}]}>
-              {item.processName}
+              {item.color}
+            </Text>
+          </View>
+          <View
+            style={{flex: 1, justifyContent: 'center'}}>
+            <Text style={[CommonStyles.tylesTextStyle, {textAlign: 'center'}]}>
+              {item.inMenuName}
             </Text>
           </View>
           <View
             style={{flex: 0.5, justifyContent: 'center'}}>
             <Text style={[CommonStyles.tylesTextStyle, {textAlign: 'center'}]}>
-              {item.producttype}
+              {item.totalQty}
             </Text>
           </View>
           <View
-            style={{flex: 0.7, justifyContent: 'center'}}>
+            style={{flex: 0.5, justifyContent: 'center'}}>
             <Text style={[CommonStyles.tylesTextStyle, {textAlign: 'center'}]}>
-              {item.totalQty}
+              {item.cuttqty}
             </Text>
           </View>
         </View>
@@ -317,28 +324,35 @@ const NewProcessInListUI = ({route, navigation, ...props}) => {
                 CommonStyles.tylesHeaderTextStyle,
                 {flex: 1, textAlign: 'center'},
               ]}>
-              {'Style No (Color)'}
+              {'Style No(s)'}
             </Text>
             <Text
               style={[
                 CommonStyles.tylesHeaderTextStyle,
                 {flex: 0.7, textAlign: 'center'},
               ]}>
-              {'Process'}
+              {'Color'}
+            </Text>
+            <Text
+              style={[
+                CommonStyles.tylesHeaderTextStyle,
+                {flex: 1, textAlign: 'center'},
+              ]}>
+              {'Process Name'}
             </Text>
             <Text
               style={[
                 CommonStyles.tylesHeaderTextStyle,
                 {flex: 0.5, textAlign: 'center'},
               ]}>
-              {'Part'}
+              {'Total Qty'}
             </Text>
             <Text
               style={[
                 CommonStyles.tylesHeaderTextStyle,
-                {flex: 0.7, textAlign: 'center'},
+                {flex: 0.5, textAlign: 'center'},
               ]}>
-              {'Total Scanned Barcodes'}
+              {'Total Cut Qty'}
             </Text>
           </View>
         ) : (
