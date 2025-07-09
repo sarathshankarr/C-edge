@@ -335,7 +335,15 @@ const NewOutInProcessEditUI = ({route, ...props}) => {
   // };
 
 
-  const generateHiddenParam = data => {
+  const generateHiddenParam = async data => {
+
+    let companyObj = await AsyncStorage.getItem('companyObj');
+    const enable  =companyObj.nfsm_cuttingno_stock_details;
+    console.log("comp obj falg  ===> ",companyObj.nfsm_cuttingno_stock_details)
+
+    // return;
+
+
   return data
     .map((item, index) => {
       const childTable = rows[index].childTable;
@@ -354,10 +362,11 @@ const NewOutInProcessEditUI = ({route, ...props}) => {
         (sum, val) => sum + (parseFloat(val) || 0),
         0
       );
+      const final= enable ? "0,0,0,0" : " ";
 
       let remarks = `${item.remarksDamaged || ''} ! ${item.remarksMissing || ''} ! ${item.remarksRejected || ''} !`;
 
-      let hiddenParam = `${item.id || ''},${item.style_cost || ''},${item.sendQty || ''},${item.missedQty || ''},${item.missingPrice || ''},${item.loss || ''},${item.vendorbalanceqty || ''},${item.styleStatus || ''},${item.soNo || ''},${item.damageqty || ''},${item.nextMenuid || ''},${item.poId || ''},${item.fabOrRm || ''},${item.rejectionreason || ''},${item.uomtype || ''},${item.priceQty || ''}:${receivedQtySum || ''},${enteredInputSum || 0},${enteredInputs || ''}:${remarks || ' '}~`;
+      let hiddenParam = `${item.id || '0'},${item.style_cost || '0'},${item.sendQty || '0'},${item.missedQty || '0'},${item.missingPrice || '0'},${item.loss || '0'},${item.vendorbalanceqty || '0'},${item.styleStatus || '0'},${item.soNo || '0'},${item.damageqty || '0'},${item.nextMenuid || '0'},${item.poId || '0'},${item.fabOrRm || '0'},${item.rejectionreason || '0'},${item.uomtype || 'UOM'},${item.priceQty || '0'}:${receivedQtySum || ''},${enteredInputSum || '0'}:${enteredInputs || '0'}:${remarks || ' '}${final}~`;
 
       return hiddenParam;
     })
@@ -466,10 +475,7 @@ const NewOutInProcessEditUI = ({route, ...props}) => {
       hiddenButtonId: data?.outprocessDetails?.outprocessId || '', // outprocess id
       hiddenParam: generateHiddenParam(data.outprocessDetails.particulars),
 
-      // id, goods value, send qty, missed qty, missed price qty, loss dd, Balance Qty, styleStatus, soNo,
-      //  Damaged Qty, nextMenuid, poId, fabOrRm, Reason For Rejection dd, Unit ="PIECES",Unit Price	(priceQty) : (0/100) sum all sizes , Tot.Rec.Qty : entered inputs(',') : remarks ! *3 : ' ~'
 
-      //
     };
     props.submitAction(tempObj);
   };
@@ -628,7 +634,7 @@ const NewOutInProcessEditUI = ({route, ...props}) => {
           isChatEnable={false}
           isTImerEnable={false}
           isTitleHeaderEnable={true}
-          title={'New Out InProcessEdit UI'}
+          title={'New Out InProcessEdit '}
           backBtnAction={() => backBtnAction()}
         />
       </View>

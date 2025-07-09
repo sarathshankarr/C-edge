@@ -132,7 +132,7 @@ const NewOutInProcessEdit = ({ navigation, route, ...props }) => {
 
  console.log("edit save req body ==> ", tempObj)
 
-    let saveEditObj = await APIServiceCall.saveEditVendorMasters(tempObj);
+    let saveEditObj = await APIServiceCall.saveEditOutwardNewInProcess(tempObj);
     set_isLoading(false);
     console.log("response after approving", saveEditObj?.responseData, typeof saveEditObj?.responseData, saveEditObj?.responseData === true)
 
