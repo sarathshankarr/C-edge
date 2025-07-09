@@ -2180,7 +2180,7 @@ export async function saveDDA(jsonValue) {
     obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet }
     return obj;
 };
-export async function saveEditVendorMasters(jsonValue) {
+export async function saveEditOutwardNewInProcess(jsonValue) {
 
     let returnError = undefined;
     let statusData = undefined;
@@ -2193,8 +2193,8 @@ export async function saveEditVendorMasters(jsonValue) {
         obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
         return obj;
     }
-    console.log('saveEditVendorMasters  ', Environment.uri + "vendor/editSaveVendor")
-    await fetch(Environment.uri + "vendor/editSaveVendor",
+    console.log('saveEditVendorMasters  ', Environment.uri + "outprocess/saveOutReceivedData")
+    await fetch(Environment.uri + "outprocess/saveOutReceivedData",
         {
             method: "POST",
             headers: {

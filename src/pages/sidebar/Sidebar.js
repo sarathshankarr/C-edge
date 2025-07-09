@@ -248,12 +248,12 @@ const Sidebar = ({navigation}) => {
           menu_id: 787,
           src: require('../../../assets/images/png/fabricProce.png'),
         },
-        // {
-        //   label: 'New Process In',
-        //   route: 'NewProcessInList',
-        //   menu_id: 787,
-        //   src: require('../../../assets/images/png/fabricProce.png'),
-        // },
+        {
+          label: 'New Process In',
+          route: 'NewProcessInList',
+          menu_id: 787,
+          src: require('../../../assets/images/png/fabricProce.png'),
+        },
         // {
         //   label: 'New Process Out',
         //   route: 'NewProcessOutList',
@@ -291,12 +291,12 @@ const Sidebar = ({navigation}) => {
           menu_id: 49,
           src: require('../../../assets/images/png/acknowledge.png'),
         },
-        // {
-        //   label: 'New In Process',
-        //   route: 'NewOutInProcessList',
-        //   menu_id: 49,
-        //   src: require('../../../assets/images/png/acknowledge.png'),
-        // },
+        {
+          label: 'New In Process',
+          route: 'NewOutInProcessList',
+          menu_id: 49,
+          src: require('../../../assets/images/png/acknowledge.png'),
+        },
         // {
         //   label: 'Delivery Challan ',
         //   route: 'DeliveryChallanList',
