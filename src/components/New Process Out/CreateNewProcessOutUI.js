@@ -46,63 +46,51 @@ const CreateNewProcessOutUI = ({route, navigation, ...props}) => {
   };
 
   useEffect(() => {
-    // if (props.lists) {
-    //   console.log('data need to set ==> ', props.lists);
+    if (props.lists) {
+      console.log('data need to set create ==> ', props.lists);
 
-    //   if (processId) {
-        
-    //     if (props.lists.status) {
-    //       // Alert.alert(props.lists.statusRemarks);
-    //       props.popUpAction(
-    //         props.lists.statusRemarks,
-    //         Constant.DefaultAlert_MSG,
-    //         'OK',
-    //         true,
-    //         false,
-    //       );
 
-    //       return;
-    //     }
+         if (props.lists) {
+      // console.log('data need to set ==> ', props.lists);
+      if (props.lists.batchmasterMap) {
+        const arrayList = Object.keys(props.lists.batchmasterMap).map(key => ({
+          id: key,
+          name: props.lists.batchmasterMap[key],
+        }));
 
-    //     const getDate = new Date()
-    //       .toISOString()
-    //       .split('T')[0]
-    //       .split('-')
-    //       .reverse()
-    //       .join('-');
+        setFilteredBatch(arrayList);
+        setBatchList(arrayList);
+      }
+      if (props.lists.employeeMap) {
+        const arrayList = Object.keys(props.lists.employeeMap).map(key => ({
+          id: key,
+          name: props.lists.employeeMap[key],
+        }));
 
-    //     const tempObj = {
-    //       barcodeid: props.lists.inId ? props.lists.inId : '',
-    //       enterDate: props.lists.enterDate ? props.lists.enterDate : getDate,
-    //       styleNo: props.lists.styleName ? props.lists.styleName : '',
-    //       size: props.lists.size ? props.lists.size : '',
-    //       inputQty: props.lists.scanQty ? props.lists.scanQty.toString() : '',
-    //       process: props.lists.processName
-    //         ? props.lists.processName
-    //         : processName,
-    //       partsName: props.lists.part ? props.lists.part : '',
-    //       username: props.lists.userName ? props.lists.userName : '',
-    //       barCode: barcode,
-    //       damagedQty: '',
-    //       remarks: '',
-    //       processId: processId,
-    //       empBarcode: employeeBarcode,
-    //     };
-    //     setRows(prev => [...prev, tempObj]);
-    //   } else {
-    //     if (props.lists?.partprocess) {
-    //       const ProcessList = Object.keys(props.lists?.partprocess).map(
-    //         key => ({
-    //           id: key,
-    //           name: props.lists.partprocess[key],
-    //         }),
-    //       );
-    //       setFilteredProcess(ProcessList || []);
-    //       setProcessList(ProcessList || []);
-    //       setRows([]);
-    //     }
-    //   }
-    // }
+        setFilteredEmployee(arrayList);
+        setEmployeeList(arrayList);
+      }
+      if (props.lists.locationsMap) {
+        const arrayList = Object.keys(props.lists.locationsMap).map(key => ({
+          id: key,
+          name: props.lists.locationsMap[key],
+        }));
+
+        setFilteredLocation(arrayList);
+        setLocationList(arrayList);
+      }
+      if (props.lists.processMap) {
+        const arrayList = Object.keys(props.lists.processMap).map(key => ({
+          id: key,
+          name: props.lists.processMap[key],
+        }));
+
+        setFilteredProcess(arrayList);
+        setProcessList(arrayList);
+      }
+    }
+    
+    }
   }, [props.lists]);
 
   // Process

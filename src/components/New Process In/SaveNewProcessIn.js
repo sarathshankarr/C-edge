@@ -16,14 +16,14 @@ const SaveNewProcessIn = ({navigation, route, ...props}) => {
   const [isPopupLeft, set_isPopupLeft] = useState(false);
   const [fptid, set_fptid] = useState(0);
 
-  // React.useEffect(() => {
-  //   if (route.params) {
-  //     if (route.params?.item) {
-  //       console.log('Route Params ===> ', route.params?.item);
-  //       getInitialData(route.params?.item?.woId);
-  //     }
-  //   }
-  // }, [route.params]);
+  React.useEffect(() => {
+    if (route.params) {
+      if (route.params?.item) {
+        console.log('Route Params ===> ', route.params?.item);
+        getInitialData(route.params?.item?.woId);
+      }
+    }
+  }, [route.params]);
 
   const backBtnAction = () => {
     navigation.goBack();

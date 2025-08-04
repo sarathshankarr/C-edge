@@ -758,10 +758,9 @@ const CreateRequestUi = ({route, ...props}) => {
       uomstock: '',
     }];
 
-   
     let tempObj = {
       processId: processId,
-      woStyleId: stylesId,
+      woStyleId: stylesId ? stylesId?.split('_')[0] : '',
       trimId: fabricId,
       locationId: fabLocationId,
       unitMasterId: unitMasterId,
@@ -794,6 +793,7 @@ const CreateRequestUi = ({route, ...props}) => {
   // Action for Styles
   const actionOnStyles = (stylesId, stylesName) => {
     set_stylesId(stylesId);
+    console.log("setting styles ==> ", stylesId, stylesName)
     set_stylesName(stylesName);
     set_showStylesList(false);
   };
@@ -1783,7 +1783,7 @@ const CreateRequestUi = ({route, ...props}) => {
                             borderColor: '#D8D8D8',
                             borderRadius: hp('0.5%'),
                             width: '100%',
-                            overflow: 'hidden',
+                            // overflow: 'hidden',
                           }}
                           onPress={() => {
                             setRows(
@@ -1975,7 +1975,7 @@ const getStyles = colors =>
     SectionStyle1: {
       flexDirection: 'row',
       alignItems: 'center',
-      height: hp('7%'),
+      minHeight: hp('7%'),
       width: wp('75%'),
       borderRadius: hp('0.5%'),
     },

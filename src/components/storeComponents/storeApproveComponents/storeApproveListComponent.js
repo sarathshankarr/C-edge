@@ -66,11 +66,11 @@ const StoreApproveListComponent = ({ navigation, route, ...props }) => {
     if(stockStylesAPIObj && stockStylesAPIObj.statusData){
 
       if(stockStylesAPIObj && stockStylesAPIObj.responseData){
-        // set_itemsArray(stockStylesAPIObj.responseData)
         set_itemsArray(prevItems => reload 
           ? stockStylesAPIObj.responseData 
           : [...prevItems, ...stockStylesAPIObj.responseData] 
         );
+        console.log("setting false" , stockStylesAPIObj?.responseData?.length,  ListSize-1)
 
         if(stockStylesAPIObj?.responseData?.length < ListSize-1){
           setHasMore(false);

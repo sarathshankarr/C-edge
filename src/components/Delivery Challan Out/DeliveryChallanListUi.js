@@ -436,7 +436,7 @@ const DeliveryChallanListUi = ({route, ...props}) => {
         reqBody={filterReqBody}
       />
 
-      <AddNewItem navItem={'CreateDeliveryChallan'} />
+      <AddNewItem navItem={'DeliveryChallanEdit'} />
 
       {props.isPopUp ? (
         <View style={CommonStyles.customPopUpStyle}>

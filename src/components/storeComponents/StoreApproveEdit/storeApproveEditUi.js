@@ -25,7 +25,7 @@ import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import BottomComponent from '../../../utils/commonComponents/bottomComponent';
 import CustomCheckBox from '../../../utils/commonComponents/CustomCheckBox';
 import {ColorContext} from '../../colorTheme/colorTheme';
-import DateTimePickerModal from "react-native-modal-datetime-picker";
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
 
 let downArrowImg = require('./../../../../assets/images/png/dropDownImg.png');
 
@@ -49,6 +49,7 @@ const StoreApproveEditUi = ({route, ...props}) => {
   useEffect(() => {
     if (props?.itemsObj) {
       setData(props?.itemsObj);
+      console.log('stock approve edit data ===> ', props?.itemsObj);
       if (props?.itemsObj?.requestDetails) {
         set_stockTable(props?.itemsObj?.requestDetails);
       }
@@ -58,20 +59,26 @@ const StoreApproveEditUi = ({route, ...props}) => {
       if (props?.itemsObj?.fabricqty) {
         set_table_ip(props?.itemsObj?.fabricqty);
       }
-      if (props?.itemsObj?.stockRequestedStatus) {
-        set_flag(props?.itemsObj?.stockRequestedStatus === 1 ? false : true);
-      }
-      if (props?.itemsObj?.declinedStatus) {
-        set_flag(props?.itemsObj?.declinedStatus === 1 ? false : true);
-      }
+      // if (props?.itemsObj?.stockRequestedStatus) {
+      //   set_flag(props?.itemsObj?.stockRequestedStatus === 1 ? false : true);
+      // }
+      // if (props?.itemsObj?.declinedStatus) {
+      //   set_flag(props?.itemsObj?.declinedStatus === 1 ? false : true);
+      // }
       if (props?.itemsObj?.fabricApprovalStatus) {
-        set_checkboxT1(
-          props?.itemsObj?.fabricApprovalStatus !== 3 ? false : true,
-        );
         set_checkboxT2(
           props?.itemsObj?.fabricApprovalStatus === 3 ? false : true,
         );
-        console.log('props from before edit ===> ',  props?.itemsObj?.fabricApprovalStatus, typeof props?.itemsObj?.fabricApprovalStatus);
+      }
+
+      if (props?.itemsObj?.fabricRmApprovedStatus === 1) {
+        set_flag(false);
+      } else if (props?.itemsObj?.declinedStatus == 1) {
+        set_flag(false);
+      } else if (props?.itemsObj?.stockRequestedStatus > 0) {
+        set_flag(true);
+      } else {
+        set_flag(true);
       }
     }
   }, [props?.itemsObj]);
@@ -88,35 +95,42 @@ const StoreApproveEditUi = ({route, ...props}) => {
     props.popOkBtnAction();
   };
 
-  // const submitAction = (remarks,checkboxT1,checkboxT2 ) => {
-  //   console.log("from ui ==> ", remarks,checkboxT1,checkboxT2)
-  //   props.submitAction(remarks, checkboxT1,checkboxT2 );
-  // };
-
   const ApproveAction = () => {
     console.log('Approved');
-    console.log("Hhifi", table_ip , props?.itemsObj?.fabricqty, table_ip > props?.itemsObj?.fabricqty);
+    console.log(
+      'items for approve ',
+      table_ip,
+      props?.itemsObj?.fabricqty,
+      table_ip > props?.itemsObj?.fabricqty,
+    );
 
-    if(table_ip > props?.itemsObj?.fabricqty){
-      Alert.alert("Fabric Qty to be Approved is Greater than Requested Qty !!!");
+    if (table_ip > props?.itemsObj?.fabricqty) {
+      Alert.alert(
+        'Fabric Qty to be Approved is Greater than Requested Qty !!!',
+      );
       return;
     }
-    // if (data?.fabricApprovalStatus !== 0) {
-    //   if (stockTable?.length > 0) {
-    //     props.submitAction(remarks, checkboxT1, checkboxT2,1, 1, true,date);
-    //   } else {
-    //     props.submitAction(remarks, checkboxT1, checkboxT2,0, 1, true,date);
-    //   }
-    // } else {
-    //   if (stockTable?.length > 0) {
-    //     props.submitAction(remarks, checkboxT1, checkboxT2,1, 0, true,date);
-    //   } else {
-    //     props.submitAction(remarks, checkboxT1, checkboxT2,0, 0 , true,date);
-    //   }
-    // }
+
+    const FilteredList = stockTable
+      .filter(item => item.isChecked)
+      .map(item => ({
+        id: item.id,
+        receiveQty: item.inputQty,
+        stockLocationId: item.stockLocationId,
+        stockRequest: item.stockRequest,
+        styleRmSizeId: item.styleRmSizeId,
+        stock: item.stock,
+        stock_rm_lot: item.stock_rm_lot,
+        stockTypeName: item.stockTypeName,
+        checked: item.isChecked,
+        // approveStatus: 3,
+      }));
+
+    // console.log('filtered list ,', FilteredList);
+
     props.submitAction(
       remarks,
-      checkboxT1,
+      FilteredList,
       checkboxT2,
       stockTable?.length > 0 ? 1 : 0,
       data?.fabricApprovalStatus !== 0 ? 1 : 0,
@@ -126,9 +140,24 @@ const StoreApproveEditUi = ({route, ...props}) => {
   };
 
   const RejectAction = () => {
+    const FilteredList = stockTable
+      .filter(item => item.isChecked)
+      .map(item => ({
+        id: item.id,
+        receiveQty: item.inputQty,
+        stockLocationId: item.stockLocationId,
+        stockRequest: item.stockRequest,
+        styleRmSizeId: item.styleRmSizeId,
+        stock: item.stock,
+        stock_rm_lot: item.stock_rm_lot,
+        stockTypeName: item.stockTypeName,
+        checked: item.isChecked,
+        approveStatus: 3,
+      }));
+
     props.submitAction(
       remarks,
-      checkboxT1,
+      FilteredList,
       checkboxT2,
       stockTable?.length > 0 ? 1 : 0,
       data?.fabricApprovalStatus !== 0 ? 1 : 0,
@@ -139,8 +168,27 @@ const StoreApproveEditUi = ({route, ...props}) => {
   };
 
   const handleCheckBoxT1Toggle = () => {
-    set_checkboxT1(!checkboxT1);
+    const newValue = !checkboxT1; //whole main
+    set_checkboxT1(newValue);
+    const updatedStock = stockTable.map(item => ({
+      ...item,
+      isChecked: newValue,
+    }));
+    set_stockTable(updatedStock);
   };
+
+  const handleSingleCheckToggle = index => {
+    const updatedStock = [...stockTable];
+    updatedStock[index].isChecked = !updatedStock[index].isChecked;
+
+    set_stockTable(updatedStock);
+
+    const allChecked = updatedStock.every(
+      item => item.isChecked || item.approveStatus !== 0,
+    );
+    set_checkboxT1(allChecked);
+  };
+
   const handleCheckBoxT2Toggle = () => {
     set_checkboxT2(!checkboxT2);
   };
@@ -159,10 +207,9 @@ const StoreApproveEditUi = ({route, ...props}) => {
     setDatePickerVisibility(false);
   };
 
-  const handleCheckBoxToggle = (index) => {
-
+  const handleCheckBoxToggle = index => {
     const updatedCheckboxes = [...fabricCheckboxes];
-    updatedCheckboxes[index] = !updatedCheckboxes[index]; 
+    updatedCheckboxes[index] = !updatedCheckboxes[index];
     setFabricCheckboxes(updatedCheckboxes);
   };
 
@@ -208,7 +255,9 @@ const StoreApproveEditUi = ({route, ...props}) => {
             style={{
               alignItems: 'center',
               justifyContent: 'center',
-              marginTop: hp('1%'),
+              marginTop: 15,
+              // width: wp('100%'),
+              width: '100%',
             }}>
             <TextInputComponent
               inputText={
@@ -224,27 +273,28 @@ const StoreApproveEditUi = ({route, ...props}) => {
               // setValue={(textAnswer) => { untiPriceValue(textAnswer) }}
             />
           </View>
-          {!flag && <View
-            style={{
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginTop: hp('1%'),
-            }}>
-            <TextInputComponent
-              inputText={props.itemsObj ? props.itemsObj.approvedDateStr : ''}
-              labelText={'Approved Date'}
-              isEditable={false}
-              maxLengthVal={200}
-              autoCapitalize={'none'}
-              isBackground={'#dedede'}
-              // setValue={(textAnswer) => { untiPriceValue(textAnswer) }}
-            />
-          </View>}
+          {!flag && (
+            <View
+              style={{
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginTop: hp('1%'),
+              }}>
+              <TextInputComponent
+                inputText={props.itemsObj ? props.itemsObj.approvedDateStr : ''}
+                labelText={'Approved Date'}
+                isEditable={false}
+                maxLengthVal={200}
+                autoCapitalize={'none'}
+                isBackground={'#dedede'}
+                // setValue={(textAnswer) => { untiPriceValue(textAnswer) }}
+              />
+            </View>
+          )}
 
           {stockTable?.length > 0 && (
             <View style={styles.wrapper}>
               <View style={styles.table}>
-                {/* Table Head */}
                 <View style={styles.table_head}>
                   <View style={styles.checkbox_container}>
                     <CustomCheckBox
@@ -274,13 +324,17 @@ const StoreApproveEditUi = ({route, ...props}) => {
                 {stockTable?.map((item, index) => (
                   <View key={index} style={styles.table_body_single_row}>
                     <View style={styles.checkbox_container}>
-                      <CustomCheckBox
+                      {/* <CustomCheckBox
                         isChecked={
                           item.isChecked ||
                           checkboxT1 ||
                           item.approveStatus !== 0
                         }
                         onToggle={() => console.log('checked')}
+                      /> */}
+                      <CustomCheckBox
+                        isChecked={item.isChecked || item.approveStatus !== 0}
+                        onToggle={() => handleSingleCheckToggle(index)}
                       />
                     </View>
                     <View style={{width: '30%'}}>
@@ -301,7 +355,6 @@ const StoreApproveEditUi = ({route, ...props}) => {
             </View>
           )}
 
-          {/* { data && console.log("data==>",data?.fabric?.length)} */}
           {data && data?.fabric?.length > 0 && (
             <View style={styles.wrapper}>
               <View style={styles.table}>
@@ -336,7 +389,7 @@ const StoreApproveEditUi = ({route, ...props}) => {
                   <View style={styles.checkbox_container}>
                     <CustomCheckBox
                       isChecked={checkboxT2}
-                      onToggle={() => console.log('checked')}
+                      onToggle={handleCheckBoxT2Toggle}
                     />
                   </View>
                   <View style={{width: '30%'}}>
@@ -350,10 +403,10 @@ const StoreApproveEditUi = ({route, ...props}) => {
                       {data?.fabricRecievedQty}
                     </Text> */}
                     <TextInput
-                        value={table_ip ? table_ip.toString() : ''}
-                        mode="outlined"
-                        style={styles.input}               
-                        onChangeText={text => set_table_ip(text)}
+                      value={table_ip ? table_ip.toString() : ''}
+                      mode="outlined"
+                      style={styles.input}
+                      onChangeText={text => set_table_ip(text)}
                     />
                   </View>
                   <View style={{width: '25%'}}>
@@ -364,31 +417,33 @@ const StoreApproveEditUi = ({route, ...props}) => {
             </View>
           )}
 
-          {flag && <View
-            style={{
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: '#fff',
-              marginTop: hp('2%'),
-              flexDirection: 'row',
-              width: '90%',
-              marginHorizontal:20
-            }}>
-            <View style={{width: '85%', paddingHorizontal: 10}}>
-              <TextInput
-                label="Date"
-                value={date ? Constant.formatDateIntoDMY(date) : ''}
-                mode="outlined"
-                color="#000"
-              />
+          {flag && (
+            <View
+              style={{
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: '#fff',
+                marginTop: hp('2%'),
+                flexDirection: 'row',
+                width: '90%',
+                marginHorizontal: 20,
+              }}>
+              <View style={{width: '85%', paddingHorizontal: 10}}>
+                <TextInput
+                  label="Date"
+                  value={date ? Constant.formatDateIntoDMY(date) : ''}
+                  mode="outlined"
+                  color="#000"
+                />
+              </View>
+              <TouchableOpacity onPress={showDatePicker} style={{padding: 5}}>
+                <Image
+                  source={require('./../../../../assets/images/png/calendar11.png')}
+                  style={{width: 40, height: 40}}
+                />
+              </TouchableOpacity>
             </View>
-            <TouchableOpacity onPress={showDatePicker} style={{padding: 5}}>
-              <Image
-                source={require('./../../../../assets/images/png/calendar11.png')}
-                style={{width: 40, height: 40}}
-              />
-            </TouchableOpacity>
-          </View>}
+          )}
 
           <DateTimePickerModal
             isVisible={isDatePickerVisible}
@@ -487,7 +542,6 @@ export default StoreApproveEditUi;
 
 const getStyles = colors =>
   StyleSheet.create({
-
     SectionStyle1: {
       flexDirection: 'row',
       // justifyContent: "center",
@@ -525,13 +579,13 @@ const getStyles = colors =>
       color: '#000',
     },
     wrapper: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    flex: 1,
-    marginTop: hp('2%'),
-    width: '95%',
-    marginBottom: 10,
-    marginHorizontal: 10
+      justifyContent: 'center',
+      alignItems: 'center',
+      flex: 1,
+      marginTop: hp('2%'),
+      width: '95%',
+      marginBottom: 10,
+      marginHorizontal: 10,
     },
     table_head: {
       flexDirection: 'row',
@@ -559,7 +613,7 @@ const getStyles = colors =>
       borderBottomWidth: 1,
       borderColor: '#ddd',
       padding: 7,
-      alignItems:'center'
+      alignItems: 'center',
     },
     table_data: {
       fontSize: 11,
@@ -568,9 +622,9 @@ const getStyles = colors =>
     },
     table: {
       marginTop: 15,
-      width:'90%',
+      width: '90%',
       alignItems: 'center',
-      justifyContent:"center",
+      justifyContent: 'center',
       elevation: 1,
       backgroundColor: '#fff',
     },

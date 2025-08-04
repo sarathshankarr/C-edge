@@ -23,6 +23,7 @@ import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import BottomComponent from '../../utils/commonComponents/bottomComponent';
 import {TextInput} from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { cleanSingle } from 'react-native-image-crop-picker';
 
 let downArrowImg = require('./../../../assets/images/png/dropDownImg.png');
 let closeImg = require('./../../../assets/images/png/close1.png');
@@ -45,64 +46,53 @@ const CreateNewProcessInUI = ({route, navigation, ...props}) => {
   };
 
   useEffect(() => {
-    // if (props.lists) {
-    //   console.log('data need to set ==> ', props.lists);
+    if (props.lists) {
+      // console.log('data need to set ==> ', props.lists);
+      if (props.lists.batchmasterMap) {
+        const arrayList = Object.keys(props.lists.batchmasterMap).map(key => ({
+          id: key,
+          name: props.lists.batchmasterMap[key],
+        }));
 
-    //   if (processId) {
-        
-    //     if (props.lists.status) {
-    //       // Alert.alert(props.lists.statusRemarks);
-    //       props.popUpAction(
-    //         props.lists.statusRemarks,
-    //         Constant.DefaultAlert_MSG,
-    //         'OK',
-    //         true,
-    //         false,
-    //       );
+        setFilteredBatch(arrayList);
+        setBatchList(arrayList);
+      }
+      if (props.lists.employeeMap) {
+        const arrayList = Object.keys(props.lists.employeeMap).map(key => ({
+          id: key,
+          name: props.lists.employeeMap[key],
+        }));
 
-    //       return;
-    //     }
+        setFilteredEmployee(arrayList);
+        setEmployeeList(arrayList);
+      }
+      if (props.lists.locationsMap) {
+        const arrayList = Object.keys(props.lists.locationsMap).map(key => ({
+          id: key,
+          name: props.lists.locationsMap[key],
+        }));
 
-    //     const getDate = new Date()
-    //       .toISOString()
-    //       .split('T')[0]
-    //       .split('-')
-    //       .reverse()
-    //       .join('-');
+        setFilteredLocation(arrayList);
+        setLocationList(arrayList);
+      }
+      if (props.lists.processMap) {
+        const arrayList = Object.keys(props.lists.processMap).map(key => ({
+          id: key,
+          name: props.lists.processMap[key],
+        }));
 
-    //     const tempObj = {
-    //       barcodeid: props.lists.inId ? props.lists.inId : '',
-    //       enterDate: props.lists.enterDate ? props.lists.enterDate : getDate,
-    //       styleNo: props.lists.styleName ? props.lists.styleName : '',
-    //       size: props.lists.size ? props.lists.size : '',
-    //       inputQty: props.lists.scanQty ? props.lists.scanQty.toString() : '',
-    //       process: props.lists.processName
-    //         ? props.lists.processName
-    //         : processName,
-    //       partsName: props.lists.part ? props.lists.part : '',
-    //       username: props.lists.userName ? props.lists.userName : '',
-    //       barCode: barcode,
-    //       damagedQty: '',
-    //       remarks: '',
-    //       processId: processId,
-    //       empBarcode: employeeBarcode,
-    //     };
-    //     setRows(prev => [...prev, tempObj]);
-    //   } else {
-    //     if (props.lists?.partprocess) {
-    //       const ProcessList = Object.keys(props.lists?.partprocess).map(
-    //         key => ({
-    //           id: key,
-    //           name: props.lists.partprocess[key],
-    //         }),
-    //       );
-    //       setFilteredProcess(ProcessList || []);
-    //       setProcessList(ProcessList || []);
-    //       setRows([]);
-    //     }
-    //   }
-    // }
+        setFilteredProcess(arrayList);
+        setProcessList(arrayList);
+      }
+    }
   }, [props.lists]);
+
+  useEffect(() => {
+    if (props.stylesList) {
+      console.log('stylesList==> ', props.stylesList);
+      
+    }
+  }, [props.stylesList]);
 
   // Process
   const [processList, setProcessList] = useState([]);
@@ -115,9 +105,13 @@ const CreateNewProcessInUI = ({route, navigation, ...props}) => {
     setProcessId(item.id);
     setProcessName(item.name);
     setShowProcessList(false);
+
+    console.log("selcetd oprocess  ==> ",item.id)
+        props.getStyleList(item.id)
+
   };
 
-  const handleSearchProcess = text => {
+  const handleSearchProcess = (text) => {
     if (text.trim().length > 0) {
       const filtered = processList.filter(item =>
         item.name.toLowerCase().includes(text.toLowerCase()),
@@ -126,102 +120,102 @@ const CreateNewProcessInUI = ({route, navigation, ...props}) => {
     } else {
       setFilteredProcess(processList);
     }
+
   };
-const [batchList, setBatchList] = useState([]);
-const [filteredBatch, setFilteredBatch] = useState([]);
-const [showBatchList, setShowBatchList] = useState(false);
-const [batchName, setBatchName] = useState('');
-const [batchId, setBatchId] = useState('');
+  const [batchList, setBatchList] = useState([]);
+  const [filteredBatch, setFilteredBatch] = useState([]);
+  const [showBatchList, setShowBatchList] = useState(false);
+  const [batchName, setBatchName] = useState('');
+  const [batchId, setBatchId] = useState('');
 
-const actionOnBatch = item => {
-  setBatchId(item.id);
-  setBatchName(item.name);
-  setShowBatchList(false);
-};
+  const actionOnBatch = item => {
+    setBatchId(item.id);
+    setBatchName(item.name);
+    setShowBatchList(false);
+  };
 
-const handleSearchBatch = text => {
-  if (text.trim().length > 0) {
-    const filtered = batchList.filter(item =>
-      item.name.toLowerCase().includes(text.toLowerCase()),
-    );
-    setFilteredBatch(filtered);
-  } else {
-    setFilteredBatch(batchList);
-  }
-};
+  const handleSearchBatch = text => {
+    if (text.trim().length > 0) {
+      const filtered = batchList.filter(item =>
+        item.name.toLowerCase().includes(text.toLowerCase()),
+      );
+      setFilteredBatch(filtered);
+    } else {
+      setFilteredBatch(batchList);
+    }
+  };
 
-// Employee States
-const [employeeList, setEmployeeList] = useState([]);
-const [filteredEmployee, setFilteredEmployee] = useState([]);
-const [showEmployeeList, setShowEmployeeList] = useState(false);
-const [employeeName, setEmployeeName] = useState('');
-const [employeeId, setEmployeeId] = useState('');
+  // Employee States
+  const [employeeList, setEmployeeList] = useState([]);
+  const [filteredEmployee, setFilteredEmployee] = useState([]);
+  const [showEmployeeList, setShowEmployeeList] = useState(false);
+  const [employeeName, setEmployeeName] = useState('');
+  const [employeeId, setEmployeeId] = useState('');
 
-const actionOnEmployee = item => {
-  setEmployeeId(item.id);
-  setEmployeeName(item.name);
-  setShowEmployeeList(false);
-};
+  const actionOnEmployee = item => {
+    setEmployeeId(item.id);
+    setEmployeeName(item.name);
+    setShowEmployeeList(false);
+  };
 
-const handleSearchEmployee = text => {
-  if (text.trim().length > 0) {
-    const filtered = employeeList.filter(item =>
-      item.name.toLowerCase().includes(text.toLowerCase()),
-    );
-    setFilteredEmployee(filtered);
-  } else {
-    setFilteredEmployee(employeeList);
-  }
-};
+  const handleSearchEmployee = text => {
+    if (text.trim().length > 0) {
+      const filtered = employeeList.filter(item =>
+        item.name.toLowerCase().includes(text.toLowerCase()),
+      );
+      setFilteredEmployee(filtered);
+    } else {
+      setFilteredEmployee(employeeList);
+    }
+  };
 
-// Location States
-const [locationList, setLocationList] = useState([]);
-const [filteredLocation, setFilteredLocation] = useState([]);
-const [showLocationList, setShowLocationList] = useState(false);
-const [locationName, setLocationName] = useState('');
-const [locationId, setLocationId] = useState('');
+  // Location States
+  const [locationList, setLocationList] = useState([]);
+  const [filteredLocation, setFilteredLocation] = useState([]);
+  const [showLocationList, setShowLocationList] = useState(false);
+  const [locationName, setLocationName] = useState('');
+  const [locationId, setLocationId] = useState('');
 
-const actionOnLocation = item => {
-  setLocationId(item.id);
-  setLocationName(item.name);
-  setShowLocationList(false);
-};
+  const actionOnLocation = item => {
+    setLocationId(item.id);
+    setLocationName(item.name);
+    setShowLocationList(false);
+  };
 
-const handleSearchLocation = text => {
-  if (text.trim().length > 0) {
-    const filtered = locationList.filter(item =>
-      item.name.toLowerCase().includes(text.toLowerCase()),
-    );
-    setFilteredLocation(filtered);
-  } else {
-    setFilteredLocation(locationList);
-  }
-};
+  const handleSearchLocation = text => {
+    if (text.trim().length > 0) {
+      const filtered = locationList.filter(item =>
+        item.name.toLowerCase().includes(text.toLowerCase()),
+      );
+      setFilteredLocation(filtered);
+    } else {
+      setFilteredLocation(locationList);
+    }
+  };
 
-// Style States
-const [styleList, setStyleList] = useState([]);
-const [filteredStyle, setFilteredStyle] = useState([]);
-const [showStyleList, setShowStyleList] = useState(false);
-const [styleName, setStyleName] = useState('');
-const [styleId, setStyleId] = useState('');
+  // Style States
+  const [styleList, setStyleList] = useState([]);
+  const [filteredStyle, setFilteredStyle] = useState([]);
+  const [showStyleList, setShowStyleList] = useState(false);
+  const [styleName, setStyleName] = useState('');
+  const [styleId, setStyleId] = useState('');
 
-const actionOnStyle = item => {
-  setStyleId(item.id);
-  setStyleName(item.name);
-  setShowStyleList(false);
-};
+  const actionOnStyle = item => {
+    setStyleId(item.id);
+    setStyleName(item.name);
+    setShowStyleList(false);
+  };
 
-const handleSearchStyle = text => {
-  if (text.trim().length > 0) {
-    const filtered = styleList.filter(item =>
-      item.name.toLowerCase().includes(text.toLowerCase()),
-    );
-    setFilteredStyle(filtered);
-  } else {
-    setFilteredStyle(styleList);
-  }
-};
-
+  const handleSearchStyle = text => {
+    if (text.trim().length > 0) {
+      const filtered = styleList.filter(item =>
+        item.name.toLowerCase().includes(text.toLowerCase()),
+      );
+      setFilteredStyle(filtered);
+    } else {
+      setFilteredStyle(styleList);
+    }
+  };
 
   const backAction = async () => {
     props.backBtnAction();
@@ -250,8 +244,6 @@ const handleSearchStyle = text => {
 
     props.submitAction(checkedData);
   };
-
-
 
   return (
     <View style={[CommonStyles.mainComponentViewStyle]}>
@@ -295,14 +287,14 @@ const handleSearchStyle = text => {
               onChangeText={text => setStyleDescription(text)}
             />
           </View>
-          <View style={{marginTop: hp('2%')}}>
+          {/* <View style={{marginTop: hp('2%')}}>
             <TextInput
               label="Style"
               value={style2}
               mode="outlined"
               onChangeText={text => setStyle2(text)}
             />
-          </View>
+          </View> */}
           <View style={{marginTop: hp('2%')}}>
             <TextInput
               label="Color"
@@ -310,97 +302,6 @@ const handleSearchStyle = text => {
               mode="outlined"
               onChangeText={text => setColor(text)}
             />
-          </View>
-          <View style={{marginTop: hp('2%')}}>
-            <TextInput
-              label="Unit Price"
-              value={unitPrice}
-              mode="outlined"
-              onChangeText={text => setUnitPrice(text)}
-            />
-          </View>
-          <View style={{marginTop: hp('2%')}}>
-            <TextInput
-              label="Buyer Name"
-              value={buyerName}
-              mode="outlined"
-              onChangeText={text => setBuyerName(text)}
-            />
-          </View>
-         
-
-          <View
-            style={{
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: '#fff',
-              marginTop: hp('2%'),
-            }}>
-            <TouchableOpacity
-              style={{
-                flexDirection: 'row',
-                borderWidth: 0.5,
-                borderColor: '#D8D8D8',
-                borderRadius: hp('0.5%'),
-                width: '100%',
-                justifyContent: 'space-between',
-              }}
-              onPress={() => {
-                setShowProcessList(!showProcessList);
-              }}>
-              <View>
-                <View style={[styles.SectionStyle1, {}]}>
-                  <View style={{flexDirection: 'column'}}>
-                    <Text
-                      style={
-                        processId
-                          ? [styles.dropTextLightStyle]
-                          : [styles.dropTextInputStyle]
-                      }>
-                      {'Process *'}
-                    </Text>
-                    {processId ? (
-                      <Text style={[styles.dropTextInputStyle]}>
-                        {processName}
-                      </Text>
-                    ) : null}
-                  </View>
-                </View>
-              </View>
-
-              <View style={{justifyContent: 'center'}}>
-                <Image source={downArrowImg} style={styles.imageStyle} />
-              </View>
-            </TouchableOpacity>
-
-            {showProcessList && (
-              <View style={styles.dropdownContent1}>
-                <TextInput
-                  style={styles.searchInput}
-                  placeholder="Search "
-                  onChangeText={handleSearchProcess}
-                  placeholderTextColor="#000"
-                />
-                <ScrollView
-                  style={styles.scrollView}
-                  nestedScrollEnabled={true}>
-                  {filteredProcess.length === 0 ? (
-                    <Text style={styles.noCategoriesText}>
-                      Sorry, no results found!
-                    </Text>
-                  ) : (
-                    filteredProcess.map((item, index) => (
-                      <TouchableOpacity
-                        key={index}
-                        style={styles.dropdownOption}
-                        onPress={() => actionOnProcess(item)}>
-                        <Text style={{color: '#000'}}>{item.name}</Text>
-                      </TouchableOpacity>
-                    ))
-                  )}
-                </ScrollView>
-              </View>
-            )}
           </View>
 
           <View
@@ -476,7 +377,6 @@ const handleSearchStyle = text => {
               </View>
             )}
           </View>
-
 
           <View
             style={{
@@ -626,7 +526,6 @@ const handleSearchStyle = text => {
             )}
           </View>
 
-
           <View
             style={{
               alignItems: 'center',
@@ -701,6 +600,79 @@ const handleSearchStyle = text => {
             )}
           </View>
 
+          <View
+            style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: '#fff',
+              marginTop: hp('2%'),
+            }}>
+            <TouchableOpacity
+              style={{
+                flexDirection: 'row',
+                borderWidth: 0.5,
+                borderColor: '#D8D8D8',
+                borderRadius: hp('0.5%'),
+                width: '100%',
+                justifyContent: 'space-between',
+              }}
+              onPress={() => {
+                setShowProcessList(!showProcessList);
+              }}>
+              <View>
+                <View style={[styles.SectionStyle1, {}]}>
+                  <View style={{flexDirection: 'column'}}>
+                    <Text
+                      style={
+                        processId
+                          ? [styles.dropTextLightStyle]
+                          : [styles.dropTextInputStyle]
+                      }>
+                      {'Process *'}
+                    </Text>
+                    {processId ? (
+                      <Text style={[styles.dropTextInputStyle]}>
+                        {processName}
+                      </Text>
+                    ) : null}
+                  </View>
+                </View>
+              </View>
+
+              <View style={{justifyContent: 'center'}}>
+                <Image source={downArrowImg} style={styles.imageStyle} />
+              </View>
+            </TouchableOpacity>
+
+            {showProcessList && (
+              <View style={styles.dropdownContent1}>
+                <TextInput
+                  style={styles.searchInput}
+                  placeholder="Search "
+                  onChangeText={handleSearchProcess}
+                  placeholderTextColor="#000"
+                />
+                <ScrollView
+                  style={styles.scrollView}
+                  nestedScrollEnabled={true}>
+                  {filteredProcess.length === 0 ? (
+                    <Text style={styles.noCategoriesText}>
+                      Sorry, no results found!
+                    </Text>
+                  ) : (
+                    filteredProcess.map((item, index) => (
+                      <TouchableOpacity
+                        key={index}
+                        style={styles.dropdownOption}
+                        onPress={() => actionOnProcess(item)}>
+                        <Text style={{color: '#000'}}>{item.name}</Text>
+                      </TouchableOpacity>
+                    ))
+                  )}
+                </ScrollView>
+              </View>
+            )}
+          </View>
 
           <View
             style={{
@@ -775,9 +747,22 @@ const handleSearchStyle = text => {
               </View>
             )}
           </View>
-
-        
-
+          <View style={{marginTop: hp('2%')}}>
+            <TextInput
+              label="Unit Price"
+              value={unitPrice}
+              mode="outlined"
+              onChangeText={text => setUnitPrice(text)}
+            />
+          </View>
+          <View style={{marginTop: hp('2%')}}>
+            <TextInput
+              label="Buyer Name"
+              value={buyerName}
+              mode="outlined"
+              onChangeText={text => setBuyerName(text)}
+            />
+          </View>
         </View>
       </KeyboardAwareScrollView>
 
