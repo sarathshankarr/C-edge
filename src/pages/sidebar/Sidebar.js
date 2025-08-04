@@ -82,12 +82,12 @@ const Sidebar = ({navigation}) => {
           menu_id: 4,
           src: require('../../../assets/images/png/stamp.png'),
         },
-        // {
-        //   label: 'Master Box Packing',
-        //   route: 'masterBoxPackingList',
-        //   menu_id: 4,
-        //   src: require('../../../assets/images/png/stamp.png'),
-        // },
+        {
+          label: 'Master Box Packing',
+          route: 'masterBoxPackingList',
+          menu_id: 4,
+          src: require('../../../assets/images/png/stamp.png'),
+        },
         {
           label: 'Bill Generation',
           route: 'BillGenerationList',
@@ -254,12 +254,12 @@ const Sidebar = ({navigation}) => {
           menu_id: 787,
           src: require('../../../assets/images/png/fabricProce.png'),
         },
-        // {
-        //   label: 'New Process Out',
-        //   route: 'NewProcessOutList',
-        //   menu_id: 787,
-        //   src: require('../../../assets/images/png/fabricProce.png'),
-        // },
+        {
+          label: 'New Process Out',
+          route: 'NewProcessOutList',
+          menu_id: 787,
+          src: require('../../../assets/images/png/fabricProce.png'),
+        },
       ],
     },
     outwardProcess: {
@@ -297,12 +297,12 @@ const Sidebar = ({navigation}) => {
           menu_id: 49,
           src: require('../../../assets/images/png/acknowledge.png'),
         },
-        // {
-        //   label: 'Delivery Challan ',
-        //   route: 'DeliveryChallanList',
-        //   menu_id: 49,
-        //   src: require('../../../assets/images/png/acknowledge.png'),
-        // },
+        {
+          label: 'Delivery Challan ',
+          route: 'DeliveryChallanList',
+          menu_id: 49,
+          src: require('../../../assets/images/png/acknowledge.png'),
+        },
       ],
     },
     reports: {

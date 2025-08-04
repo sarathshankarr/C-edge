@@ -15,7 +15,7 @@ let filterImg = require('./../../../../assets/images/png/setting.png');
 const StoreApproveListUI = ({route, ...props }) => {
 
   const [isListOpen, set_ListOpen] = useState(false);
-  const [filterArray, set_filterArray] = useState(undefined);
+  const [filterArray, set_filterArray] = useState([]);
   const [recName, set_recName] = useState(undefined);
   let isKeyboard = useRef(false);
   const [refreshing, set_refreshing] = useState(false);
@@ -152,6 +152,7 @@ const StoreApproveListUI = ({route, ...props }) => {
 
   const fetchMore=()=>{
     if (!isFiltering) { 
+    console.log("called fetch more ")  
       props.fetchMore(true);
     }
   }
@@ -323,7 +324,7 @@ const StoreApproveListUI = ({route, ...props }) => {
               renderItem={renderItem}
               keyExtractor={(item, index) => '' + index}
               showsVerticalScrollIndicator={false}
-              onEndReached={() => fetchMore()}
+              onEndReached={fetchMore}
               onEndReachedThreshold={0.2}
               ListFooterComponent={() => props.isLoading && <ActivityIndicator size="large" />}
               refreshControl={

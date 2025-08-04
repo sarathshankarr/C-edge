@@ -52,7 +52,7 @@ const StockRequestEdit = ({ navigation, route, ...props }) => {
 
     if (STOREDETAILSAPIObj && STOREDETAILSAPIObj.statusData) {
       set_itemsObj(STOREDETAILSAPIObj.responseData);
-      console.log("itemsObj stock req ==============> ", STOREDETAILSAPIObj.responseData );
+      // console.log("itemsObj stock req ==============> ", STOREDETAILSAPIObj.responseData );
 
     } else {
       popUpAction(Constant.SERVICE_FAIL_MSG, Constant.DefaultAlert_MSG, 'OK', true, false);
@@ -81,7 +81,7 @@ const StockRequestEdit = ({ navigation, route, ...props }) => {
   };
 
   const submitAction = (remarks,stockTable) => {
-    console.log("itemsObj stock req ==============> ", itemsObj );
+    // console.log("itemsObj stock req ==============> ", itemsObj );
 
     let tempObj = itemsObj;
     tempObj.comments=remarks;
@@ -131,7 +131,7 @@ const StockRequestEdit = ({ navigation, route, ...props }) => {
       "ts_create":tempObj?.requestedDateStr,
     }
 
-    // console.log("req edit save of stock req  ================> ", obj );
+    console.log("req edit save of stock req  ================> ", obj );
     // return;
 
     set_isLoading(true);

@@ -66,6 +66,7 @@ const NewProcessOutListUI = ({route, navigation, ...props}) => {
       set_filterArray(props.itemsArray);
       set_ItemsArray(props.itemsArray);
     }
+    console.log("out list ==> ", props.itemsArray)
     // getRequestBody();
 
   }, [props?.itemsArray]);
@@ -391,8 +392,8 @@ const NewProcessOutListUI = ({route, navigation, ...props}) => {
         reqBody={filterReqBody}
       />
 
-      {/* <AddNewItem navItem={'CreateNewProcessOut'} /> */}
-      <AddNewItem navItem={'SaveNewProcessOut'} />
+      <AddNewItem navItem={'CreateNewProcessOut'} />
+      {/* <AddNewItem navItem={'SaveNewProcessOut'} /> */}
 
       {props.isPopUp ? (
         <View style={CommonStyles.customPopUpStyle}>

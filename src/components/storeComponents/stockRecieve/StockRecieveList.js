@@ -1,12 +1,12 @@
-import React, { useState} from 'react';
+import React, {useState} from 'react';
 import * as APIServiceCall from './../../../utils/apiCalls/apiCallsComponent';
-import * as Constant from "./../../../utils/constants/constant";
+import * as Constant from './../../../utils/constants/constant';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import StockRecieveListUI from './StockRecieveListUI'; 
+import StockRecieveListUI from './StockRecieveListUI';
 
-const StockRecieveList = ({ navigation, route, ...props }) => {
-  const ListSize=10;
+const StockRecieveList = ({navigation, route, ...props}) => {
+  const ListSize = 10;
 
   const [itemsArray, set_itemsArray] = useState([]);
   const [isLoading, set_isLoading] = useState(false);
@@ -18,9 +18,9 @@ const StockRecieveList = ({ navigation, route, ...props }) => {
 
   const [MainLoading, set_MainLoading] = useState(false);
   const [page, setpage] = useState(0);
-  const [hasMore, setHasMore] = useState(true); 
+  const [hasMore, setHasMore] = useState(true);
 
-  React.useEffect(() => {   
+  React.useEffect(() => {
     getInitialData(0, true);
   }, []);
 
@@ -29,11 +29,10 @@ const StockRecieveList = ({ navigation, route, ...props }) => {
   };
 
   const getInitialData = async (page = 0, reload = false) => {
-
     if (reload) {
-      setpage(0);  
+      setpage(0);
       setHasMore(true);
-  }
+    }
 
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
@@ -47,54 +46,67 @@ const StockRecieveList = ({ navigation, route, ...props }) => {
     set_isLoading(!reload);
     set_MainLoading(reload);
 
-    console.log("from : ",fromRecord, "to : ",  toRecord);
+    console.log('from : ', fromRecord, 'to : ', toRecord);
 
-   try {
-    let obj = {
-      "searchKeyValue": "",
-      "styleSearchDropdown": "-1",    
-      "fromRecord": fromRecord,
-      "toRecord": toRecord,
-      "username": userName,
-      "password" : userPsd,
-       "compIds": usercompanyId,
-       "company":JSON.parse(companyObj),
+    try {
+      let obj = {
+        searchKeyValue: '',
+        styleSearchDropdown: '-1',
+        fromRecord: fromRecord,
+        toRecord: toRecord,
+        username: userName,
+        password: userPsd,
+        compIds: usercompanyId,
+        company: JSON.parse(companyObj),
+      };
 
-  }
+      let stockStylesAPIObj = await APIServiceCall.stockRecieveListApi(obj);
+      // set_isLoading(false);
 
-    let stockStylesAPIObj = await APIServiceCall.stockRecieveListApi(obj);
-    // set_isLoading(false);
-    
-    if(stockStylesAPIObj && stockStylesAPIObj.statusData){
+      if (stockStylesAPIObj && stockStylesAPIObj.statusData) {
+        if (stockStylesAPIObj && stockStylesAPIObj.responseData) {
+          // set_itemsArray(stockStylesAPIObj.responseData)
+          set_itemsArray(prevItems =>
+            reload
+              ? stockStylesAPIObj.responseData
+              : [...prevItems, ...stockStylesAPIObj.responseData],
+          );
+          console.log(
+            'setting false',
+            stockStylesAPIObj?.responseData?.length,
+            ListSize - 1,
+          );
 
-      if(stockStylesAPIObj && stockStylesAPIObj.responseData){
-        // set_itemsArray(stockStylesAPIObj.responseData)
-        set_itemsArray(prevItems => reload 
-          ? stockStylesAPIObj.responseData 
-          : [...prevItems, ...stockStylesAPIObj.responseData] 
-        );
-
-        if(stockStylesAPIObj?.responseData?.length < ListSize-1){
-          setHasMore(false);
+          if (stockStylesAPIObj?.responseData?.length < ListSize - 1) {
+            setHasMore(false);
+          }
         }
-      } 
+      } else {
+        popUpAction(
+          Constant.SERVICE_FAIL_MSG,
+          Constant.DefaultAlert_MSG,
+          'OK',
+          true,
+          false,
+        );
+      }
 
-    } else {
-      popUpAction(Constant.SERVICE_FAIL_MSG,Constant.DefaultAlert_MSG,'OK', true,false);
+      if (stockStylesAPIObj && stockStylesAPIObj.error) {
+        popUpAction(
+          Constant.SERVICE_FAIL_MSG,
+          Constant.DefaultAlert_MSG,
+          'OK',
+          true,
+          false,
+        );
+      }
+    } finally {
+      set_isLoading(false);
+      set_MainLoading(false);
     }
-
-    if(stockStylesAPIObj && stockStylesAPIObj.error) {
-      popUpAction(Constant.SERVICE_FAIL_MSG,Constant.DefaultAlert_MSG,'OK', true,false)
-    }
-  }finally{
-    set_isLoading(false);
-    set_MainLoading(false);
-  }
   };
 
-
   const getFilteredList = async (types, Ids) => {
-
     set_MainLoading(true);
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
@@ -103,87 +115,91 @@ const StockRecieveList = ({ navigation, route, ...props }) => {
     let companyObj = await AsyncStorage.getItem('companyObj');
 
     let obj = {
-      "username":userName,
-      "password":userPsd,
-      "categoryType" : types,
-      "categoryIds" : Ids,
-      "compIds": usercompanyId,
-      "company":JSON.parse(companyObj),
-
-  }
+      username: userName,
+      password: userPsd,
+      categoryType: types,
+      categoryIds: Ids,
+      compIds: usercompanyId,
+      company: JSON.parse(companyObj),
+    };
     //  console.log("requested filtered body ==> ", obj);
-  
+
     let stichingOutAPIObj = await APIServiceCall.getFiltered_StockRecieve(obj);
     set_MainLoading(false);
-    
-    if(stichingOutAPIObj && stichingOutAPIObj.statusData){
 
-      if(stichingOutAPIObj && stichingOutAPIObj.responseData){
-        set_itemsArray(stichingOutAPIObj.responseData)
-      } 
-
+    if (stichingOutAPIObj && stichingOutAPIObj.statusData) {
+      if (stichingOutAPIObj && stichingOutAPIObj.responseData) {
+        set_itemsArray(stichingOutAPIObj.responseData);
+      }
     } else {
-      popUpAction(Constant.SERVICE_FAIL_MSG,Constant.DefaultAlert_MSG,'OK', true,false);
+      popUpAction(
+        Constant.SERVICE_FAIL_MSG,
+        Constant.DefaultAlert_MSG,
+        'OK',
+        true,
+        false,
+      );
     }
 
-    if(stichingOutAPIObj && stichingOutAPIObj.error) {
-      popUpAction(Constant.SERVICE_FAIL_MSG,Constant.DefaultAlert_MSG,'OK', true,false)
+    if (stichingOutAPIObj && stichingOutAPIObj.error) {
+      popUpAction(
+        Constant.SERVICE_FAIL_MSG,
+        Constant.DefaultAlert_MSG,
+        'OK',
+        true,
+        false,
+      );
     }
-
   };
 
-
-  const actionOnRow = (item,index) => {
-    navigation.navigate('StockRecieveEdit',{item:item});
+  const actionOnRow = (item, index) => {
+    navigation.navigate('StockRecieveEdit', {item: item});
   };
 
-  const popUpAction = (popMsg, popAlert,rBtnTitle,isPopup,isPopLeft) => {
+  const popUpAction = (popMsg, popAlert, rBtnTitle, isPopup, isPopLeft) => {
     set_popUpMessage(popMsg);
     set_popUpAlert(popAlert);
     set_popUpRBtnTitle(rBtnTitle);
     set_isPopupLeft(isPopLeft);
     set_isPopUp(isPopup);
-  }
+  };
 
   const popOkBtnAction = () => {
-    popUpAction(undefined,undefined,'', false,false)
-  }
+    popUpAction(undefined, undefined, '', false, false);
+  };
 
-  const fetchMore= (more) =>{
-    console.log("fetch more ==> ", hasMore, isLoading );
-    
-    if(more){
-      if(!hasMore || MainLoading || isLoading) return;
-      const next =page + 1  ;
+  const fetchMore = more => {
+    console.log('fetch more ==> ', hasMore, isLoading);
+
+    if (more) {
+      if (!hasMore || MainLoading || isLoading) return;
+      const next = page + 1;
       setpage(next);
       getInitialData(next, false);
-    }else{
+    } else {
       getInitialData(0, true);
       // setpage(0);
       // setHasMore(true);
     }
-  }
-
+  };
 
   return (
-
     <StockRecieveListUI
-      itemsArray = {itemsArray}
-      isLoading = {isLoading}
-      popUpAlert = {popUpAlert}
-      popUpMessage = {popUpMessage}
-      popUpRBtnTitle = {popUpRBtnTitle}
-      isPopupLeft = {isPopupLeft}
-      isPopUp = {isPopUp}
-      backBtnAction = {backBtnAction}
-      actionOnRow = {actionOnRow}
-      popOkBtnAction = {popOkBtnAction}
+      itemsArray={itemsArray}
+      isLoading={isLoading}
+      popUpAlert={popUpAlert}
+      popUpMessage={popUpMessage}
+      popUpRBtnTitle={popUpRBtnTitle}
+      isPopupLeft={isPopupLeft}
+      isPopUp={isPopUp}
+      backBtnAction={backBtnAction}
+      actionOnRow={actionOnRow}
+      popOkBtnAction={popOkBtnAction}
       fetchMore={fetchMore}
-      MainLoading = {MainLoading}
+      MainLoading={MainLoading}
       applyFilterFxn={getFilteredList}
     />
   );
-
-}
+};
 
 export default StockRecieveList;
