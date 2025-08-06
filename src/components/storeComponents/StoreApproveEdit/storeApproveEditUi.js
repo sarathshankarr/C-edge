@@ -42,6 +42,7 @@ const StoreApproveEditUi = ({route, ...props}) => {
   const [table_ip, set_table_ip] = useState('');
   const [flag, set_flag] = useState(true);
   const [fabricCheckboxes, setFabricCheckboxes] = useState([]);
+  const [fabricAlreadyChecked, setFabricAlreadyChecked] = useState(false);
 
   const {colors} = useContext(ColorContext);
   const styles = getStyles(colors);
@@ -69,6 +70,8 @@ const StoreApproveEditUi = ({route, ...props}) => {
         set_checkboxT2(
           props?.itemsObj?.fabricApprovalStatus === 3 ? false : true,
         );
+        setFabricAlreadyChecked(props?.itemsObj?.fabricApprovalStatus === 3 ? false : true,)
+
       }
 
       if (props?.itemsObj?.fabricRmApprovedStatus === 1) {
@@ -97,12 +100,6 @@ const StoreApproveEditUi = ({route, ...props}) => {
 
   const ApproveAction = () => {
     console.log('Approved');
-    console.log(
-      'items for approve ',
-      table_ip,
-      props?.itemsObj?.fabricqty,
-      table_ip > props?.itemsObj?.fabricqty,
-    );
 
     if (table_ip > props?.itemsObj?.fabricqty) {
       Alert.alert(
@@ -112,22 +109,32 @@ const StoreApproveEditUi = ({route, ...props}) => {
     }
 
     const FilteredList = stockTable
-      .filter(item => item.isChecked)
+      .filter(item => item.isChecked && !item.approveStatus)
       .map(item => ({
         id: item.id,
         receiveQty: item.inputQty,
         stockLocationId: item.stockLocationId,
+        stockLocationName: item.stockLocationName,
         stockRequest: item.stockRequest,
         styleRmSizeId: item.styleRmSizeId,
         stock: item.stock,
         stock_rm_lot: item.stock_rm_lot,
         stockTypeName: item.stockTypeName,
         checked: item.isChecked,
-        // approveStatus: 3,
+        approveStatus: 3,
       }));
 
-    // console.log('filtered list ,', FilteredList);
-
+    console.log(
+      'approve action from ui ==> ',
+      remarks,
+      FilteredList,
+      checkboxT2,
+      stockTable?.length > 0 ? 1 : 0,
+      data?.fabricApprovalStatus !== 0 ? 1 : 0,
+      true,
+      date,
+      table_ip,
+    );
     props.submitAction(
       remarks,
       FilteredList,
@@ -136,6 +143,7 @@ const StoreApproveEditUi = ({route, ...props}) => {
       data?.fabricApprovalStatus !== 0 ? 1 : 0,
       true,
       date,
+      fabricAlreadyChecked ? 0 : table_ip,
     );
   };
 
@@ -163,6 +171,7 @@ const StoreApproveEditUi = ({route, ...props}) => {
       data?.fabricApprovalStatus !== 0 ? 1 : 0,
       false,
       date,
+      fabricAlreadyChecked ? 0 : table_ip,
     );
     console.log('Rejected');
   };
@@ -292,6 +301,68 @@ const StoreApproveEditUi = ({route, ...props}) => {
             </View>
           )}
 
+          {data && data?.fabric?.length > 0 && (
+            <View style={styles.wrapper}>
+              <View style={styles.table}>
+                {/* Table Head */}
+                <View style={styles.table_head}>
+                  <View style={styles.checkbox_container}>
+                    <CustomCheckBox
+                      isChecked={checkboxT2}
+                      onToggle={handleCheckBoxT2Toggle}
+                    />
+                  </View>
+
+                  <View style={{width: '30%'}}>
+                    <Text style={styles.table_head_captions}>Fabric</Text>
+                  </View>
+                  <View style={{width: '15%'}}>
+                    <Text style={styles.table_head_captions}>
+                      Input Fabric Qty
+                    </Text>
+                  </View>
+                  <View style={{width: '25%'}}>
+                    <Text style={styles.table_head_captions}>
+                      Approved Fabric
+                    </Text>
+                  </View>
+                  <View style={{width: '25%'}}>
+                    <Text style={styles.table_head_captions}>UOM Fabric</Text>
+                  </View>
+                </View>
+
+                <View style={styles.table_body_single_row}>
+                  <View style={styles.checkbox_container}>
+                    <CustomCheckBox
+                      isChecked={checkboxT2}
+                      onToggle={handleCheckBoxT2Toggle}
+                    />
+                  </View>
+                  <View style={{width: '30%'}}>
+                    <Text style={styles.table_data}>{data?.fabric}</Text>
+                  </View>
+                  <View style={{width: '15%'}}>
+                    <Text style={styles.table_data}>{data?.fabricqty}</Text>
+                  </View>
+                  <View style={{width: '25%'}}>
+                    {/* <Text style={styles.table_data}>
+                      {data?.fabricRecievedQty}
+                    </Text> */}
+                    <TextInput
+                      value={table_ip ? table_ip.toString() : ''}
+                      mode="outlined"
+                      style={styles.input}
+                      onChangeText={text => set_table_ip(text)}
+                    />
+                  </View>
+                  <View style={{width: '25%'}}>
+                    <Text style={styles.table_data}>{data?.uomfabric}</Text>
+                  </View>
+                </View>
+              </View>
+            </View>
+          )}
+
           {stockTable?.length > 0 && (
             <View style={styles.wrapper}>
               <View style={styles.table}>
@@ -351,68 +422,6 @@ const StoreApproveEditUi = ({route, ...props}) => {
                     </View>
                   </View>
                 ))}
-              </View>
-            </View>
-          )}
-
-          {data && data?.fabric?.length > 0 && (
-            <View style={styles.wrapper}>
-              <View style={styles.table}>
-                {/* Table Head */}
-                <View style={styles.table_head}>
-                  <View style={styles.checkbox_container}>
-                    <CustomCheckBox
-                      isChecked={checkboxT2}
-                      onToggle={handleCheckBoxT2Toggle}
-                    />
-                  </View>
-
-                  <View style={{width: '30%'}}>
-                    <Text style={styles.table_head_captions}>Fabric</Text>
-                  </View>
-                  <View style={{width: '15%'}}>
-                    <Text style={styles.table_head_captions}>
-                      Input Fabric Qty
-                    </Text>
-                  </View>
-                  <View style={{width: '25%'}}>
-                    <Text style={styles.table_head_captions}>
-                      Approved Fabric
-                    </Text>
-                  </View>
-                  <View style={{width: '25%'}}>
-                    <Text style={styles.table_head_captions}>UOM Fabric</Text>
-                  </View>
-                </View>
-
-                <View style={styles.table_body_single_row}>
-                  <View style={styles.checkbox_container}>
-                    <CustomCheckBox
-                      isChecked={checkboxT2}
-                      onToggle={handleCheckBoxT2Toggle}
-                    />
-                  </View>
-                  <View style={{width: '30%'}}>
-                    <Text style={styles.table_data}>{data?.fabric}</Text>
-                  </View>
-                  <View style={{width: '15%'}}>
-                    <Text style={styles.table_data}>{data?.fabricqty}</Text>
-                  </View>
-                  <View style={{width: '25%'}}>
-                    {/* <Text style={styles.table_data}>
-                      {data?.fabricRecievedQty}
-                    </Text> */}
-                    <TextInput
-                      value={table_ip ? table_ip.toString() : ''}
-                      mode="outlined"
-                      style={styles.input}
-                      onChangeText={text => set_table_ip(text)}
-                    />
-                  </View>
-                  <View style={{width: '25%'}}>
-                    <Text style={styles.table_data}>{data?.uomfabric}</Text>
-                  </View>
-                </View>
               </View>
             </View>
           )}

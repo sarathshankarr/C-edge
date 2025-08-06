@@ -3,6 +3,7 @@ import StoreApproveListUI from './storeApproveListUI';
 import * as APIServiceCall from './../../../utils/apiCalls/apiCallsComponent';
 import * as Constant from "./../../../utils/constants/constant";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from '@react-navigation/native';
 
 
 const StoreApproveListComponent = ({ navigation, route, ...props }) => {
@@ -20,9 +21,15 @@ const StoreApproveListComponent = ({ navigation, route, ...props }) => {
   const [page, setpage] = useState(0);
   const [hasMore, setHasMore] = useState(true); 
 
-  React.useEffect(() => {   
-    getInitialData(0, true);
-  }, []);
+  // React.useEffect(() => {   
+  //   getInitialData(0, true);
+  // }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      getInitialData(0, true);
+    }, [])
+  );
+
 
   const backBtnAction = () => {
     navigation.navigate('Main');

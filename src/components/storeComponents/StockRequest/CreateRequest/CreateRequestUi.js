@@ -29,8 +29,8 @@ import * as APIServiceCall from '../../../../utils/apiCalls/apiCallsComponent';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {ColorContext} from '../../../colorTheme/colorTheme';
 import {RadioGroup} from 'react-native-radio-buttons-group';
-import DateTimePickerModal from "react-native-modal-datetime-picker";
-import { formatDateIntoDMY } from '../../../../utils/constants/constant';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import {formatDateIntoDMY} from '../../../../utils/constants/constant';
 let downArrowImg = require('./../../../../../assets/images/png/dropDownImg.png');
 let closeImg = require('./../../../../../assets/images/png/close1.png');
 
@@ -53,13 +53,11 @@ const CreateRequestUi = ({route, ...props}) => {
   const [locationName, set_locationName] = useState('');
   const [locationId, set_locationId] = useState(0);
 
-
   const [showFabLocationList, set_showFabLocationList] = useState(false);
   const [fabLocationName, set_fabLocationName] = useState('');
   const [fabLocationId, set_fabLocationId] = useState(0);
   const [filteredFabLocation, set_filteredFabLocation] = useState([]);
   const [fabLocationList, set_fabLocationList] = useState([]);
-
 
   // Fabric
   const [showFabricList, set_showFabricList] = useState(false);
@@ -107,9 +105,8 @@ const CreateRequestUi = ({route, ...props}) => {
     fabricqty: '',
   });
 
-    const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-    const [date, setDate] = useState('');
-  
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  const [date, setDate] = useState('');
 
   // const [stocksList, set_stocksList] = useState([]);
 
@@ -126,6 +123,8 @@ const CreateRequestUi = ({route, ...props}) => {
         uom: '',
         stockTypeId: '',
         stockId: '',
+        stockLocationName: '',
+        stockLocationId: '',
         showStockTypesList: false,
         showStocksList: false,
         stocksList: [],
@@ -210,9 +209,9 @@ const CreateRequestUi = ({route, ...props}) => {
     }
   }, [props?.lists]);
 
-  useEffect(()=>{
-        handleConfirm(new Date());
-  }, [])
+  useEffect(() => {
+    handleConfirm(new Date());
+  }, []);
 
   const RemoveRow = id => {
     console.log('ROW ID ===> ', id);
@@ -304,21 +303,28 @@ const CreateRequestUi = ({route, ...props}) => {
       set_itemsObj(prev => ({
         ...prev,
         approvedFabric: STOREDETAILSAPIObj.responseData.approvedFabric,
-        approvedFabricConsumption: STOREDETAILSAPIObj.responseData.approvedFabricConsumption,
+        approvedFabricConsumption:
+          STOREDETAILSAPIObj.responseData.approvedFabricConsumption,
         allowanceFabric: STOREDETAILSAPIObj.responseData.allowanceFabric,
-        totalFabricApprovedWithAllowance: STOREDETAILSAPIObj.responseData.totalFabricApprovedWithAllowance,
+        totalFabricApprovedWithAllowance:
+          STOREDETAILSAPIObj.responseData.totalFabricApprovedWithAllowance,
         availFabricQty: STOREDETAILSAPIObj.responseData.availFabricQty,
         uomfabric: STOREDETAILSAPIObj.responseData.uomType,
       }));
       set_fabLocationId(STOREDETAILSAPIObj.responseData.fabricLocationId);
-      const found= fabLocationList.filter((item)=> item.id=== (STOREDETAILSAPIObj.responseData.fabricLocationId).toString())
-      set_fabLocationName(found ? found[0].name : "");
-      
+      const found = fabLocationList.filter(
+        item =>
+          item.id ===
+          STOREDETAILSAPIObj.responseData.fabricLocationId.toString(),
+      );
+      set_fabLocationName(found ? found[0].name : '');
+
       if (
         STOREDETAILSAPIObj?.responseData?.trimConstructionsList &&
         STOREDETAILSAPIObj?.responseData?.trimConstructionsList?.length > 0
       ) {
         setRows([]); // Clear previous rows
+        console.log("location id ", STOREDETAILSAPIObj.responseData.trimConstructionsList)
         STOREDETAILSAPIObj.responseData.trimConstructionsList.forEach(
           (item, index) => {
             setRows(prevRows => [
@@ -340,6 +346,8 @@ const CreateRequestUi = ({route, ...props}) => {
                 filteredStocks: [],
                 editStockType: false,
                 editStock: false,
+                stockLocationName: item.locationName,
+                stockLocationId: item.companyLocationIds,
               },
             ]);
           },
@@ -424,11 +432,7 @@ const CreateRequestUi = ({route, ...props}) => {
       //   STOREDETAILSAPIObj.responseData.availFabricQty,
       //   STOREDETAILSAPIObj.responseData.uomType,
       // );
-      console.log(
-        'Values to Prepopulate',
-        STOREDETAILSAPIObj.responseData,
-
-      );
+      console.log('Values to Prepopulate', STOREDETAILSAPIObj.responseData);
       // set_itemsObj((prev) => ({ ...prev, fabricqty: STOREDETAILSAPIObj.responseData.fabricqty}));
     } else {
       popUpAction(
@@ -663,8 +667,8 @@ const CreateRequestUi = ({route, ...props}) => {
       );
     }
   };
-  
-  const getFabQtyByLocation = async (id) => {
+
+  const getFabQtyByLocation = async id => {
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
@@ -730,33 +734,33 @@ const CreateRequestUi = ({route, ...props}) => {
   const ApproveAction = () => {
     console.log('Approved');
 
-    if(rows.length==0  && displayStyleRadio!=='Yes'){
-      Alert("Please select Stock Details !");
-      return;
-    }
-
+    // if (rows.length == 0 && displayStyleRadio !== 'Yes') {
+    //   Alert.alert('Please select Stock Details !');
+    //   return;
+    // }
 
     const requestDetails = rows.map(detail => ({
-      stockType: detail.stockTypeId ? detail.stockTypeId: 0,
-      stockTypeName: detail.stockType,
+      stockType: detail.stockTypeId ? detail.stockTypeId : 0,
+      stockTypeName: detail.stockType ? detail.stockType : '',
       stock: detail.stockId ? detail.stockId : 0,
       stock_rm_lot: 0,
-      stockLocationId: 1,
-      styleRmSizeId: detail.size,
-      inputQty: detail.inputQty,
-      uomstock: detail.uom,
+      stockLocationId: detail.stockLocationId  ? detail.stockLocationId : 0,
+      stockLocationName: detail.stockLocationName  ? detail.stockLocationName : '',
+      styleRmSizeId: detail.size ? detail.size : 0,
+      inputQty: detail.inputQty ? detail.inputQty : '',
+      uomstock: detail.uom ? detail.uom : '',
     }));
 
-     const requestDetails2 = [{
-      stockType:  0,
-      stockTypeName: '',
-      stock:  0,
-      stock_rm_lot: 0,
-      stockLocationId: 0,
-      styleRmSizeId: '',
-      inputQty: '',
-      uomstock: '',
-    }];
+    //  const requestDetails2 = [{
+    //   stockType:  0,
+    //   stockTypeName: '',
+    //   stock:  0,
+    //   stock_rm_lot: 0,
+    //   stockLocationId: 0,
+    //   styleRmSizeId: '',
+    //   inputQty: '',
+    //   uomstock: '',
+    // }];
 
     let tempObj = {
       processId: processId,
@@ -770,8 +774,9 @@ const CreateRequestUi = ({route, ...props}) => {
       buyerpowise: buyerRadio === 'Yes' ? '1' : '0',
       fabricQty: enteredFabQty,
       uom: itemsObj?.uomfabric,
-      rmDetails:  displayStyleRadio==='Yes' ? requestDetails2 : requestDetails,
-      ts_create:date
+      // rmDetails:  displayStyleRadio==='Yes' ? requestDetails2 : requestDetails,
+      rmDetails: requestDetails,
+      ts_create: date,
     };
     props.submitAction(tempObj);
   };
@@ -793,7 +798,7 @@ const CreateRequestUi = ({route, ...props}) => {
   // Action for Styles
   const actionOnStyles = (stylesId, stylesName) => {
     set_stylesId(stylesId);
-    console.log("setting styles ==> ", stylesId, stylesName)
+    console.log('setting styles ==> ', stylesId, stylesName);
     set_stylesName(stylesName);
     set_showStylesList(false);
   };
@@ -813,12 +818,11 @@ const CreateRequestUi = ({route, ...props}) => {
   };
 
   const actionOnFabLocation = async (fabLocationId, fabLocationName) => {
-    await getFabQtyByLocation(fabLocationId)
+    await getFabQtyByLocation(fabLocationId);
     set_fabLocationId(fabLocationId);
     set_fabLocationName(fabLocationName);
     set_showFabLocationList(false);
   };
-  
 
   const actionOnStocks = async (item, rowId) => {
     set_dataFromStock({
@@ -907,7 +911,6 @@ const CreateRequestUi = ({route, ...props}) => {
       set_filteredFabLocation(fabLocationList);
     }
   };
-  
 
   const handleSearchStockType = (text, rowId) => {
     setRows(
@@ -939,7 +942,7 @@ const CreateRequestUi = ({route, ...props}) => {
     );
   };
 
-  const handleConfirm = (d) => {
+  const handleConfirm = d => {
     const formattedDate = d.toISOString().split('T')[0];
     setDate(formattedDate);
     hideDatePicker();
@@ -952,8 +955,6 @@ const CreateRequestUi = ({route, ...props}) => {
   const hideDatePicker = () => {
     setDatePickerVisibility(false);
   };
-
-
 
   return (
     <View style={[CommonStyles.mainComponentViewStyle]}>
@@ -1078,13 +1079,12 @@ const CreateRequestUi = ({route, ...props}) => {
                 </TouchableOpacity>
               </View>
 
-                <DateTimePickerModal
-                  isVisible={isDatePickerVisible}
-                  mode="date"
-                  onConfirm={handleConfirm}
-                  onCancel={hideDatePicker}
-                  />
-              
+              <DateTimePickerModal
+                isVisible={isDatePickerVisible}
+                mode="date"
+                onConfirm={handleConfirm}
+                onCancel={hideDatePicker}
+              />
             </View>
           </View>
 
@@ -1095,7 +1095,6 @@ const CreateRequestUi = ({route, ...props}) => {
                 justifyContent: 'center',
                 marginTop: hp('2%'),
                 // backgroundColor: '#f8f8f8',
-           
               }}>
               <TouchableOpacity
                 style={{
@@ -1104,7 +1103,7 @@ const CreateRequestUi = ({route, ...props}) => {
                   borderColor: '#D8D8D8',
                   borderRadius: hp('0.5%'),
                   width: '90%',
-                  justifyContent:'space-between',
+                  justifyContent: 'space-between',
                   backgroundColor: '#fff',
                 }}
                 onPress={() => {
@@ -1176,7 +1175,7 @@ const CreateRequestUi = ({route, ...props}) => {
                 borderColor: '#D8D8D8',
                 borderRadius: hp('0.5%'),
                 width: '90%',
-                justifyContent:"space-between",
+                justifyContent: 'space-between',
                 backgroundColor: '#fff',
               }}
               onPress={() => {
@@ -1247,7 +1246,7 @@ const CreateRequestUi = ({route, ...props}) => {
                   borderColor: '#D8D8D8',
                   borderRadius: hp('0.5%'),
                   width: '90%',
-                  justifyContent:'space-between',
+                  justifyContent: 'space-between',
                   backgroundColor: '#fff',
                 }}
                 onPress={() => {
@@ -1294,7 +1293,9 @@ const CreateRequestUi = ({route, ...props}) => {
                         <TouchableOpacity
                           key={index}
                           style={styles.dropdownOption}
-                          onPress={() => actionOnFabLocation(item.id, item.name)}>
+                          onPress={() =>
+                            actionOnFabLocation(item.id, item.name)
+                          }>
                           <Text style={{color: '#000'}}>{item.name}</Text>
                         </TouchableOpacity>
                       ))
@@ -1327,8 +1328,6 @@ const CreateRequestUi = ({route, ...props}) => {
               />
             </View>
           )}
-
-         
 
           {generalRadio === 'No' && (
             <View
@@ -1443,7 +1442,7 @@ const CreateRequestUi = ({route, ...props}) => {
                 borderColor: '#D8D8D8',
                 borderRadius: hp('0.5%'),
                 width: '90%',
-                justifyContent:'space-between',
+                justifyContent: 'space-between',
                 backgroundColor: '#ffffff',
               }}
               onPress={() => {
@@ -1501,7 +1500,7 @@ const CreateRequestUi = ({route, ...props}) => {
                 borderColor: '#D8D8D8',
                 borderRadius: hp('0.5%'),
                 width: '90%',
-                justifyContent:'space-between',
+                justifyContent: 'space-between',
                 backgroundColor: '#ffffff',
               }}
               onPress={() => {
@@ -1697,9 +1696,15 @@ const CreateRequestUi = ({route, ...props}) => {
                                       ...r,
                                       showStockTypesList: !r.showStockTypesList,
                                       showStocksList: false,
-                                      filteredStockTypes : props.lists.getStockTypes
+                                      filteredStockTypes:
+                                        props.lists.getStockTypes,
                                     }
-                                  : {...r, showStockTypesList: false, filteredStockTypes:props.lists.getStockTypes},
+                                  : {
+                                      ...r,
+                                      showStockTypesList: false,
+                                      filteredStockTypes:
+                                        props.lists.getStockTypes,
+                                    },
                               ),
                             );
                           }}>
@@ -1761,10 +1766,9 @@ const CreateRequestUi = ({route, ...props}) => {
                           </View>
                         )}
                       </View>
-                      </View>
+                    </View>
 
-                   
-                      <View style={{width: 5}}></View>
+                    <View style={{width: 5}}></View>
                     {/* Stock Dropdown */}
                     <View style={{width: 200}}>
                       <View
@@ -1819,7 +1823,7 @@ const CreateRequestUi = ({route, ...props}) => {
                               style={{
                                 height: 20,
                                 width: 20,
-                                tintColor:'red',
+                                tintColor: 'red',
                                 aspectRatio: 1,
                                 marginRight: 20,
                                 resizeMode: 'contain',
@@ -1861,7 +1865,7 @@ const CreateRequestUi = ({route, ...props}) => {
                           </View>
                         )}
                       </View>
-                      </View>
+                    </View>
                     <View style={{width: 80}}>
                       <Text style={styles.table_data}>{row.size}</Text>
                     </View>
@@ -2141,4 +2145,4 @@ const getStyles = colors =>
       fontWeight: '600',
       color: '#000000',
     },
-});
+  });

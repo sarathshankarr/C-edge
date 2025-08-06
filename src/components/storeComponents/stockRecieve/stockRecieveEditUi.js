@@ -87,7 +87,7 @@ const StockRecieveEditUi = ({ route, ...props }) => {
     if(!editCheckboxT1) return ;
 
     const updatedCheckboxes = [...fabricCheckboxes];
-    updatedCheckboxes[index] = !updatedCheckboxes[index]; // Toggle the value at the specific index
+    updatedCheckboxes[index] = !updatedCheckboxes[index]; 
     setFabricCheckboxes(updatedCheckboxes);
   };
 
