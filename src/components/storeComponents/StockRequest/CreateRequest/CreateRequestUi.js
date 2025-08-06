@@ -333,7 +333,7 @@ const CreateRequestUi = ({route, ...props}) => {
                 id: index,
                 stockType: item.trimType,
                 stock: item.trimConstruction,
-                size: item.scaleSizes,
+                size: item.scaleSizesIds,
                 availableQty: item.stockAvailQty,
                 inputQty: '0',
                 uom: item.uomType,
@@ -739,6 +739,8 @@ const CreateRequestUi = ({route, ...props}) => {
     //   return;
     // }
 
+console.log("rows ==> ", rows)
+// return;
     const requestDetails = rows.map(detail => ({
       stockType: detail.stockTypeId ? detail.stockTypeId : 0,
       stockTypeName: detail.stockType ? detail.stockType : '',
@@ -746,7 +748,7 @@ const CreateRequestUi = ({route, ...props}) => {
       stock_rm_lot: 0,
       stockLocationId: detail.stockLocationId  ? detail.stockLocationId : 0,
       stockLocationName: detail.stockLocationName  ? detail.stockLocationName : '',
-      styleRmSizeId: detail.size ? detail.size : 0,
+      styleRmSizeId:  detail.size ? detail.size : 0,
       inputQty: detail.inputQty ? detail.inputQty : '',
       uomstock: detail.uom ? detail.uom : '',
     }));

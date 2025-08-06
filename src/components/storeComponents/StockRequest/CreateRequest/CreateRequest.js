@@ -287,7 +287,7 @@ const CreateRequest = ({ navigation, route, ...props }) => {
       "requestedDate": tempObj.ts_create,
     };
     
-    console.log("req for save create stock req ====>   ", obj.rmDetails)
+    console.log("req for save create stock req ====>   ", obj)
 // return;
     set_isLoading(true);
     let SAVEAPIObj = await APIServiceCall.saveStockRequest(obj);
