@@ -29,11 +29,14 @@ import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import {RadioGroup} from 'react-native-radio-buttons-group';
 import {ColorContext} from '../colorTheme/colorTheme';
 import CustomCheckBox from '../../utils/commonComponents/CustomCheckBox';
+import {useNavigation} from '@react-navigation/native';
 
 let downArrowImg = require('./../../../assets/images/png/dropDownImg.png');
 let closeImg = require('./../../../assets/images/png/close1.png');
 
-const CreateMasterBoxPackingUI = ({route, navigation, ...props}) => {
+const CreateMasterBoxPackingUI = ({route, ...props}) => {
+  const navigation = useNavigation();
+
   const [masterBoxName, setMasterBoxName] = useState('');
   const [rows, setRows] = useState([]);
   const [buyerName, setbuyerName] = React.useState('');
@@ -124,9 +127,46 @@ const CreateMasterBoxPackingUI = ({route, navigation, ...props}) => {
     props.backBtnAction();
   };
 
+  const handleCallBarcodes = code => {
+    console.log('barcode scanned ', code);
+  };
+
+  const handleScannedCode = (text) => {
+    text =42;
+    if (!text) {
+      Alert.alert('Please Enter the Valid Barcode');
+    }
+
+    if (text) {
+      handleCallBarcodes(text);
+      setRows(prev => [
+        ...prev,
+        {
+          id: 1,
+          BoxId: 'box_001',
+          BoxName: 'Box Alpha',
+          CustomerStyleName: 'Style 101',
+          size: 'M',
+          Qty: 10,
+          showBoxList: false,
+          filteredBoxList: [
+            {id: 'box_001', name: 'Box Alpha'},
+            {id: 'box_002', name: 'Box Beta'},
+            {id: 'box_003', name: 'Box Gamma'},
+          ],
+          childTable: [
+            {SIZE_ID: 1, SIZE_VAL: 'XS', checked: true},
+            {SIZE_ID: 2, SIZE_VAL: 'S', checked: false},
+            {SIZE_ID: 3, SIZE_VAL: 'M', checked: true},
+          ],
+        },
+      ]);
+    } else {
+      Alert.alert('Please Enter the Valid Barcode');
+    }
+  };
+
   const submitAction = async () => {
-
-
     const mappedRows = rows.flatMap(row => {
       const barcodeString = row.childTable?.length
         ? Array(row.childTable.length).fill(row.barcode).join(',')
@@ -253,6 +293,15 @@ const CreateMasterBoxPackingUI = ({route, navigation, ...props}) => {
     }
   };
 
+  const handleScan = () => {
+    navigation.navigate('ScanQRPage', {
+      onScanSuccess: scannedValue => {
+        console.log('Scanned Code: ', scannedValue);
+        handleScannedCode(scannedValue);
+      },
+    });
+  };
+
   return (
     <View style={[CommonStyles.mainComponentViewStyle]}>
       <View style={[CommonStyles.headerView]}>
@@ -288,7 +337,7 @@ const CreateMasterBoxPackingUI = ({route, navigation, ...props}) => {
             />
           </View>
 
-          <View
+          {/* <View
             style={{
               alignItems: 'center',
               justifyContent: 'center',
@@ -369,7 +418,7 @@ const CreateMasterBoxPackingUI = ({route, navigation, ...props}) => {
               mode="outlined"
               onChangeText={text => setbuyerName(text)}
             />
-          </View>
+          </View> */}
 
           <View style={{marginTop: hp('2%')}}>
             <TextInput
@@ -378,6 +427,45 @@ const CreateMasterBoxPackingUI = ({route, navigation, ...props}) => {
               mode="outlined"
               onChangeText={text => setBarcode(text)}
             />
+          </View>
+
+          <View
+            style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: 'auto',
+              paddingVertical: hp('1.5%'),
+              borderRadius: 10,
+              backgroundColor: '#fff',
+              shadowColor: '#000',
+              shadowOffset: {width: 0, height: 2},
+              shadowOpacity: 0.1,
+              shadowRadius: 4,
+              elevation: 5, // For Android shadow
+              marginTop: hp('2%'),
+            }}>
+            <TouchableOpacity
+              onPress={handleScan}
+              style={{alignItems: 'center'}}>
+              <Image
+                source={require('./../../../assets/images/png/scan.png')}
+                style={{
+                  height: 28,
+                  width: 28,
+                  marginBottom: hp('0.5%'),
+                }}
+                resizeMode="contain"
+              />
+              <Text
+                style={{
+                  color: '#333',
+                  fontSize: hp('1.6%'),
+                  fontWeight: '500',
+                  marginTop: hp('0.3%'),
+                }}>
+                Scan
+              </Text>
+            </TouchableOpacity>
           </View>
 
           <View

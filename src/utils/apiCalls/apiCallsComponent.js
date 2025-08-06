@@ -2652,7 +2652,7 @@ export async function saveStockRequest(jsonValue) {
         obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
         return obj;
     }
-    // console.log('saveStock request ', jsonValue, Environment.uri + "stockapprove/saveStockReq")
+    console.log('saveStock request calling api ==> ',  Environment.uri + "stockapprove/saveStockReq")
     await fetch(Environment.uri + "stockapprove/saveStockReq",
         {
             method: "POST",
