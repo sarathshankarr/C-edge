@@ -94,6 +94,12 @@ const Sidebar = ({navigation}) => {
           menu_id: 4,
           src: require('../../../assets/images/png/stamp.png'),
         },
+        {
+          label: 'Bill Generation (Barcode)',
+          route: 'BillGenerationBarcodeList',
+          menu_id: 4,
+          src: require('../../../assets/images/png/stamp.png'),
+        },
       ],
     },
     masters: {

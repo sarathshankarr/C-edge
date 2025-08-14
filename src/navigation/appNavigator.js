@@ -140,6 +140,9 @@ import NewOutInProcessEdit from '../components/NewOutInProcess/NewOutInProcessEd
 import CreateDeliveryChallan from '../components/Delivery Challan Out/CreateDeliveryChallan';
 import DeliveryChallanList from '../components/Delivery Challan Out/DeliveryChallanList';
 import DeliveryChallanEdit from '../components/Delivery Challan Out/DeliveryChallanEdit';
+import CreateBillGenerationBarcode from '../components/Bill Generation (Barcode)/CreateBillGenerationBarcode';
+import BillGenerationBarcodeList from '../components/Bill Generation (Barcode)/BillGenerationBarcodeList';
+import SaveBillGenerationBarcode from '../components/Bill Generation (Barcode)/SaveBillGenerationBarcode';
 
 
 const Stack = createNativeStackNavigator();
@@ -283,6 +286,9 @@ const AppStack = () => {
       <Stack.Screen name="CreateDeliveryChallan" component={CreateDeliveryChallan} options={{ headerShown: false }} /> 
       <Stack.Screen name="DeliveryChallanList" component={DeliveryChallanList} options={{ headerShown: false }} /> 
       <Stack.Screen name="DeliveryChallanEdit" component={DeliveryChallanEdit} options={{ headerShown: false }} /> 
+      <Stack.Screen name="CreateBillGenerationBarcode" component={CreateBillGenerationBarcode} options={{ headerShown: false }} /> 
+      <Stack.Screen name="BillGenerationBarcodeList" component={BillGenerationBarcodeList} options={{ headerShown: false }} /> 
+      <Stack.Screen name="SaveBillGenerationBarcode" component={SaveBillGenerationBarcode} options={{ headerShown: false }} /> 
     </Stack.Navigator>
   );
 };
