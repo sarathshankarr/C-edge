@@ -53,7 +53,7 @@ const CuttingSaveComponent = ({ navigation, route, ...props }) => {
       "company":JSON.parse(companyObj),
    }
 
-    // console.log("req body of add cutting ", obj1)
+    console.log("req body of add cutting ", obj1)
 
     let addCuttingAPIObj = await APIServiceCall.addCuttingDetails(obj1);
     set_isLoading(false);

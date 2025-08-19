@@ -68,7 +68,7 @@ const CreatePurchaseOrderDraft = ({route}) => {
 
     let LISTAPIOBJ = await APIServiceCall.getPurchaseOrderDraftDetails(obj);
     set_isLoading(false);
-    // console.log("intial req bidy ====>  ", obj)
+    console.log("create po  req body ====>  ", obj)
 
     if (LISTAPIOBJ && LISTAPIOBJ.statusData) {
       if (LISTAPIOBJ && LISTAPIOBJ.responseData) {

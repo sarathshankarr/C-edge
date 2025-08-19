@@ -73,7 +73,7 @@ const CuttingSaveUI = ({route, ...props}) => {
       set_fabricReturn(props.itemsObj.fabricReturn);
       set_enterSizesArray(props.itemsObj.sizeDetails);
       set_actualConsumption(props.itemsObj.actualConsumption);
-      set_fabNfoRecQty(props.itemsObj.nfoQty);
+      set_fabNfoRecQty(props.itemsObj?.nfoQty || 0);
       set_approvedConsumption(props.itemsObj.approvedConsumption);
       set_unitPrice(props.itemsObj?.unitprice || '0');
       if (props.itemsObj.companyLocation) {
@@ -89,7 +89,7 @@ const CuttingSaveUI = ({route, ...props}) => {
         set_filteredLocations(Object.keys(props?.itemsObj?.locationMap || {}));
       }
 
-      console.log('Fab NFO Rec Qty ==> ', props.itemsObj.nfoQty);
+      console.log('Fab NFO Rec Qty ===============> ', props.itemsObj?.nfoQty);
 
       set_batchMapArr(props?.itemsObj?.batchMap);
       set_filteredBatchTypes(Object.keys(props?.itemsObj?.batchMap));
@@ -730,7 +730,7 @@ const CuttingSaveUI = ({route, ...props}) => {
               marginTop: hp('1%'),
             }}>
             <TextInputComponent
-              inputText={fabNfoRecQty.toString()}
+              inputText={fabNfoRecQty?.toString() || ""}
               labelText={'Fab NFO Rec Qty '}
               isEditable={false}
               maxLengthVal={10}

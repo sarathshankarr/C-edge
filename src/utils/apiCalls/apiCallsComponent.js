@@ -302,6 +302,7 @@ export async function allPOAPIService(jsonValue) {
     }
     // await fetch(Environment.uri + "po/loadAllPOs",
     await fetch(Environment.uri + "po/loadAllPoDraft",
+    // await fetch(Environment.uri + "po/loadAllPOs",
         {
             method: "POST",
             headers: {
