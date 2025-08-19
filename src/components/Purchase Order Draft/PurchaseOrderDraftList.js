@@ -86,7 +86,7 @@ const PurchaseOrderDraftList = ({route}) => {
         userName: userName,
         userPwd: userPsd,
       };
-      console.log("req body ===> ", obj)
+      // console.log("req body ===> ", obj)
       let LISTAPIOBJ = await APIServiceCall.LoadAllPoDraft(obj);
       set_isLoading(false);
 
