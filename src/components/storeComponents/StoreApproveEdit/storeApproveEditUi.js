@@ -50,7 +50,7 @@ const StoreApproveEditUi = ({route, ...props}) => {
   useEffect(() => {
     if (props?.itemsObj) {
       setData(props?.itemsObj);
-      console.log('stock approve edit data ===> ', props?.itemsObj);
+      // console.log('stock approve edit data ===> ', props?.itemsObj);
       if (props?.itemsObj?.requestDetails) {
         set_stockTable(props?.itemsObj?.requestDetails);
       }
@@ -71,7 +71,7 @@ const StoreApproveEditUi = ({route, ...props}) => {
           props?.itemsObj?.fabricApprovalStatus === 3 ? false : true,
         );
         setFabricAlreadyChecked(props?.itemsObj?.fabricApprovalStatus === 3 ? false : true,)
-
+        console.log("fabric approve status ", props?.itemsObj?.fabricApprovalStatus)
       }
 
       if (props?.itemsObj?.fabricRmApprovedStatus === 1) {
@@ -129,7 +129,6 @@ const StoreApproveEditUi = ({route, ...props}) => {
       remarks,
       FilteredList,
       checkboxT2,
-      stockTable?.length > 0 ? 1 : 0,
       data?.fabricApprovalStatus !== 0 ? 1 : 0,
       true,
       date,
@@ -139,8 +138,7 @@ const StoreApproveEditUi = ({route, ...props}) => {
       remarks,
       FilteredList,
       checkboxT2,
-      stockTable?.length > 0 ? 1 : 0,
-      data?.fabricApprovalStatus !== 0 ? 1 : 0,
+      fabricAlreadyChecked,
       true,
       date,
       fabricAlreadyChecked ? 0 : table_ip,
@@ -167,8 +165,7 @@ const StoreApproveEditUi = ({route, ...props}) => {
       remarks,
       FilteredList,
       checkboxT2,
-      stockTable?.length > 0 ? 1 : 0,
-      data?.fabricApprovalStatus !== 0 ? 1 : 0,
+      fabricAlreadyChecked  ? 0 : 1,
       false,
       date,
       fabricAlreadyChecked ? 0 : table_ip,
@@ -271,7 +268,7 @@ const StoreApproveEditUi = ({route, ...props}) => {
             <TextInputComponent
               inputText={
                 props.itemsObj
-                  ? `${props.itemsObj.stylename} ( ${props.itemsObj.styleColor} ) `
+                  ? `${props?.itemsObj?.stylename || ''} ( ${props?.itemsObj?.styleColor || ''} ) `
                   : ''
               }
               labelText={'Style(Color)'}

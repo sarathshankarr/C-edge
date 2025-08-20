@@ -324,7 +324,10 @@ const CreateRequestUi = ({route, ...props}) => {
         STOREDETAILSAPIObj?.responseData?.trimConstructionsList?.length > 0
       ) {
         setRows([]); // Clear previous rows
-        console.log("location id ", STOREDETAILSAPIObj.responseData.trimConstructionsList)
+        console.log(
+          'location id ',
+          STOREDETAILSAPIObj.responseData.trimConstructionsList,
+        );
         STOREDETAILSAPIObj.responseData.trimConstructionsList.forEach(
           (item, index) => {
             setRows(prevRows => [
@@ -346,6 +349,8 @@ const CreateRequestUi = ({route, ...props}) => {
                 filteredStocks: [],
                 editStockType: false,
                 editStock: false,
+                bomRequiredQty:item.bomRequiredQty,
+                allowQty:item.allowQty,
                 stockLocationName: item.locationName,
                 stockLocationId: item.companyLocationIds,
               },
@@ -738,17 +743,25 @@ const CreateRequestUi = ({route, ...props}) => {
     //   Alert.alert('Please select Stock Details !');
     //   return;
     // }
+    if (itemsObj?.availFabricQty) {
+      if (enteredFabQty > itemsObj?.availFabricQty) {
+        Alert.alert('Fabric Quantity should be less than Available Quantity');
+        return;
+      }
+    }
 
-console.log("rows ==> ", rows)
-// return;
+    console.log('rows ==> ', rows);
+    // return;
     const requestDetails = rows.map(detail => ({
       stockType: detail.stockTypeId ? detail.stockTypeId : 0,
       stockTypeName: detail.stockType ? detail.stockType : '',
       stock: detail.stockId ? detail.stockId : 0,
       stock_rm_lot: 0,
-      stockLocationId: detail.stockLocationId  ? detail.stockLocationId : 0,
-      stockLocationName: detail.stockLocationName  ? detail.stockLocationName : '',
-      styleRmSizeId:  detail.size ? detail.size : 0,
+      stockLocationId: detail.stockLocationId ? detail.stockLocationId : 0,
+      stockLocationName: detail.stockLocationName
+        ? detail.stockLocationName
+        : '',
+      styleRmSizeId: detail.size ? detail.size : 0,
       inputQty: detail.inputQty ? detail.inputQty : '',
       uomstock: detail.uom ? detail.uom : '',
     }));
@@ -1655,6 +1668,11 @@ console.log("rows ==> ", rows)
                     </Text>
                   </View>
                   <View style={{width: 100}}>
+                    <Text style={styles.table_head_captions}>
+                      BOM Required Qty/Allow Qty
+                    </Text>
+                  </View>
+                  <View style={{width: 100}}>
                     <Text style={styles.table_head_captions}>Stock UOM</Text>
                   </View>
                 </View>
@@ -1718,7 +1736,7 @@ console.log("rows ==> ", rows)
                                     ? styles.dropTextLightStyle
                                     : styles.dropTextInputStyle
                                 }>
-                                {'StockTypes '}
+                                {'Stock Types '}
                               </Text>
                               <Text style={styles.dropTextInputStyle}>
                                 {row.stockTypeId
@@ -1728,10 +1746,10 @@ console.log("rows ==> ", rows)
                             </View>
                           </View>
                           <View style={{justifyContent: 'center'}}>
-                            <Image
+                            {/* <Image
                               source={downArrowImg}
                               style={styles.imageStyle}
-                            />
+                            /> */}
                           </View>
                         </TouchableOpacity>
                         {row.showStockTypesList && row.editStockType && (
@@ -1789,7 +1807,7 @@ console.log("rows ==> ", rows)
                             borderColor: '#D8D8D8',
                             borderRadius: hp('0.5%'),
                             width: '100%',
-                            // overflow: 'hidden',
+                            overflow: 'hidden',
                           }}
                           onPress={() => {
                             setRows(
@@ -1886,6 +1904,9 @@ console.log("rows ==> ", rows)
                           );
                         }}
                       />
+                    </View>
+                    <View style={{width: 100}}>
+                      <Text style={styles.table_data}>{Number(row.bomRequiredQty).toFixed(2)}/{Number(row.allowQty).toFixed(2)}</Text>
                     </View>
                     <View style={{width: 100}}>
                       <Text style={styles.table_data}>{row.uom}</Text>

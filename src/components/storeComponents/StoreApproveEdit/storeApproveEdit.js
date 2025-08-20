@@ -87,15 +87,16 @@ const StoreApproveEdit = ({navigation, route, ...props}) => {
     remarks,
     FilteredList,
     checkboxT2,
-    T1,
-    T2,
+    fabricAlreadyChecked,
     status,
     date,
     table_ip,
   ) => {
     let tempObj = itemsObj;
 
-    if (FilteredList.length === 0 || !checkboxT2) {
+    console.log('to submit action', checkboxT2);
+
+    if (FilteredList.length === 0 && !checkboxT2) {
       popUpAction(
         'Please Select Atleast one Style',
         Constant.DefaultAlert_MSG,
@@ -106,13 +107,24 @@ const StoreApproveEdit = ({navigation, route, ...props}) => {
       return;
     }
 
-    if (T2 && checkboxT2) {
-      tempObj.fabricApprovalStatus = 3;
-    } else if (T2 && !checkboxT2) {
-      tempObj.fabricApprovalStatus = 1;
+    if (!fabricAlreadyChecked) {
+      if (checkboxT2) {
+        tempObj.fabricApprovalStatus = 1;
+        tempObj.isFabricChecked = 1;
+      } else if (!checkboxT2) {
+        tempObj.isFabricChecked = 0;
+        tempObj.fabricApprovalStatus = 0;
+      }
+    } else {
+      tempObj.isFabricChecked = 0;
     }
+
+    console.log(
+      'saving fabricApprovalStatus ==> ',
+      tempObj.fabricApprovalStatus,
+    );
+
     tempObj.requestDetails = FilteredList;
-    console.log('saving OBj edit req==> ', tempObj.requestDetails);
 
     if (!status) {
       tempObj.declinedStatus = 1;
@@ -123,8 +135,7 @@ const StoreApproveEdit = ({navigation, route, ...props}) => {
 
     tempObj.stockapprove_remarks = remarks;
     tempObj.date = date;
-    tempObj.fabricRecievedQty = table_ip;
-    // return;
+    tempObj.fabricRecievedQty = checkboxT2 ? table_ip : 0;
     saveStoreApprove(tempObj);
   };
 
@@ -141,11 +152,11 @@ const StoreApproveEdit = ({navigation, route, ...props}) => {
       company: JSON.parse(companyObj),
       stockRequest: tempObj,
       receiveDate: tempObj.date,
-      approveDate: "04/08/2025",  
-      updateRemarks:tempObj?.stockapprove_remarks
+      approveDate: '04/08/2025',
+      updateRemarks: tempObj?.stockapprove_remarks,
     };
 
-    // console.log('saving OBj edit req==> ', obj.stockRequest);
+    console.log('saving OBj edit req==> ', obj.stockRequest);
     // return;
     set_isLoading(true);
     let SAVEAPIObj = await APIServiceCall.saveStoreApproval(obj);
