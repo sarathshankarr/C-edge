@@ -349,8 +349,8 @@ const CreateRequestUi = ({route, ...props}) => {
                 filteredStocks: [],
                 editStockType: false,
                 editStock: false,
-                bomRequiredQty:item.bomRequiredQty,
-                allowQty:item.allowQty,
+                bomRequiredQty: item.bomRequiredQty,
+                allowQty: item.allowQty,
                 stockLocationName: item.locationName,
                 stockLocationId: item.companyLocationIds,
               },
@@ -743,6 +743,7 @@ const CreateRequestUi = ({route, ...props}) => {
     //   Alert.alert('Please select Stock Details !');
     //   return;
     // }
+
     if (itemsObj?.availFabricQty) {
       if (enteredFabQty > itemsObj?.availFabricQty) {
         Alert.alert('Fabric Quantity should be less than Available Quantity');
@@ -750,8 +751,22 @@ const CreateRequestUi = ({route, ...props}) => {
       }
     }
 
+for (let index = 0; index < rows.length; index++) {
+  const row = rows[index];
+  const inputQty = Number(row.inputQty);
+  const availableQty = Number(row.availableQty);
+
+  if (inputQty > availableQty) {
+    Alert.alert(
+      'Invalid Quantity',
+      `Row ${ index + 1 }: Input quantity should be less than Style Wise Location Avail Qty (${availableQty})`
+    );
+    break; 
+  }
+}
+
+
     console.log('rows ==> ', rows);
-    // return;
     const requestDetails = rows.map(detail => ({
       stockType: detail.stockTypeId ? detail.stockTypeId : 0,
       stockTypeName: detail.stockType ? detail.stockType : '',
@@ -1906,7 +1921,10 @@ const CreateRequestUi = ({route, ...props}) => {
                       />
                     </View>
                     <View style={{width: 100}}>
-                      <Text style={styles.table_data}>{Number(row.bomRequiredQty).toFixed(2)}/{Number(row.allowQty).toFixed(2)}</Text>
+                      <Text style={styles.table_data}>
+                        {Number(row.bomRequiredQty).toFixed(2)}/
+                        {Number(row.allowQty).toFixed(2)}
+                      </Text>
                     </View>
                     <View style={{width: 100}}>
                       <Text style={styles.table_data}>{row.uom}</Text>
