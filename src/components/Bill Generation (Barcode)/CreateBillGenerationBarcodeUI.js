@@ -56,7 +56,7 @@ const CreateBillGenerationBarcodeUI = ({route, ...props}) => {
 
   useEffect(() => {
     if (props.lists) {
-      console.log('data need to set ==> ', props.lists);
+      // console.log('data need to set ==> ', props.lists);
       if (props.lists.companyLocationsMap) {
         const shipFromList = Object.keys(props.lists.companyLocationsMap).map(
           key => ({
@@ -132,7 +132,7 @@ const CreateBillGenerationBarcodeUI = ({route, ...props}) => {
   const [shipLocationId, setShipLocationId] = useState('');
 
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-  const [orderDate, setOrderDate] = useState('');
+  const [txnDate, settxnDate] = useState('');
   const [deliveryDate, setDeliveryDate] = useState('');
   const [activeField, setActiveField] = useState(null);
 
@@ -290,50 +290,9 @@ const CreateBillGenerationBarcodeUI = ({route, ...props}) => {
     const Obj = {
       deliveryDate: deliveryDate,
       shiploc: shipLocationId,
-      orderDate: orderDate,
+      txnDate: txnDate,
       itemTrimsType: 'Fabric', // Rm //
       issueDate: '',
-      shipcancelDate: '',
-      preferredDate: '',
-      shipextDate: '',
-      completionDate: '',
-      availDate: '',
-      notes: '',
-      codeType: '',
-      contactId: 0,
-      cf_gst: 0,
-      vendorCustomerId: vendorId,
-      transportCost: 0,
-      additional_cost: 0,
-      costfoc: 0,
-      hsn: '0',
-      companySymbol: '',
-      suffix: '',
-      qtys: 0,
-      poNumber: 0,
-      posave: 0,
-      p_conv_rate: 0.0,
-      pocancel: '',
-      tc_gst: 0,
-      tc_hsn: 0,
-      ac_gst: 0,
-      ac_hsn: 0,
-      cf_hsn: '0',
-      financialYear: 0,
-      yearwiseId: 0,
-      termofpayment: '',
-      otherReference: '',
-      destination: '',
-      buyerno: '',
-      dispatch: '',
-      roundOff: 0.0,
-      isCustStyleWise: 0,
-      additionalAmount: 0,
-      poTcs: 0,
-      seqIdForStyle: '',
-      modify_user: '',
-      styleOrBuyerpo: 0,
-      lineItemsSet: checkedData,
     };
 
     console.log('checkedData ==> ', checkedData);
@@ -348,12 +307,8 @@ const CreateBillGenerationBarcodeUI = ({route, ...props}) => {
   const handleConfirm = date => {
     const extractedDate = date.toISOString().split('T')[0];
     const formattedDate = formatDateIntoDMY(extractedDate);
-
-    if (activeField === 'deliveryDate') {
-      setDeliveryDate(formattedDate);
-    } else if (activeField === 'orderDate') {
-      setOrderDate(formattedDate);
-    }
+      settxnDate(formattedDate);
+ 
     hideDatePicker();
   };
 
@@ -426,7 +381,7 @@ const CreateBillGenerationBarcodeUI = ({route, ...props}) => {
     console.log('selcetd items  ===> ', list.join(','));
     if (list.length > 0) {
       const ids = list.join(',');
-      props.getModalLists(ids);
+      // props.getModalLists(ids);
     }
     // setRows(list);
     setShowmodal(false);
@@ -456,6 +411,9 @@ const CreateBillGenerationBarcodeUI = ({route, ...props}) => {
     setShowmodal(!showModal);
   };
   const handleSearchBarcode = () => {
+    if(!barCode){
+      Alert.alert("Alert", "Please Enter Barcode !")
+    }
     handleScannedCode(barCode);
   };
 
@@ -746,8 +704,8 @@ const CreateBillGenerationBarcodeUI = ({route, ...props}) => {
             }}>
             <View style={{width: '85%'}}>
               <TextInput
-                label="Delivery Date"
-                value={orderDate ? orderDate : ''}
+                label="Txn Date"
+                value={txnDate ? txnDate : ''}
                 placeholder="Order Date"
                 placeholderTextColor="#000"
                 mode="outlined"
@@ -756,7 +714,7 @@ const CreateBillGenerationBarcodeUI = ({route, ...props}) => {
             </View>
             <TouchableOpacity
               onPress={() => {
-                showDatePicker('orderDate');
+                showDatePicker('txnDate');
               }}
               style={{padding: 5}}>
               <Image

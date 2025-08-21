@@ -58,7 +58,9 @@ const CreateBillGenerationBarcode = ({route}) => {
         language_id: 1,
       },
     };
-    let LISTAPIOBJ = await APIServiceCall.getBillGenerationBarcodeCreateList(obj);
+    let LISTAPIOBJ = await APIServiceCall.getBillGenerationBarcodeCreateList(
+      obj,
+    );
     set_isLoading(false);
 
     if (LISTAPIOBJ && LISTAPIOBJ.statusData) {
@@ -100,13 +102,21 @@ const CreateBillGenerationBarcode = ({route}) => {
       company: JSON.parse(companyObj),
       barcodeNo: id,
     };
+    // console.log("barcode valid req body ", obj)
     let LISTAPIOBJ = await APIServiceCall.validateBillGenerationBarcode(obj);
     set_isLoading(false);
 
-    if (LISTAPIOBJ && LISTAPIOBJ.statusData) {
-      if (LISTAPIOBJ && LISTAPIOBJ.responseData) {
-        set_lists(LISTAPIOBJ.responseData);
-      }
+    if (
+      LISTAPIOBJ &&
+      LISTAPIOBJ.statusData &&
+      LISTAPIOBJ.responseData &&
+      LISTAPIOBJ.responseData.status === false
+    ) {
+      console.log(
+        'barcode scanend succesfully  ',
+        LISTAPIOBJ.responseData.status,
+      );
+      getBillGeneratonDataFromBarcode(id);
     } else {
       popUpAction(
         Constant.SERVICE_FAIL_MSG,
@@ -183,9 +193,7 @@ const CreateBillGenerationBarcode = ({route}) => {
       );
     }
   };
-  const getModalLists = async id => {
-    return;
-
+  const getBillGeneratonDataFromBarcode = async id => {
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
@@ -193,7 +201,7 @@ const CreateBillGenerationBarcode = ({route}) => {
 
     set_isLoading(true);
     let obj = {
-      menuId: 7,
+      menuId: 346,
       userName: userName,
       userPwd: userPsd,
       itemId: id,
@@ -201,17 +209,16 @@ const CreateBillGenerationBarcode = ({route}) => {
       vendorPriceId: '0',
       trimId: '0',
       sizeId: '0',
-      itemTrimsType: 'STYLE',
       ratioType: 'S',
+      masterbox: 'M',
+      itemType: 'Barcode',
       compIds: usercompanyId,
       company: JSON.parse(companyObj),
-    };
-
-    // console.log('modal list ===> , calling 1, id, req body ===> ', id);
+    }
 
     let LISTAPIOBJ;
 
-    LISTAPIOBJ = await APIServiceCall.getBillGenCreateTablefromPopUp(obj);
+    LISTAPIOBJ = await APIServiceCall.getBillGeneratonDataFromBarcode(obj);
 
     set_isLoading(false);
 
@@ -307,7 +314,7 @@ const CreateBillGenerationBarcode = ({route}) => {
       lists={lists}
       modalLists={modalLists}
       tableLists={tableLists}
-      getModalLists={getModalLists}
+      // getModalLists={getModalLists}
       getModalStyleFgList={getModalStyleFgList}
       submitAction={submitAction}
       getData={getData}
