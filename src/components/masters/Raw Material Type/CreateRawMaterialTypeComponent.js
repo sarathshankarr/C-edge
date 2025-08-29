@@ -51,13 +51,14 @@ const CreateRawMaterialTypeComponent = ({ route }) => {
     "compIds" : usercompanyId,
     "company" :JSON.parse(companyObj),
     }
+    // console.log("req body ", Obj)
 
     set_isLoading(true);
 
     let SAVEAPIObj = await APIServiceCall.validateRawMaterialTypeMasters(Obj);
     set_isLoading(false);
 
-    console.log("Sucess before returned obj ", SAVEAPIObj);
+    // console.log("Sucess before returned obj ", SAVEAPIObj);
 
     return SAVEAPIObj?.responseData;
   };
@@ -65,10 +66,13 @@ const CreateRawMaterialTypeComponent = ({ route }) => {
 
   const submitAction = async (tempObj) => {
 
-    const validateRMT= await ValidateAction()
+    
+    const validateRMT= await ValidateAction(tempObj.trimtype)
 
-    if(validateRMT==="no"){
-      console.log("failed  saving =====> ")
+
+    console.log("validate RM ", validateRMT)
+
+    if(validateRMT!=="no"){
       popUpAction(Constant.Fail_Validate_RMT_MSG, Constant.DefaultAlert_MSG, 'OK', true, false);
       return;
     }

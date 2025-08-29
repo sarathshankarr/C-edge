@@ -36,11 +36,45 @@ let closeImg = require('./../../../assets/images/png/close1.png');
 
 const CreateBillGenerationBarcodeUI = ({route, ...props}) => {
   const navigation = useNavigation();
-  const [rows, setRows] = React.useState([]);
+  const [rows, setRows] = React.useState([
+    {
+      styleName: 'T-Shirt',
+      size: 'Small',
+      totolQty: '10',
+      hsn: '6109',
+      unitPrice: '50',
+      gst_percent: 5,
+      gross: 500,
+      gstAmount: 25,
+      totalRowAmount: 525,
+    },
+    {
+      styleName: 'T-Shirt',
+      size: 'Medium',
+      totolQty: '5',
+      hsn: '6109',
+      unitPrice: '100',
+      gst_percent: 12,
+      gross: 500,
+      gstAmount: 60,
+      totalRowAmount: 560,
+    },
+    {
+      styleName: 'T-Shirt',
+      size: 'Large',
+      totolQty: '2',
+      hsn: '6109',
+      unitPrice: '250',
+      gst_percent: 18,
+      gross: 500,
+      gstAmount: 90,
+      totalRowAmount: 590,
+    },
+  ]);
   const [selectedradiooption1, setSelectedradiooption1] = useState('StyleWise');
   const [totalQty, setTotalQty] = useState(false);
   const [invoiceNo, setInvoiceNo] = useState('');
-  const [notes, setNotes] = useState('');
+  const [poNo, setPoNo] = useState('');
   const [barCode, setBarcode] = useState('');
   const {colors} = useContext(ColorContext);
 
@@ -98,18 +132,6 @@ const CreateBillGenerationBarcodeUI = ({route, ...props}) => {
   //     console.log('modal lists ===>  ==> ', props.modalLists[0]);
   //   }
   // }, [props.modalLists]);
-
-  // useEffect(() => {
-  //   if (props.tableLists) {
-  //     if (props.tableLists) {
-  //       setRows(props.tableLists);
-  //     }
-  //     console.log('table lists ===>  ==> ', props.tableLists);
-  //   }
-  // }, [props.tableLists]);
-
-  // Process
-  // Vendor state variables
 
   const [billNoList, setBillNoList] = useState([]);
   const [filteredBillNoList, setFilteredBillNoList] = useState([]);
@@ -253,51 +275,78 @@ const CreateBillGenerationBarcodeUI = ({route, ...props}) => {
   };
 
   const submitAction = async () => {
-    // rows.map((row,index)=> (
-    let usercompanyId = await AsyncStorage.getItem('companyId');
-
-    const checkedData = [];
-    rows.forEach((item, index) => {
-      const tempObj = {
-        itemId: 477,
-        itemQty: 100,
-        itemTrimsType: 'Fabric',
-        itemdesc: 'RAYON PLAIN12',
-        sizeCapacity: '',
-        gsCode: '',
-        gstAmount: '5',
-        price: 1,
-        pml_gst: 5,
-        uom: 'MTRS',
-        discountAmount: 0,
-        styleId: 0,
-        buyer_Po_Id: 0,
-        grnAllow: '0',
-        style_size_id: 0,
-        pml_fab_width: 0,
-        buyerNo: 0,
-        batchid: 0,
-        withAllowance: 0,
-        po_gsm: '',
-        weight: '',
-        po_rib_id: '0',
-        processid: '0',
-        description: '',
-      };
-      checkedData.push(tempObj);
-    });
-
+    const filteredRows = rows.map(item => ({
+      gsCode: 'GS001',
+      prePackQuantity: '5',
+      quantity: 10,
+      price: 200.5,
+      gstAmount: 18.5,
+      sizeCapacity: 'L',
+      itemId: 112,
+      barcodeNo: '11111',
+      other: 'remarks',
+      orderId: 1,
+      locationId: '9-1',
+      discountAmount: 5.0,
+      discountPercentage: 2.0,
+      colorCount: '1',
+      hsn: 'HSN001',
+      gstRate: '18%',
+      prePack: '1',
+    }));
     const Obj = {
-      deliveryDate: deliveryDate,
-      shiploc: shipLocationId,
-      txnDate: txnDate,
-      itemTrimsType: 'Fabric', // Rm //
-      issueDate: '',
+      transactionDate: txnDate,
+      transportDate: '31/12/2023',
+      dueDate: '31/12/2023',
+      shipDate: '31/12/2023',
+      vendorCustomerId: 101,
+      billToId: 202,
+      poNumber: 'PO12345',
+      vendorId: 303,
+      companyLocationId: 404,
+      financialYear: 2025,
+      yearwiseId: 1,
+      transportName: 'DHL',
+      transportNo: 'TR123',
+      bookingNo: 'BK001',
+      cartonNo: 'CARTON01',
+      invoiceNo: 'INV001',
+      itemType: 'Garment',
+      agentId: 1,
+      subagentId: 2,
+      notes: 'Urgent delivery',
+      transportCost: 100.5,
+      totalDiscount: 5.25,
+      totalDiscountPer: 2.5,
+      soNumber: 555,
+      convRate: 1.25,
+      additionalAmount: 50.0,
+      roundtotal: 1200.0,
+      roundtotal2: 1200.0,
+      packages: '5',
+      packincharge: 'John Doe',
+      ackno: 'ACK123',
+      area: 'North',
+      eway: 'EWAY001',
+      allRolls: 'YES',
+      corg: 0,
+      pIids: 'PI123,PI124',
+      masterboxbarcode: 'MB001',
+      menuId: 10,
+      master_box_proforma_id: 'MBP001',
+      company: {
+        id: 1,
+      },
+      loginDTO: {
+        userId: 1001,
+        language_id: 1,
+      },
+      items: filteredRows,
     };
 
-    console.log('checkedData ==> ', checkedData);
-
-    props.submitAction(checkedData);
+    console.log('save Obj ==> ', Obj);
+return;
+    props.submitAction(Obj);
   };
 
   const handleRemoveRow = id => {
@@ -307,8 +356,12 @@ const CreateBillGenerationBarcodeUI = ({route, ...props}) => {
   const handleConfirm = date => {
     const extractedDate = date.toISOString().split('T')[0];
     const formattedDate = formatDateIntoDMY(extractedDate);
+    if (activeField === 'deliveryDate') {
+      setDeliveryDate(formattedDate);
+    } else if (activeField === 'txnDate') {
       settxnDate(formattedDate);
- 
+    }
+
     hideDatePicker();
   };
 
@@ -332,16 +385,16 @@ const CreateBillGenerationBarcodeUI = ({route, ...props}) => {
     () => [
       {
         id: '1',
-        label: 'Solid',
-        value: 'StyleWise',
-        selected: selectedradiooption1 === 'StyleWise',
+        label: 'Box',
+        value: 'Box',
+        selected: selectedradiooption1 === 'Box',
         labelStyle: {color: '#000'},
       },
       {
-        id: '3',
-        label: 'Ratio',
-        value: 'Style (FG)',
-        selected: selectedradiooption1 === 'Style (FG)',
+        id: '2',
+        label: 'Master Box',
+        value: 'MasterBox',
+        selected: selectedradiooption1 === 'MasterBox',
         labelStyle: {color: '#000'},
       },
     ],
@@ -352,9 +405,6 @@ const CreateBillGenerationBarcodeUI = ({route, ...props}) => {
     const selected = radiogroup1.find(button => button.id === selectedId);
     if (selected) {
       setSelectedradiooption1(selected.value);
-      if (selected.value === 'Style (FG)') {
-        setselectedradiooption1('');
-      } else setselectedradiooption1('RM');
     }
   };
 
@@ -411,8 +461,8 @@ const CreateBillGenerationBarcodeUI = ({route, ...props}) => {
     setShowmodal(!showModal);
   };
   const handleSearchBarcode = () => {
-    if(!barCode){
-      Alert.alert("Alert", "Please Enter Barcode !")
+    if (!barCode) {
+      Alert.alert('Alert', 'Please Enter Barcode !');
     }
     handleScannedCode(barCode);
   };
@@ -687,12 +737,14 @@ const CreateBillGenerationBarcodeUI = ({route, ...props}) => {
           />
 
           <View style={{marginTop: hp('2%')}}>
+            {/* <Text> SC- </Text> */}
             <TextInput
               label="Invoice No *"
               value={invoiceNo}
               mode="outlined"
               onChangeText={text => setInvoiceNo(text)}
             />
+            {/* <Text>/25-26 </Text> */}
           </View>
 
           <View
@@ -704,7 +756,7 @@ const CreateBillGenerationBarcodeUI = ({route, ...props}) => {
             }}>
             <View style={{width: '85%'}}>
               <TextInput
-                label="Txn Date"
+                label="Txn Date *"
                 value={txnDate ? txnDate : ''}
                 placeholder="Order Date"
                 placeholderTextColor="#000"
@@ -724,17 +776,46 @@ const CreateBillGenerationBarcodeUI = ({route, ...props}) => {
             </TouchableOpacity>
           </View>
 
+          <View
+            style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginTop: hp('2%'),
+              flexDirection: 'row',
+            }}>
+            <View style={{width: '85%'}}>
+              <TextInput
+                label="Delivery Date "
+                value={deliveryDate ? deliveryDate : ''}
+                placeholder="Delivery Date"
+                placeholderTextColor="#000"
+                mode="outlined"
+                color="#000"
+              />
+            </View>
+            <TouchableOpacity
+              onPress={() => {
+                showDatePicker('deliveryDate');
+              }}
+              style={{padding: 5}}>
+              <Image
+                source={require('./../../../assets/images/png/calendar11.png')}
+                style={{width: 40, height: 40}}
+              />
+            </TouchableOpacity>
+          </View>
+
           <View style={{marginTop: hp('2%')}}>
             <TextInput
-              label="Notes / Comments "
-              value={notes}
+              label="PO No# "
+              value={poNo}
               mode="outlined"
-              onChangeText={text => setNotes(text)}
+              onChangeText={text => setPoNo(text)}
             />
           </View>
 
           <View style={{marginBottom: 30}} />
-          
+
           <RadioGroup
             style={{flexDirection: 'row', color: '#000'}}
             radioButtons={radiogroup1}
@@ -744,42 +825,6 @@ const CreateBillGenerationBarcodeUI = ({route, ...props}) => {
               radiogroup1.find(item => item.value === selectedradiooption1)?.id
             }
           />
-
-          {/* <View
-            style={{
-              marginTop: hp('2%'),
-              flexDirection: 'row',
-              alignItems: 'center',
-            }}>
-            <View style={{flex: 1, marginRight: 10}}>
-              <TextInput
-                label="Barcode *"
-                value={barCode}
-                mode="outlined"
-                onChangeText={text => setBarcode(text)}
-              />
-            </View>
-
-            <TouchableOpacity
-              onPress={handleScan}
-              style={{
-                backgroundColor: '#fff',
-                padding: 8,
-                borderRadius: 8,
-                elevation: 4,
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}>
-              <Image
-                source={require('./../../../assets/images/png/scan.png')}
-                style={{
-                  height: 25,
-                  width: 25,
-                }}
-                resizeMode="contain"
-              />
-            </TouchableOpacity>
-          </View> */}
 
           <View style={{marginTop: hp('2%')}}>
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
@@ -855,14 +900,6 @@ const CreateBillGenerationBarcodeUI = ({route, ...props}) => {
 
           <View style={{marginBottom: 20}} />
 
-          {/* <TouchableOpacity
-            style={styles.searchButton}
-            onPress={() => handleOpenModal(billNoId)}>
-            <Text style={styles.searchbuttonText}>
-              Search {selectedradiooption1}
-            </Text>
-          </TouchableOpacity> */}
-
           {rows.length > 0 && (
             <View style={styles.wrapper}>
               <ScrollView nestedScrollEnabled={true} horizontal>
@@ -871,13 +908,28 @@ const CreateBillGenerationBarcodeUI = ({route, ...props}) => {
                     <View style={{width: 60}}>
                       <Text style={styles.table_head_captions}>Action</Text>
                     </View>
-                    <View style={{width: 60}}>
-                      <Text style={styles.table_head_captions}>Qty</Text>
-                    </View>
-                    <View style={{width: 10}} />
-
                     <View style={{width: 100}}>
                       <Text style={styles.table_head_captions}>Style No</Text>
+                    </View>
+
+                    <View style={{width: 10}} />
+                    <View style={{width: 100}}>
+                      <Text style={styles.table_head_captions}>Size</Text>
+                    </View>
+                    <View style={{width: 10}} />
+                    <View style={{width: 100}}>
+                      <Text style={styles.table_head_captions}>Total Qty</Text>
+                    </View>
+                    <View style={{width: 10}} />
+                    <View style={{width: 100}}>
+                      <Text style={styles.table_head_captions}>HSN</Text>
+                    </View>
+
+                    <View style={{width: 5}} />
+                    <View style={{width: 100}}>
+                      <Text style={styles.table_head_captions}>
+                        Unit Price After Disc
+                      </Text>
                     </View>
 
                     <View style={{width: 5}} />
@@ -887,20 +939,14 @@ const CreateBillGenerationBarcodeUI = ({route, ...props}) => {
 
                     <View style={{width: 5}} />
                     <View style={{width: 60}}>
-                      <Text style={styles.table_head_captions}>
-                        Unit Price{' '}
-                      </Text>
+                      <Text style={styles.table_head_captions}>Gross</Text>
                     </View>
 
                     <View style={{width: 5}} />
+                    <View style={{width: 60}}>
+                      <Text style={styles.table_head_captions}>GST Amount</Text>
+                    </View>
 
-                    <View style={{width: 60}}>
-                      <Text style={styles.table_head_captions}>GST</Text>
-                    </View>
-                    <View style={{width: 5}} />
-                    <View style={{width: 60}}>
-                      <Text style={styles.table_head_captions}>NET Amount</Text>
-                    </View>
                     <View style={{width: 5}} />
                     <View style={{width: 60}}>
                       <Text style={styles.table_head_captions}>Total</Text>
@@ -909,12 +955,12 @@ const CreateBillGenerationBarcodeUI = ({route, ...props}) => {
 
                   {rows.length > 0 &&
                     rows.map((row, index) => {
-                      const netAmount =
-                        Number(row.input_Qty || 0) *
-                        Number(row.input_UnitPrice || 0);
-                      const gstAmount =
-                        (netAmount * Number(row.input_Gst || 0)) / 100;
-                      const totalAmount = netAmount + gstAmount;
+                      // const netAmount =
+                      //   Number(row.input_Qty || 0) *
+                      //   Number(row.input_UnitPrice || 0);
+                      // const gstAmount =
+                      //   (netAmount * Number(row.input_Gst || 0)) / 100;
+                      // const totalAmount = netAmount + gstAmount;
 
                       return (
                         <View key={index} style={styles.table_body_single_row}>
@@ -928,52 +974,26 @@ const CreateBillGenerationBarcodeUI = ({route, ...props}) => {
                             </TouchableOpacity>
                           </View>
 
-                          <View style={{width: 60}}>
-                            <TextInput
-                              style={styles.table_data_input}
-                              value={row.input_Qty}
-                              onChangeText={text => {
-                                setRows(
-                                  rows.map((r, i) =>
-                                    i === index ? {...r, input_Qty: text} : r,
-                                  ),
-                                );
-                              }}
-                              keyboardType="numeric"
-                            />
-                          </View>
-                          <View style={{width: 10}} />
-
                           <View style={{width: 100}}>
-                            <Text style={styles.table_data}>{row.Title}</Text>
+                            <Text style={styles.table_data}>
+                              {row.styleName}
+                            </Text>
                           </View>
 
-                          <View style={{width: 5}} />
-                          <View style={{width: 60}}>
-                            <TextInput
-                              style={styles.table_data_input}
-                              value={row.Gst.toString()}
-                              onChangeText={text => {
-                                setRows(
-                                  rows.map((r, i) =>
-                                    i === index ? {...r, input_Gst: text} : r,
-                                  ),
-                                );
-                              }}
-                              keyboardType="numeric"
-                            />
+                          <View style={{width: 10}} />
+                          <View style={{width: 100}}>
+                            <Text style={styles.table_data}>{row.size}</Text>
                           </View>
-                          <View style={{width: 5}} />
-                          <View style={{width: 60}}>
+
+                          <View style={{width: 10}} />
+                          <View style={{width: 100}}>
                             <TextInput
                               style={styles.table_data_input}
-                              value={row.Price}
+                              value={row.totolQty}
                               onChangeText={text => {
                                 setRows(
                                   rows.map((r, i) =>
-                                    i === index
-                                      ? {...r, input_UnitPrice: text}
-                                      : r,
+                                    i === index ? {...r, totolQty: text} : r,
                                   ),
                                 );
                               }}
@@ -981,11 +1001,50 @@ const CreateBillGenerationBarcodeUI = ({route, ...props}) => {
                             />
                           </View>
 
+                          <View style={{width: 10}} />
+                          <View style={{width: 100}}>
+                            <TextInput
+                              style={styles.table_data_input}
+                              value={row.hsn}
+                              onChangeText={text => {
+                                setRows(
+                                  rows.map((r, i) =>
+                                    i === index ? {...r, hsn: text} : r,
+                                  ),
+                                );
+                              }}
+                              keyboardType="numeric"
+                            />
+                          </View>
+
+                          <View style={{width: 5}} />
+                          <View style={{width: 100}}>
+                            <Text style={styles.table_data}>
+                              {row.unitPrice}
+                            </Text>
+                          </View>
+
                           <View style={{width: 5}} />
                           <View style={{width: 60}}>
                             <TextInput
                               style={styles.table_data_input}
-                              value={gstAmount.toFixed(2)}
+                              value={row.gst_percent.toString()}
+                              onChangeText={text => {
+                                setRows(
+                                  rows.map((r, i) =>
+                                    i === index ? {...r, gst_percent: text} : r,
+                                  ),
+                                );
+                              }}
+                              keyboardType="numeric"
+                            />
+                          </View>
+
+                          <View style={{width: 5}} />
+                          <View style={{width: 60}}>
+                            <TextInput
+                              style={styles.table_data_input}
+                              value={row.gross}
                               editable={false}
                             />
                           </View>
@@ -994,7 +1053,7 @@ const CreateBillGenerationBarcodeUI = ({route, ...props}) => {
                           <View style={{width: 60}}>
                             <TextInput
                               style={styles.table_data_input}
-                              value={netAmount.toFixed(2)}
+                              value={row.unitPricegstAmount}
                               editable={false}
                             />
                           </View>
@@ -1003,7 +1062,7 @@ const CreateBillGenerationBarcodeUI = ({route, ...props}) => {
                           <View style={{width: 60}}>
                             <TextInput
                               style={styles.table_data_input}
-                              value={totalAmount.toFixed(2)}
+                              value={row.totalRowAmount}
                               editable={false}
                             />
                           </View>
@@ -1017,8 +1076,14 @@ const CreateBillGenerationBarcodeUI = ({route, ...props}) => {
                       {paddingVertical: 12},
                     ]}>
                     <View style={{width: 60}}></View>
-                    <View style={{width: 60}}></View>
+                    <View style={{width: 100}}></View>
                     <View style={{width: 10}} />
+                    <View style={{width: 100}}></View>
+                    <View style={{width: 10}} />
+                    <View style={{width: 100}}></View>
+                    <View style={{width: 10}} />
+                    <View style={{width: 100}}></View>
+                    <View style={{width: 5}} />
                     <View style={{width: 100}}></View>
                     <View style={{width: 5}} />
                     <View style={{width: 60}}></View>
@@ -1026,21 +1091,18 @@ const CreateBillGenerationBarcodeUI = ({route, ...props}) => {
                     <View style={{width: 60}}></View>
                     <View style={{width: 5}} />
                     <View style={{width: 60}}>
-                      <Text style={styles.table_data}>
-                        {totalGstAmount.toFixed(2)}
-                      </Text>
+                      <Text style={styles.table_data}>Transport Cost</Text>
                     </View>
                     <View style={{width: 5}} />
                     <View style={{width: 60}}>
-                      <Text style={styles.table_data}>
-                        {totalNetAmount.toFixed(2)}
-                      </Text>
-                    </View>
-                    <View style={{width: 5}} />
-                    <View style={{width: 60}}>
-                      <Text style={styles.table_data}>
-                        {totalTotalAmount.toFixed(2)}
-                      </Text>
+                      <TextInput
+                        style={styles.table_data_input}
+                        value={'0'}
+                        // onChangeText={text =>
+                        //   setTransportCost(Number(text) || 0)
+                        // }
+                        keyboardType="numeric"
+                      />
                     </View>
                   </View>
 
@@ -1050,11 +1112,15 @@ const CreateBillGenerationBarcodeUI = ({route, ...props}) => {
                       {paddingVertical: 12},
                     ]}>
                     <View style={{width: 60}}></View>
-                    <View style={{width: 60}}></View>
+                    <View style={{width: 100}}></View>
+                    <View style={{width: 10}} />
+                    <View style={{width: 100}}></View>
+                    <View style={{width: 10}} />
+                    <View style={{width: 100}}></View>
                     <View style={{width: 10}} />
                     <View style={{width: 100}}></View>
                     <View style={{width: 5}} />
-                    <View style={{width: 60}}></View>
+                    <View style={{width: 100}}></View>
                     <View style={{width: 5}} />
                     <View style={{width: 60}}></View>
                     <View style={{width: 5}} />
@@ -1066,7 +1132,8 @@ const CreateBillGenerationBarcodeUI = ({route, ...props}) => {
                     <View style={{width: 5}} />
                     <View style={{width: 60}}>
                       <Text style={styles.table_data}>
-                        {totalTotalAmount.toFixed(2)}
+                        {'20'}
+                        {/* {(totalTotalAmount + transportCost).toFixed(2)} */}
                       </Text>
                     </View>
                   </View>

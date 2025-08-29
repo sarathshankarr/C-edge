@@ -23,7 +23,6 @@ import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import BottomComponent from '../../utils/commonComponents/bottomComponent';
 import {TextInput} from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { cleanSingle } from 'react-native-image-crop-picker';
 
 let downArrowImg = require('./../../../assets/images/png/dropDownImg.png');
 let closeImg = require('./../../../assets/images/png/close1.png');
@@ -691,7 +690,7 @@ const CreateNewProcessInUI = ({route, navigation, ...props}) => {
                 justifyContent: 'space-between',
               }}
               onPress={() => {
-                setShowStyleList(!styleList);
+                setShowStyleList(!showStyleList);
               }}>
               <View>
                 <View style={[styles.SectionStyle1, {}]}>

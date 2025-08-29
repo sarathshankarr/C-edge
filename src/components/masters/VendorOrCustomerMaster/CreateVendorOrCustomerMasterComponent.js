@@ -152,14 +152,13 @@ const CreateVendorOrCustomerMasterComponent = ({ route }) => {
   const submitAction = async (tempObj) => {
 
     const validateVendorName= await ValidateVendorName(tempObj.vendor_name);
-    // console.log("validated value of name ==> ",tempObj.vendor_name, validateVendorName);
+    console.log("validated value of name ==> ",tempObj.vendor_name, validateVendorName);
 
     if(validateVendorName==="true"){
       console.log("pop up")
       popUpAction(Constant.Fail_Validate_VENDORMASTER_MSG, Constant.DefaultAlert_MSG, 'OK', true, false);
       return;
     }
-    // console.log("creating new ");
 
 
     let userName = await AsyncStorage.getItem('userName');

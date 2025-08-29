@@ -31,7 +31,6 @@ let addImg1 = require('./../../../assets/images/png/add.png');
 let filterImg = require('./../../../assets/images/png/setting.png');
 let filterImg1 = require('./../../../assets/images/png/filter.png');
 
-
 const BillGenerationBarcodeListUI = ({route, navigation, ...props}) => {
   const [isListOpen, set_ListOpen] = useState(false);
   const [refreshing, set_refreshing] = useState(false);
@@ -68,7 +67,6 @@ const BillGenerationBarcodeListUI = ({route, navigation, ...props}) => {
       // console.log("list ==> ", props.itemsArray)
     }
     // getRequestBody();
-
   }, [props?.itemsArray]);
 
   const getRequestBody = async () => {
@@ -120,8 +118,8 @@ const BillGenerationBarcodeListUI = ({route, navigation, ...props}) => {
         (item?.vendorName !== '' &&
           item?.vendorName?.toLowerCase().includes(searchTerm)) ||
         (item?.txnDateStr !== '' &&
-          item?.txnDateStr?.toLowerCase().includes(searchTerm)) 
-      )
+          item?.txnDateStr?.toLowerCase().includes(searchTerm))
+      );
     });
 
     set_filterArray(styleArray || []);
@@ -153,6 +151,15 @@ const BillGenerationBarcodeListUI = ({route, navigation, ...props}) => {
     setIsFiltering(false);
   };
 
+     const handleActions = (item, type) => {
+    if (type === 'INVOICE') {
+      props.handleInvoiceAndPacking(item, 'I');
+    } else if (type === 'PACKING'){
+      props.handleInvoiceAndPacking(item, 'P');
+    }else{
+      props.handleship(item);
+    }
+  };
 
   const renderItem = ({item, index}) => {
     return (
@@ -160,30 +167,78 @@ const BillGenerationBarcodeListUI = ({route, navigation, ...props}) => {
         onPress={() => actionOnRow(item, index)}
         style={[CommonStyles.cellBackViewStyle, {marginBottom: 3}]}>
         <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-          <View
-            style={{flex: 1, justifyContent: 'center'}}>
+          <View style={{flex: 1, justifyContent: 'center'}}>
             <Text style={[CommonStyles.tylesTextStyle, {textAlign: 'center'}]}>
               {item.invoiceNo}
             </Text>
           </View>
-          <View
-            style={{flex: 1, justifyContent: 'center'}}>
+          <View style={{flex: 1, justifyContent: 'center'}}>
             <Text style={[CommonStyles.tylesTextStyle, {textAlign: 'center'}]}>
               {item.vendorName}
             </Text>
           </View>
-          <View
-            style={{flex: 1, justifyContent: 'center'}}>
+          <View style={{flex: 1, justifyContent: 'center'}}>
             <Text style={[CommonStyles.tylesTextStyle, {textAlign: 'center'}]}>
               {item.txnDateStr}
             </Text>
           </View>
+
           <View
-            style={{flex: 0.5, justifyContent: 'center'}}>
-            <Text style={[CommonStyles.tylesTextStyle, {textAlign: 'center'}]}>
-              {item.totalQty}
-            </Text>
+            style={{
+              flex: 1.5,
+              flexDirection: 'column',
+              alignItems: 'center',
+              // gap: 10,
+            }}>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                width: '85%',
+              }}>
+              <TouchableOpacity
+                onPress={() => handleActions(item, 'INVOICE')}
+                style={{alignItems: 'center', flex: 1}}>
+                <Image
+                  source={require('./../../../assets/images/png/pdf2.png')}
+                  style={{width: 18, height: 18, resizeMode: 'contain'}}
+                />
+                <Text style={{fontSize: 8, fontWeight: 'bold'}}>Invoice</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={() => handleActions(item, 'PACKING')}
+                style={{alignItems: 'center', flex: 1, marginRight: 2}}>
+                <Image
+                  source={require('./../../../assets/images/png/pdf2.png')}
+                  style={{
+                    width: 18,
+                    height: 18,
+                    resizeMode: 'contain',
+                    marginBottom: 2,
+                  }}
+                />
+                <Text style={{fontSize: 8, fontWeight: 'bold'}}>Packing</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={() => handleActions(item, 'Ship')}
+                style={{alignItems: 'center', flex: 1, marginRight: 2}}>
+                <Image
+                  source={require('./../../../assets/images/png/pdf2.png')}
+                  style={{
+                    width: 18,
+                    height: 18,
+                    resizeMode: 'contain',
+                    marginBottom: 2,
+                  }}
+                />
+                <Text style={{fontSize: 8, fontWeight: 'bold'}}>Ship</Text>
+              </TouchableOpacity>
+             
+            </View>
           </View>
+          
         </View>
       </TouchableOpacity>
     );
@@ -312,7 +367,6 @@ const BillGenerationBarcodeListUI = ({route, navigation, ...props}) => {
 
         {filterArray && filterArray.length > 0 ? (
           <View style={CommonStyles.listCommonHeader}>
-           
             <Text
               style={[
                 CommonStyles.tylesHeaderTextStyle,
@@ -337,9 +391,9 @@ const BillGenerationBarcodeListUI = ({route, navigation, ...props}) => {
             <Text
               style={[
                 CommonStyles.tylesHeaderTextStyle,
-                {flex: 0.5, textAlign: 'center'},
+                {flex: 1.5, textAlign: 'center'},
               ]}>
-              {'Total Qty'}
+              {'Action'}
             </Text>
           </View>
         ) : (
@@ -448,5 +502,3 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 });
-
-
