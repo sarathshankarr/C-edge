@@ -132,13 +132,15 @@ const CreateMasterBoxPackingUI = ({route, ...props}) => {
   };
 
   const handleScannedCode = (text) => {
-    text =42;
+    text =202213550;
     if (!text) {
       Alert.alert('Please Enter the Valid Barcode');
     }
 
+    handleCallBarcodes(text);
+
+
     if (text) {
-      handleCallBarcodes(text);
       setRows(prev => [
         ...prev,
         {

@@ -80,6 +80,105 @@ const CreateMasterBoxPacking = ({route}) => {
     }
   };
 
+  const api1 = async id => {
+    let userName = await AsyncStorage.getItem('userName');
+    let userPsd = await AsyncStorage.getItem('userPsd');
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
+
+    set_isLoading(true);
+    let obj = {
+      username: userName,
+      password: userPsd,
+      compIds: usercompanyId,
+      company: JSON.parse(companyObj),
+      barcode: '20222115',
+      multiPI: '',
+    };
+    // console.log("barcode valid req body ", obj)
+    let LISTAPIOBJ = await APIServiceCall.api11(obj);
+    set_isLoading(false);
+
+    if (
+      LISTAPIOBJ &&
+      LISTAPIOBJ.statusData &&
+      LISTAPIOBJ.responseData &&
+      LISTAPIOBJ.responseData.status === true
+    ) {
+      console.log(
+        'barcode scanend succesfully  ',
+        LISTAPIOBJ.responseData.status,
+      );
+      getBillGeneratonDataFromBarcode(id);
+    } else {
+      popUpAction(
+        Constant.SERVICE_FAIL_MSG,
+        Constant.DefaultAlert_MSG,
+        'OK',
+        true,
+        false,
+      );
+    }
+
+    if (LISTAPIOBJ && LISTAPIOBJ.error) {
+      popUpAction(
+        Constant.SERVICE_FAIL_MSG,
+        Constant.DefaultAlert_MSG,
+        'OK',
+        true,
+        false,
+      );
+    }
+  };
+
+  const api2 = async id => {
+    let userName = await AsyncStorage.getItem('userName');
+    let userPsd = await AsyncStorage.getItem('userPsd');
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
+
+    set_isLoading(true);
+    let obj = {
+      username: userName,
+      password: userPsd,
+      compIds: usercompanyId,
+      company: JSON.parse(companyObj),
+      locId: 34,
+      barcode: '20222115',
+    };
+
+    let LISTAPIOBJ;
+
+    LISTAPIOBJ = await APIServiceCall.getBillGeneratonDataFromBarcode(obj);
+
+    set_isLoading(false);
+
+    if (LISTAPIOBJ && LISTAPIOBJ.statusData) {
+      if (LISTAPIOBJ && LISTAPIOBJ.responseData) {
+        let result = LISTAPIOBJ.responseData.myArrayList.map(item => item.map);
+        set_tableLists(result);
+      }
+    } else {
+      popUpAction(
+        Constant.SERVICE_FAIL_MSG,
+        Constant.DefaultAlert_MSG,
+        'OK',
+        true,
+        false,
+      );
+    }
+
+    if (LISTAPIOBJ && LISTAPIOBJ.error) {
+      popUpAction(
+        Constant.SERVICE_FAIL_MSG,
+        Constant.DefaultAlert_MSG,
+        'OK',
+        true,
+        false,
+      );
+    }
+  };
+
   const ValidateAction = async type => {
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');

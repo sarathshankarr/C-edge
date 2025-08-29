@@ -31,7 +31,7 @@ const BillGenerationBarcodeList = ({route}) => {
   useFocusEffect(
     React.useCallback(() => {
       getInitialData(0, true);
-    }, [])
+    }, []),
   );
 
   const backBtnAction = () => {
@@ -91,8 +91,9 @@ const BillGenerationBarcodeList = ({route}) => {
         },
       };
 
-
-      let LISTAPIOBJ = await APIServiceCall.LoadAllBillGenerationBarcodeList(obj);
+      let LISTAPIOBJ = await APIServiceCall.LoadAllBillGenerationBarcodeList(
+        obj,
+      );
       set_isLoading(false);
 
       if (LISTAPIOBJ && LISTAPIOBJ.statusData) {
@@ -202,6 +203,226 @@ const BillGenerationBarcodeList = ({route}) => {
     navigation.navigate('SavePartProcessing');
   };
 
+  const handleship = async item => {
+    set_MainLoading(true);
+    let userName = await AsyncStorage.getItem('userName');
+    let userPsd = await AsyncStorage.getItem('userPsd');
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
+    let userId = await AsyncStorage.getItem('userId');
+
+    let obj = {
+      username: userName,
+      password: userPsd,
+      compIds: usercompanyId,
+      company: JSON.parse(companyObj),
+      soId: item.soNumber || '0',
+      itemType: item.itemTrimsType || '',
+      menuId: 346,
+      loginDTO: {
+        userId: userId,
+      },
+    };
+    console.log('handleship req body ', obj);
+
+    let stichingOutAPIObj = await APIServiceCall.sendShipBillGenBarcode(obj);
+    set_MainLoading(false);
+
+    if (stichingOutAPIObj && stichingOutAPIObj.statusData) {
+      console.log(
+        'response from api ==> ',
+        stichingOutAPIObj.responseData,
+        typeof stichingOutAPIObj.responseData,
+      );
+      if (stichingOutAPIObj && stichingOutAPIObj.responseData !== 'false') {
+        popUpAction(
+          'WhatsApp Sent',
+          Constant.DefaultAlert_MSG,
+          'OK',
+          true,
+          false,
+        );
+      } else {
+        popUpAction(
+          'WhatsApp Message not sent,something goes wrong..!!',
+          Constant.DefaultAlert_MSG,
+          'OK',
+          true,
+          false,
+        );
+      }
+    } else {
+      popUpAction(
+        Constant.SERVICE_FAIL_MSG,
+        Constant.DefaultAlert_MSG,
+        'OK',
+        true,
+        false,
+      );
+    }
+
+    if (stichingOutAPIObj && stichingOutAPIObj.error) {
+      popUpAction(
+        Constant.SERVICE_FAIL_MSG,
+        Constant.DefaultAlert_MSG,
+        'OK',
+        true,
+        false,
+      );
+    }
+  };
+
+  const requestStoragePermission = async () => {
+    try {
+      if (Platform.OS === 'android') {
+        if (Platform.Version >= 33) {
+          // Android 13 and above
+          const granted = await PermissionsAndroid.request(
+            PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES,
+            {
+              title: 'Storage Permission Required',
+              message: 'This app needs access to your storage to download PDF',
+              buttonNeutral: 'Ask Me Later',
+              buttonNegative: 'Cancel',
+              buttonPositive: 'OK',
+            },
+          );
+          return granted === PermissionsAndroid.RESULTS.GRANTED;
+        } else if (Platform.Version >= 30) {
+          // Android 11 - 12 (Scoped Storage)
+          const granted = await PermissionsAndroid.request(
+            PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+            {
+              title: 'Storage Permission Required',
+              message: 'This app needs access to your storage to download PDF',
+              buttonNeutral: 'Ask Me Later',
+              buttonNegative: 'Cancel',
+              buttonPositive: 'OK',
+            },
+          );
+          return granted === PermissionsAndroid.RESULTS.GRANTED;
+        } else {
+          // Below Android 11
+          const granted = await PermissionsAndroid.request(
+            PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+            PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+            {
+              title: 'Storage Permission Required',
+              message: 'This app needs access to your storage to download PDF',
+              buttonNeutral: 'Ask Me Later',
+              buttonNegative: 'Cancel',
+              buttonPositive: 'OK',
+            },
+          );
+          return granted === PermissionsAndroid.RESULTS.GRANTED;
+        }
+      }
+      return false;
+    } catch (err) {
+      console.warn('Error requesting storage permission:', err);
+      return false;
+    }
+  };
+
+  const handleInvoiceAndPacking = async (item, type = '') => {
+    let userName = await AsyncStorage.getItem('userName');
+    let userPsd = await AsyncStorage.getItem('userPsd');
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
+    let formatType =
+      JSON.parse(companyObj)?.newFlagSetupMasterDAO?.nfsm_billgen_invoice_format;
+
+    set_MainLoading(true);
+
+    let obj = {
+      username: userName,
+      password: userPsd,
+      compIds: usercompanyId,
+      company: JSON.parse(companyObj),
+      soId: item.soNumber || '0',
+      isPacking: type,
+    };
+
+    let apiUrl;
+    if (formatType === 2) {
+      apiUrl = await APIServiceCall.downloadBillGenBarcodeInvoiceAndPackingF2();
+    } else {
+      apiUrl = await APIServiceCall.downloadBillGenBarcodeInvoiceAndPackingF1();
+    }
+    console.log('apiUrl =====> ', apiUrl, formatType); 
+    console.log('handleInvoiceAndPacking req obj =====> ', obj); 
+
+    try {
+      const response = await axios.post(apiUrl, obj, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        responseType: 'arraybuffer',
+      });
+
+      console.log(
+        'Response for pdf API ==> ',
+        typeof response?.request?._response,
+      );
+
+      // Ensure the data is in binary form
+      let base64Data = response?.request?._response;
+
+      if (Platform.OS === 'android') {
+        const hasPermission = await requestStoragePermission();
+        if (!hasPermission) {
+          Alert.alert(
+            'Permission Denied',
+            'Storage permission is required to save the PDF.',
+          );
+          return;
+        }
+      }
+
+      const downloadFolder =
+        Platform.OS === 'android'
+          ? ReactNativeBlobUtil.fs.dirs.DownloadDir
+          : ReactNativeBlobUtil.fs.dirs.DocumentDir;
+
+      const pdfPath =
+        Platform.OS === 'android'
+          ? `/storage/emulated/0/Download/Outprocess_IN_DC_${item.outprocessId}.pdf`
+          : `${ReactNativeBlobUtil.fs.dirs.DocumentDir}/Outprocess_IN_DC_${item.outprocessId}.pdf`;
+
+      await ReactNativeBlobUtil.fs.writeFile(pdfPath, base64Data, 'base64');
+
+      if (Platform.OS === 'android') {
+        popUpAction(
+          `PDF saved successfully at ${pdfPath}`,
+          Constant.DefaultAlert_MSG,
+          'OK',
+          true,
+          false,
+        );
+      } else {
+        popUpAction(
+          'PDF saved successfully',
+          Constant.DefaultAlert_MSG,
+          'OK',
+          true,
+          false,
+        );
+      }
+    } catch (error) {
+      console.error('Error generating or saving PDF:', error);
+      // Alert.alert('Error', `Failed to generate or save PDF: ${error.message}`);
+      popUpAction(
+        Constant.SERVICE_FAIL_PDF_MSG,
+        Constant.DefaultAlert_MSG,
+        'OK',
+        true,
+        false,
+      );
+    } finally {
+      set_MainLoading(false);
+    }
+  };
+
   return (
     <BillGenerationBarcodeListUI
       itemsArray={itemsArray}
@@ -218,6 +439,8 @@ const BillGenerationBarcodeList = ({route}) => {
       fetchMore={fetchMore}
       applyFilterFxn={getFilteredList}
       handleNavigation={handleNavigation}
+      handleship={handleship}
+      handleInvoiceAndPacking={handleInvoiceAndPacking}
     />
   );
 };

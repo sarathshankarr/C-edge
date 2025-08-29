@@ -56,16 +56,17 @@ const WorkerWagesReportUI = ({route, ...props}) => {
   const [endDate, set_endDate] = useState('');
   const [activeField, setActiveField] = useState(null);
 
-  //   useEffect(() => {
-  //     if (props?.lists) {
-  //       if (props.lists.getStockStyles) {
-  //         set_filteredStockStyles(props.lists.getStockStyles);
-  //       }
-  //       if (props.lists.getStockFabrics) {
-  //         set_filteredStockFabrics(props.lists.getStockFabrics);
-  //       }
-  //     }
-  //   }, [props]);
+    useEffect(() => {
+      if (props?.lists) {
+        console.log("lists create ==> ", props?.lists)
+        if (props.lists.getStockStyles) {
+          set_filteredStockStyles(props.lists.getStockStyles);
+        }
+        if (props.lists.getStockFabrics) {
+          set_filteredStockFabrics(props.lists.getStockFabrics);
+        }
+      }
+    }, [props]);
 
   //   useEffect(() => {
   //     if (props?.lists) {

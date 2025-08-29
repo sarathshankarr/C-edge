@@ -56,7 +56,7 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
 
   useEffect(() => {
     if (props.itemsObj) {
-      // console.log('save grn approvve ', props.itemsObj);
+      console.log('use effect grn approvve ', props.itemsObj);
       setData(props.itemsObj);
 
       if (props.itemsObj.pomaster) {
@@ -115,11 +115,12 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
           // console.log('save grn approvve  child ', dataMap);
 
           const childMap = dataMap.map((item, index) => ({
+            ...item,
             roll: item.rollNo,
             requiredQty: item.quantitystr,
             remainingQty: item.remQty,
             enteredQty: item.recqty,
-            presentReceivedQty: item.receivedQty,
+            presentReceivedQty: '',
             fabric: item.fabrecqty,
             price: item.price,
             grnNo: item.grnUniqueNo,
@@ -131,6 +132,7 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
             total: item.totalWithGst,
             fabric: item.itemdesc,
             quantitystr: item?.quantitystr || 0,
+            alreadyReceivedQty: item?.receivedQty || 0,
           }));
 
           setRows(childMap);
@@ -145,66 +147,144 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
 
   const submitAction = async () => {
     const formatChildDataFab =
-      selectedIdxs
-        .map(idx => {
-          const child = childData[idx];
+      rows
+        .map(child => {
+          if (itemOrTrims === 'RM') {
+            const {
+              lineItemId,
+              receivedQty,
+              gsCode,
+              itemTrimsType,
+              itemId,
+              rollNo,
+              price,
+              itemdesc,
+              styleId,
+              stylewise_size_id,
+              buyer_Po_Id,
+              buyerNo,
+              gstper,
+              totprice,
+              gstamnt,
+              rejqty,
+              aisleId,
+              binId,
+              missqty,
+              batchid,
+              presentReceivedQty,
+            } = child;
 
-          const {
-            lineItemId,
-            receivedQty,
-            gsCode,
-            itemTrimsType,
-            itemId,
-            rollNo,
-            price,
-            itemdesc,
-            styleId,
-            stylewise_size_id,
-            buyer_Po_Id,
-            buyerNo,
-            gstper,
-            totprice,
-            gstamnt,
-            rejqty,
-            aisleId,
-            binId,
-            missqty,
-            batchid,
-          } = child;
-          //  receivedQty, rollNo
+            return (
+              `${lineItemId ?? '0'}#${presentReceivedQty ?? '10'}#${
+                gsCode ?? '0'
+              }#${itemTrimsType ?? ''}` +
+              `#${itemId ?? '0'}#${'1'}#${price ?? '0'}#${batchid ?? '0'}` +
+              `#${itemdesc ?? ''}#${styleId ?? '0'}#${
+                stylewise_size_id ?? '0'
+              }#${buyer_Po_Id ?? '0'}` +
+              `#${buyerNo ?? '0'}#${gstper ?? '0'}#${totprice ?? ''}#${
+                gstamnt ?? '0'
+              }#${rejqty ?? '0'}` +
+              `#${aisleId ?? '0'}#${binId ?? '0'}#${missqty ?? '0'}#${
+                rejqty ?? '0'
+              }#${missqty ?? '0'}`
+            );
+          }
 
-          return (
-            `${lineItemId ?? '0'}#${'10'}#${gsCode ?? '0'}#${
-              itemTrimsType ?? ''
-            }#${itemId ?? '0'}#${'1'}#${price ?? '0'}#${batchid ?? '0'}` +
-            `#${itemdesc ?? ''}#${styleId ?? '0'}#${stylewise_size_id ?? '0'}#${
-              buyer_Po_Id ?? '0'
-            }#${buyerNo ?? '0'}#${gstper ?? '0'}#${totprice ?? ''}#` +
-            `${gstamnt ?? '0'}#${rejqty ?? '0'}#${aisleId ?? '0'}#${
-              binId ?? '0'
-            }#${missqty ?? '0'}#${rejqty ?? '0'}#${missqty ?? '0'}`
-          );
+          if (itemOrTrims === 'Fabric') {
+            const {
+              lineItemId,
+              receivedQty,
+              gsCode,
+              itemId,
+              rollNo,
+              fabrecqty,
+              description,
+              price,
+              styleId,
+              stylewise_size_id,
+              buyer_Po_Id,
+              buyerNo,
+              po_gsm,
+              weight,
+              po_rib_id,
+              gstper,
+              totprice,
+              gstamnt,
+              rejqty,
+              aisleId,
+              binId,
+              missqty,
+              batchid,
+              shade,
+              grnwidth,
+              presentReceivedQty,
+            } = child;
+
+            return (
+              `${lineItemId ?? '0'}#${presentReceivedQty ?? '0'}#${
+                rollNo ?? '0'
+              }#${itemId ?? '0'}#${'Fabric'}` +
+              `#${''}#${receivedQty ?? '3'}#${shade ?? '0'}#${
+                grnwidth ?? '0'
+              }#${price ?? '0'}#${batchid ?? '0'}` +
+              `#${'App'}#${styleId ?? '0'}#${stylewise_size_id ?? '0'}#${
+                buyer_Po_Id ?? '0'
+              }#${buyerNo ?? '0'}` +
+              `#${gstper ?? '0'}#${totprice ?? ''}#${gstamnt ?? '0'}#${
+                po_gsm ?? '0'
+              }#${weight ?? '0.0'}#${po_rib_id ?? '0'}` +
+              `#${aisleId ?? '0'}#${binId ?? '0'}`
+            );
+          }
+
+          if (itemOrTrims === 'TRIM FABRIC') {
+            const {
+              lineItemId,
+              receivedQty,
+              gsCode,
+              itemId,
+              rollNo,
+              fabrecqty,
+              description,
+              price,
+              styleId,
+              stylewise_size_id,
+              buyer_Po_Id,
+              buyerNo,
+              po_gsm,
+              weight,
+              po_rib_id,
+              gstper,
+              totprice,
+              gstamnt,
+              rejqty,
+              aisleId,
+              binId,
+              missqty,
+              batchid,
+              shade,
+              grnwidth,
+              presentReceivedQty,
+            } = child;
+            return (
+              `${lineItemId ?? '0'}#${presentReceivedQty ?? '0'}#${
+                rollNo ?? '0'
+              }#${itemId ?? '0'}#${'TRIM FABRIC'}` +
+              `#${''}#${receivedQty ?? '0'}#${shade ?? '0'}#${
+                grnwidth ?? '0'
+              }#${price ?? '0'}#${batchid ?? '0'}` +
+              `#${'App'}#${styleId ?? '0'}#${stylewise_size_id ?? '0'}#${
+                buyer_Po_Id ?? '0'
+              }#${buyerNo ?? '0'}` +
+              `#${gstper ?? '0'}#${totprice ?? ''}#${gstamnt ?? '0'}` +
+              `#${aisleId ?? '0'}#${binId ?? '0'}`
+            );
+          }
+
+          return '';
         })
         .join(',') + ',';
-
-    //  const {
-    //     lineItemId, receivedQty, gsCode, itemId, rollNo,fabrecqty,description,
-    //     price, styleId, stylewise_size_id, buyer_Po_Id, buyerNo,po_gsm,weight,po_rib_id,
-    //     gstper, totprice, gstamnt, rejqty, aisleId, binId, missqty,batchid,shade,grnwidth
-    //   } = child;
-
-    //   console.log("child items ==> ")
-
-    //   return `${lineItemId ?? '0'}#${fabrecqty ?? '0'}#${rollNo ?? '0'}#${itemId ?? '0'}#${"Fabric"}#${gsCode ?? '0'}#${price ?? '0'}#${batchid ?? '0'}#${receivedQty ?? '0'}` +
-    //          `#${styleId ?? '0'}#${stylewise_size_id ?? '0'}#${buyer_Po_Id ?? '0'}#${buyerNo ?? '0'}#${gstper ?? '0'}#${totprice ?? ''}#` +
-    //          `${gstamnt ?? '0'}#${rejqty ?? '0'}#${missqty ?? '0'}#${aisleId ?? '0'}#${binId ?? '0'}`;
-    // }).join(',') + ',';
-    //   return `${lineItemId ?? '0'}#${'200'}#${'1'}#${itemId ?? '0'}#${"Fabric"}#${gsCode ?? '0'}#${receivedQty ?? '0'}#${shade ?? ''}#${grnwidth ?? ''}#${price ?? '0'}#${batchid ?? '0'}#${"App"}` +
-    //          `#${styleId ?? '0'}#${stylewise_size_id ?? '0'}#${buyer_Po_Id ?? '0'}#${buyerNo ?? '0'}#${gstper ?? '0'}#${totprice ?? ''}#` +
-    //          `${gstamnt ?? '0'}#${po_gsm ?? ''}#${weight ?? '0.0'}#${po_rib_id ?? '0'}#${description ?? '0'}#${aisleId ?? '0'}#${binId ?? '0'}`;
-    // }).join(',') + ',';
-
-    console.log('string is ==> ', formatChildDataFab);
 
     let obj = {
       vendorId: data.pomaster.vendorId || '',
@@ -227,14 +307,13 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
       seqIdForStyle: '',
       modify_user: '',
       styleOrBuyerpo: 0,
-      referenceDateStr: data.pomaster.referenceDateStr || '2025-01-01',
-      referenceDate: data.pomaster.referenceDate,
+      referenceDateStr: data.pomaster.referenceDateStr || '',
+      referenceDate: data.pomaster.referenceDate || '',
       gateno: '',
       grn_totamnt: data.grn_totamnt || 0,
       itemStr: formatChildDataFab || '',
     };
-
-    // return;
+    console.log('str ', obj);
     props.submitAction(obj);
   };
 
@@ -657,19 +736,55 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
   };
 
   const updateAllIndexes = () => {
-    setSelectedIdxs(selectAllCheckBox ? [] : rows.map((_, index) => index));
-    setSelectAllCheckBox(!selectAllCheckBox);
+    const newSelectAll = !selectAllCheckBox;
+
+    setSelectedIdxs(newSelectAll ? rows.map((_, index) => index) : []);
+    setSelectAllCheckBox(newSelectAll);
+
+    setRows(prevRows =>
+      prevRows.map(row => {
+        const quantity = Number(row?.quantitystr || 0);
+        const already = Number(row?.alreadyReceivedQty || 0);
+
+        return {
+          ...row,
+          presentReceivedQty: newSelectAll ? quantity - already : 0,
+        };
+      }),
+    );
   };
 
-  const toggleSelection = item => {
-    setSelectedIdxs(prevSelected => {
-      const exists = prevSelected.some(index => index === item);
+  const toggleSelection = index => {
+    setSelectedIdxs(prev => {
+      let newSelected = [...prev];
 
-      if (exists) {
-        return prevSelected.filter(i => i !== item);
+      if (newSelected.includes(index)) {
+        newSelected = newSelected.filter(i => i !== index);
+
+        setRows(prevRows => {
+          const updated = [...prevRows];
+          updated[index] = {
+            ...updated[index],
+            presentReceivedQty: 0,
+          };
+          return updated;
+        });
       } else {
-        return [...prevSelected, item];
+        newSelected.push(index);
+
+        setRows(prevRows => {
+          const updated = [...prevRows];
+          const quantity = Number(updated[index]?.quantitystr || 0);
+          const already = Number(updated[index]?.alreadyReceivedQty || 0);
+          updated[index] = {
+            ...updated[index],
+            presentReceivedQty: quantity - already,
+          };
+          return updated;
+        });
       }
+
+      return newSelected;
     });
   };
 
@@ -687,26 +802,25 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
   // };
 
   const handleInputChange = (index, field, value) => {
-  const updatedRows = [...rows];
-  updatedRows[index][field] = value;
+    const updatedRows = [...rows];
+    updatedRows[index][field] = value;
 
-  // Recalculate dependent values if Present Received or Price is updated
-  const receivedQty = parseFloat(updatedRows[index].presentReceivedQty || 0);
-  const price = parseFloat(updatedRows[index].price || 0);
-  const discount = parseFloat(updatedRows[index].discountAccount || 0);
-  const gstPercent = parseFloat(updatedRows[index].gstPercent || 0);
+    // Recalculate dependent values if Present Received or Price is updated
+    const receivedQty = parseFloat(updatedRows[index].presentReceivedQty || 0);
+    const price = parseFloat(updatedRows[index].price || 0);
+    const discount = parseFloat(updatedRows[index].discountAccount || 0);
+    const gstPercent = parseFloat(updatedRows[index].gstPercent || 0);
 
-  const itemRate = receivedQty * price;
-  const gst = ((itemRate - discount) * gstPercent) / 100;
-  const total = itemRate - discount + gst;
+    const itemRate = receivedQty * price;
+    const gst = ((itemRate - discount) * gstPercent) / 100;
+    const total = itemRate - discount + gst;
 
-  updatedRows[index].itemRate = itemRate.toFixed(2);
-  updatedRows[index].gst = gst.toFixed(2);
-  updatedRows[index].total = total.toFixed(2);
+    updatedRows[index].itemRate = itemRate.toFixed(2);
+    updatedRows[index].gst = gst.toFixed(2);
+    updatedRows[index].total = total.toFixed(2);
 
-  setRows(updatedRows);
-};
-
+    setRows(updatedRows);
+  };
 
   return (
     <View style={[CommonStyles.mainComponentViewStyle]}>
@@ -833,7 +947,10 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
                   </View>
                   <View style={{width: 5}}></View>
                   <View style={{width: 100}}>
-                    <Text style={styles.table_head_captions}> {itemOrTrims==="RM" ? "Ref No" : "GRN No"}</Text>
+                    <Text style={styles.table_head_captions}>
+                      {' '}
+                      {itemOrTrims === 'RM' ? 'Ref No' : 'GRN No'}
+                    </Text>
                   </View>
                   <View style={{width: 100}}>
                     <Text style={styles.table_head_captions}>GST%</Text>
@@ -907,7 +1024,7 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
                         {row.presentReceivedQty}
                       </Text>
                     </View> */}
-                    <View style={{width: 100}}>
+                    {/* <View style={{width: 100}}>
                       <TextInput
                         style={styles.table_data}
                         value={String(row.presentReceivedQty)}
@@ -916,7 +1033,39 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
                           handleInputChange(index, 'presentReceivedQty', text)
                         }
                       />
+                    </View> */}
+                    <View
+                      style={{
+                        width: 100,
+                        alignItems: 'center',
+                        textAlign: 'center',
+                      }}>
+                      <View
+                        style={{flexDirection: 'row', alignItems: 'center'}}>
+                        <TextInput
+                          style={[styles.table_data, {flex: 1}]}
+                          value={String(row.presentReceivedQty)}
+                          keyboardType="numeric"
+                          onChangeText={text =>
+                            handleInputChange(index, 'presentReceivedQty', text)
+                          }
+                        />
+                        <Text
+                          style={{
+                            marginLeft: 4,
+                            color: colors.color2,
+                            fontSize: 10,
+                          }}>
+                          ({row.alreadyReceivedQty})
+                        </Text>
+                      </View>
+
+                      <Text style={{marginTop: 4, fontSize: 10}}>
+                        {Number(row.alreadyReceivedQty) +
+                          Number(row.presentReceivedQty || 0)}
+                      </Text>
                     </View>
+
                     <View style={{width: 5}}></View>
                     <View style={{width: 100}}>
                       <Text style={styles.table_data}>{row.fabric}</Text>
@@ -936,7 +1085,9 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
                     </View>
                     <View style={{width: 5}}></View>
                     <View style={{width: 100}}>
-                      <Text style={styles.table_data}>{ itemOrTrims==="RM"? row.refNo: row.grnNo}</Text>
+                      <Text style={styles.table_data}>
+                        {itemOrTrims === 'RM' ? row.refNo : row.grnNo}
+                      </Text>
                     </View>
                     <View style={{width: 100}}>
                       <Text style={styles.table_data}>{row.gstPercent}</Text>
@@ -963,13 +1114,14 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
                   ))}
                   {itemOrTrims === 'Fabric' && (
                     <>
-                    <View style={{width: 100}}></View>
-                    <View style={{width: 100}}></View>
+                      <View style={{width: 100}}></View>
+                      <View style={{width: 100}}></View>
                     </>
                   )}
                   <View style={{width: 100}}>
                     <Text style={styles.table_data}>
-                      {totalpresentReceivedQty.toFixed(2)}
+                      {/* {totalpresentReceivedQty.toFixed(2)} */}
+                      {''}
                     </Text>
                   </View>
                   {[...Array(4)].map((_, i) => (
@@ -999,8 +1151,8 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
                   <View style={{width: 100}}></View>
                   {itemOrTrims === 'Fabric' && (
                     <>
-                    <View style={{width: 100}}></View>
-                  <View style={{width: 100}}></View>
+                      <View style={{width: 100}}></View>
+                      <View style={{width: 100}}></View>
                     </>
                   )}
 
@@ -1602,6 +1754,25 @@ const getStyles = colors =>
     },
   });
 
+//   return (
+//     `${lineItemId ?? '0'}#${fabrecqty ?? '0'}#${rollNo ?? '0'}#${
+//       itemId ?? '0'
+//     }#${'Fabric'}#${gsCode ?? '0'}#${price ?? '0'}#${batchid ?? '0'}#${
+//       receivedQty ?? '0'
+//     }` +
+//     `#${styleId ?? '0'}#${stylewise_size_id ?? '0'}#${
+//       buyer_Po_Id ?? '0'
+//     }#${buyerNo ?? '0'}#${gstper ?? '0'}#${totprice ?? ''}#` +
+//     `${gstamnt ?? '0'}#${rejqty ?? '0'}#${missqty ?? '0'}#${
+//       aisleId ?? '0'
+//     }#${binId ?? '0'}`
+//   );
+// })
+// .join(',') + ',';
+
+//   console.log("child items ==> ")
+
+// console.log('string is ==> ', formatChildDataFab);
 {
   /* <View style={styles.uploadSection}>
             {documents.length > 0 && (
@@ -1650,3 +1821,109 @@ const getStyles = colors =>
             )}
           </View> */
 }
+//   return `${lineItemId ?? '0'}#${fabrecqty ?? '0'}#${rollNo ?? '0'}#${itemId ?? '0'}#${"Fabric,ALREADY REC QTY"}#${shade ?? '0'}#${grnwidth ?? '0'}#${price ?? '0'}#${batchid ?? '0'}` +
+//          `#${"App" ?? ''}#${styleId ?? '0'}#${stylewise_size_id ?? '0'}#${buyer_Po_Id ?? '0'}#${buyerNo ?? '0'}#${gstper ?? '0'}#${totprice ?? ''}#` +
+//          `${gstamnt ?? '0'}#${po_gsm ?? '0'}#${weight ?? '0.0'}#${po_rib_id ?? '0'}#${aisleId ?? '0'}#${binId ?? '0'}`;
+// }).join(',') + ',';
+
+//   return `${lineItemId ?? '0'}#${'200'}#${'1'}#${itemId ?? '0'}#${"Fabric"}#${gsCode ?? '0'}#${receivedQty ?? '0'}#${shade ?? ''}#${grnwidth ?? ''}#${price ?? '0'}#${batchid ?? '0'}#${"App"}` +
+//          `#${styleId ?? '0'}#${stylewise_size_id ?? '0'}#${buyer_Po_Id ?? '0'}#${buyerNo ?? '0'}#${gstper ?? '0'}#${totprice ?? ''}#` +
+//          `${gstamnt ?? '0'}#${po_gsm ?? ''}#${weight ?? '0.0'}#${po_rib_id ?? '0'}#${description ?? '0'}#${aisleId ?? '0'}#${binId ?? '0'}`;
+// }).join(',') + ',';
+
+// console.log("selectedIdxs ==> ", rows[0])
+
+//  itemOrTrims==="RM"
+
+// const formatChildDataFab =
+//   selectedIdxs
+//     .map(idx => {
+//       const child = rows[idx];
+//       const {
+//         lineItemId,
+//         receivedQty,
+//         gsCode,
+//         itemTrimsType,
+//         itemId,
+//         rollNo,
+//         price,
+//         itemdesc,
+//         styleId,
+//         stylewise_size_id,
+//         buyer_Po_Id,
+//         buyerNo,
+//         gstper,
+//         totprice,
+//         gstamnt,
+//         rejqty,
+//         aisleId,
+//         binId,
+//         missqty,
+//         batchid,
+//       } = child;
+
+//       return (
+//         `${lineItemId ?? '0'}#${receivedQty ??'10'}#${gsCode ?? '0'}#${
+//           itemTrimsType ?? ''
+//         }#${itemId ?? '0'}#${'1'}#${price ?? '0'}#${batchid ?? '0'}` +
+//         `#${itemdesc ?? ''}#${styleId ?? '0'}#${stylewise_size_id ?? '0'}#${
+//           buyer_Po_Id ?? '0'
+//         }#${buyerNo ?? '0'}#${gstper ?? '0'}#${totprice ?? ''}#` +
+//         `${gstamnt ?? '0'}#${rejqty ?? '0'}#${aisleId ?? '0'}#${
+//           binId ?? '0'
+//         }#${missqty ?? '0'}#${rejqty ?? '0'}#${missqty ?? '0'}`
+//       );
+//     })
+//     .join(',') + ',';
+
+//  itemOrTrims==="RM"
+
+// const formatChildDataFab =
+//   selectedIdxs
+//     .map(idx => {
+//       const child = childData[idx];
+
+//       const {
+//         lineItemId,
+//         receivedQty,
+//         gsCode,
+//         itemId,
+//         rollNo,
+//         fabrecqty,
+//         description,
+//         price,
+//         styleId,
+//         stylewise_size_id,
+//         buyer_Po_Id,
+//         buyerNo,
+//         po_gsm,
+//         weight,
+//         po_rib_id,
+//         gstper,
+//         totprice,
+//         gstamnt,
+//         rejqty,
+//         aisleId,
+//         binId,
+//         missqty,
+//         batchid,
+//         shade,
+//         grnwidth,
+//       } = child;
+//       return (
+//         `${lineItemId ?? '0'}#${fabrecqty ?? '0'}#${rollNo ?? '0'}#${
+//           itemId ?? '0'
+//         }#${'Fabric'}#${''}#${receivedQty ?? '3' }#${shade ?? '0'}#${grnwidth ?? '0'}#${
+//           price ?? '0'
+//         }#${batchid ?? '0'}` +
+//         `#${'App' ?? ''}#${styleId ?? '0'}#${stylewise_size_id ?? '0'}#${
+//           buyer_Po_Id ?? '0'
+//         }#${buyerNo ?? '0'}#${gstper ?? '0'}#${totprice ?? ''}#` +
+//         `${gstamnt ?? '0'}#${po_gsm ?? '0'}#${weight ?? '0.0'}#${
+//           po_rib_id ?? '0'
+//         }#${aisleId ?? '0'}#${binId ?? '0'}`
+//       );
+//     })
+//     .join(',') + ',';
+
+//both

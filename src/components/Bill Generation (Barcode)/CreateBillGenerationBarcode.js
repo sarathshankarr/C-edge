@@ -110,7 +110,7 @@ const CreateBillGenerationBarcode = ({route}) => {
       LISTAPIOBJ &&
       LISTAPIOBJ.statusData &&
       LISTAPIOBJ.responseData &&
-      LISTAPIOBJ.responseData.status === false
+      LISTAPIOBJ.responseData.status === true
     ) {
       console.log(
         'barcode scanend succesfully  ',
@@ -137,62 +137,7 @@ const CreateBillGenerationBarcode = ({route}) => {
       );
     }
   };
-  const getModalStyleFgList = async id => {
-    return;
 
-    let userName = await AsyncStorage.getItem('userName');
-    let userPsd = await AsyncStorage.getItem('userPsd');
-    let usercompanyId = await AsyncStorage.getItem('companyId');
-    let companyObj = await AsyncStorage.getItem('companyObj');
-
-    set_isLoading(true);
-    let obj = {
-      menuId: 7,
-      searchKeyValue: '',
-      styleSearchDropdown: '-1',
-      days: '',
-      locIds: 0,
-      brandIds: 0,
-      compIds: usercompanyId,
-      company: JSON.parse(companyObj),
-      fromRecord: 0,
-      toRecord: 25,
-      userName: userName,
-      userPwd: userPsd,
-      vendorId: id,
-      styleStatus: '',
-      currentStatus: '',
-      process: 'BuyerPO',
-    };
-    // console.log('modal lsit ===>  req body ===> ', obj);
-
-    let LISTAPIOBJ = await APIServiceCall.getBillGenCreatePopUpList(obj);
-    set_isLoading(false);
-
-    if (LISTAPIOBJ && LISTAPIOBJ.statusData) {
-      if (LISTAPIOBJ && LISTAPIOBJ.responseData) {
-        set_modalLists(LISTAPIOBJ.responseData);
-      }
-    } else {
-      popUpAction(
-        Constant.SERVICE_FAIL_MSG,
-        Constant.DefaultAlert_MSG,
-        'OK',
-        true,
-        false,
-      );
-    }
-
-    if (LISTAPIOBJ && LISTAPIOBJ.error) {
-      popUpAction(
-        Constant.SERVICE_FAIL_MSG,
-        Constant.DefaultAlert_MSG,
-        'OK',
-        true,
-        false,
-      );
-    }
-  };
   const getBillGeneratonDataFromBarcode = async id => {
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
@@ -247,15 +192,12 @@ const CreateBillGenerationBarcode = ({route}) => {
       );
     }
   };
-  const submitAction = async checkedData => {
-    return;
 
+  const submitAction = async tempObj => {
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
     let companyObj = await AsyncStorage.getItem('companyObj');
-    const tempObj = {};
-
     tempObj.menuId = 787;
     tempObj.username = userName;
     tempObj.password = userPsd;
@@ -267,7 +209,7 @@ const CreateBillGenerationBarcode = ({route}) => {
 
     set_isLoading(true);
 
-    let SAVEAPIObj = await APIServiceCall.saveCreateBillGeneration(tempObj);
+    let SAVEAPIObj = await APIServiceCall.saveCreateBillGenerationBarcode(tempObj);
     set_isLoading(false);
 
     console.log('Sucess before returned obj ', SAVEAPIObj);
@@ -315,7 +257,7 @@ const CreateBillGenerationBarcode = ({route}) => {
       modalLists={modalLists}
       tableLists={tableLists}
       // getModalLists={getModalLists}
-      getModalStyleFgList={getModalStyleFgList}
+      // getModalStyleFgList={getModalStyleFgList}
       submitAction={submitAction}
       getData={getData}
       validateBarCode={validateBarCode}

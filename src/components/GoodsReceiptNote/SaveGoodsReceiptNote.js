@@ -14,15 +14,17 @@ const SaveGoodsReceiptNote = ({navigation, route, ...props}) => {
   const [popUpAlert, set_popUpAlert] = useState(undefined);
   const [popUpRBtnTitle, set_popUpRBtnTitle] = useState(undefined);
   const [isPopupLeft, set_isPopupLeft] = useState(false);
-  const [fptid, set_fptid] = useState(0);
   const [poNumber, set_poNumber] = useState(0);
+  const [editFlag, set_editFlag] = useState(true);
 
   React.useEffect(() => {
     if (route.params) {
       if (route.params?.item) {
-        console.log('Route Params ===> ', route.params?.item?.poNumber);
+        console.log('Route Params ===> ', route.params?.item);
         getInitialData(route.params?.item?.poNumber);
         set_poNumber(route.params?.item?.poNumber);
+        set_editFlag(route.params?.item?.status);
+        
       }
     }
   }, [route.params]);
@@ -109,9 +111,13 @@ const SaveGoodsReceiptNote = ({navigation, route, ...props}) => {
     tempObj.userId = userId;
     tempObj.compIds = usercompanyId;
     tempObj.companyLocationId = usercompanyId;
-    tempObj.menuId = 145;
-    tempObj.company = JSON.parse(companyObj);
+    tempObj.menuId = 5;
+    tempObj.grnapp = 1;
+    tempObj.costfoc = 0;
+
     console.log('saving obj ==>', tempObj);
+
+    tempObj.company = JSON.parse(companyObj);
 
     set_isLoading(true);
 
@@ -120,7 +126,7 @@ const SaveGoodsReceiptNote = ({navigation, route, ...props}) => {
     );
     set_isLoading(false);
 
-    console.log('Sucess before returned obj ', SAVEAPIObj);
+    // console.log('Sucess before returned obj ', SAVEAPIObj);
 
     if (
       SAVEAPIObj &&

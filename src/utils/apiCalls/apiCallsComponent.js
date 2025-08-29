@@ -2261,6 +2261,47 @@ export async function saveFabricEdit(jsonValue) {
     obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet }
     return obj;
 };
+export async function saveCreateVendorMasters(jsonValue) {
+
+    let returnError = undefined;
+    let statusData = undefined;
+    let responseData = undefined;
+    let logoutData = false;
+    let obj = undefined;
+
+    let internet = await internetCheck();
+    if (!internet) {
+        obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
+        return obj;
+    }
+    console.log('saveFabricEdit  ', Environment.uri + "vendor/saveVendor")
+    await fetch(Environment.uri + "vendor/saveVendor",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            },
+            body: JSON.stringify(jsonValue),
+        }
+    ).then((response) => response.json()).then(async (data) => {
+        console.log('saveFabricEdit ', data)
+
+        if (data) {
+            statusData = true;
+            responseData = data
+        } else {
+            statusData = undefined;
+        }
+
+    }).catch((error) => {
+        console.log('saveDDA', error)
+        returnError = error;
+    });
+
+    obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet }
+    return obj;
+};
 
 export async function saveEditStleDetails(jsonValue) {
 
@@ -2782,6 +2823,174 @@ export async function getStockFabrics(jsonValue) {
     try {
         console.log("URL", Environment.uri + "stockapprove/getStockFabrics")
         const response = await fetch(Environment.uri + "stockapprove/getStockFabrics",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                },
+                body: JSON.stringify(jsonValue),
+            }
+        )
+
+        if (!response.ok) {
+            throw new Error(`HTTP status ${response.status}`);
+        }
+
+        const contentLength = response.headers.get("content-length");
+        let data = [];
+
+        if (contentLength && parseInt(contentLength) > 0) {
+            data = await response.json(); // Parse only if content exists
+        } else {
+            console.log("Empty response body.");
+        }
+
+
+        if (data?.length > 0) {
+            responseData = data;
+            statusData = true;
+        } else {
+            responseData = [];
+            statusData = true;
+        }
+    } catch (error) {
+        console.log('getStockFabrics error ', error)
+        returnError = error;
+    };
+
+    obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet }
+    return obj;
+};
+export async function getCreateWorkWagesReport(jsonValue) {
+
+    let returnError = undefined;
+    let statusData = undefined;
+    let responseData = undefined;
+    let logoutData = false;
+    let obj = undefined;
+
+    let internet = await internetCheck();
+    if (!internet) {
+        obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
+        return obj;
+    }
+
+    try {
+        console.log("URL", Environment.uri + "stylebom/loadworkerWagesReport")
+        const response = await fetch(Environment.uri + "stylebom/loadworkerWagesReport",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                },
+                body: JSON.stringify(jsonValue),
+            }
+        )
+
+        if (!response.ok) {
+            throw new Error(`HTTP status ${response.status}`);
+        }
+
+        const contentLength = response.headers.get("content-length");
+        let data = [];
+
+        if (contentLength && parseInt(contentLength) > 0) {
+            data = await response.json(); // Parse only if content exists
+        } else {
+            console.log("Empty response body.");
+        }
+
+
+        if (data?.length > 0) {
+            responseData = data;
+            statusData = true;
+        } else {
+            responseData = [];
+            statusData = true;
+        }
+    } catch (error) {
+        console.log('getStockFabrics error ', error)
+        returnError = error;
+    };
+
+    obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet }
+    return obj;
+};
+export async function getCreateWWRSizeWise(jsonValue) {
+
+    let returnError = undefined;
+    let statusData = undefined;
+    let responseData = undefined;
+    let logoutData = false;
+    let obj = undefined;
+
+    let internet = await internetCheck();
+    if (!internet) {
+        obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
+        return obj;
+    }
+
+    try {
+        console.log("URL", Environment.uri + "stylebom/loadworkerWagesReport")
+        const response = await fetch(Environment.uri + "stylebom/loadworkerWagesReport",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                },
+                body: JSON.stringify(jsonValue),
+            }
+        )
+
+        if (!response.ok) {
+            throw new Error(`HTTP status ${response.status}`);
+        }
+
+        const contentLength = response.headers.get("content-length");
+        let data = [];
+
+        if (contentLength && parseInt(contentLength) > 0) {
+            data = await response.json(); // Parse only if content exists
+        } else {
+            console.log("Empty response body.");
+        }
+
+
+        if (data?.length > 0) {
+            responseData = data;
+            statusData = true;
+        } else {
+            responseData = [];
+            statusData = true;
+        }
+    } catch (error) {
+        console.log('getStockFabrics error ', error)
+        returnError = error;
+    };
+
+    obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet }
+    return obj;
+};
+export async function getCreateWWRNonSizeWise(jsonValue) {
+
+    let returnError = undefined;
+    let statusData = undefined;
+    let responseData = undefined;
+    let logoutData = false;
+    let obj = undefined;
+
+    let internet = await internetCheck();
+    if (!internet) {
+        obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
+        return obj;
+    }
+
+    try {
+        console.log("URL", Environment.uri + "stylebom/loadworkerWagesReport")
+        const response = await fetch(Environment.uri + "stylebom/loadworkerWagesReport",
             {
                 method: "POST",
                 headers: {
@@ -4420,6 +4629,7 @@ export async function LoadAllPoDraft(jsonValue) {
     obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet }
     return obj;
 };
+
 export async function LoadAllGRNApprove(jsonValue) {
 
     let returnError = undefined;
@@ -5125,6 +5335,47 @@ export async function validateBillGenerationBarcode(jsonValue) {
     obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet }
     return obj;
 };
+export async function api11(jsonValue) {
+
+    let returnError = undefined;
+    let statusData = undefined;
+    let responseData = undefined;
+    let logoutData = false;
+    let obj = undefined;
+
+    let internet = await internetCheck();
+    if (!internet) {
+        obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
+        return obj;
+    }
+
+    console.log("URL", Environment.uri + "masterboxpacking/getBoxIdwithonlybarcode");
+    await fetch(Environment.uri + "masterboxpacking/getBoxIdwithonlybarcode",
+
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            },
+            body: JSON.stringify(jsonValue),
+        }
+    ).then((response) => response.json()).then(async (data) => {
+        if (data) {
+            statusData = true;
+            responseData = data
+        } else {
+            statusData = undefined;
+        }
+
+    }).catch((error) => {
+        console.log('getPartsProcessingCreateList error ', error)
+        returnError = error;
+    });
+
+    obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet }
+    return obj;
+};
 
 
 export async function getBoxPackingCreateStylesList(jsonValue) {
@@ -5790,6 +6041,45 @@ export async function getBillGeneratonDataFromBarcode(jsonValue) {
     obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet }
     return obj;
 };
+export async function api22(jsonValue) {
+
+    let returnError = undefined;
+    let statusData = undefined;
+    let responseData = undefined;
+    let logoutData = false;
+    let obj = undefined;
+
+    let internet = await internetCheck();
+    if (!internet) {
+        obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
+        return obj;
+    }
+    console.log("URL", Environment.uri + "masterboxpacking/getQuantityByBarcodeAPI");
+    await fetch(Environment.uri + "masterboxpacking/getQuantityByBarcodeAPI",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            },
+            body: JSON.stringify(jsonValue),
+        }
+    ).then((response) => response.json()).then(async (data) => {
+        if (data) {
+            statusData = true;
+            responseData = data
+        } else {
+            statusData = undefined;
+        }
+
+    }).catch((error) => {
+        console.log('getPartsProcessingCreateList error ', error)
+        returnError = error;
+    });
+
+    obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet }
+    return obj;
+};
 export async function getStyleRm(jsonValue) {
 
     let returnError = undefined;
@@ -6288,6 +6578,46 @@ export async function saveCreateBillGeneration(jsonValue) {
         return obj;
     }
     await fetch(Environment.uri + "billgenerationapi/saveBillGeneration",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            },
+            body: JSON.stringify(jsonValue),
+        }
+    ).then((response) => response.json()).then(async (data) => {
+        // console.log('saveCreatePartsProcessing ', data)
+
+        if (data) {
+            statusData = true;
+            responseData = data
+        } else {
+            statusData = undefined;
+        }
+
+    }).catch((error) => {
+        console.log('saveCreatePartsProcessing', error)
+        returnError = error;
+    });
+
+    obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet }
+    return obj;
+};
+export async function saveCreateBillGenerationBarcode(jsonValue) {
+
+    let returnError = undefined;
+    let statusData = undefined;
+    let responseData = undefined;
+    let logoutData = false;
+    let obj = undefined;
+
+    let internet = await internetCheck();
+    if (!internet) {
+        obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
+        return obj;
+    }
+    await fetch(Environment.uri + "buyerpoapicon/insertBuyerPO",
         {
             method: "POST",
             headers: {
@@ -7719,6 +8049,14 @@ export const downloadOutProcessNewInProcessInDcFormat1 =()=>{
 } 
 export const downloadOutProcessNewInProcessInDcFormat2 =()=>{
     const URL= Environment.uri + "outprocess/generategodc";
+    return URL;
+} 
+export const downloadBillGenBarcodeInvoiceAndPackingF1 =()=>{
+    const URL= Environment.uri + "buyerpoapicon/generateInvoice";
+    return URL;
+} 
+export const downloadBillGenBarcodeInvoiceAndPackingF2 =()=>{
+    const URL= Environment.uri + "buyerpoapicon/generateFormatTwoInvoiceAPI";
     return URL;
 } 
 
@@ -9330,7 +9668,45 @@ export async function sendWhatsAppOutProNewInProcessComponent(jsonValue) {
     obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet }
     return obj;
 };
-// ================================================
+export async function sendShipBillGenBarcode(jsonValue) {
+
+    let returnError = undefined;
+    let statusData = undefined;
+    let responseData = undefined;
+    let logoutData = false;
+    let obj = undefined;
+
+    let internet = await internetCheck();
+    if (!internet) {
+        obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet };
+        return obj;
+    }
+    console.log("URL", Environment.uri + "buyerpoapicon/shippingQtyAPI");
+    await fetch(Environment.uri + "buyerpoapicon/shippingQtyAPI",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            },
+            body: JSON.stringify(jsonValue),
+        }
+    ).then((response) => response.json()).then(async (data) => {
+        if (data) {
+            statusData = true;
+            responseData = data
+        } else {
+            statusData = undefined;
+        }
+
+    }).catch((error) => {
+        console.log('sendShipBillGenBarcode  error ', error)
+        returnError = error;
+    });
+
+    obj = { logoutData: logoutData, statusData: statusData, responseData: responseData, error: returnError, isInternet: internet }
+    return obj;
+};
 
 export async function getSelectedCategoryList_DDA(jsonValue) {
 

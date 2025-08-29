@@ -87,6 +87,56 @@ const SaveBillGenerationBarcode = ({navigation, route, ...props}) => {
   };
 
 
+   const submitAction = async tempObj => {
+    let userName = await AsyncStorage.getItem('userName');
+    let userPsd = await AsyncStorage.getItem('userPsd');
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
+    tempObj.menuId = 787;
+    tempObj.username = userName;
+    tempObj.password = userPsd;
+    tempObj.compIds = usercompanyId;
+    tempObj.checkedData = checkedData;
+    tempObj.company = JSON.parse(companyObj);
+
+    console.log('saving obj ==>', tempObj);
+
+    set_isLoading(true);
+
+    let SAVEAPIObj = await APIServiceCall.saveCreateBillGenerationBarcode(tempObj);
+    set_isLoading(false);
+
+    console.log('Sucess before returned obj ', SAVEAPIObj);
+
+    if (
+      SAVEAPIObj &&
+      SAVEAPIObj?.statusData &&
+      SAVEAPIObj?.responseData !== 0
+    ) {
+      console.log('Sucessfully saved ===> ');
+      backBtnAction();
+    } else {
+      console.log('failed  saving =====> ');
+      popUpAction(
+        Constant.Fail_Save_Dtls_MSG,
+        Constant.DefaultAlert_MSG,
+        'OK',
+        true,
+        false,
+      );
+    }
+
+    if (SAVEAPIObj && SAVEAPIObj.error) {
+      popUpAction(
+        Constant.SERVICE_FAIL_MSG,
+        Constant.DefaultAlert_MSG,
+        'OK',
+        true,
+        false,
+      );
+    }
+  };
+
 
   return (
     <SaveBillGenerationBarcodeUI
@@ -100,6 +150,7 @@ const SaveBillGenerationBarcode = ({navigation, route, ...props}) => {
       backBtnAction={backBtnAction}
       actionOnRow={actionOnRow}
       popOkBtnAction={popOkBtnAction}
+      submitAction={submitAction}
     />
   );
 };
