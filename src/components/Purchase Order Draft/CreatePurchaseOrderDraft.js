@@ -68,7 +68,7 @@ const CreatePurchaseOrderDraft = ({route}) => {
 
     let LISTAPIOBJ = await APIServiceCall.getPurchaseOrderDraftDetails(obj);
     set_isLoading(false);
-    console.log("create po  req body ====>  ", obj)
+    console.log('create po  req body ====>  ', obj);
 
     if (LISTAPIOBJ && LISTAPIOBJ.statusData) {
       if (LISTAPIOBJ && LISTAPIOBJ.responseData) {
@@ -205,7 +205,7 @@ const CreatePurchaseOrderDraft = ({route}) => {
     }
   };
 
-  const getModalPrices = async (itemObj) => {
+  const getModalPrices = async itemObj => {
     set_isLoading(true);
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
@@ -219,10 +219,9 @@ const CreatePurchaseOrderDraft = ({route}) => {
       compIds: usercompanyId,
       company: JSON.parse(companyObj),
       itemTrimsType: itemObj.type,
-      itemStr: itemObj.type==="TRIMFABRIC" ? itemObj.type : '',
+      itemStr: itemObj.type === 'TRIMFABRIC' ? itemObj.type : '',
       itemId: itemObj.id,
     };
-
 
     // console.log("req body for prices  ==> ", obj)
 
@@ -243,6 +242,58 @@ const CreatePurchaseOrderDraft = ({route}) => {
         false,
       );
     }
+
+    if (LISTAPIOBJ && LISTAPIOBJ.error) {
+      popUpAction(
+        Constant.SERVICE_FAIL_MSG,
+        Constant.DefaultAlert_MSG,
+        'OK',
+        true,
+        false,
+      );
+    }
+  };
+  const getGstStatusFromVendor = async id => {
+    set_isLoading(true);
+    let userName = await AsyncStorage.getItem('userName');
+    let userPsd = await AsyncStorage.getItem('userPsd');
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
+
+    let obj = {
+      userName: userName,
+      userPwd: userPsd,
+      vendorId: id,
+      compIds: usercompanyId,
+      company: JSON.parse(companyObj),
+    };
+
+    let LISTAPIOBJ = await APIServiceCall.getGstStatusFromVendorApi(obj);
+    set_isLoading(false);
+
+    if (LISTAPIOBJ && LISTAPIOBJ.statusData) {
+      if (LISTAPIOBJ && LISTAPIOBJ.responseData && LISTAPIOBJ.responseData.status==="true") {
+        console.log('getGstStatusFromVendor ', LISTAPIOBJ.responseData);
+        popUpAction(
+        "This Vendor do not have GST",
+        Constant.DefaultAlert_MSG,
+        'OK',
+        true,
+        false,
+      );
+      return LISTAPIOBJ?.responseData?.status;
+      }
+
+    } 
+    // else {
+    //   popUpAction(
+    //     Constant.SERVICE_FAIL_MSG,
+    //     Constant.DefaultAlert_MSG,
+    //     'OK',
+    //     true,
+    //     false,
+    //   );
+    // }
 
     if (LISTAPIOBJ && LISTAPIOBJ.error) {
       popUpAction(
@@ -443,6 +494,7 @@ const CreatePurchaseOrderDraft = ({route}) => {
       submitAction={submitAction}
       backBtnAction={backBtnAction}
       popOkBtnAction={popOkBtnAction}
+      getGstStatusFromVendor={getGstStatusFromVendor}
     />
   );
 };
