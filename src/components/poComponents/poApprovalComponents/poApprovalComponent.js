@@ -142,22 +142,21 @@ const POApprovalComponent = ({ navigation, route, ...props }) => {
     set_isLoading(true);
     //reject = 3
     let obj = {
-      "poNumber": poNumber,  // mandatory
+      "poNumber": poNumber,  
       "statusRemarks": remarks,
-      "status": value && value === 100 ? 3 : 1, // mandatory
+      "status": value && value === 100 ? 3 : 1, 
       "secondLevelFlag": "0",
-      "notes": "",
+      "notes": itemsObj?.notes || "",
       "locId": 0,
       "styleId": 0,
-      "menuId": 4,      // mandatory
-      "userName": userName,  // mandatory
-      "userPwd": userPsd, // mandatory
+      "menuId": 4,      
+      "userName": userName, 
+      "userPwd": userPsd, 
       "compIds": usercompanyId,
       "company":JSON.parse(companyObj),
     }
 
     let poApproveAPIObj = await APIServiceCall.poApproveAPIService(obj);
-    // console.log('poNumber Approve API----> ', poApproveAPIObj)
     set_isLoading(false);
 
     if (poApproveAPIObj && poApproveAPIObj.statusData) {

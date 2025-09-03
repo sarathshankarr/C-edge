@@ -50,6 +50,9 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
   const [uploadedMediaFiles, setUploadedMediaFiles] = useState([]);
   const [selectedIdxs, setSelectedIdxs] = useState([]);
   const [selectAllCheckBox, setSelectAllCheckBox] = useState(false);
+  const [referenceDate, setReferenceDate] = useState('');
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  
 
   const {colors} = useContext(ColorContext);
   const styles = getStyles(colors);
@@ -113,14 +116,13 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
           const dataMap = props.itemsObj.pomaster.poMasterChildMappingDao;
           setChildData(props.itemsObj.pomaster.poMasterChildMappingDao);
           // console.log('save grn approvve  child ', dataMap);
-
+          // props.itemsObj.pomaster.itemTrimsType
           const childMap = dataMap.map((item, index) => ({
             ...item,
             roll: item.rollNo,
             requiredQty: item.quantitystr,
             remainingQty: item.remQty,
             enteredQty: item.recqty,
-            presentReceivedQty: '',
             fabric: item.fabrecqty,
             price: item.price,
             grnNo: item.grnUniqueNo,
@@ -133,6 +135,15 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
             fabric: item.itemdesc,
             quantitystr: item?.quantitystr || 0,
             alreadyReceivedQty: item?.receivedQty || 0,
+            showClose: false,
+            presentReceivedQty:
+              props.itemsObj?.pomaster?.itemTrimsType === 'Fabric'
+                ? item?.receivedQty
+                : '',
+            editablePriceReceivedQty:
+              props.itemsObj?.pomaster?.itemTrimsType === 'Fabric'
+                ? false
+                : true,
           }));
 
           setRows(childMap);
@@ -146,6 +157,26 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
   };
 
   const submitAction = async () => {
+    if (itemOrTrims === 'Fabric') {
+      const missingRoll = rows.find(row => !row.roll || row.roll.trim() === '');
+      if (missingRoll) {
+        Alert.alert('Missing Roll', 'Please enter Roll No');
+        return;
+      }
+    }
+
+    const missingQty = rows.find(
+      row => !row.presentReceivedQty || row.presentReceivedQty.trim() === '',
+    );
+    if (missingQty) {
+      Alert.alert(
+        'Missing Quantity',
+        'Please enter Received Quantity for all rows.',
+      );
+      return;
+    }
+    console.log('oyeee');
+    return;
     const formatChildDataFab =
       rows
         .map(child => {
@@ -821,6 +852,38 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
 
     setRows(updatedRows);
   };
+  const addRowBelow = index => {
+    const rowToCopy = rows[index];
+    const newRow = {
+      ...rowToCopy,
+      showClose: true,
+      presentReceivedQty: 0,
+      editablePriceReceivedQty: true,
+    };
+    const updatedRows = [...rows];
+    updatedRows.splice(index + 1, 0, newRow);
+    setRows(updatedRows);
+  };
+
+  const handleRemoveRow = id => {
+    setRows(prev => prev.filter((_, index) => index !== id));
+  };
+
+  const handleConfirm = date => {
+    const extractedDate = date.toISOString().split('T')[0];
+    const formattedDate = formatDateIntoDMY(extractedDate);
+
+    setReferenceDate(formattedDate);
+    hideDatePicker();
+  };
+
+  const showDatePicker = () => {
+    setDatePickerVisibility(true);
+  };
+
+  const hideDatePicker = () => {
+    setDatePickerVisibility(false);
+  };
 
   return (
     <View style={[CommonStyles.mainComponentViewStyle]}>
@@ -880,6 +943,39 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
               onChangeText={text => console.log(text)}
             />
           </View>
+
+          <DateTimePickerModal
+            isVisible={isDatePickerVisible}
+            mode="date"
+            onConfirm={handleConfirm}
+            onCancel={hideDatePicker}
+          />
+
+          <View
+            style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginTop: hp('2%'),
+              flexDirection: 'row',
+            }}>
+            <View style={{width: '85%'}}>
+              <TextInput
+                label="Reference Date"
+                value={referenceDate || ''}
+                placeholder="Reference Date"
+                placeholderTextColor="#000"
+                mode="outlined"
+                color="#000"
+              />
+            </View>
+            <TouchableOpacity onPress={showDatePicker} style={{padding: 5}}>
+              <Image
+                source={require('./../../../assets/images/png/calendar11.png')}
+                style={{width: 40, height: 40}}
+              />
+            </TouchableOpacity>
+          </View>
+
           <View style={styles.wrapper}>
             <ScrollView nestedScrollEnabled={true} horizontal>
               <View style={styles.table}>
@@ -889,8 +985,6 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
                       style={[
                         styles.checkboxItem,
                         {
-                          // marginTop: hp('2%'),
-                          // marginBottom: hp('2%'),
                           flex: 0.5,
                         },
                       ]}>
@@ -899,6 +993,9 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
                         onToggle={updateAllIndexes}
                       />
                     </View>
+                  </View>
+                  <View style={{width: 60}}>
+                    <Text style={styles.table_head_captions1}>Action</Text>
                   </View>
 
                   {itemOrTrims === 'RM' ? (
@@ -967,16 +1064,20 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
                   <View style={{width: 100}}>
                     <Text style={styles.table_head_captions}>Total</Text>
                   </View>
+                  {itemOrTrims === 'Fabric' && (
+                    <View style={{width: 150}}>
+                      <Text style={styles.table_head_captions}>Action</Text>
+                    </View>
+                  )}
                 </View>
-                {rows.map((row, index) => (
+
+                {/* {rows.map((row, index) => (
                   <View key={index} style={styles.table_body_single_row}>
                     <View style={{width: 70}}>
                       <View
                         style={[
                           styles.checkboxItem,
                           {
-                            // marginTop: hp('1%'),
-                            // marginBottom: hp('2%'),
                             flex: 0.5,
                           },
                         ]}>
@@ -1019,21 +1120,7 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
                         </View>
                       </>
                     )}
-                    {/* <View style={{width: 100}}>
-                      <Text style={styles.table_data}>
-                        {row.presentReceivedQty}
-                      </Text>
-                    </View> */}
-                    {/* <View style={{width: 100}}>
-                      <TextInput
-                        style={styles.table_data}
-                        value={String(row.presentReceivedQty)}
-                        keyboardType="numeric"
-                        onChangeText={text =>
-                          handleInputChange(index, 'presentReceivedQty', text)
-                        }
-                      />
-                    </View> */}
+                  
                     <View
                       style={{
                         width: 100,
@@ -1070,9 +1157,6 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
                     <View style={{width: 100}}>
                       <Text style={styles.table_data}>{row.fabric}</Text>
                     </View>
-                    {/* <View style={{width: 100}}>
-                      <Text style={styles.table_data}>{row.price}</Text>
-                    </View> */}
                     <View style={{width: 100}}>
                       <TextInput
                         style={styles.table_data}
@@ -1107,7 +1191,192 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
                       <Text style={styles.table_data}>{row.total}</Text>
                     </View>
                   </View>
+                ))} */}
+
+                {rows.map((row, index) => (
+                  <View key={index} style={styles.table_body_single_row}>
+                    <View style={{width: 70}}>
+                      <View
+                        style={[
+                          styles.checkboxItem,
+                          {
+                            flex: 0.5,
+                          },
+                        ]}>
+                        <CustomCheckBox
+                          isChecked={selectedIdxs.includes(index)}
+                          onToggle={() => toggleSelection(index)}
+                        />
+                      </View>
+                    </View>
+                    <View style={{width: 60}}>
+                      {row.showClose && (
+                        <TouchableOpacity
+                          onPress={() => handleRemoveRow(index)}>
+                          <Image source={closeImg} style={styles.imageStyle1} />
+                        </TouchableOpacity>
+                      )}
+                    </View>
+
+                    {itemOrTrims === 'RM' ? (
+                      <View style={{width: 100}}>
+                        <Text style={styles.table_data}>{row.quantitystr}</Text>
+                      </View>
+                    ) : (
+                      <View style={{width: 100}}>
+                        <TextInput
+                          style={styles.table_data}
+                          value={row.roll}
+                          onChangeText={text =>
+                            handleInputChange(index, 'roll', text)
+                          }
+                        />
+                      </View>
+                    )}
+
+                    <View style={{width: 5}}></View>
+
+                    {itemOrTrims === 'Fabric' && (
+                      <>
+                        <View style={{width: 100}}>
+                          <Text style={styles.table_data}>
+                            {row.requiredQty}
+                          </Text>
+                        </View>
+
+                        <View style={{width: 100}}>
+                          <Text style={styles.table_data}>
+                            {row.remainingQty}/{row.enteredQty}
+                          </Text>
+                        </View>
+                      </>
+                    )}
+                    {itemOrTrims === 'RM' ? (
+                      <View
+                        style={{
+                          width: 100,
+                          alignItems: 'center',
+                          textAlign: 'center',
+                        }}>
+                        <View
+                          style={{flexDirection: 'row', alignItems: 'center'}}>
+                          <TextInput
+                            style={[styles.table_data, {flex: 1}]}
+                            value={String(row.presentReceivedQty)}
+                            keyboardType="numeric"
+                            onChangeText={text =>
+                              handleInputChange(
+                                index,
+                                'presentReceivedQty',
+                                text,
+                              )
+                            }
+                            editable={row?.editablePriceReceivedQty}
+                          />
+                          <Text
+                            style={{
+                              marginLeft: 4,
+                              color: colors.color2,
+                              fontSize: 10,
+                            }}>
+                            ({row.alreadyReceivedQty})
+                          </Text>
+                        </View>
+
+                        <Text style={{marginTop: 4, fontSize: 10}}>
+                          {Number(row.alreadyReceivedQty) +
+                            Number(row.presentReceivedQty || 0)}
+                        </Text>
+                      </View>
+                    ) : (
+                      <View
+                        style={{
+                          width: 100,
+                          alignItems: 'center',
+                          textAlign: 'center',
+                        }}>
+                        <View
+                          style={{flexDirection: 'row', alignItems: 'center'}}>
+                          <TextInput
+                            style={[styles.table_data, {flex: 1}]}
+                            value={String(row.presentReceivedQty)}
+                            keyboardType="numeric"
+                            onChangeText={text =>
+                              handleInputChange(
+                                index,
+                                'presentReceivedQty',
+                                text,
+                              )
+                            }
+                            editable={row?.editablePriceReceivedQty}
+                          />
+                        </View>
+
+                        <Text
+                          style={{
+                            marginLeft: 4,
+                            color: colors.color2,
+                            fontSize: 10,
+                          }}>
+                          ({row.alreadyReceivedQty})
+                        </Text>
+                      </View>
+                    )}
+
+                    <View style={{width: 5}}></View>
+                    <View style={{width: 100}}>
+                      <Text style={styles.table_data}>{row.fabric}</Text>
+                    </View>
+
+                    <View style={{width: 100}}>
+                      <TextInput
+                        style={styles.table_data}
+                        value={String(row.price)}
+                        keyboardType="numeric"
+                        onChangeText={text =>
+                          handleInputChange(index, 'price', text)
+                        }
+                      />
+                    </View>
+                    <View style={{width: 5}}></View>
+                    <View style={{width: 100}}>
+                      <Text style={styles.table_data}>
+                        {itemOrTrims === 'RM' ? row.refNo : row.grnNo}
+                      </Text>
+                    </View>
+                    <View style={{width: 100}}>
+                      <Text style={styles.table_data}>{row.gstPercent}</Text>
+                    </View>
+                    <View style={{width: 100}}>
+                      <Text style={styles.table_data}>{row.itemRate}</Text>
+                    </View>
+                    <View style={{width: 100}}>
+                      <Text style={styles.table_data}>
+                        {row.discountAccount}
+                      </Text>
+                    </View>
+                    <View style={{width: 100}}>
+                      <Text style={styles.table_data}>{row.gst}</Text>
+                    </View>
+                    <View style={{width: 100}}>
+                      <Text style={styles.table_data}>{row.total}</Text>
+                    </View>
+                    {itemOrTrims === 'Fabric' && (
+                      <View style={{width: 150}}>
+                        {!row.showClose && (
+                          <TouchableOpacity
+                            style={styles.searchButton}
+                            onPress={() => addRowBelow(index)}>
+                            <Text style={styles.searchbuttonText}>
+                              Add Roll
+                            </Text>
+                          </TouchableOpacity>
+                        )}
+                      </View>
+                    )}
+                  </View>
                 ))}
+
                 <View style={styles.table_body_single_row}>
                   {[...Array(2)].map((_, i) => (
                     <View key={i} style={{width: 100}} />
@@ -1145,6 +1414,7 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
                       {totalAmount.toFixed(2)}
                     </Text>
                   </View>
+                  <View style={{width: 100}}></View>
                 </View>
 
                 <View style={styles.table_body_single_row}>
@@ -1174,6 +1444,7 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
                       ).toFixed(2)}
                     </Text>
                   </View>
+                  <View style={{width: 100}}></View>
                 </View>
               </View>
             </ScrollView>
@@ -1620,6 +1891,12 @@ const getStyles = colors =>
       alignItems: 'center',
       textAlign: 'center',
     },
+    table_head_captions1: {
+      fontSize: 15,
+      color: 'white',
+      alignItems: 'center',
+      textAlign: 'left',
+    },
 
     table_body_single_row: {
       backgroundColor: '#fff',
@@ -1699,7 +1976,7 @@ const getStyles = colors =>
       aspectRatio: 1,
       resizeMode: 'contain',
       tintColor: 'red',
-      alignSelf: 'center',
+      alignSelf: 'left',
     },
     uploadanyimg: {
       width: 65,
@@ -1751,6 +2028,24 @@ const getStyles = colors =>
       height: 25,
       justifyContent: 'center',
       alignItems: 'center',
+    },
+    searchButton: {
+      marginVertical: 15,
+      flex: 1,
+      alignSelf: 'center',
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingHorizontal: 5,
+      paddingVertical: 5,
+      borderWidth: 0.5,
+      borderColor: '#D8D8D8',
+      borderRadius: hp('0.5%'),
+      backgroundColor: colors.color2,
+    },
+    searchbuttonText: {
+      color: 'white',
+      fontSize: 16,
+      fontWeight: 'bold',
     },
   });
 
@@ -1927,3 +2222,22 @@ const getStyles = colors =>
 //     .join(',') + ',';
 
 //both
+{
+  /* <View style={{width: 100}}>
+                      <Text style={styles.table_data}>
+                        {row.presentReceivedQty}
+                      </Text>
+                    </View> */
+}
+{
+  /* <View style={{width: 100}}>
+                      <TextInput
+                        style={styles.table_data}
+                        value={String(row.presentReceivedQty)}
+                        keyboardType="numeric"
+                        onChangeText={text =>
+                          handleInputChange(index, 'presentReceivedQty', text)
+                        }
+                      />
+                    </View> */
+}

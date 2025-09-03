@@ -205,10 +205,14 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
     }
   };
 
-  const actionOnVendor = item => {
-    setVendorId(item.id);
-    setVendorName(item.name);
-    setShowVendorList(false);
+  const actionOnVendor = async item => {
+    let status="";
+     status = await props.getGstStatusFromVendor(item.id);
+    if (status !== 'true') {
+      setVendorId(item.id);
+      setVendorName(item.name);
+      setShowVendorList(false);
+    }
   };
 
   const handleSearchVendor = text => {
@@ -647,14 +651,20 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
       } else if (selectedradiooption2 === 'Trim Fabric(RM)') {
         item.styleNameALL = item.trimName || '';
       }
+      let gstPrct='0';
+      if( selectedradiooption2 === 'Fabric'){
+        gstPrct =item?.gst.toString() || '0'
+      }else{
+        gstPrct =item?.gstRate.toString() || '0'
+      }
 
       item.input_UnitPrice = unitPrice;
       item.input_Qty = '';
-      item.input_Gst = '';
+      item.input_Gst = gstPrct || '0';
       item.input_NetAmount = '';
       item.input_GstAmount = '';
       item.input_TotalAmount = '';
-
+      console.log("item ===> ", item)
       newList.push(item);
     }
 
@@ -729,6 +739,7 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
     setShowmodal(!showModal);
   };
 
+  // console.log("modal list ==> ",modalLists )
   const totalGstAmount = rows.reduce(
     (sum, row) =>
       sum +
