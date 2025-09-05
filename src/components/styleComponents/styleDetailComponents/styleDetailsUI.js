@@ -23,6 +23,7 @@ import AlertComponent from '../../../utils/commonComponents/alertComponent';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {ColorContext} from '../../colorTheme/colorTheme';
 import {List, TextInput} from 'react-native-paper';
+import CustomCheckBox from '../../../utils/commonComponents/CustomCheckBox';
 
 let arrowImg = require('./../../../../assets/images/png/arrowImg.png');
 let closeImg = require('./../../../../assets/images/png/close1.png');
@@ -41,7 +42,6 @@ const StyleDetailsUI = ({route, ...props}) => {
   const styles = getStyles(colors);
 
   useEffect(() => {
-    // console.log('item obj1 ==> ', props.itemObj);
     if (props.itemObj) {
       if (props.itemObj.styleName) {
         setStyleNo(props.itemObj.styleName);
@@ -154,22 +154,115 @@ const StyleDetailsUI = ({route, ...props}) => {
         set_editScaleOrSize(false);
       }
       if (props.itemObj.sizesGSCodesList) {
-        // console.log("table   ==> ", props.itemObj.sizesGSCodesList);
+        // console.log('table   scales list ==> ', props.itemObj.sizesGSCodesList);
         const ScaleTable = props.itemObj?.sizesGSCodesList?.map(
           (item, index) => ({
             id: item.size_id,
             name: item.sizeCode,
             consumption: item.size_cons,
             invLimit: item.sizeInvLimit,
+            enteredQty: item.gs_code_quantity,
+            gsCode: item.gsCode,
           }),
         );
+
         set_scaleTable(ScaleTable);
+
+        const sizeMap = {};
+        props.itemObj.sizesGSCodesList.forEach(item => {
+          sizeMap[item.size_id] = item.sizeCode;
+        });
+
+        set_sizeLookup(sizeMap);
+
+        const lookup = ScaleTable.reduce((acc, curr) => {
+          acc[curr.id] = curr.enteredQty;
+          return acc;
+        }, {});
+        setSizeQtyLookup(lookup);
 
         set_showScaleTable(true);
       }
-      if (props.itemObj.styleTrimCodeMappingList) {
-        const ary = props.itemObj.styleTrimCodeMappingList;
 
+      if (props.itemObj.styleTrimCodeMappingList) {
+        const buyerPOQty = props?.itemObj?.poQty || 0;
+
+        const mappedData = props?.itemObj?.styleTrimCodeMappingList?.map(
+          (item, index) => {
+            const initialConsumption = item.consumption || 0;
+            const initialRequiredQty = (
+              parseFloat(buyerPOQty) * parseFloat(initialConsumption)
+            ).toString();
+
+            return {
+              idx: index + 1,
+              rmType: item.trimTypeName ?? '',
+              selectedRmName: item.trimConstructionName || '',
+              selectedRmId: item.trimConstructionId || '',
+              showList: false,
+              showRmRow: true,
+              childList: [],
+              trimTypeId: item.trimTypeId,
+              trimTypeName: item.trimTypeName,
+              type: item.type,
+              selectedScales: item.scaleWise ? item.scaleWise.split('~') : [],
+              isScaleWise: item.isScaleWise,
+              scaleWise: props.itemObj?.sizesGSCodesList
+                ? props.itemObj.sizesGSCodesList
+                    .map(item => item.size_id)
+                    .join(',')
+                : '',
+              uomType: item.uomType,
+              consumption: initialConsumption.toString(),
+              requiredQty: item.requiredQty
+                ? item?.requiredQty?.toString()
+                : initialRequiredQty,
+              List: item.trimWiseTrimNamesList
+                ? item.trimWiseTrimNamesList.map(obj => ({
+                    ...obj,
+                    id: obj.trimConstructionId,
+                    name: obj.trimConstructionName,
+                  }))
+                : [],
+              filteredList: item.trimWiseTrimNamesList
+                ? item.trimWiseTrimNamesList.map(obj => ({
+                    ...obj,
+                    id: obj.trimConstructionId,
+                    name: obj.trimConstructionName,
+                  }))
+                : [],
+            };
+          },
+        );
+        // console.log('mappedData ==> ', mappedData);
+
+        const grouped = Object.values(
+          mappedData.reduce((acc, curr) => {
+            if (!acc[curr.trimTypeId]) {
+              acc[curr.trimTypeId] = {
+                trimTypeId: curr.trimTypeId,
+                rmType: curr.trimTypeName,
+                type: curr.type,
+                showRmRow: true,
+                List: curr.List,
+                filteredList: curr.filteredList,
+                selectedRmId: '',
+                selectedRmName: '',
+                childList: [],
+              };
+            }
+            if (curr.selectedRmId) {
+              acc[curr.trimTypeId].childList.push(curr);
+            }
+            // acc[curr.trimTypeId].childList.push(curr);
+            return acc;
+          }, {}),
+        );
+        setRmAllocationBomList(grouped);
+
+        // console.log('grouped ==> ', grouped[1]);
+
+        const ary = props.itemObj.styleTrimCodeMappingList;
         const table = ary.map(item => ({
           rmType: item.trimTypeName,
           List: Object.entries(item.trimWiseTrimNamesMap).map(([id, name]) => ({
@@ -181,11 +274,13 @@ const StyleDetailsUI = ({route, ...props}) => {
         const table1 = ary.map((item, index) => ({
           idx: index + 1,
           rmType: item.trimTypeName ?? '',
-          selectedRmName: '',
-          selectedRmId: '',
+          selectedRmName: item.trimConstructionName || '',
+          selectedRmId: item.trimConstructionId || '',
           showList: false,
-          showRmRow: false,
+          showRmRow: true,
           childList: [],
+          requiredQty: item.requiredQty,
+          consumption: item.consumption,
           List: item.trimWiseTrimNamesMap
             ? Object.entries(item.trimWiseTrimNamesMap).map(([id, name]) => ({
                 id,
@@ -200,8 +295,9 @@ const StyleDetailsUI = ({route, ...props}) => {
             : [],
         }));
 
-        setRmAllocationBomList(table1);
-        // console.log("table ==> ",table1[0].List , typeof table, table?.length);
+        // setRmAllocationBomList(table1);
+        // console.log("table1 ==> ",table1);
+        // console.log('grouped ==> ', grouped);
       }
     }
   }, [props.itemObj]);
@@ -217,6 +313,10 @@ const StyleDetailsUI = ({route, ...props}) => {
   const [selectedTab, setSelectedTab] = useState(1);
 
   const [name, setName] = useState('');
+  const [sizeLookup, set_sizeLookup] = useState({});
+  const [sizeQtyLookup, setSizeQtyLookup] = useState({});
+
+  const [totalEnteredQty, setTotalEnteredQty] = useState('0');
   const [scaleTable, set_scaleTable] = useState([]);
   const [showScaleTable, set_showScaleTable] = useState(false);
   const [styleNo, setStyleNo] = useState('');
@@ -424,53 +524,120 @@ const StyleDetailsUI = ({route, ...props}) => {
   };
 
   const rgtBtnAction = () => {
-    if (
-      !styleNo &&
-      !customerStyleNo &&
-      !locationId &&
-      selectedIndices.length > 0 &&
-      !seasonId &&
-      buyerPOQty &&
-      !scaleOrSizeId &&
-      !hsn &&
-      !processWorkFlowId
-    ) {
-      Alert.alert('Please fill all mandatory fields !');
-      return;
-    }
+    if (selectedTab === 1) {
+      if (
+        !styleNo ||
+        !customerStyleNo ||
+        !locationId ||
+        selectedIndices.length > 0 ||
+        !seasonId ||
+        buyerPOQty ||
+        !scaleOrSizeId ||
+        !hsn ||
+        !processWorkFlowId
 
-    if (!brandId) {
-      Alert.alert(
-        'Confirm',
-        'Do you want to Continue without Brand?',
-        [
-          {
-            text: 'Cancel',
-            style: 'cancel',
-          },
-          {
-            text: 'OK',
-            onPress: () => proceedWithSubmission(),
-          },
-        ],
-        {cancelable: false},
-      );
-      return;
+        
+      ) {
+        Alert.alert('Please fill all mandatory fields !');
+        return;
+      }
+
+      if (totalEnteredQty != buyerPOQty) {
+        Alert.alert('Entered Qty in the Sizes should be equal to Buyer Po Qty');
+        return;
+      }
+
+      if (!brandId) {
+        Alert.alert(
+          'Confirm',
+          'Do you want to Continue without Brand?',
+          [
+            {
+              text: 'Cancel',
+              style: 'cancel',
+            },
+            {
+              text: 'OK',
+              onPress: () => proceedWithSubmission(),
+            },
+          ],
+          {cancelable: false},
+        );
+        return;
+      }
+      proceedWithSubmission();
     }
-    proceedWithSubmission();
+    if (selectedTab === 4) {
+      let hiddenSelectedTrimIdsParam = [];
+      let trimDataMap = {};
+
+      RmAllocationBomList.forEach(parent => {
+        parent.childList.forEach(child => {
+          if (!child.selectedRmId) return; // skip if not selected
+
+          const keyBase = `${parent.trimTypeId}_${child.selectedRmId}`;
+
+          hiddenSelectedTrimIdsParam.push(keyBase);
+
+          trimDataMap[`consumption_${keyBase}`] = child.consumption || '0';
+          trimDataMap[`requiredQty_${keyBase}`] = child.requiredQty || '0';
+
+          if (child.isScaleWise == '1') {
+            trimDataMap[`isScaleWise_${keyBase}`] = '1';
+
+            const scales = (child.scaleWise || '').split(',').filter(Boolean);
+
+            const selected = child.selectedScales || [];
+            trimDataMap[`sizeIds`] = scales.join(',');
+
+            scales.forEach(sizeId => {
+              const isChecked = selected.includes(sizeId);
+              trimDataMap[`scaleWise_${keyBase}_${sizeId}`] = isChecked
+                ? 'on'
+                : 'off';
+            });
+          } else {
+            trimDataMap[`isScaleWise_${keyBase}`] = '0';
+          }
+        });
+      });
+
+      // console.log('child submit hiddenSelectedTrimIdsParam ===> ', hiddenSelectedTrimIdsParam);
+      // console.log('child submit trimDataMap ===> ', trimDataMap);
+
+      let tempObj = {
+        mainAllowance: 0,
+        garmentTypeId: 0,
+        locationId: locationId,
+        fabflag: 0,
+        faballow: 'approved',
+        hiddenSelectedTrimIdsParam: hiddenSelectedTrimIdsParam,
+        trimDataMap: trimDataMap,
+      };
+      props.saveEditStleBOMDetails(tempObj);
+    }
   };
   const proceedWithSubmission = () => {
     const consumptionObj = {};
     const invLimitObj = {};
+    const enteredQtyObj = {};
+    const gsCodeMap = {};
     const emptyObj1 = {};
     const emptyObj2 = {};
 
     scaleTable.forEach(item => {
       consumptionObj[item.id] = item.consumption;
       invLimitObj[item.id] = item.invLimit;
+      enteredQtyObj[item.id] = item.enteredQty;
       emptyObj1[item.id] = '';
       emptyObj2[item.id] = '0';
+      gsCodeMap[item.id] = item.gsCode;
     });
+
+    console.log('empty obj ', enteredQtyObj);
+    console.log('emptyObj1 ', emptyObj1);
+    console.log('emptyObj2 ', emptyObj2);
+    console.log('gsCodeMap ', gsCodeMap);
 
     const colorStr = selectedIndices.join(',') + ',';
     const colorStr1 = selectedIndices.join(',');
@@ -492,20 +659,23 @@ const StyleDetailsUI = ({route, ...props}) => {
       hsn: hsn,
       configurationId: processWorkFlowId,
       price: stylePriceFOB,
+      rate: stylePriceFOB,
       mrp: mrpTagPrice,
       newBrand: '',
       gst: '0',
       appConsumption: approvedConsumption,
-      gsCodesMap: emptyObj2,
-      gsCodesPriceMap: emptyObj1,
+
+      gsCodesMap: gsCodeMap,
+      gsCodesPriceMap: enteredQtyObj,
+
       articleNumberMap: emptyObj1,
       gscodesizeprice: emptyObj1,
       sizeWiseEAN: emptyObj1,
       sizeCons: consumptionObj,
       weightMap: emptyObj2,
+
       sizeWiseInvLimit: invLimitObj,
     };
-    // console.log("Temp obj ===> ", tempObj)
     props.submitAction(tempObj);
   };
 
@@ -517,62 +687,65 @@ const StyleDetailsUI = ({route, ...props}) => {
     props.popOkBtnAction();
   };
 
-  const renderItem = ({item, index}) => {
-    return (
-      <TouchableOpacity
-        onPress={() => actionOnRow(item, index)}
-        style={CommonStyles.cellBackViewStyle}>
-        <View style={[{flexDirection: 'row'}]}>
-          <Text
-            style={[
-              CommonStyles.tylesTextStyle,
-              {flex: 1, textAlign: 'center'},
-            ]}>
-            {item.size}
-          </Text>
-          <Text
-            style={[
-              CommonStyles.tylesTextStyle,
-              {flex: 2, textAlign: 'center'},
-            ]}>
-            {item.sizeQty}
-          </Text>
-        </View>
-      </TouchableOpacity>
-    );
-  };
+  // const renderItem = ({item, index}) => {
+  //   return (
+  //     <TouchableOpacity
+  //       onPress={() => actionOnRow(item, index)}
+  //       style={CommonStyles.cellBackViewStyle}>
+  //       <View style={[{flexDirection: 'row'}]}>
+  //         <Text
+  //           style={[
+  //             CommonStyles.tylesTextStyle,
+  //             {flex: 1, textAlign: 'center'},
+  //           ]}>
+  //           {item.size}
+  //         </Text>
+  //         <Text
+  //           style={[
+  //             CommonStyles.tylesTextStyle,
+  //             {flex: 2, textAlign: 'center'},
+  //           ]}>
+  //           {item.sizeQty}
+  //         </Text>
+  //       </View>
+  //     </TouchableOpacity>
+  //   );
+  // };
 
-  const RemoveRow = selectedId => {
-    const filtered = RmAllocationBomList.map(r =>
-      r.id === selectedId
-        ? {
-            ...r,
-            showRmRow: !r.showRmRow,
-          }
-        : {...r, showRmRow: false},
-    );
-    setRmAllocationBomList(filtered);
-  };
+  // const RemoveRow = selectedId => {
+  //   const filtered = RmAllocationBomList.map(r =>
+  //     r.id === selectedId
+  //       ? {
+  //           ...r,
+  //           showRmRow: !r.showRmRow,
+  //         }
+  //       : {...r, showRmRow: false},
+  //   );
+  //   setRmAllocationBomList(filtered);
+  // };
 
-  const ToggleRow = selectedId => {
-    const filtered = RmAllocationBomList.map(r => ({
-      ...r,
-      showRmRow: r.id === selectedId ? !r.showRmRow : false,
-    }));
-    setRmAllocationBomList(filtered);
-  };
+  // const ToggleRow = selectedId => {
+  //   const filtered = RmAllocationBomList.map(r => ({
+  //     ...r,
+  //     showRmRow: r.id === selectedId ? !r.showRmRow : false,
+  //   }));
+  //   setRmAllocationBomList(filtered);
+  // };
 
   const handleAdd = selectedId => {
-    const selectedItem = RmAllocationBomList.find(r => r.idx === selectedId);
+    const selectedParent = RmAllocationBomList.find(
+      r => r.trimTypeId === selectedId,
+    );
 
-    if (!selectedItem) return;
-    if (!selectedItem.selectedRmId) {
+    if (!selectedParent) return;
+
+    if (!selectedParent.selectedRmId) {
       Alert.alert('Please select RM Name');
       return;
     }
 
-    const alreadyExists = selectedItem.childList.some(
-      child => child.id === selectedItem.selectedRmId,
+    const alreadyExists = selectedParent.childList.some(
+      child => child.selectedRmId === selectedParent.selectedRmId,
     );
 
     if (alreadyExists) {
@@ -580,28 +753,39 @@ const StyleDetailsUI = ({route, ...props}) => {
       return;
     }
 
-    const newObj = {
-      id: selectedItem.selectedRmId,
-      name: selectedItem.selectedRmName,
+    console.log('new parent ', selectedParent);
+
+    const newChild = {
+      idx: Date.now(),
+      selectedRmId: selectedParent.selectedRmId,
+      selectedRmName: selectedParent.selectedRmName,
       consumption: '',
       requiredQty: '',
+      trimTypeId: selectedParent.trimTypeId,
+      rmType: selectedParent.rmType,
+      uomType: selectedParent.uomType || '',
+      isScaleWise: selectedParent.isScaleWise || '0',
+      scaleWise: scaleTable.map(item => item.id)
+                    .join(',') || '',
+      selectedScales: [],
+      // List: selectedParent.List || [],
+      // filteredList: selectedParent.filteredList || [],
+      showList: false,
+      showRmRow: true,
     };
 
-    const updatedList = RmAllocationBomList.map(r =>
-      r.idx === selectedId
-        ? {...r, childList: [...r.childList, newObj], showRmRow: true}
-        : r,
-    );
+        console.log('new newChild ', newChild);
 
-    setRmAllocationBomList(updatedList);
-  };
 
-  const ToggleChildRow = (childIdx, selectedId) => {
     const updatedList = RmAllocationBomList.map(r =>
-      r.idx === selectedId
+      r.trimTypeId === selectedId
         ? {
             ...r,
-            childList: r.childList.filter((_, index) => index !== childIdx),
+            childList: [newChild, ...r.childList],
+            selectedRmId: '',
+            selectedRmName: '',
+            isScaleWise:'',
+            showRmRow: true,
           }
         : r,
     );
@@ -609,23 +793,54 @@ const StyleDetailsUI = ({route, ...props}) => {
     setRmAllocationBomList(updatedList);
   };
 
-  const actionOnRMList = (item, selectedId) => {
-    const updatedList = RmAllocationBomList.map(r =>
-      r.idx === selectedId
+  const ToggleChildRow = (childIdx, parentTrimTypeId) => {
+    const updatedList = RmAllocationBomList.map(parent =>
+      parent.trimTypeId === parentTrimTypeId
         ? {
-            ...r,
-            selectedRmName: item?.name,
-            selectedRmId: item?.id,
+            ...parent,
+            childList: parent.childList.filter(child => child.idx !== childIdx),
+          }
+        : parent,
+    );
+
+    setRmAllocationBomList(updatedList);
+  };
+
+  // const actionOnRMList = (item, selectedId) => {
+  //   const updatedList = RmAllocationBomList.map(r =>
+  //     r.idx === selectedId
+  //       ? {
+  //           ...r,
+  //           selectedRmName: item?.name,
+  //           selectedRmId: item?.id,
+  //           showList: false,
+  //         }
+  //       : r,
+  //   );
+
+  //   setRmAllocationBomList(updatedList);
+  // };
+const actionOnRMList = (rm, parentTrimTypeId) => {
+  console.log("rm ", rm)
+  setRmAllocationBomList(prev =>
+    prev.map(p =>
+      p.trimTypeId === parentTrimTypeId
+        ? {
+            ...p,
+            selectedRmId: rm.id,
+            selectedRmName: rm.name,
+            uomType: rm.uomType || '',
+            isScaleWise: String(rm.scaleWise ?? '0'), 
             showList: false,
           }
-        : r,
-    );
+        : p
+    )
+  );
+};
 
-    setRmAllocationBomList(updatedList);
-  };
 
-  const handleChangeChildItems = (text, type, childIdx, selectedId) => {
-    // console.log('handleChangeChildItems ===> ', text, type, childIdx, selectedId)
+
+  const handleChangeChildItems1 = (text, type, childIdx, selectedId) => {
     const updatedList = RmAllocationBomList.map(r =>
       r.idx === selectedId
         ? {
@@ -645,21 +860,73 @@ const StyleDetailsUI = ({route, ...props}) => {
     setRmAllocationBomList(updatedList);
   };
 
-  const handleChangeSearchQuery = (text, selectedId) => {
-    const filtered = RmAllocationBomList.map(item =>
-      item.idx === selectedId
+  const handleChangeChildItems = (text, type, childIdx, parentTrimTypeId) => {
+    console.log('updating child ', text, type, childIdx, parentTrimTypeId);
+    const updatedList = RmAllocationBomList.map(r =>
+      r.trimTypeId === parentTrimTypeId
         ? {
-            ...item,
-            filteredList: item.List.filter(item1 =>
-              item1.name.toLowerCase().includes(text.toLowerCase()),
-            ),
-          }
-        : item,
-    );
+            ...r,
+            childList: r.childList.map((child, index) => {
+              if (index === childIdx) {
+                if (type === 'cons') {
+                  const newCons = text;
+                  const newReq = (
+                    parseFloat(buyerPOQty || 0) * parseFloat(newCons || 0)
+                  ).toString();
+                  console.log('updated new rew req ', newReq);
 
-    setSearchQuery(text);
-    setRmAllocationBomList(filtered);
+                  return {
+                    ...child,
+                    consumption: newCons,
+                    requiredQty: newReq,
+                  };
+                } else {
+                  return {
+                    ...child,
+                    requiredQty: text,
+                  };
+                }
+              }
+              return child;
+            }),
+          }
+        : r,
+    );
+    console.log('updated ');
+
+    setRmAllocationBomList(updatedList);
   };
+
+  // const handleChangeSearchQuery1 = (text, selectedId) => {
+  //   const filtered = RmAllocationBomList.map(item =>
+  //     item.idx === selectedId
+  //       ? {
+  //           ...item,
+  //           filteredList: item.List.filter(item1 =>
+  //             item1.name.toLowerCase().includes(text.toLowerCase()),
+  //           ),
+  //         }
+  //       : item,
+  //   );
+
+  //   setSearchQuery(text);
+  //   setRmAllocationBomList(filtered);
+  // };
+const handleChangeSearchQuery = (text, trimTypeId) => {
+  const filtered = RmAllocationBomList.map(item =>
+    item.trimTypeId === trimTypeId
+      ? {
+          ...item,
+          filteredList: item.List.filter(item1 =>
+            item1.name.toLowerCase().includes(text.toLowerCase())
+          ),
+        }
+      : item
+  );
+
+  setSearchQuery(text);
+  setRmAllocationBomList(filtered);
+};
 
   return (
     <View style={[CommonStyles.mainComponentViewStyle]}>
@@ -708,1086 +975,1290 @@ const StyleDetailsUI = ({route, ...props}) => {
               </TouchableOpacity>
             ))}
           </ScrollView>
-       
 
-        {selectedTab == 1 && (
-          <View
-            style={{
-              marginBottom: hp('5%'),
-              width: '100%',
-              marginTop: hp('2%'),
-            }}>
-            <View style={{marginTop: hp('2%')}}>
-              <TextInput
-                label="Style No *"
-                value={styleNo}
-                mode="outlined"
-                editable={props?.itemObj?.styleName ? false : true}
-                style={{
-                  backgroundColor: props?.itemObj?.styleName
-                    ? '#f8f8f8'
-                    : '#fff',
-                }}
-                onChangeText={text => {
-                  setStyleNo(text);
-                  setCustomerStyleNo(text);
-                }}
-              />
-            </View>
-            <View style={{marginTop: hp('2%')}}>
-              <TextInput
-                label="Style Description"
-                value={styleDescription}
-                mode="outlined"
-                multiline
-                onChangeText={text => setStyleDescription(text)}
-              />
-            </View>
-            <View style={{marginTop: hp('2%')}}>
-              <TextInput
-                label="Customer Style No *"
-                value={customerStyleNo}
-                mode="outlined"
-                onChangeText={text => setCustomerStyleNo(text)}
-              />
-            </View>
-
+          {selectedTab == 1 && (
             <View
               style={{
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundColor: editLocation ? '#e8e8e8' : '#fff',
+                marginBottom: hp('5%'),
+                width: '100%',
                 marginTop: hp('2%'),
               }}>
-              <TouchableOpacity
+              <View style={{marginTop: hp('2%')}}>
+                <TextInput
+                  label="Style No *"
+                  value={styleNo}
+                  mode="outlined"
+                  editable={props?.itemObj?.styleName ? false : true}
+                  style={{
+                    backgroundColor: props?.itemObj?.styleName
+                      ? '#f8f8f8'
+                      : '#fff',
+                  }}
+                  onChangeText={text => {
+                    setStyleNo(text);
+                    setCustomerStyleNo(text);
+                  }}
+                />
+              </View>
+              <View style={{marginTop: hp('2%')}}>
+                <TextInput
+                  label="Style Description"
+                  value={styleDescription}
+                  mode="outlined"
+                  multiline
+                  onChangeText={text => setStyleDescription(text)}
+                />
+              </View>
+              <View style={{marginTop: hp('2%')}}>
+                <TextInput
+                  label="Customer Style No *"
+                  value={customerStyleNo}
+                  mode="outlined"
+                  onChangeText={text => setCustomerStyleNo(text)}
+                />
+              </View>
+
+              <View
                 style={{
-                  flexDirection: 'row',
-                  // borderWidth: 0.5,
-                  // borderColor: '#D8D8D8',
-                  borderRadius: hp('0.5%'),
-                  width: '90%',
-                  justifyContent:'space-between'
-                }}
-                onPress={() => {
-                  setShowLocationList(!showLocationList);
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: editLocation ? '#e8e8e8' : '#fff',
+                  marginTop: hp('2%'),
                 }}>
-                <View>
-                  <View style={[styles.SectionStyle1, {}]}>
-                    <View style={{flexDirection: 'column'}}>
-                      <Text
-                        style={
-                          locationId
-                            ? [styles.dropTextLightStyle]
-                            : [styles.dropTextInputStyle]
-                        }>
-                        {'Location *'}
-                      </Text>
-                      {locationId ? (
-                        <Text style={[styles.dropTextInputStyle]}>
-                          {locationName}
+                <TouchableOpacity
+                  style={{
+                    flexDirection: 'row',
+                    // borderWidth: 0.5,
+                    // borderColor: '#D8D8D8',
+                    borderRadius: hp('0.5%'),
+                    width: '90%',
+                    justifyContent: 'space-between',
+                  }}
+                  onPress={() => {
+                    setShowLocationList(!showLocationList);
+                  }}>
+                  <View>
+                    <View style={[styles.SectionStyle1, {}]}>
+                      <View style={{flexDirection: 'column'}}>
+                        <Text
+                          style={
+                            locationId
+                              ? [styles.dropTextLightStyle]
+                              : [styles.dropTextInputStyle]
+                          }>
+                          {'Location *'}
                         </Text>
-                      ) : null}
+                        {locationId ? (
+                          <Text style={[styles.dropTextInputStyle]}>
+                            {locationName}
+                          </Text>
+                        ) : null}
+                      </View>
                     </View>
                   </View>
-                </View>
 
-                <View style={{justifyContent: 'center'}}>
-                  <Image source={downArrowImg} style={styles.imageStyle} />
-                </View>
-              </TouchableOpacity>
+                  <View style={{justifyContent: 'center'}}>
+                    <Image source={downArrowImg} style={styles.imageStyle} />
+                  </View>
+                </TouchableOpacity>
 
-              {showLocationList && editLocation && (
-                <View style={styles.dropdownContent1}>
-                  <TextInput
-                    style={styles.searchInput}
-                    placeholder="Search "
-                    onChangeText={handleSearchLocation}
-                    placeholderTextColor="#000"
-                  />
-                  <ScrollView
-                    style={styles.scrollView}
-                    nestedScrollEnabled={true}>
-                    {filteredLocation.length === 0 ? (
-                      <Text style={styles.noCategoriesText}>
-                        Sorry, no results found!
-                      </Text>
-                    ) : (
-                      filteredLocation.map((item, index) => (
-                        <TouchableOpacity
-                          key={index}
-                          style={styles.dropdownOption}
-                          onPress={() => actionOnLocation(item)}>
-                          <Text style={{color: '#000'}}>{item.name}</Text>
-                        </TouchableOpacity>
-                      ))
-                    )}
-                  </ScrollView>
-                </View>
-              )}
-            </View>
-
-            <View
-              style={{
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundColor: editFabric ? '#e8e8e8' : '#fff',
-                marginTop: hp('2%'),
-              }}>
-              <TouchableOpacity
-                style={{
-                  flexDirection: 'row',
-                 // borderWidth: 0.5,
-                  // borderColor: '#D8D8D8',
-                  borderRadius: hp('0.5%'),
-                  width: '90%',
-                  justifyContent:'space-between'
-                }}
-                onPress={() => {
-                  setShowFabricList(!showFabricList);
-                }}>
-                <View>
-                  <View style={[styles.SectionStyle1, {}]}>
-                    <View style={{flexDirection: 'column'}}>
-                      <Text
-                        style={
-                          fabricId
-                            ? [styles.dropTextLightStyle]
-                            : [styles.dropTextInputStyle]
-                        }>
-                        {'Fabric '}
-                      </Text>
-                      {fabricId ? (
-                        <Text style={[styles.dropTextInputStyle]}>
-                          {fabricName}
+                {showLocationList && editLocation && (
+                  <View style={styles.dropdownContent1}>
+                    <TextInput
+                      style={styles.searchInput}
+                      placeholder="Search "
+                      onChangeText={handleSearchLocation}
+                      placeholderTextColor="#000"
+                    />
+                    <ScrollView
+                      style={styles.scrollView}
+                      nestedScrollEnabled={true}>
+                      {filteredLocation.length === 0 ? (
+                        <Text style={styles.noCategoriesText}>
+                          Sorry, no results found!
                         </Text>
-                      ) : null}
+                      ) : (
+                        filteredLocation.map((item, index) => (
+                          <TouchableOpacity
+                            key={index}
+                            style={styles.dropdownOption}
+                            onPress={() => actionOnLocation(item)}>
+                            <Text style={{color: '#000'}}>{item.name}</Text>
+                          </TouchableOpacity>
+                        ))
+                      )}
+                    </ScrollView>
+                  </View>
+                )}
+              </View>
+
+              <View
+                style={{
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: editFabric ? '#e8e8e8' : '#fff',
+                  marginTop: hp('2%'),
+                }}>
+                <TouchableOpacity
+                  style={{
+                    flexDirection: 'row',
+                    // borderWidth: 0.5,
+                    // borderColor: '#D8D8D8',
+                    borderRadius: hp('0.5%'),
+                    width: '90%',
+                    justifyContent: 'space-between',
+                  }}
+                  onPress={() => {
+                    setShowFabricList(!showFabricList);
+                  }}>
+                  <View>
+                    <View style={[styles.SectionStyle1, {}]}>
+                      <View style={{flexDirection: 'column'}}>
+                        <Text
+                          style={
+                            fabricId
+                              ? [styles.dropTextLightStyle]
+                              : [styles.dropTextInputStyle]
+                          }>
+                          {'Fabric '}
+                        </Text>
+                        {fabricId ? (
+                          <Text style={[styles.dropTextInputStyle]}>
+                            {fabricName}
+                          </Text>
+                        ) : null}
+                      </View>
                     </View>
                   </View>
-                </View>
 
-                <View style={{justifyContent: 'center'}}>
-                  <Image source={downArrowImg} style={styles.imageStyle} />
-                </View>
-              </TouchableOpacity>
+                  <View style={{justifyContent: 'center'}}>
+                    <Image source={downArrowImg} style={styles.imageStyle} />
+                  </View>
+                </TouchableOpacity>
 
-              {showFabricList && editFabric && (
-                <View style={styles.dropdownContent1}>
-                  <TextInput
-                    style={styles.searchInput}
-                    placeholder="Search "
-                    onChangeText={handleSearchFabric}
-                    placeholderTextColor="#000"
-                  />
-                  <ScrollView
-                    style={styles.scrollView}
-                    nestedScrollEnabled={true}>
-                    {filteredFabric.length === 0 ? (
-                      <Text style={styles.noCategoriesText}>
-                        Sorry, no results found!
-                      </Text>
-                    ) : (
-                      filteredFabric.map((item, index) => (
-                        <TouchableOpacity
-                          key={index}
-                          style={styles.dropdownOption}
-                          onPress={() => actionOnFabric(item)}>
-                          <Text style={{color: '#000'}}>{item.name}</Text>
-                        </TouchableOpacity>
-                      ))
-                    )}
-                  </ScrollView>
-                </View>
-              )}
-            </View>
-
-            <View
-              style={{
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundColor: editColor ? '#e8e8e8' : '#fff',
-                marginTop: hp('2%'),
-              }}>
-              <TouchableOpacity
-                style={{
-                  flexDirection: 'row',
-                // borderWidth: 0.5,
-                  // borderColor: '#D8D8D8',
-                  borderRadius: hp('0.5%'),
-                  width: '90%',
-                  justifyContent:'space-between'
-                }}
-                onPress={() => {
-                  setShowColorList(!showColorList);
-                }}>
-                <View>
-                  <View style={[styles.SectionStyle1, {}]}>
-                    <View style={{flexDirection: 'column'}}>
-                      <Text
-                        style={
-                          selectedIndices.length > 0
-                            ? [styles.dropTextLightStyle]
-                            : [styles.dropTextInputStyle]
-                        }>
-                        {'Color *'}
-                      </Text>
-                      {selectedIndices.length > 0 ? (
-                        <Text style={[styles.dropTextInputStyle]}>
-                          {colorList
-                            .filter(color => selectedIndices.includes(color.id))
-                            .map(color => color.name)
-                            .join(', ')}
+                {showFabricList && editFabric && (
+                  <View style={styles.dropdownContent1}>
+                    <TextInput
+                      style={styles.searchInput}
+                      placeholder="Search "
+                      onChangeText={handleSearchFabric}
+                      placeholderTextColor="#000"
+                    />
+                    <ScrollView
+                      style={styles.scrollView}
+                      nestedScrollEnabled={true}>
+                      {filteredFabric.length === 0 ? (
+                        <Text style={styles.noCategoriesText}>
+                          Sorry, no results found!
                         </Text>
-                      ) : null}
+                      ) : (
+                        filteredFabric.map((item, index) => (
+                          <TouchableOpacity
+                            key={index}
+                            style={styles.dropdownOption}
+                            onPress={() => actionOnFabric(item)}>
+                            <Text style={{color: '#000'}}>{item.name}</Text>
+                          </TouchableOpacity>
+                        ))
+                      )}
+                    </ScrollView>
+                  </View>
+                )}
+              </View>
+
+              <View
+                style={{
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: editColor ? '#e8e8e8' : '#fff',
+                  marginTop: hp('2%'),
+                }}>
+                <TouchableOpacity
+                  style={{
+                    flexDirection: 'row',
+                    // borderWidth: 0.5,
+                    // borderColor: '#D8D8D8',
+                    borderRadius: hp('0.5%'),
+                    width: '90%',
+                    justifyContent: 'space-between',
+                  }}
+                  onPress={() => {
+                    setShowColorList(!showColorList);
+                  }}>
+                  <View>
+                    <View style={[styles.SectionStyle1, {}]}>
+                      <View style={{flexDirection: 'column'}}>
+                        <Text
+                          style={
+                            selectedIndices.length > 0
+                              ? [styles.dropTextLightStyle]
+                              : [styles.dropTextInputStyle]
+                          }>
+                          {'Color *'}
+                        </Text>
+                        {selectedIndices.length > 0 ? (
+                          <Text style={[styles.dropTextInputStyle]}>
+                            {colorList
+                              .filter(color =>
+                                selectedIndices.includes(color.id),
+                              )
+                              .map(color => color.name)
+                              .join(', ')}
+                          </Text>
+                        ) : null}
+                      </View>
                     </View>
                   </View>
-                </View>
 
-                <View style={{justifyContent: 'center'}}>
-                  <Image source={downArrowImg} style={styles.imageStyle} />
-                </View>
-              </TouchableOpacity>
+                  <View style={{justifyContent: 'center'}}>
+                    <Image source={downArrowImg} style={styles.imageStyle} />
+                  </View>
+                </TouchableOpacity>
 
-              {showColorList && editColor && (
-                <View style={styles.dropdownContent1}>
-                  <TextInput
-                    style={styles.searchInput}
-                    placeholder="Search "
-                    onChangeText={handleSearchColor}
-                    placeholderTextColor="#000"
-                  />
-                  <ScrollView
-                    style={styles.scrollView}
-                    nestedScrollEnabled={true}>
-                    {filteredColor.length === 0 ? (
-                      <Text style={styles.noCategoriesText}>
-                        Sorry, no results found!
-                      </Text>
-                    ) : (
-                      filteredColor.map((item, index) => (
-                        <TouchableOpacity
-                          key={index}
-                          style={styles.itemContainer}
-                          onPress={() => actionOnColor(item.id)}>
-                          <CustomCheckBox
-                            isChecked={selectedIndices.includes(item.id)}
-                            onToggle={() => actionOnColor(item.id)}
+                {showColorList && editColor && (
+                  <View style={styles.dropdownContent1}>
+                    <TextInput
+                      style={styles.searchInput}
+                      placeholder="Search "
+                      onChangeText={handleSearchColor}
+                      placeholderTextColor="#000"
+                    />
+                    <ScrollView
+                      style={styles.scrollView}
+                      nestedScrollEnabled={true}>
+                      {filteredColor.length === 0 ? (
+                        <Text style={styles.noCategoriesText}>
+                          Sorry, no results found!
+                        </Text>
+                      ) : (
+                        filteredColor.map((item, index) => (
+                          <TouchableOpacity
+                            key={index}
+                            style={styles.itemContainer}
+                            onPress={() => actionOnColor(item.id)}>
+                            <CustomCheckBox
+                              isChecked={selectedIndices.includes(item.id)}
+                              onToggle={() => actionOnColor(item.id)}
+                            />
+                            <Text style={{color: '#000'}}>{item.name}</Text>
+                          </TouchableOpacity>
+                        ))
+                      )}
+                    </ScrollView>
+                  </View>
+                )}
+              </View>
+
+              <View
+                style={{
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: editSeason ? '#e8e8e8' : '#fff',
+                  marginTop: hp('2%'),
+                }}>
+                <TouchableOpacity
+                  style={{
+                    flexDirection: 'row',
+                    // borderWidth: 0.5,
+                    // borderColor: '#D8D8D8',
+                    borderRadius: hp('0.5%'),
+                    width: '90%',
+                    justifyContent: 'space-between',
+                  }}
+                  onPress={() => {
+                    setShowSeasonList(!showSeasonList);
+                  }}>
+                  <View>
+                    <View style={[styles.SectionStyle1, {}]}>
+                      <View style={{flexDirection: 'column'}}>
+                        <Text
+                          style={
+                            seasonName
+                              ? [styles.dropTextLightStyle]
+                              : [styles.dropTextInputStyle]
+                          }>
+                          {'Season  *'}
+                        </Text>
+                        {seasonName ? (
+                          <Text style={[styles.dropTextInputStyle]}>
+                            {seasonName}
+                          </Text>
+                        ) : null}
+                      </View>
+                    </View>
+                  </View>
+
+                  <View style={{justifyContent: 'center'}}>
+                    <Image source={downArrowImg} style={styles.imageStyle} />
+                  </View>
+                </TouchableOpacity>
+
+                {showSeasonList && editSeason && (
+                  <View style={styles.dropdownContent1}>
+                    <TextInput
+                      style={styles.searchInput}
+                      placeholder="Search "
+                      onChangeText={handleSearchSeason}
+                      placeholderTextColor="#000"
+                    />
+                    <ScrollView
+                      style={styles.scrollView}
+                      nestedScrollEnabled={true}>
+                      {filteredSeason.length === 0 ? (
+                        <Text style={styles.noCategoriesText}>
+                          Sorry, no results found!
+                        </Text>
+                      ) : (
+                        filteredSeason.map((item, index) => (
+                          <TouchableOpacity
+                            key={index}
+                            style={styles.dropdownOption}
+                            onPress={() => actionOnSeason(item)}>
+                            <Text style={{color: '#000'}}>{item.name}</Text>
+                          </TouchableOpacity>
+                        ))
+                      )}
+                    </ScrollView>
+                  </View>
+                )}
+              </View>
+
+              <View style={{marginTop: hp('2%')}}>
+                <TextInput
+                  label="Buyer PO Qty *"
+                  value={buyerPOQty}
+                  mode="outlined"
+                  onChangeText={text => setBuyerPOQty(text)}
+                />
+              </View>
+
+              <View
+                style={{
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: '#fff',
+                  marginTop: hp('2%'),
+                }}>
+                <TouchableOpacity
+                  style={{
+                    flexDirection: 'row',
+                    // borderWidth: 0.5,
+                    // borderColor: '#D8D8D8',
+                    borderRadius: hp('0.5%'),
+                    width: '90%',
+                    justifyContent: 'space-between',
+                  }}
+                  onPress={() => {
+                    setShowBrandList(!showBrandList);
+                  }}>
+                  <View>
+                    <View style={[styles.SectionStyle1, {}]}>
+                      <View style={{flexDirection: 'column'}}>
+                        <Text
+                          style={
+                            brandId
+                              ? [styles.dropTextLightStyle]
+                              : [styles.dropTextInputStyle]
+                          }>
+                          {'Brand/Project'}
+                        </Text>
+                        {brandId ? (
+                          <Text style={[styles.dropTextInputStyle]}>
+                            {brandName}
+                          </Text>
+                        ) : null}
+                      </View>
+                    </View>
+                  </View>
+
+                  <View style={{justifyContent: 'center'}}>
+                    <Image source={downArrowImg} style={styles.imageStyle} />
+                  </View>
+                </TouchableOpacity>
+
+                {showBrandList && (
+                  <View style={styles.dropdownContent1}>
+                    <TextInput
+                      style={styles.searchInput}
+                      placeholder="Search "
+                      onChangeText={handleSearchBrand}
+                      placeholderTextColor="#000"
+                    />
+                    <ScrollView
+                      style={styles.scrollView}
+                      nestedScrollEnabled={true}>
+                      {filteredBrand.length === 0 ? (
+                        <Text style={styles.noCategoriesText}>
+                          Sorry, no results found!
+                        </Text>
+                      ) : (
+                        filteredBrand.map((item, index) => (
+                          <TouchableOpacity
+                            key={index}
+                            style={styles.dropdownOption}
+                            onPress={() => actionOnBrand(item)}>
+                            <Text style={{color: '#000'}}>{item.name}</Text>
+                          </TouchableOpacity>
+                        ))
+                      )}
+                    </ScrollView>
+                  </View>
+                )}
+              </View>
+
+              <View style={{marginTop: hp('2%')}}>
+                <TextInput
+                  label="Style Price FOB "
+                  value={stylePriceFOB}
+                  mode="outlined"
+                  onChangeText={text => setStylePriceFOB(text)}
+                />
+              </View>
+
+              <View style={{marginTop: hp('2%')}}>
+                <TextInput
+                  label="Approved consumption"
+                  value={approvedConsumption}
+                  mode="outlined"
+                  onChangeText={text => setApprovedConsumption(text)}
+                />
+              </View>
+
+              <View
+                style={{
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: editScaleOrSize ? '#e8e8e8' : '#fff',
+                  marginTop: hp('2%'),
+                }}>
+                <TouchableOpacity
+                  style={{
+                    flexDirection: 'row',
+                    // borderWidth: 0.5,
+                    // borderColor: '#D8D8D8',
+                    borderRadius: hp('0.5%'),
+                    width: '90%',
+                    justifyContent: 'space-between',
+                  }}
+                  onPress={() => {
+                    setShowScaleOrSizeList(!showScaleOrSizeList);
+                  }}>
+                  <View>
+                    <View style={[styles.SectionStyle1, {}]}>
+                      <View style={{flexDirection: 'column'}}>
+                        <Text
+                          style={
+                            scaleOrSizeId
+                              ? [styles.dropTextLightStyle]
+                              : [styles.dropTextInputStyle]
+                          }>
+                          {'Scale/Size group *'}
+                        </Text>
+                        {scaleOrSizeId ? (
+                          <Text style={[styles.dropTextInputStyle]}>
+                            {scaleOrSizeName}
+                          </Text>
+                        ) : null}
+                      </View>
+                    </View>
+                  </View>
+
+                  <View style={{justifyContent: 'center'}}>
+                    <Image source={downArrowImg} style={styles.imageStyle} />
+                  </View>
+                </TouchableOpacity>
+
+                {showScaleOrSizeList && editScaleOrSize && (
+                  <View style={styles.dropdownContent1}>
+                    <TextInput
+                      style={styles.searchInput}
+                      placeholder="Search "
+                      onChangeText={handleSearchScaleOrSize}
+                      placeholderTextColor="#000"
+                    />
+                    <ScrollView
+                      style={styles.scrollView}
+                      nestedScrollEnabled={true}>
+                      {filteredScaleOrSize.length === 0 ? (
+                        <Text style={styles.noCategoriesText}>
+                          Sorry, no results found!
+                        </Text>
+                      ) : (
+                        filteredScaleOrSize.map((item, index) => (
+                          <TouchableOpacity
+                            key={index}
+                            style={styles.dropdownOption}
+                            onPress={() => actionOnScaleOrSize(item)}>
+                            <Text style={{color: '#000'}}>{item.name}</Text>
+                          </TouchableOpacity>
+                        ))
+                      )}
+                    </ScrollView>
+                  </View>
+                )}
+              </View>
+
+              {showScaleTable && (
+                <View style={styles.wrapper}>
+                  <View style={styles.table}>
+                    {/* Table Head */}
+                    <View style={styles.table_head}>
+                      <View style={{width: '10%', alignItems: 'center'}}>
+                        <Text style={styles.table_head_captions}>Size</Text>
+                      </View>
+                      <View style={{width: '1%'}} />
+                      <View style={{width: '30%', alignItems: 'center'}}>
+                        <Text style={styles.table_head_captions}>Cons.</Text>
+                      </View>
+                      <View style={{width: '1%'}} />
+                      <View style={{width: '30%', alignItems: 'center'}}>
+                        <Text style={styles.table_head_captions}>
+                          Inv Limit
+                        </Text>
+                      </View>
+                      <View style={{width: '1%'}} />
+                      <View style={{width: '28%', alignItems: 'center'}}>
+                        <Text style={styles.table_head_captions}>Qty</Text>
+                      </View>
+                    </View>
+                  </View>
+
+                  {/* Table Body */}
+                  {scaleTable &&
+                    scaleTable.map((item, index) => (
+                      <View key={index} style={styles.table_body_single_row}>
+                        <View style={{width: '10%', alignItems: 'center'}}>
+                          <Text style={styles.table_data}>{item.name}</Text>
+                        </View>
+                        <View style={{width: '1%'}} />
+                        <View style={{width: '30%'}}>
+                          <TextInput
+                            style={styles.table_data_input}
+                            value={item.consumption.toString()}
+                            onChangeText={text => {
+                              const updatedTable = [...scaleTable];
+                              updatedTable[index].consumption = text;
+                              set_scaleTable(updatedTable);
+                            }}
+                            keyboardType="numeric"
                           />
-                          <Text style={{color: '#000'}}>{item.name}</Text>
-                        </TouchableOpacity>
-                      ))
-                    )}
-                  </ScrollView>
+                        </View>
+                        <View style={{width: '1%'}} />
+                        <View style={{width: '30%'}}>
+                          <TextInput
+                            style={styles.table_data_input}
+                            value={item.invLimit.toString()}
+                            onChangeText={text => {
+                              const updatedTable = [...scaleTable];
+                              updatedTable[index].invLimit = text;
+                              set_scaleTable(updatedTable);
+                            }}
+                            keyboardType="numeric"
+                          />
+                        </View>
+                        <View style={{width: '1%'}} />
+                        <View style={{width: '28%'}}>
+                          <TextInput
+                            style={styles.table_data_input}
+                            value={item.enteredQty.toString()}
+                            onChangeText={text => {
+                              const updatedTable = [...scaleTable];
+                              updatedTable[index].enteredQty = text;
+
+                              set_scaleTable(updatedTable);
+
+                              const total = updatedTable.reduce(
+                                (sum, item) =>
+                                  sum + (parseFloat(item.enteredQty) || 0),
+                                0,
+                              );
+                              setTotalEnteredQty(total.toString());
+                            }}
+                            keyboardType="numeric"
+                          />
+                        </View>
+                      </View>
+                    ))}
                 </View>
               )}
-            </View>
+              <View style={{marginTop: hp('2%')}}>
+                <TextInput
+                  label="Total Qty :"
+                  value={totalEnteredQty}
+                  mode="outlined"
+                  onChangeText={text => console.log(text)}
+                  editable={false}
+                />
+              </View>
 
-            <View
-              style={{
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundColor: editSeason ? '#e8e8e8' : '#fff',
-                marginTop: hp('2%'),
-              }}>
-              <TouchableOpacity
+              <View style={{marginTop: hp('2%')}}>
+                <TextInput
+                  label="HSN *"
+                  value={hsn}
+                  mode="outlined"
+                  onChangeText={text => setHSN(text)}
+                />
+              </View>
+
+              <View style={{marginTop: hp('2%')}}>
+                <TextInput
+                  label="MRP Tag price"
+                  value={mrpTagPrice}
+                  mode="outlined"
+                  onChangeText={text => setMRPTagPrice(text)}
+                />
+              </View>
+
+              <View
                 style={{
-                  flexDirection: 'row',
-               // borderWidth: 0.5,
-                  // borderColor: '#D8D8D8',
-                  borderRadius: hp('0.5%'),
-                  width: '90%',
-                  justifyContent:'space-between'
-                }}
-                onPress={() => {
-                  setShowSeasonList(!showSeasonList);
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: editProcessWF ? '#e8e8e8' : '#fff',
+                  marginTop: hp('2%'),
                 }}>
-                <View>
-                  <View style={[styles.SectionStyle1, {}]}>
-                    <View style={{flexDirection: 'column'}}>
-                      <Text
-                        style={
-                          seasonName
-                            ? [styles.dropTextLightStyle]
-                            : [styles.dropTextInputStyle]
-                        }>
-                        {'Season  *'}
-                      </Text>
-                      {seasonName ? (
-                        <Text style={[styles.dropTextInputStyle]}>
-                          {seasonName}
+                <TouchableOpacity
+                  style={{
+                    flexDirection: 'row',
+                    // borderWidth: 0.5,
+                    // borderColor: '#D8D8D8',
+                    borderRadius: hp('0.5%'),
+                    width: '90%',
+                    justifyContent: 'space-between',
+                  }}
+                  onPress={() => {
+                    setShowProcessWorkFlowList(!showProcessWorkFlowList);
+                  }}>
+                  <View>
+                    <View style={[styles.SectionStyle1, {}]}>
+                      <View style={{flexDirection: 'column'}}>
+                        <Text
+                          style={
+                            processWorkFlowId
+                              ? [styles.dropTextLightStyle]
+                              : [styles.dropTextInputStyle]
+                          }>
+                          {'Process work flow *'}
                         </Text>
-                      ) : null}
+                        {processWorkFlowId ? (
+                          <Text style={[styles.dropTextInputStyle]}>
+                            {processWorkFlowName}
+                          </Text>
+                        ) : null}
+                      </View>
                     </View>
                   </View>
-                </View>
 
-                <View style={{justifyContent: 'center'}}>
-                  <Image source={downArrowImg} style={styles.imageStyle} />
-                </View>
-              </TouchableOpacity>
+                  <View style={{justifyContent: 'center'}}>
+                    <Image source={downArrowImg} style={styles.imageStyle} />
+                  </View>
+                </TouchableOpacity>
 
-              {showSeasonList && editSeason && (
-                <View style={styles.dropdownContent1}>
-                  <TextInput
-                    style={styles.searchInput}
-                    placeholder="Search "
-                    onChangeText={handleSearchSeason}
-                    placeholderTextColor="#000"
-                  />
-                  <ScrollView
-                    style={styles.scrollView}
-                    nestedScrollEnabled={true}>
-                    {filteredSeason.length === 0 ? (
-                      <Text style={styles.noCategoriesText}>
-                        Sorry, no results found!
-                      </Text>
-                    ) : (
-                      filteredSeason.map((item, index) => (
-                        <TouchableOpacity
-                          key={index}
-                          style={styles.dropdownOption}
-                          onPress={() => actionOnSeason(item)}>
-                          <Text style={{color: '#000'}}>{item.name}</Text>
-                        </TouchableOpacity>
-                      ))
-                    )}
-                  </ScrollView>
-                </View>
-              )}
+                {showProcessWorkFlowList && editProcessWF && (
+                  <View style={styles.dropdownContent1}>
+                    <TextInput
+                      style={styles.searchInput}
+                      placeholder="Search "
+                      onChangeText={handleSearchProcessWorkFlow}
+                      placeholderTextColor="#000"
+                    />
+                    <ScrollView
+                      style={styles.scrollView}
+                      nestedScrollEnabled={true}>
+                      {filteredProcessWorkFlow.length === 0 ? (
+                        <Text style={styles.noCategoriesText}>
+                          Sorry, no results found!
+                        </Text>
+                      ) : (
+                        filteredProcessWorkFlow.map((item, index) => (
+                          <TouchableOpacity
+                            key={index}
+                            style={styles.dropdownOption}
+                            onPress={() => actionOnProcessWorkFlow(item)}>
+                            <Text style={{color: '#000'}}>{item.name}</Text>
+                          </TouchableOpacity>
+                        ))
+                      )}
+                    </ScrollView>
+                  </View>
+                )}
+              </View>
             </View>
+          )}
 
-            <View style={{marginTop: hp('2%')}}>
-              <TextInput
-                label="Buyer PO Qty *"
-                value={buyerPOQty}
-                mode="outlined"
-                onChangeText={text => setBuyerPOQty(text)}
-              />
-            </View>
-
+          {selectedTab == 2 && (
             <View
               style={{
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundColor: '#fff',
+                marginBottom: hp('5%'),
                 marginTop: hp('2%'),
+                width: '100%',
               }}>
-              <TouchableOpacity
-                style={{
-                  flexDirection: 'row',
-              // borderWidth: 0.5,
-                  // borderColor: '#D8D8D8',
-                  borderRadius: hp('0.5%'),
-                  width: '90%',
-                  justifyContent:'space-between'
-                }}
-                onPress={() => {
-                  setShowBrandList(!showBrandList);
-                }}>
-                <View>
-                  <View style={[styles.SectionStyle1, {}]}>
-                    <View style={{flexDirection: 'column'}}>
-                      <Text
-                        style={
-                          brandId
-                            ? [styles.dropTextLightStyle]
-                            : [styles.dropTextInputStyle]
-                        }>
-                        {'Brand/Project'}
-                      </Text>
-                      {brandId ? (
-                        <Text style={[styles.dropTextInputStyle]}>
-                          {brandName}
-                        </Text>
-                      ) : null}
-                    </View>
-                  </View>
-                </View>
-
-                <View style={{justifyContent: 'center'}}>
-                  <Image source={downArrowImg} style={styles.imageStyle} />
-                </View>
-              </TouchableOpacity>
-
-              {showBrandList && (
-                <View style={styles.dropdownContent1}>
-                  <TextInput
-                    style={styles.searchInput}
-                    placeholder="Search "
-                    onChangeText={handleSearchBrand}
-                    placeholderTextColor="#000"
-                  />
-                  <ScrollView
-                    style={styles.scrollView}
-                    nestedScrollEnabled={true}>
-                    {filteredBrand.length === 0 ? (
-                      <Text style={styles.noCategoriesText}>
-                        Sorry, no results found!
-                      </Text>
-                    ) : (
-                      filteredBrand.map((item, index) => (
-                        <TouchableOpacity
-                          key={index}
-                          style={styles.dropdownOption}
-                          onPress={() => actionOnBrand(item)}>
-                          <Text style={{color: '#000'}}>{item.name}</Text>
-                        </TouchableOpacity>
-                      ))
-                    )}
-                  </ScrollView>
-                </View>
-              )}
-            </View>
-
-            <View style={{marginTop: hp('2%')}}>
-              <TextInput
-                label="Style Price FOB "
-                value={stylePriceFOB}
-                mode="outlined"
-                onChangeText={text => setStylePriceFOB(text)}
-              />
-            </View>
-
-            <View style={{marginTop: hp('2%')}}>
-              <TextInput
-                label="Approved consumption"
-                value={approvedConsumption}
-                mode="outlined"
-                onChangeText={text => setApprovedConsumption(text)}
-              />
-            </View>
-
-            <View
-              style={{
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundColor: editScaleOrSize ? '#e8e8e8' : '#fff',
-                marginTop: hp('2%'),
-              }}>
-              <TouchableOpacity
-                style={{
-                  flexDirection: 'row',
-                  // borderWidth: 0.5,
-                  // borderColor: '#D8D8D8',
-                  borderRadius: hp('0.5%'),
-                  width: '90%',
-                  justifyContent:'space-between'
-                }}
-                onPress={() => {
-                  setShowScaleOrSizeList(!showScaleOrSizeList);
-                }}>
-                <View>
-                  <View style={[styles.SectionStyle1, {}]}>
-                    <View style={{flexDirection: 'column'}}>
-                      <Text
-                        style={
-                          scaleOrSizeId
-                            ? [styles.dropTextLightStyle]
-                            : [styles.dropTextInputStyle]
-                        }>
-                        {'Scale/Size group *'}
-                      </Text>
-                      {scaleOrSizeId ? (
-                        <Text style={[styles.dropTextInputStyle]}>
-                          {scaleOrSizeName}
-                        </Text>
-                      ) : null}
-                    </View>
-                  </View>
-                </View>
-
-                <View style={{justifyContent: 'center'}}>
-                  <Image source={downArrowImg} style={styles.imageStyle} />
-                </View>
-              </TouchableOpacity>
-
-              {showScaleOrSizeList && editScaleOrSize && (
-                <View style={styles.dropdownContent1}>
-                  <TextInput
-                    style={styles.searchInput}
-                    placeholder="Search "
-                    onChangeText={handleSearchScaleOrSize}
-                    placeholderTextColor="#000"
-                  />
-                  <ScrollView
-                    style={styles.scrollView}
-                    nestedScrollEnabled={true}>
-                    {filteredScaleOrSize.length === 0 ? (
-                      <Text style={styles.noCategoriesText}>
-                        Sorry, no results found!
-                      </Text>
-                    ) : (
-                      filteredScaleOrSize.map((item, index) => (
-                        <TouchableOpacity
-                          key={index}
-                          style={styles.dropdownOption}
-                          onPress={() => actionOnScaleOrSize(item)}>
-                          <Text style={{color: '#000'}}>{item.name}</Text>
-                        </TouchableOpacity>
-                      ))
-                    )}
-                  </ScrollView>
-                </View>
-              )}
-            </View>
-
-            {showScaleTable && (
               <View style={styles.wrapper}>
                 <View style={styles.table}>
-                  {/* Table Head */}
                   <View style={styles.table_head}>
-                    <View style={{width: '30%', alignItems: 'center'}}>
-                      <Text style={styles.table_head_captions}>Size</Text>
+                    <View style={{width: '55%'}}>
+                      <Text style={styles.table_head_captions}>
+                        Production Name
+                      </Text>
+                    </View>
+                    <View style={{width: '2%'}} />
+                    <View style={{width: '20%'}}>
+                      <Text style={styles.table_head_captions}>Total Qty</Text>
+                    </View>
+                    <View style={{width: '2%'}} />
+                    <View style={{width: '20%'}}>
+                      <Text style={styles.table_head_captions}>
+                        Processed Qty
+                      </Text>
                     </View>
                     <View style={{width: '1%'}} />
-                    <View style={{width: '34%', alignItems: 'center'}}>
-                      <Text style={styles.table_head_captions}>Cons.</Text>
-                    </View>
-                    <View style={{width: '1%'}} />
-                    <View style={{width: '34%', alignItems: 'flex-end'}}>
-                      <Text style={styles.table_head_captions}>Inv Limit</Text>
-                    </View>
+                  </View>
+
+                  {props.listItems.productionSummary &&
+                    props.listItems.productionSummary.styleresponselist &&
+                    props.listItems.productionSummary.styleresponselist.map(
+                      (item, index) => (
+                        <View
+                          key={index}
+                          style={[styles.table_body_single_row]}>
+                          <View style={{width: '55%'}}>
+                            <Text style={styles.table_data}>
+                              {item.processName}
+                            </Text>
+                          </View>
+                          <View style={{width: '2%'}} />
+                          <View style={{width: '20%'}}>
+                            <Text style={styles.table_data}>
+                              {item.totalqty}
+                            </Text>
+                          </View>
+                          <View style={{width: '2%'}} />
+                          <View style={{width: '20%'}}>
+                            <Text style={styles.table_data}>
+                              {item.processqty}
+                            </Text>
+                          </View>
+                          <View style={{width: '1%'}} />
+                        </View>
+                      ),
+                    )}
+                </View>
+              </View>
+            </View>
+          )}
+
+          {selectedTab == 3 && (
+            <View style={styles.wrapper}>
+              <View style={styles.table}>
+                <View style={styles.table_head}>
+                  <View style={{width: '35%'}}>
+                    <Text style={styles.table_head_captions}>Process</Text>
+                  </View>
+                  <View style={{width: '1%'}} />
+                  <View style={{width: '15%'}}>
+                    <Text style={styles.table_head_captions}>Start Date</Text>
+                  </View>
+                  <View style={{width: '1%'}} />
+                  <View style={{width: '15%'}}>
+                    <Text style={styles.table_head_captions}>End Date</Text>
+                  </View>
+                  <View style={{width: '1%'}} />
+                  <View style={{width: '15%'}}>
+                    <Text style={styles.table_head_captions}>
+                      Actual Start Date
+                    </Text>
+                  </View>
+                  <View style={{width: '2%'}} />
+                  <View style={{width: '15%'}}>
+                    <Text style={styles.table_head_captions}>
+                      Actual Start Date
+                    </Text>
                   </View>
                 </View>
-
-                {/* Table Body */}
-                {scaleTable &&
-                  scaleTable.map((item, index) => (
-                    <View key={index} style={styles.table_body_single_row}>
-                      <View style={{width: '30%', alignItems: 'center'}}>
-                        <Text style={styles.table_data}>{item.name}</Text>
+                {props.listItems.timeAndAction &&
+                  props.listItems.timeAndAction.map((item, index) => (
+                    <View key={index} style={[styles.table_body_single_row]}>
+                      <View style={{width: '35%'}}>
+                        <Text style={styles.table_data}>
+                          {item.processName}
+                        </Text>
                       </View>
                       <View style={{width: '1%'}} />
-                      <View style={{width: '34%'}}>
-                        <TextInput
-                          style={styles.table_data_input}
-                          value={item.consumption.toString()}
-                          onChangeText={text => {
-                            const updatedTable = [...scaleTable];
-                            updatedTable[index].consumption = text;
-                            set_scaleTable(updatedTable);
-                          }}
-                          keyboardType="numeric"
-                        />
+                      <View style={{width: '15%'}}>
+                        <Text style={styles.table_data}>
+                          {item.plannedEndDate}
+                        </Text>
                       </View>
                       <View style={{width: '1%'}} />
-                      <View style={{width: '34%'}}>
-                        <TextInput
-                          style={styles.table_data_input}
-                          value={item.invLimit.toString()}
-                          onChangeText={text => {
-                            const updatedTable = [...scaleTable];
-                            updatedTable[index].invLimit = text;
-                            set_scaleTable(updatedTable);
-                          }}
-                          keyboardType="numeric"
-                        />
+                      <View style={{width: '15%'}}>
+                        <Text style={styles.table_data}>
+                          {item.plannedStartDate}
+                        </Text>
+                      </View>
+                      <View style={{width: '1%'}} />
+                      <View style={{width: '15%'}}>
+                        <Text style={styles.table_data}>
+                          {item.actualStartDate}
+                        </Text>
+                      </View>
+                      <View style={{width: '2%'}} />
+                      <View style={{width: '15%'}}>
+                        <Text style={styles.table_data}>
+                          {item.actualEndDate}
+                        </Text>
                       </View>
                     </View>
                   ))}
               </View>
-            )}
-
-            <View style={{marginTop: hp('2%')}}>
-              <TextInput
-                label="HSN *"
-                value={hsn}
-                mode="outlined"
-                onChangeText={text => setHSN(text)}
-              />
             </View>
-            <View style={{marginTop: hp('2%')}}>
-              <TextInput
-                label="MRP Tag price"
-                value={mrpTagPrice}
-                mode="outlined"
-                onChangeText={text => setMRPTagPrice(text)}
-              />
-            </View>
-
-            <View
-              style={{
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundColor: editProcessWF ? '#e8e8e8' : '#fff',
-                marginTop: hp('2%'),
-              }}>
-              <TouchableOpacity
-                style={{
-                  flexDirection: 'row',
-                  // borderWidth: 0.5,
-                  // borderColor: '#D8D8D8',
-                  borderRadius: hp('0.5%'),
-                  width: '90%',
-                  justifyContent:'space-between'
-                }}
-                onPress={() => {
-                  setShowProcessWorkFlowList(!showProcessWorkFlowList);
-                }}>
-                <View>
-                  <View style={[styles.SectionStyle1, {}]}>
-                    <View style={{flexDirection: 'column'}}>
-                      <Text
-                        style={
-                          processWorkFlowId
-                            ? [styles.dropTextLightStyle]
-                            : [styles.dropTextInputStyle]
-                        }>
-                        {'Process work flow *'}
-                      </Text>
-                      {processWorkFlowId ? (
-                        <Text style={[styles.dropTextInputStyle]}>
-                          {processWorkFlowName}
-                        </Text>
-                      ) : null}
-                    </View>
-                  </View>
-                </View>
-
-                <View style={{justifyContent: 'center'}}>
-                  <Image source={downArrowImg} style={styles.imageStyle} />
-                </View>
-              </TouchableOpacity>
-
-              {showProcessWorkFlowList && editProcessWF && (
-                <View style={styles.dropdownContent1}>
-                  <TextInput
-                    style={styles.searchInput}
-                    placeholder="Search "
-                    onChangeText={handleSearchProcessWorkFlow}
-                    placeholderTextColor="#000"
-                  />
-                  <ScrollView
-                    style={styles.scrollView}
-                    nestedScrollEnabled={true}>
-                    {filteredProcessWorkFlow.length === 0 ? (
-                      <Text style={styles.noCategoriesText}>
-                        Sorry, no results found!
-                      </Text>
-                    ) : (
-                      filteredProcessWorkFlow.map((item, index) => (
-                        <TouchableOpacity
-                          key={index}
-                          style={styles.dropdownOption}
-                          onPress={() => actionOnProcessWorkFlow(item)}>
-                          <Text style={{color: '#000'}}>{item.name}</Text>
-                        </TouchableOpacity>
-                      ))
-                    )}
-                  </ScrollView>
-                </View>
-              )}
-            </View>
-          </View>
-        )}
-
-        {selectedTab == 2 && (
-          <View
-            style={{
-              marginBottom: hp('5%'),
-              marginTop: hp('2%'),
-              width:'100%'
-            }}>
+          )}
+          {selectedTab == 4 && (
             <View style={styles.wrapper}>
               <View style={styles.table}>
                 <View style={styles.table_head}>
-                  <View style={{width: '55%'}}>
+                  <View style={{width: '15%'}}>
                     <Text style={styles.table_head_captions}>
-                      Production Name
-                    </Text>
-                  </View>
-                  <View style={{width: '2%'}} />
-                  <View style={{width: '20%'}}>
-                    <Text style={styles.table_head_captions}>Total Qty</Text>
-                  </View>
-                  <View style={{width: '2%'}} />
-                  <View style={{width: '20%'}}>
-                    <Text style={styles.table_head_captions}>
-                      Processed Qty
+                      Raw Material Type
                     </Text>
                   </View>
                   <View style={{width: '1%'}} />
+                  <View style={{width: '50%'}}>
+                    <Text style={styles.table_head_captions}>
+                      Raw Material Name
+                    </Text>
+                  </View>
+                  <View style={{width: '1%'}} />
+                  <View style={{width: '16%'}}>
+                    <Text style={styles.table_head_captions}>consumption</Text>
+                  </View>
+                  <View style={{width: '2%'}} />
+                  <View style={{width: '16%'}}>
+                    <Text style={styles.table_head_captions}>Req Qty</Text>
+                  </View>
                 </View>
 
-                {props.listItems.productionSummary &&
-                  props.listItems.productionSummary.styleresponselist &&
-                  props.listItems.productionSummary.styleresponselist.map(
-                    (item, index) => (
-                      <View key={index} style={[styles.table_body_single_row]}>
-                        <View style={{width: '55%'}}>
-                          <Text style={styles.table_data}>
-                            {item.processName}
-                          </Text>
-                        </View>
-                        <View style={{width: '2%'}} />
-                        <View style={{width: '20%'}}>
-                          <Text style={styles.table_data}>{item.totalqty}</Text>
-                        </View>
-                        <View style={{width: '2%'}} />
-                        <View style={{width: '20%'}}>
-                          <Text style={styles.table_data}>
-                            {item.processqty}
-                          </Text>
+                {RmAllocationBomList &&
+                  RmAllocationBomList?.map((item, index) => (
+                    <View key={index}>
+                      <View style={[styles.table_body_single_row]}>
+                        <View style={{width: '15%'}}>
+                          <Text style={styles.table_data}>{item?.rmType}</Text>
                         </View>
                         <View style={{width: '1%'}} />
-                      </View>
-                    ),
-                  )}
-              </View>
-            </View>
-          </View>
-        )}
-
-        {selectedTab == 3 && (
-          <View style={styles.wrapper}>
-            <View style={styles.table}>
-              <View style={styles.table_head}>
-                <View style={{width: '35%'}}>
-                  <Text style={styles.table_head_captions}>Process</Text>
-                </View>
-                <View style={{width: '1%'}} />
-                <View style={{width: '15%'}}>
-                  <Text style={styles.table_head_captions}>Start Date</Text>
-                </View>
-                <View style={{width: '1%'}} />
-                <View style={{width: '15%'}}>
-                  <Text style={styles.table_head_captions}>End Date</Text>
-                </View>
-                <View style={{width: '1%'}} />
-                <View style={{width: '15%'}}>
-                  <Text style={styles.table_head_captions}>
-                    Actual Start Date
-                  </Text>
-                </View>
-                <View style={{width: '2%'}} />
-                <View style={{width: '15%'}}>
-                  <Text style={styles.table_head_captions}>
-                    Actual Start Date
-                  </Text>
-                </View>
-              </View>
-              {props.listItems.timeAndAction &&
-                props.listItems.timeAndAction.map((item, index) => (
-                  <View key={index} style={[styles.table_body_single_row]}>
-                    <View style={{width: '35%'}}>
-                      <Text style={styles.table_data}>{item.processName}</Text>
-                    </View>
-                    <View style={{width: '1%'}} />
-                    <View style={{width: '15%'}}>
-                      <Text style={styles.table_data}>
-                        {item.plannedEndDate}
-                      </Text>
-                    </View>
-                    <View style={{width: '1%'}} />
-                    <View style={{width: '15%'}}>
-                      <Text style={styles.table_data}>
-                        {item.plannedStartDate}
-                      </Text>
-                    </View>
-                    <View style={{width: '1%'}} />
-                    <View style={{width: '15%'}}>
-                      <Text style={styles.table_data}>
-                        {item.actualStartDate}
-                      </Text>
-                    </View>
-                    <View style={{width: '2%'}} />
-                    <View style={{width: '15%'}}>
-                      <Text style={styles.table_data}>
-                        {item.actualEndDate}
-                      </Text>
-                    </View>
-                  </View>
-                ))}
-            </View>
-          </View>
-        )}
-        {selectedTab == 4 && (
-          <View style={styles.wrapper}>
-            <View style={styles.table}>
-              <View style={styles.table_head}>
-                <View style={{width: '15%'}}>
-                  <Text style={styles.table_head_captions}>
-                    Raw Material Type
-                  </Text>
-                </View>
-                <View style={{width: '1%'}} />
-                <View style={{width: '50%'}}>
-                  <Text style={styles.table_head_captions}>
-                    Raw Material Name
-                  </Text>
-                </View>
-                <View style={{width: '1%'}} />
-                <View style={{width: '16%'}}>
-                  <Text style={styles.table_head_captions}>consumption</Text>
-                </View>
-                <View style={{width: '2%'}} />
-                <View style={{width: '16%'}}>
-                  <Text style={styles.table_head_captions}>Req Qty</Text>
-                </View>
-              </View>
-
-              {RmAllocationBomList &&
-                RmAllocationBomList?.map((item, index) => (
-                  <View key={index}>
-                    <View style={[styles.table_body_single_row]}>
-                      <View style={{width: '15%'}}>
-                        <Text style={styles.table_data}>{item?.rmType}</Text>
-                      </View>
-                      <View style={{width: '1%'}} />
-                      <View style={{width: '50%'}}>
-                        <View
-                          style={{
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            marginTop: hp('1%'),
-                            backgroundColor: '#ffffff',
-                          }}>
-                          <TouchableOpacity
+                        <View style={{width: '50%'}}>
+                          <View
                             style={{
-                              flexDirection: 'row',
-                              borderWidth: 0.5,
-                              borderColor: '#D8D8D8',
-                              borderRadius: hp('0.5%'),
-                              width: '100%',
-                              overflow: 'hidden',
-                            }}
-                            onPress={() => {
-                              setRmAllocationBomList(
-                                RmAllocationBomList.map(r =>
-                                  r.idx === item.idx
-                                    ? {
-                                        ...r,
-                                        showList: !r.showList,
-                                        filteredList: r.List,
-                                      }
-                                    : {
-                                        ...r,
-                                        showList: false,
-                                        filteredList: r.List,
-                                      },
-                                ),
-                              );
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              marginTop: hp('1%'),
+                              backgroundColor: '#ffffff',
                             }}>
-                            <View style={[styles.SectionStyle1]}>
-                              <View style={{flexDirection: 'column'}}>
-                                <Text
-                                  style={
-                                    item.selectedRmId
-                                      ? styles.dropTextLightStyle
-                                      : styles.dropTextInputStyle
-                                  }>
-                                  {'RM Name '}
-                                </Text>
-                                <Text style={styles.dropTextInputStyle}>
-                                  {item.selectedRmId
-                                    ? item.selectedRmName
-                                    : 'Select '}
-                                </Text>
-                              </View>
-                            </View>
-                            <View style={{justifyContent: 'center'}}>
-                              <Image
-                                source={downArrowImg}
-                                style={styles.imageStyle}
-                              />
-                            </View>
-                          </TouchableOpacity>
-                          {item?.showList && (
-                            <View style={styles.dropdownContent2}>
-                              <TextInput
-                                style={styles.searchInput}
-                                placeholder="Search"
-                                onChangeText={text =>
-                                  handleChangeSearchQuery(text, item.idx)
-                                }
-                                placeholderTextColor="#000"
-                              />
-                              <ScrollView nestedScrollEnabled={true}>
-                                {item?.filteredList?.length === 0 ? (
-                                  <Text style={styles.noCategoriesText}>
-                                    Sorry, no results found!
+                            <TouchableOpacity
+                              style={{
+                                flexDirection: 'row',
+                                borderWidth: 0.5,
+                                borderColor: '#D8D8D8',
+                                borderRadius: hp('0.5%'),
+                                width: '100%',
+                                overflow: 'hidden',
+                              }}
+                              onPress={() => {
+                                setRmAllocationBomList(prevList =>
+                                  prevList.map(r =>
+                                    r.trimTypeId === item.trimTypeId
+                                      ? {
+                                          ...r,
+                                          showList: !r.showList,
+                                          filteredList: r.List,
+                                        }
+                                      : {
+                                          ...r,
+                                          showList: false,
+                                        },
+                                  ),
+                                );
+                              }}>
+                              <View style={[styles.SectionStyle1]}>
+                                <View style={{flexDirection: 'column'}}>
+                                  <Text
+                                    style={
+                                      item.selectedRmId
+                                        ? styles.dropTextLightStyle
+                                        : styles.dropTextInputStyle
+                                    }>
+                                    {'RM Name '}
                                   </Text>
-                                ) : (
-                                  item?.filteredList?.map(item1 => (
-                                    <TouchableOpacity
-                                      key={item1?.id}
-                                      style={{
-                                        backgroundColor: item.childList.some(
-                                          child => child.id === item1.id,
-                                        )
-                                          ? '#f3f3f3'
-                                          : '#fff',
-                                      }}
-                                      onPress={() =>
-                                        actionOnRMList(item1, item.idx)
-                                      }>
-                                      <View style={styles.dropdownOption}>
-                                        {/* <Text style={{color: '#000'}}> */}
-                                        <Text
-                                          style={{
-                                            color: '#000',
-                                            flexWrap: 'wrap',
-                                            width: '100%',
-                                          }}
-                                          numberOfLines={2}>
-                                          {item1?.name}
-                                        </Text>
-                                      </View>
-                                    </TouchableOpacity>
-                                  ))
-                                )}
-                              </ScrollView>
-                            </View>
-                          )}
+                                  <Text style={styles.dropTextInputStyle}>
+                                    {item.selectedRmId
+                                      ? item.selectedRmName
+                                      : 'Select '}
+                                  </Text>
+                                </View>
+                              </View>
+                              <View style={{justifyContent: 'center'}}>
+                                <Image
+                                  source={downArrowImg}
+                                  style={styles.imageStyle}
+                                />
+                              </View>
+                            </TouchableOpacity>
+                            {item?.showList && (
+                              <View style={styles.dropdownContent2}>
+                                <TextInput
+                                  style={styles.searchInput}
+                                  placeholder="Search"
+                                  onChangeText={text =>
+                                    handleChangeSearchQuery(
+                                      text,
+                                      item.trimTypeId,
+                                    )
+                                  }
+                                  placeholderTextColor="#000"
+                                />
+                                <ScrollView nestedScrollEnabled={true}>
+                                  {item?.filteredList?.length === 0 ? (
+                                    <Text style={styles.noCategoriesText}>
+                                      Sorry, no results found!
+                                    </Text>
+                                  ) : (
+                                    item?.filteredList?.map(item1 => (
+                                      <TouchableOpacity
+                                        key={item1?.id}
+                                        style={{
+                                          backgroundColor: item.childList.some(
+                                            child =>
+                                              child.selectedRmId === item1.id,
+                                          )
+                                            ? '#f3f3f3'
+                                            : '#fff',
+                                        }}
+                                        onPress={() =>
+                                          actionOnRMList(item1, item.trimTypeId)
+                                        }>
+                                        <View style={styles.dropdownOption}>
+                                          {/* <Text style={{color: '#000'}}> */}
+                                          <Text
+                                            style={{
+                                              color: '#000',
+                                              flexWrap: 'wrap',
+                                              width: '100%',
+                                            }}
+                                            numberOfLines={2}>
+                                            {item1?.name}
+                                          </Text>
+                                        </View>
+                                      </TouchableOpacity>
+                                    ))
+                                  )}
+                                </ScrollView>
+                              </View>
+                            )}
+                          </View>
+                        </View>
+                        <View style={{width: '1%'}} />
+                        <View style={{width: '30%'}}>
+                          <TouchableOpacity
+                            onPress={() => handleAdd(item.trimTypeId)}
+                            style={{
+                              backgroundColor: '#f3f3f3',
+                              padding: 5,
+                              borderRadius: 15,
+                              alignItems: 'center',
+                              marginHorizontal: 20,
+                            }}>
+                            <Text style={{color: 'black'}}>ADD</Text>
+                          </TouchableOpacity>
                         </View>
                       </View>
-                      <View style={{width: '1%'}} />
-                      <View style={{width: '30%'}}>
-                        <TouchableOpacity
-                          onPress={() => handleAdd(item.idx)}
-                          style={{
-                            backgroundColor: '#f3f3f3',
-                            padding: 5,
-                            borderRadius: 15,
-                            alignItems: 'center',
-                            marginHorizontal: 20,
-                          }}>
-                          <Text style={{color: 'black'}}>ADD</Text>
-                        </TouchableOpacity>
-                      </View>
-                    </View>
-                    {item.showRmRow &&
-                      item.childList.map((child, index) => (
-                        <View
-                          key={index}
-                          style={[styles.table_body_single_row]}>
-                          <View style={{width: '15%'}}>
-                            <TouchableOpacity
-                              style={{alignItems: '', justifyContent: ''}}
-                              onPress={() => ToggleChildRow(index, item.idx)}>
-                              <Image
-                                source={closeImg}
-                                style={styles.imageStyle1}
-                              />
-                            </TouchableOpacity>
-                          </View>
-                          <View style={{width: '1%'}} />
-                          <View style={{width: '50%'}}>
-                            <View
-                              style={{
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                marginTop: hp('1%'),
-                                backgroundColor: child.id
-                                  ? '#f3f3f3'
-                                  : '#ffffff',
-                              }}>
+                      {item.showRmRow &&
+                        item.childList.map((child, index) => (
+                          <View
+                            key={index}
+                            style={[styles.table_body_single_row]}>
+                            <View style={{width: '15%'}}>
                               <TouchableOpacity
-                                style={{
-                                  flexDirection: 'row',
-                                  borderWidth: 0.5,
-                                  borderColor: '#D8D8D8',
-                                  borderRadius: hp('0.5%'),
-                                  width: '100%',
-                                  overflow: 'hidden',
-                                }}
-                                onPress={() => console.log('hi')}>
-                                <View style={[styles.SectionStyle1]}>
-                                  <View style={{flexDirection: 'column'}}>
-                                    <Text
-                                      style={
-                                        item.idx
-                                          ? styles.dropTextLightStyle
-                                          : styles.dropTextInputStyle
-                                      }>
-                                      {'Rm Name '}
-                                    </Text>
-                                    <Text style={styles.dropTextInputStyle}>
-                                      {child.id ? child.name : 'Select '}
-                                    </Text>
-                                  </View>
-                                </View>
-                                <View style={{justifyContent: 'center'}}>
-                                  <Image
-                                    source={downArrowImg}
-                                    style={styles.imageStyle}
-                                  />
-                                </View>
+                                style={{alignItems: '', justifyContent: ''}}
+                                onPress={() =>
+                                  ToggleChildRow(child.idx, item.trimTypeId)
+                                }>
+                                <Image
+                                  source={closeImg}
+                                  style={styles.imageStyle1}
+                                />
                               </TouchableOpacity>
-                              {false && (
-                                <View style={styles.dropdownContent2}>
-                                  <TextInput
-                                    style={styles.searchInput}
-                                    placeholder="Search Stock"
-                                    onChangeText={text =>
-                                      console.log('text, row.id')
-                                    }
-                                    placeholderTextColor="#000"
-                                  />
-                                  <ScrollView nestedScrollEnabled={true}>
-                                    {item?.List?.length === 0 ? (
-                                      <Text style={styles.noCategoriesText}>
-                                        Sorry, no results found!
+                            </View>
+                            <View style={{width: '1%'}} />
+                            <View style={{width: '50%'}}>
+                              <View
+                                style={{
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  marginTop: hp('1%'),
+                                  backgroundColor: child.id
+                                    ? '#f3f3f3'
+                                    : '#ffffff',
+                                }}>
+                                <TouchableOpacity
+                                  style={{
+                                    flexDirection: 'row',
+                                    borderWidth: 0.5,
+                                    borderColor: '#D8D8D8',
+                                    borderRadius: hp('0.5%'),
+                                    width: '100%',
+                                    overflow: 'hidden',
+                                  }}
+                                  onPress={() => console.log('hi')}>
+                                  <View style={[styles.SectionStyle1]}>
+                                    <View style={{flexDirection: 'column'}}>
+                                      <Text
+                                        style={
+                                          item.selectedRmId
+                                            ? styles.dropTextLightStyle
+                                            : styles.dropTextInputStyle
+                                        }>
+                                        {'Rm Name '}
                                       </Text>
-                                    ) : (
-                                      item?.List?.map(item1 => (
+                                      <Text style={styles.dropTextInputStyle}>
+                                        {child.selectedRmId
+                                          ? child.selectedRmName
+                                          : 'Select '}
+                                      </Text>
+                                    </View>
+                                  </View>
+                                  <View style={{justifyContent: 'center'}}>
+                                    <Image
+                                      source={downArrowImg}
+                                      style={styles.imageStyle}
+                                    />
+                                  </View>
+                                </TouchableOpacity>
+                                {false && (
+                                  <View style={styles.dropdownContent2}>
+                                    <TextInput
+                                      style={styles.searchInput}
+                                      placeholder="Search Stock"
+                                      onChangeText={text =>
+                                        console.log('text, row.id')
+                                      }
+                                      placeholderTextColor="#000"
+                                    />
+                                    <ScrollView nestedScrollEnabled={true}>
+                                      {item?.List?.length === 0 ? (
+                                        <Text style={styles.noCategoriesText}>
+                                          Sorry, no results found!
+                                        </Text>
+                                      ) : (
+                                        item?.List?.map(item1 => (
+                                          <TouchableOpacity
+                                            key={item1?.id}
+                                            onPress={() =>
+                                              console.log('item1, row.id')
+                                            }>
+                                            <View style={styles.dropdownOption}>
+                                              <Text style={{color: '#000'}}>
+                                                {item1?.name}
+                                              </Text>
+                                            </View>
+                                          </TouchableOpacity>
+                                        ))
+                                      )}
+                                    </ScrollView>
+                                  </View>
+                                )}
+                              </View>
+                              {child.isScaleWise == 1 && child.scaleWise && (
+                                <View
+                                  style={{
+                                    flexDirection: 'row',
+                                    flexWrap: 'wrap',
+                                  }}>
+                                  {child.scaleWise
+                                    .split(',')
+                                    .map((val, index) => {
+                                      const isChecked =
+                                        child.selectedScales?.includes(val);
+                                      return (
                                         <TouchableOpacity
-                                          key={item1?.id}
-                                          onPress={() =>
-                                            console.log('item1, row.id')
-                                          }>
-                                          <View style={styles.dropdownOption}>
-                                            <Text style={{color: '#000'}}>
-                                              {item1?.name}
-                                            </Text>
-                                          </View>
+                                          key={index}
+                                          style={[
+                                            styles.itemContainer,
+                                            {marginRight: 8, marginBottom: 8},
+                                          ]}
+                                          onPress={() => {
+                                            const updatedList =
+                                              RmAllocationBomList.map(r =>
+                                                r.trimTypeId === item.trimTypeId
+                                                  ? {
+                                                      ...r,
+                                                      childList:
+                                                        r.childList.map(c =>
+                                                          c.idx === child.idx
+                                                            ? {
+                                                                ...c,
+                                                                selectedScales:
+                                                                  isChecked
+                                                                    ? c.selectedScales.filter(
+                                                                        s =>
+                                                                          s !==
+                                                                          val,
+                                                                      )
+                                                                    : [
+                                                                        ...(c.selectedScales ||
+                                                                          []),
+                                                                        val,
+                                                                      ],
+                                                              }
+                                                            : c,
+                                                        ),
+                                                    }
+                                                  : r,
+                                              );
+                                            setRmAllocationBomList(updatedList);
+                                          }}>
+                                          <CustomCheckBox
+                                            isChecked={isChecked}
+                                            onToggle={() => {
+                                              const updatedList =
+                                                RmAllocationBomList.map(r =>
+                                                  r.trimTypeId ===
+                                                  item.trimTypeId
+                                                    ? {
+                                                        ...r,
+                                                        childList:
+                                                          r.childList.map(c => {
+                                                            if (
+                                                              c.idx !==
+                                                              child.idx
+                                                            )
+                                                              return c;
+
+                                                            // update selected scales
+                                                            let updatedScales;
+                                                            if (isChecked) {
+                                                              updatedScales =
+                                                                c.selectedScales.filter(
+                                                                  s =>
+                                                                    s !== val,
+                                                                );
+                                                            } else {
+                                                              updatedScales = [
+                                                                ...(c.selectedScales ||
+                                                                  []),
+                                                                val,
+                                                              ];
+                                                            }
+
+                                                            // compute required qty using lookup state
+                                                            let requiredQty;
+                                                            if (
+                                                              updatedScales.length ===
+                                                              0
+                                                            ) {
+                                                              requiredQty =
+                                                                Number(
+                                                                  c.consumption,
+                                                                ) * buyerPOQty;
+                                                            } else {
+                                                              const totalSelectedQty =
+                                                                updatedScales.reduce(
+                                                                  (sum, sid) =>
+                                                                    sum +
+                                                                    (sizeQtyLookup[
+                                                                      sid
+                                                                    ] || 0),
+                                                                  0,
+                                                                );
+                                                              requiredQty =
+                                                                Number(
+                                                                  c.consumption,
+                                                                ) *
+                                                                totalSelectedQty;
+                                                            }
+
+                                                            return {
+                                                              ...c,
+                                                              selectedScales:
+                                                                updatedScales,
+                                                              requiredQty:
+                                                                requiredQty.toString(),
+                                                            };
+                                                          }),
+                                                      }
+                                                    : r,
+                                                );
+
+                                              setRmAllocationBomList(
+                                                updatedList,
+                                              );
+                                            }}
+                                          />
+
+                                          <Text style={{color: '#000'}}>
+                                            {sizeLookup[val] || val}
+                                          </Text>
                                         </TouchableOpacity>
-                                      ))
-                                    )}
-                                  </ScrollView>
+                                      );
+                                    })}
                                 </View>
                               )}
                             </View>
+                            <View style={{width: '1%'}} />
+                            <View style={{width: '16%'}}>
+                              <TextInput
+                                style={styles.table_data_input}
+                                value={child.consumption}
+                                onChangeText={text =>
+                                  handleChangeChildItems(
+                                    text,
+                                    'cons',
+                                    index,
+                                    item.trimTypeId,
+                                  )
+                                }
+                                keyboardType="numeric"
+                              />
+                              <Text
+                                style={{
+                                  marginLeft: 4,
+                                  color: colors.color2,
+                                  fontSize: 10,
+                                  textAlign: 'center',
+                                }}>
+                                ({child.uomType})
+                              </Text>
+                            </View>
+                            <View style={{width: '2%'}} />
+                            <View style={{width: '16%'}}>
+                              <TextInput
+                                style={styles.table_data_input}
+                                value={child.requiredQty}
+                                onChangeText={text =>
+                                  handleChangeChildItems(
+                                    text,
+                                    'req',
+                                    index,
+                                    item.trimTypeId,
+                                  )
+                                }
+                                keyboardType="numeric"
+                              />
+                              <Text
+                                style={{
+                                  marginLeft: 4,
+                                  color: colors.color2,
+                                  fontSize: 10,
+                                  textAlign: 'center',
+                                }}>
+                                ({child.requiredQty})
+                              </Text>
+                            </View>
                           </View>
-                          <View style={{width: '1%'}} />
-                          <View style={{width: '16%'}}>
-                            <TextInput
-                              style={styles.table_data_input}
-                              value={child.consumption}
-                              onChangeText={text =>
-                                handleChangeChildItems(
-                                  text,
-                                  'cons',
-                                  index,
-                                  item.idx,
-                                )
-                              }
-                              keyboardType="numeric"
-                            />
-                          </View>
-                          <View style={{width: '2%'}} />
-                          <View style={{width: '16%'}}>
-                            <TextInput
-                              style={styles.table_data_input}
-                              value={child.requiredQty}
-                              onChangeText={text =>
-                                handleChangeChildItems(
-                                  text,
-                                  'req',
-                                  index,
-                                  item.idx,
-                                )
-                              }
-                              keyboardType="numeric"
-                            />
-                          </View>
-                        </View>
-                      ))}
-                  </View>
-                ))}
+                        ))}
+                    </View>
+                  ))}
+              </View>
             </View>
-          </View>
-        )}
-         </View>
+          )}
+        </View>
 
         <View style={{height: 200}}></View>
       </KeyboardAwareScrollView>
@@ -1975,7 +2446,7 @@ const getStyles = colors =>
       width: '100%',
     },
     table: {
-      width: '100%', 
+      width: '100%',
       backgroundColor: '#fff',
       elevation: 1,
       borderRadius: 5,
@@ -2073,3 +2544,44 @@ const getStyles = colors =>
       borderBottomColor: '#ccc',
     },
   });
+
+{
+  /* <CustomCheckBox
+                                            isChecked={isChecked}
+                                            
+                                            onToggle={() => {
+                                              const updatedList =
+                                                RmAllocationBomList.map(r =>
+                                                  r.trimTypeId ===
+                                                  item.trimTypeId
+                                                    ? {
+                                                        ...r,
+                                                        childList:
+                                                          r.childList.map(c =>
+                                                            c.idx === child.idx
+                                                              ? {
+                                                                  ...c,
+                                                                  selectedScales:
+                                                                    isChecked
+                                                                      ? c.selectedScales.filter(
+                                                                          s =>
+                                                                            s !==
+                                                                            val,
+                                                                        )
+                                                                      : [
+                                                                          ...(c.selectedScales ||
+                                                                            []),
+                                                                          val,
+                                                                        ],
+                                                                }
+                                                              : c,
+                                                          ),
+                                                      }
+                                                    : r,
+                                                );
+                                              setRmAllocationBomList(
+                                                updatedList,
+                                              );
+                                            }}
+                                          /> */
+}

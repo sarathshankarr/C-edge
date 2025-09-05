@@ -52,7 +52,6 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
   const [selectAllCheckBox, setSelectAllCheckBox] = useState(false);
   const [referenceDate, setReferenceDate] = useState('');
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-  
 
   const {colors} = useContext(ColorContext);
   const styles = getStyles(colors);
@@ -137,15 +136,34 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
             alreadyReceivedQty: item?.receivedQty || 0,
             showClose: false,
             presentReceivedQty:
-              props.itemsObj?.pomaster?.itemTrimsType === 'Fabric'
+              props.itemsObj?.pomaster?.itemTrimsType === 'Fabric' ||
+              Number(item?.receivedQty || 0) >=
+                  Number(item?.quantitystr || 0)
                 ? item?.receivedQty
                 : '',
+            // editablePriceReceivedQty:
+            //   props.itemsObj?.pomaster?.itemTrimsType === 'Fabric'
+            //     ? false
+            //     : true,
             editablePriceReceivedQty:
               props.itemsObj?.pomaster?.itemTrimsType === 'Fabric'
                 ? false
+                : Number(item?.receivedQty || 0) >=
+                  Number(item?.quantitystr || 0)
+                ? false
                 : true,
-          }));
 
+            totalRecieved:
+              Number(item?.receivedQty || 0) >= Number(item?.quantitystr || 0),
+          }));
+          console.log(
+            'child map  ',
+            childMap[0].receivedQty,
+            childMap[0].quantitystr,
+            typeof childMap[0].receivedQty,
+            typeof childMap[0].quantitystr,
+            childMap[0].totalRecieved,
+          );
           setRows(childMap);
         }
       }
@@ -165,9 +183,8 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
       }
     }
 
-    const missingQty = rows.find(
-      row => !row.presentReceivedQty || row.presentReceivedQty.trim() === '',
-    );
+    const missingQty = rows.find(row => !row.presentReceivedQty);
+
     if (missingQty) {
       Alert.alert(
         'Missing Quantity',
@@ -175,8 +192,6 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
       );
       return;
     }
-    console.log('oyeee');
-    return;
     const formatChildDataFab =
       rows
         .map(child => {
@@ -203,12 +218,13 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
               missqty,
               batchid,
               presentReceivedQty,
+              totalRecieved,
             } = child;
 
             return (
-              `${lineItemId ?? '0'}#${presentReceivedQty ?? '10'}#${
-                gsCode ?? '0'
-              }#${itemTrimsType ?? ''}` +
+              `${lineItemId ?? '0'}#${
+                totalRecieved ? '0' : presentReceivedQty ?? '0'
+              }#${gsCode ?? '0'}#${itemTrimsType ?? ''}` +
               `#${itemId ?? '0'}#${'1'}#${price ?? '0'}#${batchid ?? '0'}` +
               `#${itemdesc ?? ''}#${styleId ?? '0'}#${
                 stylewise_size_id ?? '0'
@@ -344,6 +360,7 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
       grn_totamnt: data.grn_totamnt || 0,
       itemStr: formatChildDataFab || '',
     };
+    
     console.log('str ', obj);
     props.submitAction(obj);
   };
@@ -789,6 +806,11 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
     setSelectedIdxs(prev => {
       let newSelected = [...prev];
 
+       if (rows[index]?.totalRecieved) {
+        console.log("returning cuz already received")
+      return newSelected;
+    }
+
       if (newSelected.includes(index)) {
         newSelected = newSelected.filter(i => i !== index);
 
@@ -832,7 +854,7 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
   //   setRows(updatedRows);
   // };
 
-  const handleInputChange = (index, field, value) => {
+  const handleInputChange1 = (index, field, value) => {
     const updatedRows = [...rows];
     updatedRows[index][field] = value;
 
@@ -852,6 +874,38 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
 
     setRows(updatedRows);
   };
+  const handleInputChange = (index, field, value) => {
+    const updatedRows = [...rows];
+
+    // convert only for numeric fields
+    let parsedValue = value;
+    if (
+      field === 'presentReceivedQty' ||
+      field === 'price' ||
+      field === 'discountAccount' ||
+      field === 'gstPercent'
+    ) {
+      parsedValue = value === '' ? '' : Number(value); // keep empty string if no input
+    }
+
+    updatedRows[index][field] = parsedValue;
+
+    const receivedQty = Number(updatedRows[index].presentReceivedQty || 0);
+    const price = Number(updatedRows[index].price || 0);
+    const discount = Number(updatedRows[index].discountAccount || 0);
+    const gstPercent = Number(updatedRows[index].gstPercent || 0);
+
+    const itemRate = receivedQty * price;
+    const gst = ((itemRate - discount) * gstPercent) / 100;
+    const total = itemRate - discount + gst;
+
+    updatedRows[index].itemRate = itemRate.toFixed(2);
+    updatedRows[index].gst = gst.toFixed(2);
+    updatedRows[index].total = total.toFixed(2);
+
+    setRows(updatedRows);
+  };
+
   const addRowBelow = index => {
     const rowToCopy = rows[index];
     const newRow = {
@@ -1071,128 +1125,6 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
                   )}
                 </View>
 
-                {/* {rows.map((row, index) => (
-                  <View key={index} style={styles.table_body_single_row}>
-                    <View style={{width: 70}}>
-                      <View
-                        style={[
-                          styles.checkboxItem,
-                          {
-                            flex: 0.5,
-                          },
-                        ]}>
-                        <CustomCheckBox
-                          isChecked={selectedIdxs.includes(index)}
-                          onToggle={() => toggleSelection(index)}
-                        />
-                      </View>
-                    </View>
-                    {itemOrTrims === 'RM' ? (
-                      <View style={{width: 100}}>
-                        <Text style={styles.table_data}>{row.quantitystr}</Text>
-                      </View>
-                    ) : (
-                      <View style={{width: 100}}>
-                        <TextInput
-                          style={styles.table_data}
-                          value={row.roll}
-                          onChangeText={text =>
-                            handleInputChange(index, 'roll', text)
-                          }
-                        />
-                      </View>
-                    )}
-
-                    <View style={{width: 5}}></View>
-
-                    {itemOrTrims === 'Fabric' && (
-                      <>
-                        <View style={{width: 100}}>
-                          <Text style={styles.table_data}>
-                            {row.requiredQty}
-                          </Text>
-                        </View>
-
-                        <View style={{width: 100}}>
-                          <Text style={styles.table_data}>
-                            {row.remainingQty}/{row.enteredQty}
-                          </Text>
-                        </View>
-                      </>
-                    )}
-                  
-                    <View
-                      style={{
-                        width: 100,
-                        alignItems: 'center',
-                        textAlign: 'center',
-                      }}>
-                      <View
-                        style={{flexDirection: 'row', alignItems: 'center'}}>
-                        <TextInput
-                          style={[styles.table_data, {flex: 1}]}
-                          value={String(row.presentReceivedQty)}
-                          keyboardType="numeric"
-                          onChangeText={text =>
-                            handleInputChange(index, 'presentReceivedQty', text)
-                          }
-                        />
-                        <Text
-                          style={{
-                            marginLeft: 4,
-                            color: colors.color2,
-                            fontSize: 10,
-                          }}>
-                          ({row.alreadyReceivedQty})
-                        </Text>
-                      </View>
-
-                      <Text style={{marginTop: 4, fontSize: 10}}>
-                        {Number(row.alreadyReceivedQty) +
-                          Number(row.presentReceivedQty || 0)}
-                      </Text>
-                    </View>
-
-                    <View style={{width: 5}}></View>
-                    <View style={{width: 100}}>
-                      <Text style={styles.table_data}>{row.fabric}</Text>
-                    </View>
-                    <View style={{width: 100}}>
-                      <TextInput
-                        style={styles.table_data}
-                        value={String(row.price)}
-                        keyboardType="numeric"
-                        onChangeText={text =>
-                          handleInputChange(index, 'price', text)
-                        }
-                      />
-                    </View>
-                    <View style={{width: 5}}></View>
-                    <View style={{width: 100}}>
-                      <Text style={styles.table_data}>
-                        {itemOrTrims === 'RM' ? row.refNo : row.grnNo}
-                      </Text>
-                    </View>
-                    <View style={{width: 100}}>
-                      <Text style={styles.table_data}>{row.gstPercent}</Text>
-                    </View>
-                    <View style={{width: 100}}>
-                      <Text style={styles.table_data}>{row.itemRate}</Text>
-                    </View>
-                    <View style={{width: 100}}>
-                      <Text style={styles.table_data}>
-                        {row.discountAccount}
-                      </Text>
-                    </View>
-                    <View style={{width: 100}}>
-                      <Text style={styles.table_data}>{row.gst}</Text>
-                    </View>
-                    <View style={{width: 100}}>
-                      <Text style={styles.table_data}>{row.total}</Text>
-                    </View>
-                  </View>
-                ))} */}
-
                 {rows.map((row, index) => (
                   <View key={index} style={styles.table_body_single_row}>
                     <View style={{width: 70}}>
@@ -1273,20 +1205,20 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
                             }
                             editable={row?.editablePriceReceivedQty}
                           />
-                          <Text
+                         {!row.totalRecieved && <Text
                             style={{
                               marginLeft: 4,
                               color: colors.color2,
                               fontSize: 10,
                             }}>
                             ({row.alreadyReceivedQty})
-                          </Text>
+                          </Text>}
                         </View>
 
-                        <Text style={{marginTop: 4, fontSize: 10}}>
+                       {!row.totalRecieved &&  (<Text style={{marginTop: 4, fontSize: 10}}>
                           {Number(row.alreadyReceivedQty) +
                             Number(row.presentReceivedQty || 0)}
-                        </Text>
+                        </Text>)}
                       </View>
                     ) : (
                       <View
@@ -2240,4 +2172,127 @@ const getStyles = colors =>
                         }
                       />
                     </View> */
+}
+{
+  /* {rows.map((row, index) => (
+                  <View key={index} style={styles.table_body_single_row}>
+                    <View style={{width: 70}}>
+                      <View
+                        style={[
+                          styles.checkboxItem,
+                          {
+                            flex: 0.5,
+                          },
+                        ]}>
+                        <CustomCheckBox
+                          isChecked={selectedIdxs.includes(index)}
+                          onToggle={() => toggleSelection(index)}
+                        />
+                      </View>
+                    </View>
+                    {itemOrTrims === 'RM' ? (
+                      <View style={{width: 100}}>
+                        <Text style={styles.table_data}>{row.quantitystr}</Text>
+                      </View>
+                    ) : (
+                      <View style={{width: 100}}>
+                        <TextInput
+                          style={styles.table_data}
+                          value={row.roll}
+                          onChangeText={text =>
+                            handleInputChange(index, 'roll', text)
+                          }
+                        />
+                      </View>
+                    )}
+
+                    <View style={{width: 5}}></View>
+
+                    {itemOrTrims === 'Fabric' && (
+                      <>
+                        <View style={{width: 100}}>
+                          <Text style={styles.table_data}>
+                            {row.requiredQty}
+                          </Text>
+                        </View>
+
+                        <View style={{width: 100}}>
+                          <Text style={styles.table_data}>
+                            {row.remainingQty}/{row.enteredQty}
+                          </Text>
+                        </View>
+                      </>
+                    )}
+                  
+                    <View
+                      style={{
+                        width: 100,
+                        alignItems: 'center',
+                        textAlign: 'center',
+                      }}>
+                      <View
+                        style={{flexDirection: 'row', alignItems: 'center'}}>
+                        <TextInput
+                          style={[styles.table_data, {flex: 1}]}
+                          value={String(row.presentReceivedQty)}
+                          keyboardType="numeric"
+                          onChangeText={text =>
+                            handleInputChange(index, 'presentReceivedQty', text)
+                          }
+                        />
+                        <Text
+                          style={{
+                            marginLeft: 4,
+                            color: colors.color2,
+                            fontSize: 10,
+                          }}>
+                          ({row.alreadyReceivedQty})
+                        </Text>
+                      </View>
+
+                      <Text style={{marginTop: 4, fontSize: 10}}>
+                        {Number(row.alreadyReceivedQty) +
+                          Number(row.presentReceivedQty || 0)}
+                      </Text>
+                    </View>
+
+                    <View style={{width: 5}}></View>
+                    <View style={{width: 100}}>
+                      <Text style={styles.table_data}>{row.fabric}</Text>
+                    </View>
+                    <View style={{width: 100}}>
+                      <TextInput
+                        style={styles.table_data}
+                        value={String(row.price)}
+                        keyboardType="numeric"
+                        onChangeText={text =>
+                          handleInputChange(index, 'price', text)
+                        }
+                      />
+                    </View>
+                    <View style={{width: 5}}></View>
+                    <View style={{width: 100}}>
+                      <Text style={styles.table_data}>
+                        {itemOrTrims === 'RM' ? row.refNo : row.grnNo}
+                      </Text>
+                    </View>
+                    <View style={{width: 100}}>
+                      <Text style={styles.table_data}>{row.gstPercent}</Text>
+                    </View>
+                    <View style={{width: 100}}>
+                      <Text style={styles.table_data}>{row.itemRate}</Text>
+                    </View>
+                    <View style={{width: 100}}>
+                      <Text style={styles.table_data}>
+                        {row.discountAccount}
+                      </Text>
+                    </View>
+                    <View style={{width: 100}}>
+                      <Text style={styles.table_data}>{row.gst}</Text>
+                    </View>
+                    <View style={{width: 100}}>
+                      <Text style={styles.table_data}>{row.total}</Text>
+                    </View>
+                  </View>
+                ))} */
 }

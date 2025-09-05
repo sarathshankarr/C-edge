@@ -104,8 +104,8 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
 
   useEffect(() => {
     if (props.modalLists) {
-      if (selectedradiooption1 === 'Style (FG)' && props.modalLists.StyleFg) {
-        setModalLists(props.modalLists.StyleFg);
+      if (selectedradiooption1 === 'Style (FG)' && props?.modalLists?.StyleFg) {
+        setModalLists(props.modalLists?.StyleFg || []);
         setCachedModalLists(prev => ({
           ...prev,
           StyleFg: props.modalLists.StyleFg,
@@ -206,13 +206,19 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
   };
 
   const actionOnVendor = async item => {
-    let status="";
+    // let status="";
+    //  status = await props.getGstStatusFromVendor(item.id);
+    // if (status !== 'true') {
+    //   setVendorId(item.id);
+    //   setVendorName(item.name);
+    //   setShowVendorList(false);
+    // }
      status = await props.getGstStatusFromVendor(item.id);
-    if (status !== 'true') {
+    
       setVendorId(item.id);
       setVendorName(item.name);
       setShowVendorList(false);
-    }
+  
   };
 
   const handleSearchVendor = text => {
@@ -624,18 +630,18 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
             : item.trimconstruction_id,
       };
 
-      const priceData = await props.getModalPrices(itemObj);
+      // const priceData = await props?.getModalPrices(itemObj);
 
-      let unitPrice = '';
-      if (
-        priceData &&
-        priceData.responseData &&
-        priceData.responseData.myArrayList
-      ) {
-        const mapData = priceData.responseData.myArrayList[0].map;
-        console.log('mapdata ===> ', mapData);
-        unitPrice = mapData?.Price ? (mapData?.Price).toString() : '0';
-      }
+      let unitPrice = '2';
+      // if (
+      //   priceData &&
+      //   priceData.responseData &&
+      //   priceData.responseData.myArrayList
+      // ) {
+      //   const mapData = priceData.responseData.myArrayList[0].map;
+      //   console.log('mapdata ===> ', mapData);
+      //   unitPrice = mapData?.Price ? (mapData?.Price).toString() : '0';
+      // }
 
       console.log('unit price set ===> ', unitPrice);
 
@@ -653,9 +659,9 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
       }
       let gstPrct='0';
       if( selectedradiooption2 === 'Fabric'){
-        gstPrct =item?.gst.toString() || '0'
+        gstPrct =item?.gst?.toString() || '0'
       }else{
-        gstPrct =item?.gstRate.toString() || '0'
+        gstPrct =item?.gstRate?.toString() || '0'
       }
 
       item.input_UnitPrice = unitPrice;

@@ -75,19 +75,24 @@ const StyleCreateUI = ({route, navigation, ...props}) => {
 
   useEffect(() => {
     if (props.sizeMap) {
-      set_scaleTable(props.sizeMap);
+      console.log('scale map ==> ', props.sizeMap);
+      const updatedScaleMap = props.sizeMap.map(item => ({
+        ...item,
+        enteredQty: '0',
+      }));
+
+      set_scaleTable(updatedScaleMap);
     }
   }, [props.sizeMap]);
 
   useEffect(() => {
     if (props.colorObj) {
-      console.log("color Obj", props.colorObj);
-      
-      if(props?.colorObj?.color){
+      console.log('color Obj', props.colorObj);
+
+      if (props?.colorObj?.color) {
         setSelectedIndices([props.colorObj.color]);
         setEditColor(false);
       }
-
     }
   }, [props.colorObj]);
 
@@ -99,9 +104,10 @@ const StyleCreateUI = ({route, navigation, ...props}) => {
   const [customerStyleNo, setCustomerStyleNo] = useState('');
   const [buyerPOQty, setBuyerPOQty] = useState('');
   const [hsn, setHSN] = useState('');
-  const [stylePriceFOB, setStylePriceFOB] = useState('');
+  const [stylePriceFOB, setStylePriceFOB] = useState('0');
   const [mrpTagPrice, setMRPTagPrice] = useState('');
   const [approvedConsumption, setApprovedConsumption] = useState('');
+  const [totalEnteredQty, setTotalEnteredQty] = useState('0');
 
   // Location
   const [locationList, setLocationList] = useState([]);
@@ -294,20 +300,23 @@ const StyleCreateUI = ({route, navigation, ...props}) => {
     props.popOkBtnAction();
   };
 
-
   const submitAction = async () => {
     if (
-      !styleNo &&
-      !customerStyleNo &&
-      !locationId &&
-      selectedIndices.length > 0 &&
-      !seasonId &&
-      buyerPOQty &&
-      !scaleOrSizeId &&
-      !hsn &&
+      !styleNo ||
+      !customerStyleNo ||
+      !locationId ||
+      selectedIndices.length > 0 ||
+      !seasonId ||
+      buyerPOQty ||
+      !scaleOrSizeId ||
+      !hsn ||
       !processWorkFlowId
     ) {
       Alert.alert('Please fill all mandatory fields !');
+      return;
+    }
+    if (totalEnteredQty != buyerPOQty) {
+      Alert.alert('Entered Qty in the Sizes should be equal to Buyer Po Qty');
       return;
     }
 
@@ -331,15 +340,15 @@ const StyleCreateUI = ({route, navigation, ...props}) => {
     }
 
     proceedWithSubmission();
-  }
+  };
 
-const proceedWithSubmission=()=>{
-
+  const proceedWithSubmission = () => {
     const consumptionObj = {};
     const invLimitObj = {};
     const emptyObj1 = {};
     const emptyObj2 = {};
     const emptyObj3 = {};
+    const enteredQtyObj = {};
 
     scaleTable.forEach(item => {
       consumptionObj[item.id] = item.consumption;
@@ -347,7 +356,12 @@ const proceedWithSubmission=()=>{
       emptyObj1[item.id] = '';
       emptyObj2[item.id] = '';
       emptyObj3[item.id] = '0';
+      enteredQtyObj[item.id] = item.enteredQty;
     });
+
+    console.log('empty obj ', enteredQtyObj);
+    console.log('emptyObj1 ', emptyObj1);
+    console.log('emptyObj2 ', emptyObj2);
 
     const colorStr = selectedIndices.join(',') + ',';
     const colorStr1 = selectedIndices.join(',');
@@ -369,12 +383,13 @@ const proceedWithSubmission=()=>{
       hsn: hsn,
       configurationId: processWorkFlowId,
       price: stylePriceFOB,
+      rate: stylePriceFOB,
       mrp: mrpTagPrice ? mrpTagPrice : '0',
       newBrand: '',
       gst: '0',
       appConsumption: approvedConsumption,
       gsCodesMap: emptyObj2,
-      gsCodesPriceMap: emptyObj1,
+      gsCodesPriceMap: enteredQtyObj,
       articleNumberMap: emptyObj1,
       gscodesizeprice: emptyObj1,
       sizeWiseEAN: emptyObj1,
@@ -595,7 +610,7 @@ const proceedWithSubmission=()=>{
             style={{
               alignItems: 'center',
               justifyContent: 'center',
-              backgroundColor: editColor ?  '#fff' : '#D8D8D8',
+              backgroundColor: editColor ? '#fff' : '#D8D8D8',
               marginTop: hp('2%'),
             }}>
             <TouchableOpacity
@@ -922,16 +937,20 @@ const proceedWithSubmission=()=>{
               <View style={styles.table}>
                 {/* Table Head */}
                 <View style={styles.table_head}>
-                  <View style={{width: '30%', alignItems: 'center'}}>
+                  <View style={{width: '10%', alignItems: 'center'}}>
                     <Text style={styles.table_head_captions}>Size</Text>
                   </View>
                   <View style={{width: '1%'}} />
-                  <View style={{width: '34%', alignItems: 'center'}}>
+                  <View style={{width: '30%', alignItems: 'center'}}>
                     <Text style={styles.table_head_captions}>Cons.</Text>
                   </View>
                   <View style={{width: '1%'}} />
-                  <View style={{width: '34%', alignItems: 'flex-end'}}>
+                  <View style={{width: '30%', alignItems: 'center'}}>
                     <Text style={styles.table_head_captions}>Inv Limit</Text>
+                  </View>
+                  <View style={{width: '1%'}} />
+                  <View style={{width: '28%', alignItems: 'center'}}>
+                    <Text style={styles.table_head_captions}>Qty</Text>
                   </View>
                 </View>
               </View>
@@ -940,11 +959,11 @@ const proceedWithSubmission=()=>{
               {scaleTable &&
                 scaleTable.map((item, index) => (
                   <View key={index} style={styles.table_body_single_row}>
-                    <View style={{width: '30%', alignItems: 'center'}}>
+                    <View style={{width: '10%', alignItems: 'center'}}>
                       <Text style={styles.table_data}>{item.name}</Text>
                     </View>
                     <View style={{width: '1%'}} />
-                    <View style={{width: '34%'}}>
+                    <View style={{width: '30%'}}>
                       <TextInput
                         style={styles.table_data_input}
                         value={item.consumption.toString()}
@@ -957,7 +976,7 @@ const proceedWithSubmission=()=>{
                       />
                     </View>
                     <View style={{width: '1%'}} />
-                    <View style={{width: '34%'}}>
+                    <View style={{width: '30%'}}>
                       <TextInput
                         style={styles.table_data_input}
                         value={item.invLimit.toString()}
@@ -969,10 +988,46 @@ const proceedWithSubmission=()=>{
                         keyboardType="numeric"
                       />
                     </View>
+                    <View style={{width: '1%'}} />
+                    <View style={{width: '28%'}}>
+                      <TextInput
+                        style={styles.table_data_input}
+                        value={item.enteredQty.toString()}
+                        // onChangeText={text => {
+                        //   const updatedTable = [...scaleTable];
+                        //   updatedTable[index].enteredQty = text;
+                        //   set_scaleTable(updatedTable);
+                        // }}
+                        onChangeText={text => {
+                          const updatedTable = [...scaleTable];
+                          updatedTable[index].enteredQty = text;
+
+                          set_scaleTable(updatedTable);
+
+                          const total = updatedTable.reduce(
+                            (sum, item) =>
+                              sum + (parseFloat(item.enteredQty) || 0),
+                            0,
+                          );
+                          setTotalEnteredQty(total.toString());
+                        }}
+                        keyboardType="numeric"
+                      />
+                    </View>
                   </View>
                 ))}
             </View>
           )}
+
+          <View style={{marginTop: hp('2%')}}>
+            <TextInput
+              label="Total Qty :"
+              value={totalEnteredQty}
+              mode="outlined"
+              onChangeText={text => console.log(text)}
+              editable={false}
+            />
+          </View>
 
           <View style={{marginTop: hp('2%')}}>
             <TextInput
@@ -982,6 +1037,7 @@ const proceedWithSubmission=()=>{
               onChangeText={text => setHSN(text)}
             />
           </View>
+
           <View style={{marginTop: hp('2%')}}>
             <TextInput
               label="MRP Tag price"
@@ -1108,7 +1164,6 @@ export default StyleCreateUI;
 
 const getStyles = colors =>
   StyleSheet.create({
-
     SectionStyle1: {
       flexDirection: 'row',
       // justifyContent: "center",
@@ -1153,7 +1208,7 @@ const getStyles = colors =>
       width: '100%',
     },
     table: {
-      width: '95%', // Reduces extra space on the sides
+      width: '100%', // Reduces extra space on the sides
       backgroundColor: '#fff',
       elevation: 1,
       borderRadius: 5,
