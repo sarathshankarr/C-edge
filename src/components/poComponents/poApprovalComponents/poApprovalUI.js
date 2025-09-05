@@ -584,6 +584,40 @@ const POApprovalUI = ({route, ...props}) => {
                 </Text>
               </View>
             </View>
+
+              <Text
+              style={[
+                CommonStyles.tylesHeaderTextStyle,
+                {
+                  alignItems: 'center',
+                  marginLeft: 10,
+                  backgroundColor: 'white',
+                },
+              ]}>
+              {'Notes/Comments  :'}
+            </Text>
+            <View
+              style={{
+                borderWidth: 1,
+                borderColor: 'black',
+                marginHorizontal: 10,
+                marginTop: 15,
+                borderRadius: 10,
+                backgroundColor: 'white',
+              }}>
+              <TextInput
+                placeholder=""
+                autoCapitalize="none"
+                multiline
+                value={props.notes}
+                onChangeText={text => props.set_notes(text)}
+                style={[
+                  styles.input,
+                  Platform.OS === 'ios' && {paddingVertical: 20},
+                ]}
+              />
+            </View>
+
             <View
               style={{
                 flexDirection: 'row',
@@ -1048,6 +1082,7 @@ const POApprovalUI = ({route, ...props}) => {
 
             <View style={{height: 150}} />
           </View>
+
         </View>
       </ScrollView>
       <View style={CommonStyles.bottomViewComponentStyle}>

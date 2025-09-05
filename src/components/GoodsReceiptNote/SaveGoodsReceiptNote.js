@@ -100,12 +100,14 @@ const SaveGoodsReceiptNote = ({navigation, route, ...props}) => {
   };
 
   const submitAction = async tempObj => {
+
+    console.log("save ", tempObj);
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
     let companyObj = await AsyncStorage.getItem('companyObj');
     let userId = await AsyncStorage.getItem('userId');
-
+   
     tempObj.userName = userName;
     tempObj.userPwd = userPsd;
     tempObj.userId = userId;
@@ -115,7 +117,7 @@ const SaveGoodsReceiptNote = ({navigation, route, ...props}) => {
     tempObj.grnapp = 1;
     tempObj.costfoc = 0;
 
-    console.log('saving obj ==>', tempObj);
+   
 
     tempObj.company = JSON.parse(companyObj);
 

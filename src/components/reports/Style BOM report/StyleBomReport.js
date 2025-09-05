@@ -129,8 +129,6 @@ const StyleBomReport = ({navigation, route, ...props}) => {
     popUpAction(undefined, undefined, '', false, false);
   };
 
-
-
   const requestStoragePermission = async () => {
     try {
       if (Platform.OS === 'android') {
@@ -262,7 +260,7 @@ const StyleBomReport = ({navigation, route, ...props}) => {
     }
   };
 
-  const submitAction = async tempObj => {
+  const submitActionXl = async tempObj => {
     try {
       let userName = await AsyncStorage.getItem('userName');
       let userPsd = await AsyncStorage.getItem('userPsd');
@@ -275,10 +273,17 @@ const StyleBomReport = ({navigation, route, ...props}) => {
         password: userPsd,
         compIds: usercompanyId,
         company: JSON.parse(companyObj),
+
+        // multistyle: tempObj.multistyle,
+        // QtyVal: tempObj.QtyVal,
+        // soId: tempObj.soId,
+
         multistyle: tempObj.multistyle,
-        QtyVal: tempObj.QtyVal,
+        qtys: tempObj.QtyVal,
         soId: tempObj.soId,
       };
+      console.log('submitAction obj', obj);
+
       console.log('req for excel ===> ', obj);
       const apiUrl = APIServiceCall.downloadStyleBomReport();
       console.log('API URL:', apiUrl);
@@ -287,7 +292,7 @@ const StyleBomReport = ({navigation, route, ...props}) => {
         headers: {
           'Content-Type': 'application/json',
         },
-        responseType: 'arraybuffer', 
+        responseType: 'arraybuffer',
       });
 
       console.log('Binary Excel file received, converting to base64...');
@@ -328,6 +333,171 @@ const StyleBomReport = ({navigation, route, ...props}) => {
       );
     } catch (error) {
       console.error('Error generating or saving Excel file:', error);
+      popUpAction(
+        Constant.SERVICE_FAIL_PDF_MSG,
+        Constant.DefaultAlert_MSG,
+        'OK',
+        true,
+        false,
+      );
+    } finally {
+      set_isLoading(false);
+    }
+  };
+  const submitAction2 = async tempObj => {
+    try {
+      console.log('submitAction obj', obj);
+
+      console.log('req for excel ===> ', obj);
+      const apiUrl = APIServiceCall.downloadStyleBomReport();
+      console.log('API URL:', apiUrl);
+
+      const response = await axios.post(apiUrl, obj, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        responseType: 'arraybuffer',
+      });
+
+      console.log('Binary Excel file received, converting to base64...');
+
+      // Convert binary response to base64
+      const base64Excel = Buffer.from(response.data).toString('base64');
+
+      // Android storage permission
+      if (Platform.OS === 'android') {
+        const hasPermission = await requestStoragePermission();
+        if (!hasPermission) {
+          Alert.alert(
+            'Permission Denied',
+            'Storage permission is required to save the XLSX file.',
+          );
+          return;
+        }
+      }
+
+      // File path
+      const filePath =
+        Platform.OS === 'android'
+          ? `/storage/emulated/0/Download/StyleBomReport_${Date.now()}.xlsx`
+          : `${
+              ReactNativeBlobUtil.fs.dirs.DocumentDir
+            }/StyleBomReport_${Date.now()}.xlsx`;
+
+      // Save base64 file
+      await ReactNativeBlobUtil.fs.writeFile(filePath, base64Excel, 'base64');
+
+      // Success
+      popUpAction(
+        `Excel file saved successfully at ${filePath}`,
+        Constant.DefaultAlert_MSG,
+        'OK',
+        true,
+        false,
+      );
+    } catch (error) {
+      console.error('Error generating or saving Excel file:', error);
+      popUpAction(
+        Constant.SERVICE_FAIL_PDF_MSG,
+        Constant.DefaultAlert_MSG,
+        'OK',
+        true,
+        false,
+      );
+    } finally {
+      set_isLoading(false);
+    }
+  };
+
+  const submitAction = async tempObj => {
+    let userName = await AsyncStorage.getItem('userName');
+    let userPsd = await AsyncStorage.getItem('userPsd');
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
+    set_isLoading(true);
+
+    let obj = {
+      username: userName,
+      password: userPsd,
+      compIds: usercompanyId,
+      company: JSON.parse(companyObj),
+
+      // multistyle: tempObj.multistyle,
+      // QtyVal: tempObj.QtyVal,
+      // soId: tempObj.soId,
+
+      multistyle: tempObj.multistyle,
+      qtys: tempObj.QtyVal,
+      soId: tempObj.soId,
+    };
+
+    const apiUrl = APIServiceCall.downloadStyleBomReport();
+
+    try {
+      const response = await axios.post(apiUrl, obj, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        responseType: 'arraybuffer',
+      });
+
+      console.log(
+        'Response for pdf API ==> ',
+        typeof response?.request?._response,
+      );
+
+      // Ensure the data is in binary form
+      let base64Data = response?.request?._response;
+
+      if (Platform.OS === 'android') {
+        const hasPermission = await requestStoragePermission();
+        if (!hasPermission) {
+          Alert.alert(
+            'Permission Denied',
+            'Storage permission is required to save the PDF.',
+          );
+          return;
+        }
+      }
+
+      const downloadFolder =
+        Platform.OS === 'android'
+          ? ReactNativeBlobUtil.fs.dirs.DownloadDir
+          : ReactNativeBlobUtil.fs.dirs.DocumentDir;
+      // const pdfPath = `${downloadFolder}/${item.so_style_id}.pdf`;
+      // const pdfPath = `/storage/emulated/0/Download/${item.so_style_id}_${Date.now()}.pdf`;
+
+      const pdfPath =
+        Platform.OS === 'android'
+          ? `/storage/emulated/0/Download/StyleBomReport_${Date.now()}.pdf`
+          : `${ReactNativeBlobUtil.fs.dirs.DocumentDir}/StyleBomReport_${Date.now()}.pdf`;
+
+
+      await ReactNativeBlobUtil.fs.writeFile(pdfPath, base64Data, 'base64');
+
+      // Alert.alert('PDF Downloaded', `PDF saved successfully at ${pdfPath}`);
+      // popUpAction(`PDF saved successfully at ${pdfPath}`,Constant.DefaultAlert_MSG,'OK', true,false)
+
+      if (Platform.OS === 'android') {
+        popUpAction(
+          `PDF saved successfully at ${pdfPath}`,
+          Constant.DefaultAlert_MSG,
+          'OK',
+          true,
+          false,
+        );
+      } else {
+        popUpAction(
+          'PDF saved successfully',
+          Constant.DefaultAlert_MSG,
+          'OK',
+          true,
+          false,
+        );
+      }
+    } catch (error) {
+      console.error('Error generating or saving PDF:', error);
+      // Alert.alert('Error', `Failed to generate or save PDF: ${error.message}`);
       popUpAction(
         Constant.SERVICE_FAIL_PDF_MSG,
         Constant.DefaultAlert_MSG,

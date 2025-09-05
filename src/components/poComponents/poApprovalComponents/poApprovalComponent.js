@@ -21,6 +21,7 @@ const POApprovalComponent = ({ navigation, route, ...props }) => {
   const [poNumber, set_poNumber] = useState(undefined);
   const [pId, set_pId] = useState(1);
   const [remarks, set_remarks] = useState("");
+  const [notes, set_notes] = useState("");
   const [gstAmount, set_gstAmount]=useState(0);
   const [itemsObj, set_itemsObj] = useState([]);
 
@@ -90,7 +91,8 @@ const POApprovalComponent = ({ navigation, route, ...props }) => {
         set_itemsArray(poEditAPIObj.responseData.poChildResponseList);
         set_sdeliveryDate(poEditAPIObj.responseData.deliveryDateStr);
         set_startDate(poEditAPIObj.responseData.issueDateStr);
-        set_remarks(poEditAPIObj.responseData.statusRemarks)
+        set_remarks(poEditAPIObj.responseData?.statusRemarks|| "");
+        set_notes(poEditAPIObj.responseData?.notes || "");
         // set_poNumber(poEditAPIObj.responseData.poNumber);
         setItemDetails({
           ...itemDetails,
@@ -143,10 +145,10 @@ const POApprovalComponent = ({ navigation, route, ...props }) => {
     //reject = 3
     let obj = {
       "poNumber": poNumber,  
-      "statusRemarks": remarks,
+      "statusRemarks": remarks || "",
       "status": value && value === 100 ? 3 : 1, 
       "secondLevelFlag": "0",
-      "notes": itemsObj?.notes || "",
+      "notes": notes || "",
       "locId": 0,
       "styleId": 0,
       "menuId": 4,      
@@ -155,6 +157,8 @@ const POApprovalComponent = ({ navigation, route, ...props }) => {
       "compIds": usercompanyId,
       "company":JSON.parse(companyObj),
     }
+
+    console.log("obj ",obj.statusRemarks, "----",  obj.notes)
 
     let poApproveAPIObj = await APIServiceCall.poApproveAPIService(obj);
     set_isLoading(false);
@@ -272,6 +276,8 @@ const POApprovalComponent = ({ navigation, route, ...props }) => {
       gstName={gstName}
       remarks={remarks}
       set_remarks={set_remarks}
+      notes={notes}
+      set_notes={set_notes}
       popUpAlert={popUpAlert}
       popUpMessage={popUpMessage}
       popUpRBtnTitle={popUpRBtnTitle}
