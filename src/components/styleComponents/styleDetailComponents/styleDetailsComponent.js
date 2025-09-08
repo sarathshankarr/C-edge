@@ -209,6 +209,49 @@ const StyleDetailsComponent = ({navigation, route, ...props}) => {
       );
     }
   };
+  
+  
+  const getBOMRowDelete = async (childIdx, parentTrimTypeId) => {
+    set_isLoading(true);
+    let userName = await AsyncStorage.getItem('userName');
+    let userPsd = await AsyncStorage.getItem('userPsd');
+    let obj = {
+      username: userName,
+      password: userPsd,
+      styleId: styleId,
+      trimtypeId: parentTrimTypeId,
+      itemconstructionId: childIdx,
+    };
+    console.log("getBOMRowDelete obj , ", obj)
+    let getBOMRowDeleteObj = await APIServiceCall.getBOMRowDelete(obj);
+    set_isLoading(false);
+    if (getBOMRowDeleteObj && getBOMRowDeleteObj.statusData) {
+      if (getBOMRowDeleteObj && getBOMRowDeleteObj.responseData) {
+        console.log('Status ', getBOMRowDeleteObj.responseData);
+        return getBOMRowDeleteObj.responseData; 
+      }
+    } else {
+      popUpAction(
+        Constant.SERVICE_FAIL_MSG,
+        Constant.DefaultAlert_MSG,
+        'OK',
+        true,
+        false,
+      );
+      return null;
+    }
+
+    if (getBOMRowDeleteObj && getBOMRowDeleteObj.error) {
+      popUpAction(
+        Constant.SERVICE_FAIL_MSG,
+        Constant.DefaultAlert_MSG,
+        'OK',
+        true,
+        false,
+      );
+    }
+    return null;
+  };
 
   const popUpAction = (popMsg, popAlert, rBtnTitle, isPopup, isPopLeft) => {
     set_popUpMessage(popMsg);
@@ -357,6 +400,7 @@ const StyleDetailsComponent = ({navigation, route, ...props}) => {
       viewProcessFlowAction={viewProcessFlowAction}
       listItems={listItems}
       submitAction={submitAction}
+      getBOMRowDelete={getBOMRowDelete}
       saveEditStleBOMDetails={saveEditStleBOMDetails}
     />
   );

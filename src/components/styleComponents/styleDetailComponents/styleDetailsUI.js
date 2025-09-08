@@ -793,7 +793,32 @@ const StyleDetailsUI = ({route, ...props}) => {
     setRmAllocationBomList(updatedList);
   };
 
-  const ToggleChildRow = (childIdx, parentTrimTypeId) => {
+  const ToggleChildRow1 = (childIdx, parentTrimTypeId) => {
+    console.log("delete row ", childIdx, parentTrimTypeId);
+
+      Alert.alert(
+    'Confirm',
+    'Do you want to delete RM allocation?',
+    [
+      {
+        text: 'Cancel',
+        style: 'cancel',
+        onPress: () => {
+          console.log('Toggle cancelled');
+          return; 
+        },
+      },
+      {
+        text: 'OK',
+        onPress: () => {
+          console.log("delete row ", childIdx, parentTrimTypeId);
+          props.getBOMRowDelete(childIdx, parentTrimTypeId);
+        },
+      },
+    ],
+    { cancelable: false }
+  );
+
     const updatedList = RmAllocationBomList.map(parent =>
       parent.trimTypeId === parentTrimTypeId
         ? {
@@ -805,6 +830,51 @@ const StyleDetailsUI = ({route, ...props}) => {
 
     setRmAllocationBomList(updatedList);
   };
+  const ToggleChildRow = (childIdx, parentTrimTypeId) => {
+  Alert.alert(
+    'Confirm',
+    'Do you want to delete RM allocation?',
+    [
+      {
+        text: 'Cancel',
+        style: 'cancel',
+        onPress: () => {
+          console.log('Delete cancelled');
+          return;
+        },
+      },
+      {
+        text: 'OK',
+        onPress: async () => {
+          console.log("Deleting row...", childIdx, parentTrimTypeId);
+          const res = await props.getBOMRowDelete(childIdx, parentTrimTypeId);
+
+          if (res?.status === "true") {
+            console.log("Delete Success response :", res);
+
+           
+            const updatedList = RmAllocationBomList.map(parent =>
+              parent.trimTypeId === parentTrimTypeId
+                ? {
+                    ...parent,
+                    childList: parent.childList.filter(
+                      child => child.selectedRmId !== childIdx
+                    ),
+                  }
+                : parent
+            );
+
+            setRmAllocationBomList(updatedList);
+          } else {
+            console.log("Delete failed or API returned null");
+          }
+        },
+      },
+    ],
+    { cancelable: false }
+  );
+};
+
 
   // const actionOnRMList = (item, selectedId) => {
   //   const updatedList = RmAllocationBomList.map(r =>
@@ -1978,7 +2048,7 @@ const handleChangeSearchQuery = (text, trimTypeId) => {
                               <TouchableOpacity
                                 style={{alignItems: '', justifyContent: ''}}
                                 onPress={() =>
-                                  ToggleChildRow(child.idx, item.trimTypeId)
+                                  ToggleChildRow(child.selectedRmId, item.trimTypeId)
                                 }>
                                 <Image
                                   source={closeImg}
