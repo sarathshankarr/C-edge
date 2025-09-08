@@ -526,15 +526,25 @@ const StyleDetailsUI = ({route, ...props}) => {
   const rgtBtnAction = () => {
     if (selectedTab === 1) {
       if (
-        !styleNo ||
-        !customerStyleNo ||
-        !locationId ||
-        selectedIndices.length > 0 ||
-        !seasonId ||
-        buyerPOQty ||
-        !scaleOrSizeId ||
-        !hsn ||
-        !processWorkFlowId
+        // !styleNo ||
+        // !customerStyleNo ||
+        // !locationId ||
+        // selectedIndices.length > 0 ||
+        // !seasonId ||
+        // buyerPOQty ||
+        // !scaleOrSizeId ||
+        // !hsn ||
+        // !processWorkFlowId
+
+           !styleNo ||
+      !customerStyleNo ||
+      !locationId ||
+      !selectedIndices.length > 0 ||
+      !seasonId ||
+      !buyerPOQty ||
+      !scaleOrSizeId ||
+      !hsn ||
+      !processWorkFlowId
 
         
       ) {

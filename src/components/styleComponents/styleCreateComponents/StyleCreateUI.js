@@ -301,13 +301,24 @@ const StyleCreateUI = ({route, navigation, ...props}) => {
   };
 
   const submitAction = async () => {
+    // console.log("mandatory fields ", !styleNo ,
+    //   !customerStyleNo ,
+    //   !locationId ,
+    //   // selectedIndices.length > 0 ,
+    //   !seasonId ,
+    //   !buyerPOQty ,
+    //   !scaleOrSizeId ,
+    //   !hsn ,
+    //   !processWorkFlowId)
+
+
     if (
       !styleNo ||
       !customerStyleNo ||
       !locationId ||
-      selectedIndices.length > 0 ||
+      !selectedIndices.length > 0 ||
       !seasonId ||
-      buyerPOQty ||
+      !buyerPOQty ||
       !scaleOrSizeId ||
       !hsn ||
       !processWorkFlowId

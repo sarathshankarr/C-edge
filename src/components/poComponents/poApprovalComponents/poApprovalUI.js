@@ -60,7 +60,7 @@ const POApprovalUI = ({route, ...props}) => {
 
   useEffect(() => {
     if (props.itemsObj) {
-      console.log('po ===> ', props.itemsObj);
+      // console.log('po ===> ', props.itemsObj);
       if (props?.itemsObj?.poFiles) {
         const filenames = props.itemsObj.poFiles.replace(/,+$/, '').split(',');
 
