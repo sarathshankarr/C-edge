@@ -165,8 +165,13 @@ const StyleDetailsUI = ({route, ...props}) => {
             gsCode: item.gsCode,
           }),
         );
-
         set_scaleTable(ScaleTable);
+
+         const total = ScaleTable.reduce(
+      (sum, row) => sum + (parseFloat(row.enteredQty) || 0),
+      0
+    );
+    setTotalEnteredQty(total.toString());
 
         const sizeMap = {};
         props.itemObj.sizesGSCodesList.forEach(item => {
@@ -636,15 +641,17 @@ const StyleDetailsUI = ({route, ...props}) => {
     const emptyObj2 = {};
 
     scaleTable.forEach(item => {
-      consumptionObj[item.id] = item.consumption;
-      invLimitObj[item.id] = item.invLimit;
-      enteredQtyObj[item.id] = item.enteredQty;
+      consumptionObj[item.id] = item.consumption || '0';
+      invLimitObj[item.id] = item.invLimit|| '0';
+      enteredQtyObj[item.id] = item.enteredQty|| '0';
       emptyObj1[item.id] = '';
       emptyObj2[item.id] = '0';
       gsCodeMap[item.id] = item.gsCode;
     });
 
-    console.log('empty obj ', enteredQtyObj);
+    console.log('enteredQtyObj ', enteredQtyObj);
+    console.log('invLimitObj ', invLimitObj);
+    console.log('consumptionObj ', consumptionObj);
     console.log('emptyObj1 ', emptyObj1);
     console.log('emptyObj2 ', emptyObj2);
     console.log('gsCodeMap ', gsCodeMap);
@@ -1006,6 +1013,18 @@ const handleChangeSearchQuery = (text, trimTypeId) => {
 
   setSearchQuery(text);
   setRmAllocationBomList(filtered);
+};
+
+
+const handleApprovedConsumptionChange = (value) => {
+  setApprovedConsumption(value);
+
+  set_scaleTable(prevTable =>
+    prevTable.map(row => ({
+      ...row,
+      consumption: value,   
+    }))
+  );
 };
 
   return (
@@ -1500,7 +1519,7 @@ const handleChangeSearchQuery = (text, trimTypeId) => {
                   label="Approved consumption"
                   value={approvedConsumption}
                   mode="outlined"
-                  onChangeText={text => setApprovedConsumption(text)}
+                  onChangeText={text => handleApprovedConsumptionChange(text)}
                 />
               </View>
 
@@ -1619,6 +1638,17 @@ const handleChangeSearchQuery = (text, trimTypeId) => {
                               const updatedTable = [...scaleTable];
                               updatedTable[index].consumption = text;
                               set_scaleTable(updatedTable);
+
+                                  const totalConsumption = updatedTable.reduce(
+              (sum, row) => sum + (parseFloat(row.consumption) || 0),
+              0
+            );
+            const avgConsumption =
+              updatedTable.length > 0
+                ? totalConsumption / updatedTable.length
+                : 0;
+
+            setApprovedConsumption(avgConsumption.toString());
                             }}
                             keyboardType="numeric"
                           />

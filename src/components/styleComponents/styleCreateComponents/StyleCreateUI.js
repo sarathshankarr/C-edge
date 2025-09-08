@@ -362,14 +362,16 @@ const StyleCreateUI = ({route, navigation, ...props}) => {
     const enteredQtyObj = {};
 
     scaleTable.forEach(item => {
-      consumptionObj[item.id] = item.consumption;
-      invLimitObj[item.id] = item.invLimit;
+      consumptionObj[item.id] = item.consumption || '0';
+      invLimitObj[item.id] = item.invLimit || '0';
       emptyObj1[item.id] = '';
       emptyObj2[item.id] = '';
       emptyObj3[item.id] = '0';
-      enteredQtyObj[item.id] = item.enteredQty;
+      enteredQtyObj[item.id] = item.enteredQty || '0';
     });
 
+    console.log('invLimitObj ', invLimitObj);
+    console.log('consumptionObj ', consumptionObj);
     console.log('empty obj ', enteredQtyObj);
     console.log('emptyObj1 ', emptyObj1);
     console.log('emptyObj2 ', emptyObj2);
@@ -414,6 +416,17 @@ const StyleCreateUI = ({route, navigation, ...props}) => {
   const backAction = async () => {
     props.backBtnAction();
   };
+
+  const handleApprovedConsumptionChange = (value) => {
+  setApprovedConsumption(value);
+
+  set_scaleTable(prevTable =>
+    prevTable.map(row => ({
+      ...row,
+      consumption: value,   
+    }))
+  );
+};
 
   return (
     <View style={[CommonStyles.mainComponentViewStyle]}>
@@ -866,7 +879,7 @@ const StyleCreateUI = ({route, navigation, ...props}) => {
               label="Approved consumption"
               value={approvedConsumption}
               mode="outlined"
-              onChangeText={text => setApprovedConsumption(text)}
+              onChangeText={text => handleApprovedConsumptionChange(text)}
             />
           </View>
 
@@ -982,6 +995,18 @@ const StyleCreateUI = ({route, navigation, ...props}) => {
                           const updatedTable = [...scaleTable];
                           updatedTable[index].consumption = text;
                           set_scaleTable(updatedTable);
+
+                          // ✅ Recalculate approved consumption
+            const totalConsumption = updatedTable.reduce(
+              (sum, row) => sum + (parseFloat(row.consumption) || 0),
+              0
+            );
+            const avgConsumption =
+              updatedTable.length > 0
+                ? totalConsumption / updatedTable.length
+                : 0;
+
+            setApprovedConsumption(avgConsumption.toString());
                         }}
                         keyboardType="numeric"
                       />
