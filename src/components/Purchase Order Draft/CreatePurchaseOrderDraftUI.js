@@ -641,9 +641,10 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
       };
 
       const priceData = await props?.getModalPrices(itemObj);
-      console.log("response of price api ", priceData);
+      console.log('response of price api ', priceData);
 
       let unitPrice;
+      let gstPrct = '0';
       if (
         priceData &&
         priceData.responseData &&
@@ -651,7 +652,14 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
       ) {
         const mapData = priceData.responseData.myArrayList[0].map;
         // console.log('mapdata ===> ', mapData);
-        unitPrice = mapData?.Price ? (mapData?.Price).toString() : '0';
+        if (selectedradiooption1 === 'Style (FG)') {
+          unitPrice = mapData?.unitprice
+            ? (mapData?.unitprice).toString()
+            : '0';
+          gstPrct = mapData?.gst ? (mapData?.gst).toString() : '0';
+        } else {
+          unitPrice = mapData?.Price ? (mapData?.Price).toString() : '0';
+        }
       }
 
       console.log('unit price set ===> ', unitPrice);
@@ -668,11 +676,13 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
       } else if (selectedradiooption2 === 'Trim Fabric(RM)') {
         item.styleNameALL = item.trimName || '';
       }
-      let gstPrct = '0';
-      if (selectedradiooption2 === 'Fabric') {
-        gstPrct = item?.gst?.toString() || '0';
-      } else {
-        gstPrct = item?.gstRate?.toString() || '0';
+
+      if (selectedradiooption1 !== 'Style (FG)') {
+        if (selectedradiooption2 === 'Fabric') {
+          gstPrct = item?.gst?.toString() || '0';
+        } else {
+          gstPrct = item?.gstRate?.toString() || '0';
+        }
       }
 
       item.input_UnitPrice = unitPrice;
