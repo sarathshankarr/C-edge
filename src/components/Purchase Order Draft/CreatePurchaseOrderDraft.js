@@ -218,12 +218,12 @@ const CreatePurchaseOrderDraft = ({route}) => {
       menuId: 247,
       compIds: usercompanyId,
       company: JSON.parse(companyObj),
-      itemTrimsType: itemObj.type,
+      itemTrimsType: itemObj.type,  //FG
       itemStr: itemObj.type === 'TRIMFABRIC' ? itemObj.type : '',
-      itemId: itemObj.id,
+      itemId: itemObj.id,  //STYLEID
     };
 
-    // console.log("req body for prices  ==> ", obj)
+    console.log("req body for prices  ==> ", obj )
 
     let LISTAPIOBJ = await APIServiceCall.getPODModalPricesList(obj);
     set_isLoading(false);

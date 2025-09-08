@@ -213,12 +213,11 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
     //   setVendorName(item.name);
     //   setShowVendorList(false);
     // }
-     status = await props.getGstStatusFromVendor(item.id);
-    
-      setVendorId(item.id);
-      setVendorName(item.name);
-      setShowVendorList(false);
-  
+    status = await props.getGstStatusFromVendor(item.id);
+
+    setVendorId(item.id);
+    setVendorName(item.name);
+    setShowVendorList(false);
   };
 
   const handleSearchVendor = text => {
@@ -325,11 +324,16 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
         itemId = item.trimconstruction_id;
         itemName = item.trimName;
         itemDescription = item.description;
+      } else {
+        itemId = item?.trimconstruction_id;
+        itemName = item.styleName;
+        itemDescription = item.styleNameALL;
       }
       const tempObj = {
         itemId: itemId || 0,
         itemQty: item.input_Qty,
-        itemTrimsType: selectedradiooption2,
+        itemTrimsType:
+          selectedradiooption1 === 'Style (FG)' ? 'FG' : selectedradiooption2,
         itemdesc: itemName || '',
         sizeCapacity: '',
         gsCode: '',
@@ -368,7 +372,8 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
       deliveryDate: formatDateIntoDMY(deliveryDate),
       shiploc: shipLocationId,
       orderDate: formatDateIntoDMY(orderDate),
-      itemTrimsType: selectedradiooption2,
+      itemTrimsType:
+        selectedradiooption1 === 'Style (FG)' ? 'FG' : selectedradiooption2,
       issueDate: '',
       shipcancelDate: '',
       preferredDate: '',
@@ -412,7 +417,6 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
       modify_user: '',
       styleOrBuyerpo: 0,
       lineItemsSet: checkedData,
-
       totalQty: totalInputQty,
       subTotal: totalNetAmount,
       totalPrice: totalNetAmount,
@@ -420,8 +424,9 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
       gst_prct: '0',
       totalDiscountAmount: '0',
     };
-    // console.log('sub obj  po save ===> ', tempObj.posave);
-    // return;
+    console.log('sub obj  po save ===> ', tempObj);
+    console.log('rows po save ===> ', rows);
+    return;
 
     props.submitAction(tempObj);
   };
@@ -612,36 +617,42 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
     props.set_isLoading(true);
 
     const newList = [];
+    console.log('modal lists ', modalLists[0]);
 
     for (const index of selectedIdxs) {
       const item = {...modalLists[index]};
       const itemObj = {
         type:
-          selectedradiooption2 === 'RM'
+          selectedradiooption1 === 'Style (FG)'
+            ? 'FG'
+            : selectedradiooption2 === 'RM'
             ? 'Trims'
             : selectedradiooption2 === 'Fabric'
             ? 'Fabric'
             : 'TRIMFABRIC',
         id:
-          selectedradiooption2 === 'RM'
+          selectedradiooption1 === 'Style (FG)'
+            ? item.styleId
+            : selectedradiooption2 === 'RM'
             ? item.trimTypeId
             : selectedradiooption2 === 'Fabric'
             ? item.fabricId
             : item.trimconstruction_id,
       };
 
-      // const priceData = await props?.getModalPrices(itemObj);
+      const priceData = await props?.getModalPrices(itemObj);
+      console.log("response of price api ", priceData);
 
-      let unitPrice = '2';
-      // if (
-      //   priceData &&
-      //   priceData.responseData &&
-      //   priceData.responseData.myArrayList
-      // ) {
-      //   const mapData = priceData.responseData.myArrayList[0].map;
-      //   console.log('mapdata ===> ', mapData);
-      //   unitPrice = mapData?.Price ? (mapData?.Price).toString() : '0';
-      // }
+      let unitPrice;
+      if (
+        priceData &&
+        priceData.responseData &&
+        priceData.responseData.myArrayList
+      ) {
+        const mapData = priceData.responseData.myArrayList[0].map;
+        // console.log('mapdata ===> ', mapData);
+        unitPrice = mapData?.Price ? (mapData?.Price).toString() : '0';
+      }
 
       console.log('unit price set ===> ', unitPrice);
 
@@ -657,11 +668,11 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
       } else if (selectedradiooption2 === 'Trim Fabric(RM)') {
         item.styleNameALL = item.trimName || '';
       }
-      let gstPrct='0';
-      if( selectedradiooption2 === 'Fabric'){
-        gstPrct =item?.gst?.toString() || '0'
-      }else{
-        gstPrct =item?.gstRate?.toString() || '0'
+      let gstPrct = '0';
+      if (selectedradiooption2 === 'Fabric') {
+        gstPrct = item?.gst?.toString() || '0';
+      } else {
+        gstPrct = item?.gstRate?.toString() || '0';
       }
 
       item.input_UnitPrice = unitPrice;
@@ -670,7 +681,7 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
       item.input_NetAmount = '';
       item.input_GstAmount = '';
       item.input_TotalAmount = '';
-      console.log("item ===> ", item)
+      // console.log("item ===> ", item)
       newList.push(item);
     }
 
