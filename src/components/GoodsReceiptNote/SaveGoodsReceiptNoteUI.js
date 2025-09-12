@@ -52,12 +52,16 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
   const [selectAllCheckBox, setSelectAllCheckBox] = useState(false);
   const [referenceDate, setReferenceDate] = useState('');
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  const [tcs, setTcs] = useState('0');
+  const [showSave, setShowSave] = useState(true);
 
   const {colors} = useContext(ColorContext);
   const styles = getStyles(colors);
 
   useEffect(() => {
     if (props.itemsObj) {
+      handleConfirm(new Date());
+
       console.log('use effect grn approvve ', props.itemsObj);
       setData(props.itemsObj);
 
@@ -71,6 +75,13 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
         }
         if (props.itemsObj.pomaster.itemTrimsType) {
           setItemOrTrims(props.itemsObj.pomaster.itemTrimsType);
+        }
+        console.log(
+          'reference date ',
+          props.itemsObj?.pomaster?.referenceDateStr,
+        );
+        if (props.itemsObj.pomaster.referenceDateStr) {
+          setReferenceDate(props.itemsObj.pomaster.referenceDateStr);
         }
         // if (props.itemsObj.grnImgFile) {
         //   console.log("============> ", props.itemsObj.grnImgFile);
@@ -96,6 +107,13 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
         if (props.itemsObj.pomaster.companyName) {
           setShipTo(props.itemsObj.pomaster.companyName);
         }
+        if (props.itemsObj.pomaster.poStatus) {
+          const flag =
+            props.itemsObj.pomaster.poStatus === 'CANCEL' ||
+            props.itemsObj.pomaster.poStatus === 'CLOSED';
+          console.log('show save btn btn ', !flag);
+          setShowSave(!flag);
+        }
         if (
           props.itemsObj.pomaster.transportCost ||
           props.itemsObj.pomaster.additional_cost ||
@@ -109,12 +127,17 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
             (parseFloat(additional_cost) || 0) +
             (parseFloat(poTcs) || 0);
 
-          if (total > 0) set_totaTax(total);
+          const tcsvalue = parseFloat(poTcs) || 0;
+          setTcs(tcsvalue.toString());
+
+          console.log('total tax ', total, typeof total);
+
+          if (total > 0) set_totaTax(total.toString());
         }
         if (props.itemsObj.pomaster.poMasterChildMappingDao) {
           const dataMap = props.itemsObj.pomaster.poMasterChildMappingDao;
           setChildData(props.itemsObj.pomaster.poMasterChildMappingDao);
-          // console.log('save grn approvve  child ', dataMap);
+          // console.log('prepopuate  child ', dataMap);
           // props.itemsObj.pomaster.itemTrimsType
           const childMap = dataMap.map((item, index) => ({
             ...item,
@@ -122,14 +145,21 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
             requiredQty: item.quantitystr,
             remainingQty: item.remQty,
             enteredQty: item.recqty,
+            remainingQty1: item.remQty,
+            enteredQty1: item.recqty,
             fabric: item.fabrecqty,
             price: item.price,
             grnNo: item.grnUniqueNo,
-            refNo: item.referenceNo || '',
+            refNo:
+              !item.referenceNo || item.referenceNo === 'null'
+                ? ''
+                : item.referenceNo,
             gstPercent: item.gstper,
-            itemRate: item.itemratestr,
+            // itemRate: item.itemratestr,
+            itemRate: item.totprice,
             discountAccount: item.discAmnt,
-            gst: item.gstamntstr,
+            // gst: item.gstamntstr,
+            gst: item.gstamnt,
             total: item.totalWithGst,
             fabric: item.itemdesc,
             quantitystr: item?.quantitystr || 0,
@@ -137,8 +167,8 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
             showClose: false,
             presentReceivedQty:
               props.itemsObj?.pomaster?.itemTrimsType === 'Fabric' ||
-              Number(item?.receivedQty || 0) >=
-                  Number(item?.quantitystr || 0)
+              props.itemsObj?.pomaster?.itemTrimsType === 'TRIM FABRIC' ||
+              Number(item?.receivedQty || 0) >= Number(item?.quantitystr || 0)
                 ? item?.receivedQty
                 : '',
             // editablePriceReceivedQty:
@@ -146,24 +176,22 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
             //     ? false
             //     : true,
             editablePriceReceivedQty:
-              props.itemsObj?.pomaster?.itemTrimsType === 'Fabric'
-                ? false
+              props.itemsObj?.pomaster?.itemTrimsType === 'Fabric' ||
+              props.itemsObj?.pomaster?.itemTrimsType === 'TRIM FABRIC'
+                ? Number(item?.receivedQty || 0) > 0
+                  ? false
+                  : true
                 : Number(item?.receivedQty || 0) >=
-                  Number(item?.quantitystr || 0)
+                    Number(item?.quantitystr || 0) &&
+                  Number(item?.receivedQty || 0) !== 0
                 ? false
                 : true,
 
             totalRecieved:
               Number(item?.receivedQty || 0) >= Number(item?.quantitystr || 0),
           }));
-          console.log(
-            'child map  ',
-            childMap[0].receivedQty,
-            childMap[0].quantitystr,
-            typeof childMap[0].receivedQty,
-            typeof childMap[0].quantitystr,
-            childMap[0].totalRecieved,
-          );
+          // console.log("child , ", childMap[0]?.alreadyReceivedQty, childMap[1]?.alreadyReceivedQty,  Number(childMap[0]?.alreadyReceivedQty || 0) > 0 ? false : true, Number(childMap[1]?.alreadyReceivedQty || 0) > 0 ? false : true)
+          // console.log("child 2, ", childMap[0]?.editablePriceReceivedQty, childMap[1]?.editablePriceReceivedQty)
           setRows(childMap);
         }
       }
@@ -173,25 +201,75 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
   const popOkBtnAction = () => {
     props.popOkBtnAction();
   };
+  const formattedDate = date => {
+    const [d, m, y] = date.split('-');
+    const newDate = [y, m, d].join('-');
+    console.log('formateed => date ==> ', newDate);
+    return newDate;
+  };
 
   const submitAction = async () => {
-    if (itemOrTrims === 'Fabric') {
-      const missingRoll = rows.find(row => !row.roll || row.roll.trim() === '');
-      if (missingRoll) {
-        Alert.alert('Missing Roll', 'Please enter Roll No');
+    console.log('rows ', rows);
+    const missingQty = rows.every(row => !row.presentReceivedQty);
+
+    if (missingQty) {
+      Alert.alert('Missing Quantity', 'Please enter Atleast 1  Quantity .');
+      return;
+    }
+
+     for (let idx = 0; idx < rows.length; idx++) {
+      const row = rows[idx];
+      const present = Number(row.presentReceivedQty) || 0;
+      const qtyStr = Number(row.quantitystr) || 0;
+      const required = Number(row.requiredQty) || 0;
+      const entered = Number(row.enteredQty1) || 0;
+
+      if (row.itemTrimsType === 'RM') {
+        if (present > qtyStr) {
+          alert(
+            `Row ${
+              idx + 1
+            }: Present Received Qty (${present}) should not be greater than Quantity (${qtyStr})`,
+          );
+          return; 
+        }
+      } else {
+        if (entered > required) {
+          alert(
+            `Row ${
+              idx + 1
+            }: Present Received Qty (${present}) should not be greater than Required Qty (${required})`,
+          );
+          return; 
+        }
+      }
+    }
+
+
+    if (itemOrTrims === 'Fabric' || itemOrTrims === 'TRIM FABRIC') {
+      const rowsWithMissingRoll = rows
+        .map((row, idx) => ({
+          ...row,
+          index: idx + 1, // so you can show row number (1-based)
+        }))
+        .filter(
+          row =>
+            Number(row?.presentReceivedQty || 0) > 0 &&
+            (!row?.roll || row.roll.trim() === ''),
+        );
+
+      if (rowsWithMissingRoll.length > 0) {
+        const missingRolls = rowsWithMissingRoll
+          .map(r => `Row ${r.index}`)
+          .join(', ');
+
+        Alert.alert('Alert', `Please enter Roll No for :  ${missingRolls}`);
         return;
       }
     }
 
-    const missingQty = rows.find(row => !row.presentReceivedQty);
+    console.log('hi');
 
-    if (missingQty) {
-      Alert.alert(
-        'Missing Quantity',
-        'Please enter Received Quantity for all rows.',
-      );
-      return;
-    }
     const formatChildDataFab =
       rows
         .map(child => {
@@ -219,6 +297,8 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
               batchid,
               presentReceivedQty,
               totalRecieved,
+              itemRate,
+              gst,
             } = child;
 
             return (
@@ -229,8 +309,8 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
               `#${itemdesc ?? ''}#${styleId ?? '0'}#${
                 stylewise_size_id ?? '0'
               }#${buyer_Po_Id ?? '0'}` +
-              `#${buyerNo ?? '0'}#${gstper ?? '0'}#${totprice ?? ''}#${
-                gstamnt ?? '0'
+              `#${buyerNo ?? '0'}#${gstper ?? '0'}#${itemRate ?? ''}#${
+                gst ?? '0'
               }#${rejqty ?? '0'}` +
               `#${aisleId ?? '0'}#${binId ?? '0'}#${missqty ?? '0'}#${
                 rejqty ?? '0'
@@ -266,19 +346,28 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
               shade,
               grnwidth,
               presentReceivedQty,
+              totalRecieved,
+              itemRate,
+              gst,
+              alreadyReceivedQty,
+              editablePriceReceivedQty,
+              roll,
             } = child;
 
             return (
-              `${lineItemId ?? '0'}#${presentReceivedQty ?? '0'}#${
-                rollNo ?? '0'
-              }#${itemId ?? '0'}#${'Fabric'}` +
-              `#${''}#${receivedQty ?? '3'}#${shade ?? '0'}#${
+              // `${lineItemId ?? '0'}#${presentReceivedQty ?? '0'}#${
+              `${lineItemId ?? '0'}#${
+                !editablePriceReceivedQty
+                  ? '0'
+                  : presentReceivedQty ?? '0' ?? '0'
+              }#${roll ?? '0'}#${itemId ?? '0'}#${'Fabric'}` +
+              `#${''}#${alreadyReceivedQty ?? '0'}#${shade ?? '0'}#${
                 grnwidth ?? '0'
               }#${price ?? '0'}#${batchid ?? '0'}` +
               `#${'App'}#${styleId ?? '0'}#${stylewise_size_id ?? '0'}#${
                 buyer_Po_Id ?? '0'
               }#${buyerNo ?? '0'}` +
-              `#${gstper ?? '0'}#${totprice ?? ''}#${gstamnt ?? '0'}#${
+              `#${gstper ?? '0'}#${itemRate ?? ''}#${gst ?? '0'}#${
                 po_gsm ?? '0'
               }#${weight ?? '0.0'}#${po_rib_id ?? '0'}` +
               `#${aisleId ?? '0'}#${binId ?? '0'}`
@@ -313,20 +402,39 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
               shade,
               grnwidth,
               presentReceivedQty,
+              itemRate,
+              gst,
+              alreadyReceivedQty,
+              editablePriceReceivedQty,
+              roll,
             } = child;
             return (
-              `${lineItemId ?? '0'}#${presentReceivedQty ?? '0'}#${
-                rollNo ?? '0'
-              }#${itemId ?? '0'}#${'TRIM FABRIC'}` +
-              `#${''}#${receivedQty ?? '0'}#${shade ?? '0'}#${
-                grnwidth ?? '0'
-              }#${price ?? '0'}#${batchid ?? '0'}` +
-              `#${'App'}#${styleId ?? '0'}#${stylewise_size_id ?? '0'}#${
-                buyer_Po_Id ?? '0'
-              }#${buyerNo ?? '0'}` +
-              `#${gstper ?? '0'}#${totprice ?? ''}#${gstamnt ?? '0'}` +
+              `${lineItemId ?? '0'}#${
+                !editablePriceReceivedQty
+                  ? '0'
+                  : presentReceivedQty ?? '0' ?? '0'
+              }#${roll ?? '0'}#${itemId ?? '0'}#${'TRIM FABRIC'}` +
+              `#${''}#${price ?? '0'}#${batchid ?? '0'}#${
+                alreadyReceivedQty ?? '0'
+              }#${styleId ?? '0'}` +
+              `#${shade ?? '0'}#${grnwidth ?? '0'}` +
+              `#${'App'}` +
+              `#${gstper ?? '0'}#${itemRate ?? ''}#${gst ?? '0'}` +
               `#${aisleId ?? '0'}#${binId ?? '0'}`
             );
+            // return (
+            //   `${lineItemId ?? '0'}#${!editablePriceReceivedQty ? '0' : presentReceivedQty ?? '0' ?? '0'}#${
+            //     roll ?? '0'
+            //   }#${itemId ?? '0'}#${'TRIM FABRIC'}` +
+            //   `#${''}#${alreadyReceivedQty ?? '0'}#${shade ?? '0'}#${
+            //     grnwidth ?? '0'
+            //   }#${price ?? '0'}#${batchid ?? '0'}` +
+            //   `#${'App'}#${styleId ?? '0'}#${stylewise_size_id ?? '0'}#${
+            //     buyer_Po_Id ?? '0'
+            //   }#${buyerNo ?? '0'}` +
+            //   `#${gstper ?? '0'}#${itemRate ?? ''}#${gst ?? '0'}` +
+            //   `#${aisleId ?? '0'}#${binId ?? '0'}`
+            // );
           }
 
           return '';
@@ -350,18 +458,20 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
       roundOff: 0.0,
       isCustStyleWise: 0,
       additionalAmount: 0,
-      poTcs: data.pomaster.poTcs || 0,
       seqIdForStyle: '',
       modify_user: '',
       styleOrBuyerpo: 0,
-      referenceDateStr: data.pomaster.referenceDateStr || '',
-      referenceDate: data.pomaster.referenceDate || '',
+      referenceDateStr: formattedDate(referenceDate) || '',
+      referenceDate: formattedDate(referenceDate) || '',
       gateno: '',
-      grn_totamnt: data.grn_totamnt || 0,
+      poTcs: data.pomaster.poTcs || 0,
+      grn_totamnt:
+        (parseFloat(totalAmount || 0) + parseFloat(totalTax || 0)).toFixed(2) ||
+        0,
       itemStr: formatChildDataFab || '',
     };
-    
-    console.log('str ', obj);
+    console.log('str ', obj?.itemStr);
+    // return;
     props.submitAction(obj);
   };
 
@@ -783,11 +893,18 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
     props.uploadMedia(formData);
   };
 
-  const updateAllIndexes = () => {
+  const updateAllIndexes1 = () => {
     const newSelectAll = !selectAllCheckBox;
-
-    setSelectedIdxs(newSelectAll ? rows.map((_, index) => index) : []);
+    const newSelected = newSelectAll
+      ? rows
+          .map((row, index) => (!row?.totalRecieved ? index : null))
+          .filter(index => index !== null)
+      : [];
+    setSelectedIdxs(newSelected);
     setSelectAllCheckBox(newSelectAll);
+
+    // setSelectedIdxs(newSelectAll ? rows.map((_, index) => index) : []);
+    // setSelectAllCheckBox(newSelectAll);
 
     setRows(prevRows =>
       prevRows.map(row => {
@@ -802,24 +919,66 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
     );
   };
 
+  const updateAllIndexes = () => {
+    const newSelectAll = !selectAllCheckBox;
+
+    const newSelected = newSelectAll
+      ? rows
+          .map((row, index) => (!row?.totalRecieved ? index : null))
+          .filter(index => index !== null)
+      : [];
+
+    setSelectedIdxs(newSelected);
+    setSelectAllCheckBox(newSelectAll);
+
+    setRows(prevRows => {
+      const updated = [...prevRows];
+
+      updated.forEach((row, index) => {
+        // if (row?.totalRecieved) {
+        //   // Skip if already received
+        //   return;
+        // }
+        if (!row?.editablePriceReceivedQty) {
+          // Skip if already received
+          return;
+        }
+
+        const quantity = Number(row?.quantitystr || 0);
+        const already = Number(row?.alreadyReceivedQty || 0);
+        const newQty = newSelectAll ? quantity - already : 0;
+
+        // Always use handleInputChange
+        handleInputChange(index, 'presentReceivedQty', newQty);
+      });
+
+      return updated;
+    });
+  };
+
   const toggleSelection = index => {
     setSelectedIdxs(prev => {
       let newSelected = [...prev];
 
-       if (rows[index]?.totalRecieved) {
-        console.log("returning cuz already received")
-      return newSelected;
-    }
+      // if (rows[index]?.totalRecieved) {
+      //   console.log('returning cuz already received');
+      //   return newSelected;
+      // }
+      if (!rows[index]?.editablePriceReceivedQty) {
+        console.log('returning cuz already received');
+        return newSelected;
+      }
 
       if (newSelected.includes(index)) {
         newSelected = newSelected.filter(i => i !== index);
 
         setRows(prevRows => {
           const updated = [...prevRows];
-          updated[index] = {
-            ...updated[index],
-            presentReceivedQty: 0,
-          };
+          // updated[index] = {
+          //   ...updated[index],
+          //   presentReceivedQty: 0,
+          // };
+          handleInputChange(index, 'presentReceivedQty', 0);
           return updated;
         });
       } else {
@@ -829,10 +988,21 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
           const updated = [...prevRows];
           const quantity = Number(updated[index]?.quantitystr || 0);
           const already = Number(updated[index]?.alreadyReceivedQty || 0);
-          updated[index] = {
-            ...updated[index],
-            presentReceivedQty: quantity - already,
-          };
+          // const alreadyFab = Number(updated[index]?.remainingQty || 0);
+          const alreadyFab1 = Number(updated[index]?.enteredQty || 0);
+
+          // console.log("values ==> ", alreadyFab, alreadyFab1)
+
+          const newQty =
+            itemOrTrims === 'Fabric' || itemOrTrims === 'TRIM FABRIC'
+              ? quantity - alreadyFab1
+              : quantity - already;
+          // updated[index] = {
+          //   ...updated[index],
+          //   presentReceivedQty: newQty,
+          // };
+
+          handleInputChange(index, 'presentReceivedQty', newQty);
           return updated;
         });
       }
@@ -844,15 +1014,6 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
   const removeUploadedMedia = indexToRemove => {
     setUploadedMediaFiles(prev => prev.filter((_, i) => i !== indexToRemove));
   };
-
-  // const handleInputChange = (rowIndex, field, value) => {
-  //   const updatedRows = [...rows];
-  //   updatedRows[rowIndex] = {
-  //     ...updatedRows[rowIndex],
-  //     [field]: value,
-  //   };
-  //   setRows(updatedRows);
-  // };
 
   const handleInputChange1 = (index, field, value) => {
     const updatedRows = [...rows];
@@ -875,6 +1036,7 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
     setRows(updatedRows);
   };
   const handleInputChange = (index, field, value) => {
+    console.log('changing  ', field, ' :  ', index, value);
     const updatedRows = [...rows];
 
     // convert only for numeric fields
@@ -889,13 +1051,20 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
     }
 
     updatedRows[index][field] = parsedValue;
+    console.log('updating, ', field, '  ==> ', index, parsedValue);
 
     const receivedQty = Number(updatedRows[index].presentReceivedQty || 0);
+    const alreadyRcdQty = Number(updatedRows[index].alreadyReceivedQty || 0);
     const price = Number(updatedRows[index].price || 0);
     const discount = Number(updatedRows[index].discountAccount || 0);
     const gstPercent = Number(updatedRows[index].gstPercent || 0);
 
-    const itemRate = receivedQty * price;
+    // const itemRate = receivedQty * price;
+    const itemRate =
+      itemOrTrims === 'RM'
+        ? (receivedQty + alreadyRcdQty) * price
+        : receivedQty * price;
+
     const gst = ((itemRate - discount) * gstPercent) / 100;
     const total = itemRate - discount + gst;
 
@@ -903,15 +1072,48 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
     updatedRows[index].gst = gst.toFixed(2);
     updatedRows[index].total = total.toFixed(2);
 
+    if (
+      (itemOrTrims === 'Fabric' || itemOrTrims === 'TRIM FABRIC') &&
+      field === 'presentReceivedQty'
+    ) {
+      const entered1 = Number(updatedRows[index].enteredQty || 0);
+      const rem1 = Number(updatedRows[index].remainingQty || 0);
+      console.log('start ', entered1, rem1, parsedValue); // 0 150 20
+
+      const newRem = rem1 - parsedValue;
+      const newEntered = entered1 + parsedValue;
+
+      updatedRows[index].enteredQty1 = newEntered;
+      updatedRows[index].remainingQty1 = newRem;
+    }
+
+    console.log('itemRate,gst,total ===> ', itemRate, gst, total);
     setRows(updatedRows);
   };
 
   const addRowBelow = index => {
+    // condn
     const rowToCopy = rows[index];
+
+    if (
+      Number(rowToCopy?.presentReceivedQty || 0) > 0 &&
+      (!rowToCopy?.roll ||
+        String(rowToCopy.roll).trim() === '' ||
+        rowToCopy.roll == 0)
+    ) {
+      Alert.alert(
+        'Alert',
+        `Please enter Roll No for Row ${index + 1} before adding a new row`,
+      );
+      return;
+    }
+
     const newRow = {
       ...rowToCopy,
       showClose: true,
       presentReceivedQty: 0,
+      roll: 0,
+      itemRate: 0,
       editablePriceReceivedQty: true,
     };
     const updatedRows = [...rows];
@@ -1048,9 +1250,12 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
                       />
                     </View>
                   </View>
-                  <View style={{width: 60}}>
-                    <Text style={styles.table_head_captions1}>Action</Text>
-                  </View>
+                  {(itemOrTrims === 'Fabric' ||
+                    itemOrTrims === 'TRIM FABRIC') && (
+                    <View style={{width: 60}}>
+                      <Text style={styles.table_head_captions1}>Action</Text>
+                    </View>
+                  )}
 
                   {itemOrTrims === 'RM' ? (
                     <View style={{width: 100}}>
@@ -1066,7 +1271,8 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
 
                   <View style={{width: 5}}></View>
 
-                  {itemOrTrims === 'Fabric' && (
+                  {(itemOrTrims === 'Fabric' ||
+                    itemOrTrims === 'TRIM FABRIC') && (
                     <>
                       <View style={{width: 100}}>
                         <Text style={styles.table_head_captions}>
@@ -1118,7 +1324,8 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
                   <View style={{width: 100}}>
                     <Text style={styles.table_head_captions}>Total</Text>
                   </View>
-                  {itemOrTrims === 'Fabric' && (
+                  {(itemOrTrims === 'Fabric' ||
+                    itemOrTrims === 'TRIM FABRIC') && (
                     <View style={{width: 150}}>
                       <Text style={styles.table_head_captions}>Action</Text>
                     </View>
@@ -1141,14 +1348,22 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
                         />
                       </View>
                     </View>
-                    <View style={{width: 60}}>
-                      {row.showClose && (
-                        <TouchableOpacity
-                          onPress={() => handleRemoveRow(index)}>
-                          <Image source={closeImg} style={styles.imageStyle1} />
-                        </TouchableOpacity>
-                      )}
-                    </View>
+
+                    {(itemOrTrims === 'Fabric' ||
+                      itemOrTrims === 'TRIM FABRIC') && (
+                      <View style={{width: 60}}>
+                        {row.showClose && (
+                          <TouchableOpacity
+                            onPress={() => handleRemoveRow(index)}>
+                            <Image
+                              source={closeImg}
+                              style={styles.imageStyle1}
+                            />
+                          </TouchableOpacity>
+                        )}
+                        {/* <Text>hi</Text> */}
+                      </View>
+                    )}
 
                     {itemOrTrims === 'RM' ? (
                       <View style={{width: 100}}>
@@ -1168,7 +1383,8 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
 
                     <View style={{width: 5}}></View>
 
-                    {itemOrTrims === 'Fabric' && (
+                    {(itemOrTrims === 'Fabric' ||
+                      itemOrTrims === 'TRIM FABRIC') && (
                       <>
                         <View style={{width: 100}}>
                           <Text style={styles.table_data}>
@@ -1178,11 +1394,12 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
 
                         <View style={{width: 100}}>
                           <Text style={styles.table_data}>
-                            {row.remainingQty}/{row.enteredQty}
+                            {row.remainingQty1}/{row.enteredQty1}
                           </Text>
                         </View>
                       </>
                     )}
+
                     {itemOrTrims === 'RM' ? (
                       <View
                         style={{
@@ -1205,20 +1422,24 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
                             }
                             editable={row?.editablePriceReceivedQty}
                           />
-                         {!row.totalRecieved && <Text
-                            style={{
-                              marginLeft: 4,
-                              color: colors.color2,
-                              fontSize: 10,
-                            }}>
-                            ({row.alreadyReceivedQty})
-                          </Text>}
+                          {!row.totalRecieved && (
+                            <Text
+                              style={{
+                                marginLeft: 4,
+                                color: colors.color2,
+                                fontSize: 10,
+                              }}>
+                              ({row.alreadyReceivedQty})
+                            </Text>
+                          )}
                         </View>
 
-                       {!row.totalRecieved &&  (<Text style={{marginTop: 4, fontSize: 10}}>
-                          {Number(row.alreadyReceivedQty) +
-                            Number(row.presentReceivedQty || 0)}
-                        </Text>)}
+                        {!row.totalRecieved && (
+                          <Text style={{marginTop: 4, fontSize: 10}}>
+                            {Number(row.alreadyReceivedQty) +
+                              Number(row.presentReceivedQty || 0)}
+                          </Text>
+                        )}
                       </View>
                     ) : (
                       <View
@@ -1293,7 +1514,8 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
                     <View style={{width: 100}}>
                       <Text style={styles.table_data}>{row.total}</Text>
                     </View>
-                    {itemOrTrims === 'Fabric' && (
+                    {(itemOrTrims === 'Fabric' ||
+                      itemOrTrims === 'TRIM FABRIC') && (
                       <View style={{width: 150}}>
                         {!row.showClose && (
                           <TouchableOpacity
@@ -1310,24 +1532,38 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
                 ))}
 
                 <View style={styles.table_body_single_row}>
-                  {[...Array(2)].map((_, i) => (
-                    <View key={i} style={{width: 100}} />
-                  ))}
-                  {itemOrTrims === 'Fabric' && (
+                  <View style={{width: 70}} />
+
+                  {(itemOrTrims === 'Fabric' ||
+                    itemOrTrims === 'TRIM FABRIC') && (
+                    <View style={{width: 60}} />
+                  )}
+                  <View style={{width: 100}} />
+
+                  <View style={{width: 5}} />
+
+                  {(itemOrTrims === 'Fabric' ||
+                    itemOrTrims === 'TRIM FABRIC') && (
                     <>
                       <View style={{width: 100}}></View>
                       <View style={{width: 100}}></View>
                     </>
                   )}
+
                   <View style={{width: 100}}>
-                    <Text style={styles.table_data}>
-                      {/* {totalpresentReceivedQty.toFixed(2)} */}
-                      {''}
-                    </Text>
+                    <Text style={styles.table_data}>{''}</Text>
                   </View>
-                  {[...Array(4)].map((_, i) => (
-                    <View key={i} style={{width: 100}} />
-                  ))}
+
+                  <View style={{width: 5}} />
+
+                  <View style={{width: 100}} />
+
+                  <View style={{width: 100}} />
+
+                  <View style={{width: 5}} />
+                  <View style={{width: 100}} />
+                  <View style={{width: 100}} />
+
                   <View style={{width: 100}}>
                     <Text style={styles.table_data}>
                       {totalItemRate.toFixed(2)}
@@ -1346,24 +1582,97 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
                       {totalAmount.toFixed(2)}
                     </Text>
                   </View>
-                  <View style={{width: 100}}></View>
+                  {(itemOrTrims === 'Fabric' ||
+                    itemOrTrims === 'TRIM FABRIC') && (
+                    <View style={{width: 150}}></View>
+                  )}
                 </View>
 
                 <View style={styles.table_body_single_row}>
-                  <View style={{width: 100}}></View>
-                  {itemOrTrims === 'Fabric' && (
+                  <View style={{width: 70}} />
+                  {(itemOrTrims === 'Fabric' ||
+                    itemOrTrims === 'TRIM FABRIC') && (
+                    <View style={{width: 60}} />
+                  )}
+
+                  <View style={{width: 100}} />
+
+                  <View style={{width: 5}} />
+
+                  {(itemOrTrims === 'Fabric' ||
+                    itemOrTrims === 'TRIM FABRIC') && (
                     <>
                       <View style={{width: 100}}></View>
                       <View style={{width: 100}}></View>
                     </>
                   )}
 
+                  <View style={{width: 100}}>
+                    <Text style={styles.table_data}>{''}</Text>
+                  </View>
+
+                  <View style={{width: 5}} />
+
+                  <View style={{width: 100}} />
+
+                  <View style={{width: 100}} />
+
+                  <View style={{width: 5}} />
+                  <View style={{width: 100}} />
+                  <View style={{width: 100}} />
+
                   <View style={{width: 100}}></View>
                   <View style={{width: 100}}></View>
-                  <View style={{width: 100}}></View>
-                  <View style={{width: 100}}></View>
-                  <View style={{width: 100}}></View>
-                  <View style={{width: 100}}></View>
+                  <View style={{width: 100}}>
+                    <Text style={styles.table_data}>{'TCS'}</Text>
+                  </View>
+                  <View style={{width: 100}}>
+                    <TextInput
+                      style={styles.table_data}
+                      value={tcs}
+                      keyboardType="numeric"
+                      onChangeText={text => setTcs(text)}
+                    />
+                  </View>
+                  {(itemOrTrims === 'Fabric' ||
+                    itemOrTrims === 'TRIM FABRIC') && (
+                    <View style={{width: 150}}></View>
+                  )}
+                </View>
+
+                <View style={styles.table_body_single_row}>
+                  <View style={{width: 70}} />
+                  {(itemOrTrims === 'Fabric' ||
+                    itemOrTrims === 'TRIM FABRIC') && (
+                    <View style={{width: 60}} />
+                  )}
+
+                  <View style={{width: 100}} />
+
+                  <View style={{width: 5}} />
+
+                  {(itemOrTrims === 'Fabric' ||
+                    itemOrTrims === 'TRIM FABRIC') && (
+                    <>
+                      <View style={{width: 100}}></View>
+                      <View style={{width: 100}}></View>
+                    </>
+                  )}
+
+                  <View style={{width: 100}}>
+                    <Text style={styles.table_data}>{''}</Text>
+                  </View>
+
+                  <View style={{width: 5}} />
+
+                  <View style={{width: 100}} />
+
+                  <View style={{width: 100}} />
+
+                  <View style={{width: 5}} />
+                  <View style={{width: 100}} />
+                  <View style={{width: 100}} />
+
                   <View style={{width: 100}}></View>
                   <View style={{width: 100}}></View>
                   <View style={{width: 100}}>
@@ -1376,7 +1685,11 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
                       ).toFixed(2)}
                     </Text>
                   </View>
-                  <View style={{width: 100}}></View>
+
+                  {(itemOrTrims === 'Fabric' ||
+                    itemOrTrims === 'TRIM FABRIC') && (
+                    <View style={{width: 150}}></View>
+                  )}
                 </View>
               </View>
             </ScrollView>
@@ -1691,8 +2004,8 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
           rightBtnTitle={'Save'}
           leftBtnTitle={'Back'}
           isLeftBtnEnable={true}
-          rigthBtnState={true}
-          isRightBtnEnable={true}
+          rigthBtnState={showSave}
+          isRightBtnEnable={showSave}
           rightButtonAction={async () => submitAction()}
           leftButtonAction={async () => backAction()}
         />

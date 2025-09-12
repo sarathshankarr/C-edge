@@ -118,6 +118,7 @@ const SaveGoodsReceiptNote = ({navigation, route, ...props}) => {
     tempObj.costfoc = 0;
 
    
+    console.log('save obj tempObj', tempObj);
 
     tempObj.company = JSON.parse(companyObj);
 
