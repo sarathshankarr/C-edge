@@ -476,6 +476,60 @@ const CreatePurchaseOrderDraft = ({route}) => {
     }
   };
 
+    const getTableListStyleFog = async id => {
+    let userName = await AsyncStorage.getItem('userName');
+    let userPsd = await AsyncStorage.getItem('userPsd');
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
+
+    set_isLoading(true);
+    let rmObj = {
+      fromRecord: 0,
+      userName: userName,
+      userPwd: userPsd,
+      searchKeyValue: '',
+      styleSearchDropdown: '-1',
+      menuId: 145,
+      locIds: 0,
+      brandIds: 0,
+      fromRecord: 0,
+      toRecord: 999,
+      dataFilter: '0',
+      compIds: usercompanyId,
+      company: JSON.parse(companyObj),
+    };
+    // console.log('modal list fabObj ===> req body ===> ',TrimfabObj);
+
+    let LISTAPIOBJ = await APIServiceCall.getTableListStyleFog(rmObj);;
+
+    set_isLoading(false);
+
+    if (LISTAPIOBJ && LISTAPIOBJ.statusData) {
+      if (LISTAPIOBJ && LISTAPIOBJ.responseData) {
+       return LISTAPIOBJ.responseData;
+      }
+    } else {
+      popUpAction(
+        Constant.SERVICE_FAIL_MSG,
+        Constant.DefaultAlert_MSG,
+        'OK',
+        true,
+        false,
+      );
+      return null;
+    }
+
+    if (LISTAPIOBJ && LISTAPIOBJ.error) {
+      popUpAction(
+        Constant.SERVICE_FAIL_MSG,
+        Constant.DefaultAlert_MSG,
+        'OK',
+        true,
+        false,
+      );
+    }
+  };
+
   return (
     <CreatePurchaseOrderDraftUI
       isLoading={isLoading}

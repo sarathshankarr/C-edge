@@ -180,8 +180,10 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
   const [styleList, setStyleList] = useState([]);
   const [filteredStyle, setFilteredStyle] = useState([]);
   const [showStyleList, setShowStyleList] = useState(false);
-  const [styleName, setStyleName] = useState(''); // Default can be set as needed
+  const [styleName, setStyleName] = useState(''); 
   const [styleId, setStyleId] = useState('');
+  const [poTcs, setPoTcs] = useState('0');
+  const [poTcsPercent, setPoTcsPerc] = useState('0');
 
   const actionOnStyle = item => {
     setStyleId(item.id);
@@ -333,7 +335,9 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
         itemId: itemId || 0,
         itemQty: item.input_Qty,
         itemTrimsType:
-          selectedradiooption1 === 'Style (FG)' ? 'FG' : selectedradiooption2,
+          // selectedradiooption1 === 'Style (FG)' ? 'FG' : selectedradiooption2,
+        selectedradiooption1 === 'Style (FG)' ? 'FG' : selectedradiooption2==="Trim Fabric(RM)" ? "TRIM FABRIC" :selectedradiooption2,
+
         itemdesc: itemName || '',
         sizeCapacity: '',
         gsCode: '',
@@ -373,7 +377,7 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
       shiploc: shipLocationId,
       orderDate: formatDateIntoDMY(orderDate),
       itemTrimsType:
-        selectedradiooption1 === 'Style (FG)' ? 'FG' : selectedradiooption2,
+        selectedradiooption1 === 'Style (FG)' ? 'FG' : selectedradiooption2==="Trim Fabric(RM)" ? "TRIM FABRIC" :selectedradiooption2,
       issueDate: '',
       shipcancelDate: '',
       preferredDate: '',
@@ -412,7 +416,7 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
       roundOff: 0.0,
       isCustStyleWise: 0,
       additionalAmount: 0,
-      poTcs: 0,
+      poTcs: poTcsPercent,
       seqIdForStyle: '',
       modify_user: '',
       styleOrBuyerpo: 0,
@@ -426,7 +430,7 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
     };
     console.log('sub obj  po save ===> ', tempObj);
     console.log('rows po save ===> ', rows);
-    return;
+    // return;
 
     props.submitAction(tempObj);
   };
@@ -475,13 +479,13 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
         selected: selectedradiooption1 === 'StyleWise',
         labelStyle: {color: '#000'},
       },
-      {
-        id: '3',
-        label: 'Style (FG)',
-        value: 'Style (FG)',
-        selected: selectedradiooption1 === 'Style (FG)',
-        labelStyle: {color: '#000'},
-      },
+      // {
+      //   id: '3',
+      //   label: 'Style (FG)',
+      //   value: 'Style (FG)',
+      //   selected: selectedradiooption1 === 'Style (FG)',
+      //   labelStyle: {color: '#000'},
+      // },
     ],
     [selectedradiooption1],
   );
@@ -695,6 +699,11 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
       newList.push(item);
     }
 
+    let companyObj = await AsyncStorage.getItem('companyObj');
+    const objj = JSON.parse(companyObj);
+    setPoTcs(objj.tcs || '0');
+    console.log('companyObj objj.tcs  ==> ', objj.tcs);
+
     setRows(newList);
     // setShowmodal(false);
     props.set_isLoading(false);
@@ -781,7 +790,34 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
       sum + Number(row.input_Qty || 0) * Number(row.input_UnitPrice || 0),
     0,
   );
-  const totalTotalAmount = totalNetAmount + totalGstAmount;
+
+  // const totalTotalAmount = totalNetAmount + totalGstAmount;
+  // const TcsPerc = (totalTotalAmount * Number(poTcs)) / 100;
+  // const totalTotalAmountTcs = totalTotalAmount + TcsPerc;
+
+
+  // total without TCS
+const totalTotalAmount = totalNetAmount + totalGstAmount;
+
+useEffect(() => {
+  if (!isNaN(totalTotalAmount) && totalTotalAmount > 0) {
+    const amount = (totalTotalAmount * Number(poTcs)) / 100;
+    setPoTcsPerc(amount.toString());
+  }
+}, [poTcs, totalTotalAmount]);
+
+const handleTcsAmountChange = (text) => {
+  setPoTcsPerc(text);
+  const num = parseFloat(text) || 0;
+  const perc = (num / totalTotalAmount) * 100;
+  setPoTcs(perc.toString());
+};
+
+// const totalTotalAmountTcs = totalTotalAmount + Number(poTcsPercent);
+
+const tcsRounded = Number(parseFloat(poTcsPercent).toFixed(2));
+const totalTotalAmountTcs = Number(totalTotalAmount.toFixed(3)) + tcsRounded;
+
 
   function formatDateIntoDMY(inp) {
     const [y, m, d] = inp.split('-');
@@ -1494,12 +1530,46 @@ const CreatePurchaseOrderDraftUI = ({route, navigation, ...props}) => {
                     <View style={{width: 60}}></View>
                     <View style={{width: 5}} />
                     <View style={{width: 60}}>
+                      <Text style={styles.table_data}>{'TCS'}</Text>
+                    </View>
+                    <View style={{width: 5}} />
+                    <View style={{width: 60}}>
+                      {/* <Text style={styles.table_data}>
+                        {TcsPerc.toFixed(2)}
+                      </Text> */}
+                      <TextInput
+                        style={styles.table_data_input}
+                        value={parseFloat(poTcsPercent).toFixed(3)}
+                        onChangeText={text => handleTcsAmountChange(text)}
+                        keyboardType="numeric"
+                      />
+                    </View>
+                  </View>
+
+                  <View
+                    style={[
+                      styles.table_body_single_row,
+                      {paddingVertical: 12},
+                    ]}>
+                    <View style={{width: 60}}></View>
+                    <View style={{width: 60}}></View>
+                    <View style={{width: 10}} />
+                    <View style={{width: 100}}></View>
+                    <View style={{width: 100}}></View>
+                    <View style={{width: 5}} />
+                    <View style={{width: 60}}></View>
+                    <View style={{width: 5}} />
+                    <View style={{width: 60}}></View>
+                    <View style={{width: 5}} />
+                    <View style={{width: 60}}></View>
+                    <View style={{width: 5}} />
+                    <View style={{width: 60}}>
                       <Text style={styles.table_data}>{'Total Amount'}</Text>
                     </View>
                     <View style={{width: 5}} />
                     <View style={{width: 60}}>
                       <Text style={styles.table_data}>
-                        {totalTotalAmount.toFixed(2)}
+                        {totalTotalAmountTcs.toFixed(3)}
                       </Text>
                     </View>
                   </View>
