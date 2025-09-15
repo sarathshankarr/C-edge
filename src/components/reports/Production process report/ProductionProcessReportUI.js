@@ -110,21 +110,21 @@ const ProductionProcessReportUI = ({route, ...props}) => {
     console.log('Rejected');
   };
 
-  const actionOnLocation = (id, name) => {
-    set_locationId(id);
-    set_locationName(name);
+  const actionOnLocation = (item) => {
+    set_locationId(item.id);
+    set_locationName(item.name);
     set_showLocationList(false);
   };
 
-  const actionOnProcessName = (id, name) => {
-    set_processId(id);
-    set_processName(name);
+  const actionOnProcessName = (item) => {
+    set_processId(item.id);
+    set_processName(item.name);
     set_showProcessNameList(false);
   };
   
-  const actionOnBrand = (id, name) => {
-    set_brandId(id);
-    set_brandName(name);
+  const actionOnBrand = (item) => {
+    set_brandId(item.id);
+    set_brandName(item.name);
     set_showBrandList(false);
   };
 

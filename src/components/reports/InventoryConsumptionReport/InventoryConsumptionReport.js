@@ -1,37 +1,29 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import * as APIServiceCall from '../../../utils/apiCalls/apiCallsComponent';
-import * as Constant from "../../../utils/constants/constant";
+import * as Constant from '../../../utils/constants/constant';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import InventoryConsumptionReportUI from './InventoryConsumptionReportUI';
 
-const InventoryConsumptionReport = ({ navigation, route, ...props }) => {
-
-  const [itemsObj, set_itemsObj] = useState([]);
+const InventoryConsumptionReport = ({navigation, route, ...props}) => {
   const [isLoading, set_isLoading] = useState(false);
   const [isPopUp, set_isPopUp] = useState(false);
   const [popUpMessage, set_popUpMessage] = useState(undefined);
   const [popUpAlert, set_popUpAlert] = useState(undefined);
   const [popUpRBtnTitle, set_popUpRBtnTitle] = useState(undefined);
   const [isPopupLeft, set_isPopupLeft] = useState(false);
-  const [lists, set_lists] = useState({
-    getStockFabrics: [],
-    getStockStyles: [],
-  });
+  const [lists, set_lists] = useState([]);
+  const [rmTypeList, set_rmTypeList] = useState([]);
 
-
-  // React.useEffect(() => {
-  //   getStockFabrics();
-  //   getStockStyles();
-  // }, []);
-
+  React.useEffect(() => {
+    getInventoryConsumptionReport();
+  }, []);
 
   const backBtnAction = () => {
     navigation.goBack();
   };
 
-  const getStockFabrics = async () => {
-
+  const getInventoryConsumptionReport = async () => {
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
@@ -39,38 +31,82 @@ const InventoryConsumptionReport = ({ navigation, route, ...props }) => {
 
     set_isLoading(true);
     let obj = {
-      "username": userName,
-      "password": userPsd,
-      "compIds": usercompanyId,
-      "company":JSON.parse(companyObj),
+      username: userName,
+      password: userPsd,
+      compIds: usercompanyId,
+      company: JSON.parse(companyObj),
+      languageId: 1,
+    };
 
-    }
-
-    let STOREDETAILSAPIObj = await APIServiceCall.getStockFabrics(obj);
-    // console.log('STOREDETAILSAPIObj,', STOREDETAILSAPIObj,'\nSTOREDETAILSAPIObj,',  STOREDETAILSAPIObj.responseData.sizeDetails)
+    let STOREDETAILSAPIObj =
+      await APIServiceCall.getInventoryConsumptionReportCreate(obj);
     set_isLoading(false);
 
     if (STOREDETAILSAPIObj && STOREDETAILSAPIObj.statusData) {
-      set_lists(prevLists => ({
-        ...prevLists,
-        getStockFabrics: STOREDETAILSAPIObj.responseData
-      }));
-
+      set_lists(STOREDETAILSAPIObj.responseData);
     } else {
-      popUpAction(Constant.SERVICE_FAIL_MSG, Constant.DefaultAlert_MSG, 'OK', true, false);
+      popUpAction(
+        Constant.SERVICE_FAIL_MSG,
+        Constant.DefaultAlert_MSG,
+        'OK',
+        true,
+        false,
+      );
     }
 
     if (STOREDETAILSAPIObj && STOREDETAILSAPIObj.error) {
-      popUpAction(Constant.SERVICE_FAIL_MSG, Constant.DefaultAlert_MSG, 'OK', true, false)
+      popUpAction(
+        Constant.SERVICE_FAIL_MSG,
+        Constant.DefaultAlert_MSG,
+        'OK',
+        true,
+        false,
+      );
+    }
+  };
+  const getICReportTrimTypeList = async (id) => {
+    let userName = await AsyncStorage.getItem('userName');
+    let userPsd = await AsyncStorage.getItem('userPsd');
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
+
+    set_isLoading(true);
+    let obj = {
+      username: userName,
+      password: userPsd,
+      compIds: usercompanyId,
+      company: JSON.parse(companyObj),
+      project: id,
+    };
+
+    let STOREDETAILSAPIObj =
+      await APIServiceCall.getICReportTrimTypeList(obj);
+    set_isLoading(false);
+
+    if (STOREDETAILSAPIObj && STOREDETAILSAPIObj.statusData) {
+      set_rmTypeList(STOREDETAILSAPIObj.responseData);
+    } else {
+      popUpAction(
+        Constant.SERVICE_FAIL_MSG,
+        Constant.DefaultAlert_MSG,
+        'OK',
+        true,
+        false,
+      );
     }
 
+    if (STOREDETAILSAPIObj && STOREDETAILSAPIObj.error) {
+      popUpAction(
+        Constant.SERVICE_FAIL_MSG,
+        Constant.DefaultAlert_MSG,
+        'OK',
+        true,
+        false,
+      );
+    }
   };
 
 
-
-  const actionOnRow = (item, index) => {
-    console.log("Clicked on the row");
-  };
 
   const popUpAction = (popMsg, popAlert, rBtnTitle, isPopup, isPopLeft) => {
     set_popUpMessage(popMsg);
@@ -81,83 +117,109 @@ const InventoryConsumptionReport = ({ navigation, route, ...props }) => {
   };
 
   const popOkBtnAction = () => {
-    popUpAction(undefined, undefined, '', false, false)
+    popUpAction(undefined, undefined, '', false, false);
   };
 
-  const submitAction = (reqBody) => {
-    // let tempObj = itemsObj;
-    // tempObj.comments = remarks;
+  const submitAction = async tempObj => {
+    try {
+      const userName = await AsyncStorage.getItem('userName');
+      const userPsd = await AsyncStorage.getItem('userPsd');
+      const usercompanyId = await AsyncStorage.getItem('companyId');
+      const companyObjRaw = await AsyncStorage.getItem('companyObj');
+      const companyObj = companyObjRaw ? JSON.parse(companyObjRaw) : {};
 
-    // let filteredRequestDetails = stockTable.map(detail => ({
-    //   "stockType": detail.stockType,
-    //   "stockTypeName": detail.stockTypeName,
-    //   "stock": detail.stock,
-    //   "stock_rm_lot": detail.stock_rm_lot,
-    //   "stockLocationId": detail.stockLocationId,
-    //   "styleRmSizeId": detail.styleRmSizeId,
-    //   "inputQty": detail.inputQty,
-    //   "uomstock": detail.uomstock
-    // }));
+      set_isLoading(true);
 
-    // tempObj.requestDetails = filteredRequestDetails;
+      const obj = {
+        username: userName,
+        password: userPsd,
+        compIds: usercompanyId,
+        company: companyObj,
+        startDate: tempObj.startDate,
+        endDate: tempObj.endDate,
+        fabricId: tempObj.fabricId,
+        rawMaterialId: tempObj.rawMaterialId,
+        rawMaterialTypeId: tempObj.rawMaterialTypeId,
+        styleId: tempObj.styleId,
+        itemType: tempObj.itemType,
+        location: tempObj.location,
+        multiStyle: '',
+        multiRm: '',
+        procuredOrSupplied:tempObj.procuredOrSupplied, 
+        isCombo: tempObj.isCombo ,  
+        comboSelectedStyleIds: tempObj.comboSelectedStyleIds, 
+        nfsmBhairavFlag: companyObj?.newFlagSetupMasterDAO?.nfsm_bhairav_inv_consum_report_flag_rm || '0',
+      };
 
-    // console.log("filteredRequestDetails==>", tempObj.requestDetails);
+      let apiUrl = APIServiceCall.downloadInventoryConsumptionReport();
 
-    saveStoreRequest(reqBody);
+      console.log('API URL:', tempObj.type, apiUrl);
+      const response = await axios.post(apiUrl, obj, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        responseType: 'arraybuffer', // Get binary Excel file
+      });
+
+      console.log('Binary Excel file received, converting to base64...');
+
+      // Convert binary response to base64
+      const base64Excel = Buffer.from(response.data).toString('base64');
+
+      // Android storage permission
+      if (Platform.OS === 'android') {
+        const hasPermission = await requestStoragePermission();
+        if (!hasPermission) {
+          Alert.alert(
+            'Permission Denied',
+            'Storage permission is required to save the XLSX file.',
+          );
+          return;
+        }
+      }
+
+      // File path
+      const filePath =
+        Platform.OS === 'android'
+          ? `/storage/emulated/0/Download/InventoryConsumptionReport_${Date.now()}.xlsx`
+          : `${
+              ReactNativeBlobUtil.fs.dirs.DocumentDir
+            }/InventoryConsumptionReport_${Date.now()}.xlsx`;
+
+      // Save base64 file
+      await ReactNativeBlobUtil.fs.writeFile(filePath, base64Excel, 'base64');
+
+      // Success
+      popUpAction(
+        `Excel file saved successfully at ${filePath}`,
+        Constant.DefaultAlert_MSG,
+        'OK',
+        true,
+        false,
+      );
+      // backBtnAction()
+    } catch (error) {
+      console.error('Error generating or saving Excel file:', error);
+      popUpAction(
+        Constant.SERVICE_FAIL_PDF_MSG,
+        Constant.DefaultAlert_MSG,
+        'OK',
+        true,
+        false,
+      );
+    } finally {
+      set_isLoading(false);
+    }
   };
 
-  const saveStoreRequest = async (tempObj) => {
-
-    let userName = await AsyncStorage.getItem('userName');
-    let userPsd = await AsyncStorage.getItem('userPsd');
-    let usercompanyId = await AsyncStorage.getItem('companyId');
-    let companyObj = await AsyncStorage.getItem('companyObj');
-
-    let obj = {
-      "username": userName,
-      "password": userPsd,
-      "compIds": usercompanyId,
-      "company":JSON.parse(companyObj),
-
-      "processId": tempObj.processId,
-      "woStyleId": tempObj.woStyleId,
-      "trimId": tempObj.trimId,
-      "locationId": tempObj.locationId,
-      "unitMasterId": tempObj.unitMasterId,
-      "comments": tempObj.comments,
-      "general": tempObj.general,
-      "styleWise": tempObj.styleWise,
-      "fabricQty": tempObj.fabricQty,
-      "uom": tempObj.uom,
-      "rmDetails": tempObj.rmDetails,
-    }
-    console.log("saving obj ==>", obj);
-
-    set_isLoading(true);
-    let SAVEAPIObj = await APIServiceCall.saveStockRequest(obj);
-    set_isLoading(false);
-
-    if (SAVEAPIObj && SAVEAPIObj.statusData && SAVEAPIObj.responseData !== "false") {
-      console.log("Sucess");
-      backBtnAction();
-    } else {
-      popUpAction(Constant.Fail_Save_Dtls_MSG, Constant.DefaultAlert_MSG, 'OK', true, false);
-    }
-
-    if (SAVEAPIObj && SAVEAPIObj.error) {
-      popUpAction(Constant.SERVICE_FAIL_MSG, Constant.DefaultAlert_MSG, 'OK', true, false)
-    }
-
-  };
-
-  const setLoad=(val)=> {
+  const setLoad = val => {
     set_isLoading(val);
-  }
+  };
 
   return (
-
     <InventoryConsumptionReportUI
       lists={lists}
+      rmTypeList={rmTypeList}
       isLoading={isLoading}
       setLoad={setLoad}
       popUpAlert={popUpAlert}
@@ -165,15 +227,12 @@ const InventoryConsumptionReport = ({ navigation, route, ...props }) => {
       popUpRBtnTitle={popUpRBtnTitle}
       isPopupLeft={isPopupLeft}
       isPopUp={isPopUp}
+      getICReportTrimTypeList={getICReportTrimTypeList}
       backBtnAction={backBtnAction}
-      actionOnRow={actionOnRow}
       popOkBtnAction={popOkBtnAction}
       submitAction={submitAction}
     />
-
   );
-
-}
+};
 
 export default InventoryConsumptionReport;
-

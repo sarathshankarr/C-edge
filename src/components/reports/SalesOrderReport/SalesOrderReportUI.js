@@ -8,6 +8,7 @@ import {
   ScrollView,
   Image,
   TextInput,
+  Alert,
 } from 'react-native';
 import {
   heightPercentageToDP as hp,
@@ -36,50 +37,61 @@ const SalesOrderReportUI = ({route, ...props}) => {
   const [data, setData] = useState([]);
   const [checkbox, set_checkbox] = useState(false);
 
-
-
   const [customerList, setCustomerList] = useState([]);
   const [filteredCustomer, set_filteredCustomer] = useState([]);
   const [showCustomerList, set_showCustomerList] = useState(false);
   const [customerName, set_customerName] = useState('');
   const [customerId, set_customerId] = useState('');
-  
 
   const [agentList, setAgentList] = useState([]);
   const [filteredAgent, set_filteredAgent] = useState([]);
   const [showAgentList, set_showAgentList] = useState(false);
   const [agentName, set_agentName] = useState('');
   const [agentId, set_agentId] = useState('');
-  
 
-  const [gstList, setGstList] = useState([]);
-  const [filteredGst, set_filteredGst] = useState([]);
+  const LList = [
+    {id: 0, name: 'Select'},
+    {id: 1, name: 'Registered'},
+    {id: 2, name: 'UnRegistered'},
+  ];
+
+  const [gstList, setGstList] = useState(LList);
+  const [filteredGst, set_filteredGst] = useState(LList);
   const [showGstList, set_showGstList] = useState(false);
   const [gstName, set_gstName] = useState('');
   const [gstId, set_gstId] = useState('');
-  
 
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [startDate, set_startDate] = useState('');
   const [endDate, set_endDate] = useState('');
   const [activeField, setActiveField] = useState(null);
 
-  //   useEffect(() => {
-  //     if (props?.lists) {
-  //       if (props.lists.getStockStyles) {
-  //         set_filteredStockStyles(props.lists.getStockStyles);
-  //       }
-  //       if (props.lists.getStockFabrics) {
-  //         set_filteredStockFabrics(props.lists.getStockFabrics);
-  //       }
-  //     }
-  //   }, [props]);
+  useEffect(() => {
+    if (props?.itemsObj) {
+      // console.log('props?.itemsObj ', props?.itemsObj);
+      if (props?.itemsObj.vendorsCustomersMap) {
+        const formattedMap = Object.keys(
+          props?.itemsObj.vendorsCustomersMap,
+        ).map(key => ({
+          id: key,
+          name: props?.itemsObj.vendorsCustomersMap[key],
+        }));
+        setCustomerList(formattedMap);
+        set_filteredCustomer(formattedMap);
+      }
 
-  //   useEffect(() => {
-  //     if (props?.lists) {
-  //       setData(props?.lists);
-  //     }
-  //   }, [props?.lists]);
+      if (props?.itemsObj.agentcustomer) {
+        const formattedMap = Object.keys(props?.itemsObj.agentcustomer).map(
+          key => ({
+            id: key,
+            name: props?.itemsObj.agentcustomer[key],
+          }),
+        );
+        setAgentList(formattedMap);
+        set_filteredAgent(formattedMap);
+      }
+    }
+  }, [props.itemsObj]);
 
   const backBtnAction = () => {
     props.backBtnAction();
@@ -89,35 +101,30 @@ const SalesOrderReportUI = ({route, ...props}) => {
     props.popOkBtnAction();
   };
 
+  const formattedDate=(date)=>{
+    let [d,m,y]=date.split('-');
+    let formatted=[y,m,d].join('-');
+    return formatted;
+  }
+
   const ApproveAction = () => {
+
+    if(!startDate || !endDate){
+      Alert.alert("Alert", "Please select Start Date Date and End Date to Proceed");
+      return;
+    }
     console.log('Approved');
 
-    const requestDetails = rows.map(detail => ({
-      stockType: detail.stockTypeId,
-      stockTypeName: detail.stockType,
-      stock: detail.stockId,
-      stock_rm_lot: 0,
-      stockLocationId: 1,
-      styleRmSizeId: detail.size,
-      inputQty: detail.inputQty,
-      uomstock: detail.uom,
-    }));
-
     let tempObj = {
-      processId: processId,
-      woStyleId: stylesId,
-      trimId: fabricId,
-      locationId: locationId,
-      unitMasterId: unitMasterId,
-      comments: remarks,
-      general: generalRadio === 'Yes' ? '1' : '0',
-      styleWise: displayStyleRadio === 'Yes' ? '1' : '0',
-      fabricQty: enteredFabQty,
-      uom: itemsObj?.uomfabric,
-      rmDetails: requestDetails,
+      startDate: formattedDate(startDate), 
+      endDate: formattedDate(endDate), 
+      vendorCustomerId: customerId, 
+      agent: agentId, 
+      registerId: gstId, 
     };
 
-    // console.log("SAVING OBJ=====>   ", tempObj);
+    console.log("SAVING OBJ=====>   ", tempObj);
+    // return;
     props.submitAction(tempObj);
   };
 
@@ -125,57 +132,56 @@ const SalesOrderReportUI = ({route, ...props}) => {
     console.log('Rejected');
   };
 
-  const actionOnCustomer = (id, name) => {
-    set_customerId(id);
-    set_customerName(name);
+  const actionOnCustomer = (item) => {
+    set_customerId(item.id);
+    set_customerName(item.name);
     set_showCustomerList(false);
-};
+  };
 
-const actionOnAgent = (id, name) => {
-    set_agentId(id);
-    set_agentName(name);
+  const actionOnAgent = (item) => {
+    set_agentId(item.id);
+    set_agentName(item.name);
     set_showAgentList(false);
-};
+  };
 
-const actionOnGst = (id, name) => {
-    set_gstId(id);
-    set_gstName(name);
+  const actionOnGst = (item) => {
+    set_gstId(item.id);
+    set_gstName(item.name);
     set_showGstList(false);
-};
+  };
 
-const handleSearchCustomer = text => {
+  const handleSearchCustomer = text => {
     if (text.trim().length > 0) {
-        const filtered = props.lists.getStockCustomers.filter(customer =>
-            customer.name.toLowerCase().includes(text.toLowerCase()),
-        );
-        set_filteredCustomer(filtered);
+      const filtered = customerList.filter(customer =>
+        customer.name.toLowerCase().includes(text.toLowerCase()),
+      );
+      set_filteredCustomer(filtered);
     } else {
-        set_filteredCustomer(props.lists.getStockCustomers);
+      set_filteredCustomer(customerList);
     }
-};
+  };
 
-const handleSearchAgent = text => {
+  const handleSearchAgent = text => {
     if (text.trim().length > 0) {
-        const filtered = props.lists.getStockAgents.filter(agent =>
-            agent.name.toLowerCase().includes(text.toLowerCase()),
-        );
-        set_filteredAgent(filtered);
+      const filtered = agentList.filter(agent =>
+        agent.name.toLowerCase().includes(text.toLowerCase()),
+      );
+      set_filteredAgent(filtered);
     } else {
-        set_filteredAgent(props.lists.getStockAgents);
+      set_filteredAgent(agentList);
     }
-};
+  };
 
-const handleSearchGst = text => {
+  const handleSearchGst = text => {
     if (text.trim().length > 0) {
-        const filtered = props.lists.getStockGst.filter(gst =>
-            gst.name.toLowerCase().includes(text.toLowerCase()),
-        );
-        set_filteredGst(filtered);
+      const filtered = gstList.filter(gst =>
+        gst.name.toLowerCase().includes(text.toLowerCase()),
+      );
+      set_filteredGst(filtered);
     } else {
-        set_filteredGst(props.lists.getStockGst);
+      set_filteredGst(gstList);
     }
-};
-
+  };
 
   const handleConfirm = date => {
     const extractedDate = date.toISOString().split('T')[0];
@@ -206,8 +212,6 @@ const handleSearchGst = text => {
     return ans;
   }
 
-
-
   return (
     <View style={[CommonStyles.mainComponentViewStyle]}>
       <View style={[CommonStyles.headerView]}>
@@ -233,7 +237,6 @@ const handleSearchGst = text => {
             width: '90%',
             marginHorizontal: wp('5%'),
           }}>
-
           {/* dates */}
           <DateTimePickerModal
             isVisible={isDatePickerVisible}
@@ -249,7 +252,7 @@ const handleSearchGst = text => {
               marginTop: hp('2%'),
               flexDirection: 'row',
             }}>
-            <View style={{width: '85%', paddingHorizontal:10}}>
+            <View style={{width: '85%', paddingHorizontal: 10}}>
               <TextInput
                 label="Start Date *"
                 value={startDate ? startDate : ''}
@@ -279,7 +282,7 @@ const handleSearchGst = text => {
               marginTop: hp('2%'),
               flexDirection: 'row',
             }}>
-            <View style={{width: '85%',paddingHorizontal:10}}>
+            <View style={{width: '85%', paddingHorizontal: 10}}>
               <TextInput
                 label="End Date *"
                 value={endDate ? endDate : ''}
@@ -303,154 +306,151 @@ const handleSearchGst = text => {
 
           {/* drop down lists */}
 
-          
-            <View
+          <View
+            style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: '#fff',
+              marginTop: hp('2%'),
+            }}>
+            <TouchableOpacity
               style={{
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundColor: '#fff',
-                marginTop: hp('2%'),
+                flexDirection: 'row',
+                borderWidth: 0.5,
+                borderColor: '#D8D8D8',
+                borderRadius: hp('0.5%'),
+                width: wp('90%'),
+              }}
+              onPress={() => {
+                set_showCustomerList(!showCustomerList);
               }}>
-              <TouchableOpacity
-                style={{
-                  flexDirection: 'row',
-                  borderWidth: 0.5,
-                  borderColor: '#D8D8D8',
-                  borderRadius: hp('0.5%'),
-                  width: wp('90%'),
-                }}
-                onPress={() => {
-                  set_showCustomerList(!showCustomerList);
-                }}>
-                <View>
-                  <View style={[styles.SectionStyle1, {}]}>
-                    <View style={{flexDirection: 'column'}}>
-                      <Text
-                        style={
-                          customerId
-                            ? [styles.dropTextLightStyle]
-                            : [styles.dropTextInputStyle]
-                        }>
-                        {'Customer'}
+              <View>
+                <View style={[styles.SectionStyle1, {}]}>
+                  <View style={{flexDirection: 'column'}}>
+                    <Text
+                      style={
+                        customerId
+                          ? [styles.dropTextLightStyle]
+                          : [styles.dropTextInputStyle]
+                      }>
+                      {'Customer'}
+                    </Text>
+                    {customerId ? (
+                      <Text style={[styles.dropTextInputStyle]}>
+                        {customerName}
                       </Text>
-                      {customerId ? (
-                        <Text style={[styles.dropTextInputStyle]}>
-                          {customerName}
-                        </Text>
-                      ) : null}
-                    </View>
+                    ) : null}
                   </View>
                 </View>
+              </View>
 
-                <View style={{justifyContent: 'center'}}>
-                  <Image source={downArrowImg} style={styles.imageStyle} />
-                </View>
-              </TouchableOpacity>
+              <View style={{justifyContent: 'center'}}>
+                <Image source={downArrowImg} style={styles.imageStyle} />
+              </View>
+            </TouchableOpacity>
 
-              {showCustomerList && (
-                <View style={styles.dropdownContent1}>
-                  <TextInput
-                    style={styles.searchInput}
-                    placeholder="Search "
-                    onChangeText={handleSearchCustomer}
-                    placeholderTextColor="#000"
-                  />
-                  <ScrollView
-                    style={styles.scrollView}
-                    nestedScrollEnabled={true}>
-                    {filteredCustomer.length === 0 ? (
-                      <Text style={styles.noCategoriesText}>
-                        Sorry, no results found!
-                      </Text>
-                    ) : (
-                        filteredCustomer.map((item, index) => (
-                        <TouchableOpacity
-                          key={index}
-                          style={styles.dropdownOption}
-                          onPress={() => actionOnCustomer(item)}>
-                          <Text style={{color: '#000'}}>{item.name}</Text>
-                        </TouchableOpacity>
-                      ))
-                    )}
-                  </ScrollView>
-                </View>
-              )}
-            </View>
-        
-          
-            <View
+            {showCustomerList && (
+              <View style={styles.dropdownContent1}>
+                <TextInput
+                  style={styles.searchInput}
+                  placeholder="Search "
+                  onChangeText={handleSearchCustomer}
+                  placeholderTextColor="#000"
+                />
+                <ScrollView
+                  style={styles.scrollView}
+                  nestedScrollEnabled={true}>
+                  {filteredCustomer.length === 0 ? (
+                    <Text style={styles.noCategoriesText}>
+                      Sorry, no results found!
+                    </Text>
+                  ) : (
+                    filteredCustomer.map((item, index) => (
+                      <TouchableOpacity
+                        key={index}
+                        style={styles.dropdownOption}
+                        onPress={() => actionOnCustomer(item)}>
+                        <Text style={{color: '#000'}}>{item.name}</Text>
+                      </TouchableOpacity>
+                    ))
+                  )}
+                </ScrollView>
+              </View>
+            )}
+          </View>
+
+          <View
+            style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: '#fff',
+              marginTop: hp('2%'),
+            }}>
+            <TouchableOpacity
               style={{
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundColor: '#fff',
-                marginTop: hp('2%'),
+                flexDirection: 'row',
+                borderWidth: 0.5,
+                borderColor: '#D8D8D8',
+                borderRadius: hp('0.5%'),
+                width: wp('90%'),
+              }}
+              onPress={() => {
+                set_showAgentList(!showAgentList);
               }}>
-              <TouchableOpacity
-                style={{
-                  flexDirection: 'row',
-                  borderWidth: 0.5,
-                  borderColor: '#D8D8D8',
-                  borderRadius: hp('0.5%'),
-                  width: wp('90%'),
-                }}
-                onPress={() => {
-                  set_showAgentList(!showAgentList);
-                }}>
-                <View>
-                  <View style={[styles.SectionStyle1, {}]}>
-                    <View style={{flexDirection: 'column'}}>
-                      <Text
-                        style={
-                          agentId
-                            ? [styles.dropTextLightStyle]
-                            : [styles.dropTextInputStyle]
-                        }>
-                        {'Agent'}
+              <View>
+                <View style={[styles.SectionStyle1, {}]}>
+                  <View style={{flexDirection: 'column'}}>
+                    <Text
+                      style={
+                        agentId
+                          ? [styles.dropTextLightStyle]
+                          : [styles.dropTextInputStyle]
+                      }>
+                      {'Agent'}
+                    </Text>
+                    {agentId ? (
+                      <Text style={[styles.dropTextInputStyle]}>
+                        {agentName}
                       </Text>
-                      {agentId ? (
-                        <Text style={[styles.dropTextInputStyle]}>
-                          {agentName}
-                        </Text>
-                      ) : null}
-                    </View>
+                    ) : null}
                   </View>
                 </View>
+              </View>
 
-                <View style={{justifyContent: 'center'}}>
-                  <Image source={downArrowImg} style={styles.imageStyle} />
-                </View>
-              </TouchableOpacity>
+              <View style={{justifyContent: 'center'}}>
+                <Image source={downArrowImg} style={styles.imageStyle} />
+              </View>
+            </TouchableOpacity>
 
-              {showAgentList && (
-                <View style={styles.dropdownContent1}>
-                  <TextInput
-                    style={styles.searchInput}
-                    placeholder="Search "
-                    onChangeText={handleSearchAgent}
-                    placeholderTextColor="#000"
-                  />
-                  <ScrollView
-                    style={styles.scrollView}
-                    nestedScrollEnabled={true}>
-                    {filteredAgent.length === 0 ? (
-                      <Text style={styles.noCategoriesText}>
-                        Sorry, no results found!
-                      </Text>
-                    ) : (
-                        filteredAgent.map((item, index) => (
-                        <TouchableOpacity
-                          key={index}
-                          style={styles.dropdownOption}
-                          onPress={() => actionOnAgent(item)}>
-                          <Text style={{color: '#000'}}>{item.name}</Text>
-                        </TouchableOpacity>
-                      ))
-                    )}
-                  </ScrollView>
-                </View>
-              )}
-            </View>
-        
+            {showAgentList && (
+              <View style={styles.dropdownContent1}>
+                <TextInput
+                  style={styles.searchInput}
+                  placeholder="Search "
+                  onChangeText={handleSearchAgent}
+                  placeholderTextColor="#000"
+                />
+                <ScrollView
+                  style={styles.scrollView}
+                  nestedScrollEnabled={true}>
+                  {filteredAgent.length === 0 ? (
+                    <Text style={styles.noCategoriesText}>
+                      Sorry, no results found!
+                    </Text>
+                  ) : (
+                    filteredAgent.map((item, index) => (
+                      <TouchableOpacity
+                        key={index}
+                        style={styles.dropdownOption}
+                        onPress={() => actionOnAgent(item)}>
+                        <Text style={{color: '#000'}}>{item.name}</Text>
+                      </TouchableOpacity>
+                    ))
+                  )}
+                </ScrollView>
+              </View>
+            )}
+          </View>
 
           <View
             style={{
@@ -482,9 +482,7 @@ const handleSearchGst = text => {
                       {'GST'}
                     </Text>
                     {gstId ? (
-                      <Text style={[styles.dropTextInputStyle]}>
-                        {gstName}
-                      </Text>
+                      <Text style={[styles.dropTextInputStyle]}>{gstName}</Text>
                     ) : null}
                   </View>
                 </View>
@@ -525,7 +523,6 @@ const handleSearchGst = text => {
             )}
           </View>
 
-          
           {/* <View style={{marginBottom: 150}} /> */}
         </View>
       </KeyboardAwareScrollView>
