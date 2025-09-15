@@ -183,66 +183,6 @@ const ProductionProcessReport = ({navigation, route, ...props}) => {
     };
 
 
-  const submitAction1 = async (tempObj) => {
-    try {
-        let userName = await AsyncStorage.getItem('userName');
-        let userPsd = await AsyncStorage.getItem('userPsd');
-        let usercompanyId = await AsyncStorage.getItem('companyId');
-        let companyObj = await AsyncStorage.getItem('companyObj');
-        set_isLoading(true);
-
-        let obj = {
-            username: userName,
-            password: userPsd,
-            compIds: usercompanyId,
-            company: JSON.parse(companyObj),
-            startDate: tempObj.startDate,
-            endDate: tempObj.startDate,
-        };
-
-        const apiUrl = APIServiceCall.downloadProductionProcessReport();
-
-        console.log("API URL:", apiUrl);
-        // console.log("Request Body:", obj);
-
-        const response = await axios.post(apiUrl, obj, {
-            headers: {
-                'Content-Type': 'application/json',
-                // 'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-            },
-            responseType: 'arraybuffer', 
-        });
-
-        console.log("Response received, processing file...");
-
-        // Convert binary data to Base64 manually
-        let base64Data = ReactNativeBlobUtil.base64.encode(response.data);
-
-        // Request permission for Android
-        if (Platform.OS === 'android') {
-            const hasPermission = await requestStoragePermission();
-            if (!hasPermission) {
-                Alert.alert('Permission Denied', 'Storage permission is required to save the XLSX file.');
-                return;
-            }
-        }
-
-        // Set the file path
-        const filePath = `/storage/emulated/0/Download/${Date.now()}.xlsx`;
-
-        // Save the file
-        await ReactNativeBlobUtil.fs.writeFile(filePath, base64Data, 'base64');
-
-        // Show success message
-        popUpAction(`Excel file saved successfully at ${filePath}`, Constant.DefaultAlert_MSG, 'OK', true, false);
-
-    } catch (error) {
-        console.error('Error generating or saving Excel file:', error);
-        popUpAction(Constant.SERVICE_FAIL_PDF_MSG, Constant.DefaultAlert_MSG, 'OK', true, false);
-    } finally {
-        set_isLoading(false);
-    }
-};
 
 const submitAction = async (tempObj) => {
   try {

@@ -1489,6 +1489,7 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
                         onChangeText={text =>
                           handleInputChange(index, 'price', text)
                         }
+                        editable={false}
                       />
                     </View>
                     <View style={{width: 5}}></View>

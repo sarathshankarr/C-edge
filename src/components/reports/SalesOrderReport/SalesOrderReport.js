@@ -1,12 +1,15 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import * as APIServiceCall from '../../../utils/apiCalls/apiCallsComponent';
-import * as Constant from "../../../utils/constants/constant";
+import * as Constant from '../../../utils/constants/constant';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import SalesOrderReportUI from './SalesOrderReportUI';
+import { Alert, PermissionsAndroid, Platform } from 'react-native';
+import axios from 'axios';
+import ReactNativeBlobUtil from 'react-native-blob-util';
+import XLSX from 'xlsx';
+import { Buffer } from 'buffer';
 
-
-const SalesOrderReport = ({ navigation, route, ...props }) => {
-
+const SalesOrderReport = ({navigation, route, ...props}) => {
   const [itemsObj, set_itemsObj] = useState([]);
   const [isLoading, set_isLoading] = useState(false);
   const [isPopUp, set_isPopUp] = useState(false);
@@ -14,24 +17,16 @@ const SalesOrderReport = ({ navigation, route, ...props }) => {
   const [popUpAlert, set_popUpAlert] = useState(undefined);
   const [popUpRBtnTitle, set_popUpRBtnTitle] = useState(undefined);
   const [isPopupLeft, set_isPopupLeft] = useState(false);
-  const [lists, set_lists] = useState({
-    getStockFabrics: [],
-    getStockStyles: [],
-  });
 
-
-  // React.useEffect(() => {
-  //   getStockFabrics();
-  //   getStockStyles();
-  // }, []);
-
+  React.useEffect(() => {
+    getInitialData();
+  }, []);
 
   const backBtnAction = () => {
     navigation.goBack();
   };
 
-  const getStockFabrics = async () => {
-
+  const getInitialData = async () => {
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
@@ -39,37 +34,180 @@ const SalesOrderReport = ({ navigation, route, ...props }) => {
 
     set_isLoading(true);
     let obj = {
-      "username": userName,
-      "password": userPsd,
-      "compIds": usercompanyId,
-      "company":JSON.parse(companyObj),
+      username: userName,
+      password: userPsd,
+      compIds: usercompanyId,
+      company: JSON.parse(companyObj),
+    };
+    console.log('req sor ==> ', obj);
 
-    }
-
-    let STOREDETAILSAPIObj = await APIServiceCall.getStockFabrics(obj);
-    // console.log('STOREDETAILSAPIObj,', STOREDETAILSAPIObj,'\nSTOREDETAILSAPIObj,',  STOREDETAILSAPIObj.responseData.sizeDetails)
+    let STOREDETAILSAPIObj = await APIServiceCall.getSalesOrderReportCreate(
+      obj,
+    );
     set_isLoading(false);
 
     if (STOREDETAILSAPIObj && STOREDETAILSAPIObj.statusData) {
-      set_lists(prevLists => ({
-        ...prevLists,
-        getStockFabrics: STOREDETAILSAPIObj.responseData
-      }));
-
+      console.log('resp =======> ', STOREDETAILSAPIObj.responseData);
+      set_itemsObj(STOREDETAILSAPIObj.responseData);
     } else {
-      popUpAction(Constant.SERVICE_FAIL_MSG, Constant.DefaultAlert_MSG, 'OK', true, false);
+      popUpAction(
+        Constant.SERVICE_FAIL_MSG,
+        Constant.DefaultAlert_MSG,
+        'OK',
+        true,
+        false,
+      );
     }
 
     if (STOREDETAILSAPIObj && STOREDETAILSAPIObj.error) {
-      popUpAction(Constant.SERVICE_FAIL_MSG, Constant.DefaultAlert_MSG, 'OK', true, false)
+      popUpAction(
+        Constant.SERVICE_FAIL_MSG,
+        Constant.DefaultAlert_MSG,
+        'OK',
+        true,
+        false,
+      );
     }
-
   };
 
+  const requestStoragePermission = async () => {
+    try {
+      if (Platform.OS === 'android') {
+        if (Platform.Version >= 33) {
+          // Android 13 and above
+          const granted = await PermissionsAndroid.request(
+            PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES,
+            {
+              title: 'Storage Permission Required',
+              message: 'This app needs access to your storage to download PDF',
+              buttonNeutral: 'Ask Me Later',
+              buttonNegative: 'Cancel',
+              buttonPositive: 'OK',
+            },
+          );
+          return granted === PermissionsAndroid.RESULTS.GRANTED;
+        } else if (Platform.Version >= 30) {
+          // Android 11 - 12 (Scoped Storage)
+          const granted = await PermissionsAndroid.request(
+            PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+            {
+              title: 'Storage Permission Required',
+              message: 'This app needs access to your storage to download PDF',
+              buttonNeutral: 'Ask Me Later',
+              buttonNegative: 'Cancel',
+              buttonPositive: 'OK',
+            },
+          );
+          return granted === PermissionsAndroid.RESULTS.GRANTED;
+        } else {
+          // Below Android 11
+          const granted = await PermissionsAndroid.request(
+            PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+            PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+            {
+              title: 'Storage Permission Required',
+              message: 'This app needs access to your storage to download PDF',
+              buttonNeutral: 'Ask Me Later',
+              buttonNegative: 'Cancel',
+              buttonPositive: 'OK',
+            },
+          );
+          return granted === PermissionsAndroid.RESULTS.GRANTED;
+        }
+      }
+      return false;
+    } catch (err) {
+      console.warn('Error requesting storage permission:', err);
+      return false;
+    }
+  };
 
+  const submitAction = async (tempObj) => {
+    try {
+      const userName = await AsyncStorage.getItem('userName');
+      const userPsd = await AsyncStorage.getItem('userPsd');
+      const usercompanyId = await AsyncStorage.getItem('companyId');
+      const companyObjRaw = await AsyncStorage.getItem('companyObj');
+      const companyObj = companyObjRaw ? JSON.parse(companyObjRaw) : {};
+
+      set_isLoading(true);
+
+      const obj = {
+        username: userName,
+        password: userPsd,
+        compIds: usercompanyId,
+        company: companyObj,
+        startDate: tempObj.startDate ,
+        endDate: tempObj.endDate, 
+        vendorCustomerId: tempObj.vendorCustomerId ,
+        agent: tempObj.agent ,
+        registerId: tempObj.registerId ,
+      };
+
+      const apiUrl = APIServiceCall.downloadSalesOrderReport();
+      console.log('API URL:', apiUrl);
+
+      const response = await axios.post(apiUrl, obj, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        responseType: 'arraybuffer', // Get binary Excel file
+      });
+
+      console.log('Binary Excel file received, converting to base64...');
+
+      // Convert binary response to base64
+      const base64Excel = Buffer.from(response.data).toString('base64');
+
+      // Android storage permission
+      if (Platform.OS === 'android') {
+        const hasPermission = await requestStoragePermission();
+        if (!hasPermission) {
+          Alert.alert(
+            'Permission Denied',
+            'Storage permission is required to save the XLSX file.',
+          );
+          return;
+        }
+      }
+
+      // File path
+      const filePath =
+        Platform.OS === 'android'
+          ? `/storage/emulated/0/Download/SalesOrderReport_${Date.now()}.xlsx`
+          : `${
+              ReactNativeBlobUtil.fs.dirs.DocumentDir
+            }/SalesOrderReport_${Date.now()}.xlsx`;
+
+      // Save base64 file
+      await ReactNativeBlobUtil.fs.writeFile(filePath, base64Excel, 'base64');
+
+      // Success
+      popUpAction(
+        `Excel file saved successfully at ${filePath}`,
+        Constant.DefaultAlert_MSG,
+        'OK',
+        true,
+        false,
+      );
+      // backBtnAction()
+
+    } catch (error) {
+      console.error('Error generating or saving Excel file:', error);
+      popUpAction(
+        Constant.SERVICE_FAIL_PDF_MSG,
+        Constant.DefaultAlert_MSG,
+        'OK',
+        true,
+        false,
+      );
+    } finally {
+      set_isLoading(false);
+    }
+  };
 
   const actionOnRow = (item, index) => {
-    console.log("Clicked on the row");
+    console.log('Clicked on the row');
   };
 
   const popUpAction = (popMsg, popAlert, rBtnTitle, isPopup, isPopLeft) => {
@@ -81,83 +219,17 @@ const SalesOrderReport = ({ navigation, route, ...props }) => {
   };
 
   const popOkBtnAction = () => {
-    popUpAction(undefined, undefined, '', false, false)
+    popUpAction(undefined, undefined, '', false, false);
   };
 
-  const submitAction = (reqBody) => {
-    // let tempObj = itemsObj;
-    // tempObj.comments = remarks;
-
-    // let filteredRequestDetails = stockTable.map(detail => ({
-    //   "stockType": detail.stockType,
-    //   "stockTypeName": detail.stockTypeName,
-    //   "stock": detail.stock,
-    //   "stock_rm_lot": detail.stock_rm_lot,
-    //   "stockLocationId": detail.stockLocationId,
-    //   "styleRmSizeId": detail.styleRmSizeId,
-    //   "inputQty": detail.inputQty,
-    //   "uomstock": detail.uomstock
-    // }));
-
-    // tempObj.requestDetails = filteredRequestDetails;
-
-    // console.log("filteredRequestDetails==>", tempObj.requestDetails);
-
-    saveStoreRequest(reqBody);
-  };
-
-  const saveStoreRequest = async (tempObj) => {
-
-    let userName = await AsyncStorage.getItem('userName');
-    let userPsd = await AsyncStorage.getItem('userPsd');
-    let usercompanyId = await AsyncStorage.getItem('companyId');
-    let companyObj = await AsyncStorage.getItem('companyObj');
-
-    let obj = {
-      "username": userName,
-      "password": userPsd,
-      "compIds": usercompanyId,
-      "company":JSON.parse(companyObj),
-
-      "processId": tempObj.processId,
-      "woStyleId": tempObj.woStyleId,
-      "trimId": tempObj.trimId,
-      "locationId": tempObj.locationId,
-      "unitMasterId": tempObj.unitMasterId,
-      "comments": tempObj.comments,
-      "general": tempObj.general,
-      "styleWise": tempObj.styleWise,
-      "fabricQty": tempObj.fabricQty,
-      "uom": tempObj.uom,
-      "rmDetails": tempObj.rmDetails,
-    }
-    console.log("saving obj ==>", obj);
-
-    set_isLoading(true);
-    let SAVEAPIObj = await APIServiceCall.saveStockRequest(obj);
-    set_isLoading(false);
-
-    if (SAVEAPIObj && SAVEAPIObj.statusData && SAVEAPIObj.responseData !== "false") {
-      console.log("Sucess");
-      backBtnAction();
-    } else {
-      popUpAction(Constant.Fail_Save_Dtls_MSG, Constant.DefaultAlert_MSG, 'OK', true, false);
-    }
-
-    if (SAVEAPIObj && SAVEAPIObj.error) {
-      popUpAction(Constant.SERVICE_FAIL_MSG, Constant.DefaultAlert_MSG, 'OK', true, false)
-    }
-
-  };
-
-  const setLoad=(val)=> {
+  const setLoad = val => {
     set_isLoading(val);
-  }
+  };
 
   return (
-
     <SalesOrderReportUI
-      lists={lists}
+      itemsObj={itemsObj}
+      getInitialData={getInitialData}
       isLoading={isLoading}
       setLoad={setLoad}
       popUpAlert={popUpAlert}
@@ -170,10 +242,7 @@ const SalesOrderReport = ({ navigation, route, ...props }) => {
       popOkBtnAction={popOkBtnAction}
       submitAction={submitAction}
     />
-
   );
-
-}
+};
 
 export default SalesOrderReport;
-

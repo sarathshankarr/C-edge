@@ -3788,6 +3788,7 @@ export async function getStockFabrics(jsonValue) {
   };
   return obj;
 }
+
 export async function getCreateWorkWagesReport(jsonValue) {
   let returnError = undefined;
   let statusData = undefined;
@@ -3855,6 +3856,8 @@ export async function getCreateWorkWagesReport(jsonValue) {
   };
   return obj;
 }
+
+
 export async function getCreateWWRSizeWise(jsonValue) {
   let returnError = undefined;
   let statusData = undefined;
@@ -5103,6 +5106,107 @@ export async function GetCreateDropdownsList(jsonValue) {
   };
   return obj;
 }
+export async function getInventoryConsumptionReportCreate(jsonValue) {
+  let returnError = undefined;
+  let statusData = undefined;
+  let responseData = undefined;
+  let logoutData = false;
+  let obj = undefined;
+
+  let internet = await internetCheck();
+  if (!internet) {
+    obj = {
+      logoutData: logoutData,
+      statusData: statusData,
+      responseData: responseData,
+      error: returnError,
+      isInternet: internet,
+    };
+    return obj;
+  }
+  console.log('URL', Environment.uri + 'inventoryconsumptionreport/inventoryTransaction');
+  await fetch(Environment.uri + 'inventoryconsumptionreport/inventoryTransaction', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    body: JSON.stringify(jsonValue),
+  })
+    .then(response => response.json())
+    .then(async data => {
+      if (data) {
+        statusData = true;
+        responseData = data;
+      } else {
+        statusData = undefined;
+      }
+    })
+    .catch(error => {
+      console.log('getInventoryConsumptionReportCreate error ', error);
+      returnError = error;
+    });
+
+  obj = {
+    logoutData: logoutData,
+    statusData: statusData,
+    responseData: responseData,
+    error: returnError,
+    isInternet: internet,
+  };
+  return obj;
+}
+export async function getICReportTrimTypeList(jsonValue) {
+  let returnError = undefined;
+  let statusData = undefined;
+  let responseData = undefined;
+  let logoutData = false;
+  let obj = undefined;
+
+  let internet = await internetCheck();
+  if (!internet) {
+    obj = {
+      logoutData: logoutData,
+      statusData: statusData,
+      responseData: responseData,
+      error: returnError,
+      isInternet: internet,
+    };
+    return obj;
+  }
+
+  console.log('URL', Environment.uri + 'inventoryconsumptionreport/getAllRMType');
+  await fetch(Environment.uri + 'inventoryconsumptionreport/getAllRMType', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    body: JSON.stringify(jsonValue),
+  })
+    .then(response => response.json())
+    .then(async data => {
+      if (data) {
+        statusData = true;
+        responseData = data;
+      } else {
+        statusData = undefined;
+      }
+    })
+    .catch(error => {
+      console.log('getICReportTrimTypeList error ', error);
+      returnError = error;
+    });
+
+  obj = {
+    logoutData: logoutData,
+    statusData: statusData,
+    responseData: responseData,
+    error: returnError,
+    isInternet: internet,
+  };
+  return obj;
+}
 export async function GetCreateFabricMastersList(jsonValue) {
   let returnError = undefined;
   let statusData = undefined;
@@ -5203,6 +5307,108 @@ export async function GetCreateVendorsMastersList(jsonValue) {
   };
   return obj;
 }
+export async function getSalesOrderReportCreate(jsonValue) {
+  let returnError = undefined;
+  let statusData = undefined;
+  let responseData = undefined;
+  let logoutData = false;
+  let obj = undefined;
+
+  let internet = await internetCheck();
+  if (!internet) {
+    obj = {
+      logoutData: logoutData,
+      statusData: statusData,
+      responseData: responseData,
+      error: returnError,
+      isInternet: internet,
+    };
+    return obj;
+  }
+  console.log('URL', Environment.uri + 'salesorderreport/loadSales');
+  await fetch(Environment.uri + 'salesorderreport/loadSales', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    body: JSON.stringify(jsonValue),
+  })
+    .then(response => response.json())
+    .then(async data => {
+      if (data) {
+        statusData = true;
+        responseData = data;
+      } else {
+        statusData = undefined;
+      }
+    })
+    .catch(error => {
+      console.log('GetCreateFabricMastersList error ', error);
+      returnError = error;
+    });
+
+  obj = {
+    logoutData: logoutData,
+    statusData: statusData,
+    responseData: responseData,
+    error: returnError,
+    isInternet: internet,
+  };
+  return obj;
+}
+
+export async function getCreateWWReport(jsonValue) {
+  let returnError = undefined;
+  let statusData = undefined;
+  let responseData = undefined;
+  let logoutData = false;
+  let obj = undefined;
+
+  let internet = await internetCheck();
+  if (!internet) {
+    obj = {
+      logoutData: logoutData,
+      statusData: statusData,
+      responseData: responseData,
+      error: returnError,
+      isInternet: internet,
+    };
+    return obj;
+  }
+console.log('URL', Environment.uri + 'workwagesreport/loadWorkWagesReport');
+  await fetch(Environment.uri + 'workwagesreport/loadWorkWagesReport', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    body: JSON.stringify(jsonValue),
+  })
+    .then(response => response.json())
+    .then(async data => {
+      if (data) {
+        statusData = true;
+        responseData = data;
+      } else {
+        statusData = undefined;
+      }
+    })
+    .catch(error => {
+      console.log('getCreateWWReport error ', error);
+      returnError = error;
+    });
+
+  obj = {
+    logoutData: logoutData,
+    statusData: statusData,
+    responseData: responseData,
+    error: returnError,
+    isInternet: internet,
+  };
+  return obj;
+}
+
 export async function GetCreateStyleList(jsonValue) {
   let returnError = undefined;
   let statusData = undefined;
@@ -10503,6 +10709,22 @@ export const downloadStyleBomReport = () => {
 };
 export const downloadCuttingReport = () => {
   const URL = Environment.uri + 'cuttingApi/cuttingReport';
+  return URL;
+};
+export const downloadSalesOrderReport = () => {
+  const URL = Environment.uri + 'salesorderreport/salesOrderReport';
+  return URL;
+};
+export const downloadWorkWagesSizeWiseReport = () => {
+  const URL = Environment.uri + 'workwagesreport/workerWagesReport';
+  return URL;
+};
+export const downloadWorkWagesNoNSizeWiseReport = () => {
+  const URL = Environment.uri + 'workwagesreport/workerWagesReportNonSizeWise';
+  return URL;
+};
+export const downloadInventoryConsumptionReport = () => {
+  const URL = Environment.uri + 'inventoryconsumptionreport/getInventoryReport';
   return URL;
 };
 

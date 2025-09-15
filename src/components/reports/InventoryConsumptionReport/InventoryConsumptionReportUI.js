@@ -26,6 +26,7 @@ import {RadioButton} from 'react-native-paper';
 import {ColorContext} from '../../colorTheme/colorTheme';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import {RadioGroup} from 'react-native-radio-buttons-group';
+import CustomCheckBox from '../../../utils/commonComponents/CustomCheckBox';
 
 let downArrowImg = require('./../../../../assets/images/png/dropDownImg.png');
 let closeImg = require('./../../../../assets/images/png/close1.png');
@@ -34,12 +35,7 @@ const InventoryConsumptionReportUI = ({route, ...props}) => {
   const {colors} = useContext(ColorContext);
   const styles = getStyles(colors);
 
-  const [data, setData] = useState([]);
-  const [checkbox, set_checkbox] = useState(false);
-  const [remarks, set_remarks] = useState('');
-  const [generalRadio, set_generalRadio] = useState('Yes');
-  const [buyerRadio, set_buyerRadio] = useState('No');
-  const [displayStyleRadio, set_displayStyleRadio] = useState('No');
+
 
   const [general, set_general] = useState('Yes');
   const [customFormat, setCustomFormat] = useState('No');
@@ -47,6 +43,8 @@ const InventoryConsumptionReportUI = ({route, ...props}) => {
   const [style, setStyle] = useState('No');
   const [rm, setRm] = useState('No');
   const [rollWise, setrollWise] = useState('Yes');
+
+  const [comboStyle, setComboStyle] = useState(false);
 
   const [rawMaterialTypeList, setRawMaterialTypeList] = useState([]);
   const [filteredRawMaterialType, set_filteredRawMaterialType] = useState([]);
@@ -83,23 +81,73 @@ const InventoryConsumptionReportUI = ({route, ...props}) => {
   const [startDate, set_startDate] = useState('');
   const [endDate, set_endDate] = useState('');
   const [activeField, setActiveField] = useState(null);
+  const [selectedIndices, setSelectedIndices] = useState([]);
+  
 
-  //   useEffect(() => {
-  //     if (props?.lists) {
-  //       if (props.lists.getStockStyles) {
-  //         set_filteredStockStyles(props.lists.getStockStyles);
-  //       }
-  //       if (props.lists.getStockFabrics) {
-  //         set_filteredStockFabrics(props.lists.getStockFabrics);
-  //       }
-  //     }
-  //   }, [props]);
+  useEffect(() => {
+    if (props?.lists) {
+      if (props?.lists.stylesMap) {
+        const formattedMap = Object.keys(props?.lists.stylesMap).map(key => ({
+          id: key,
+          name: props?.lists.stylesMap[key],
+        }));
+        set_filteredStyle(formattedMap);
+        setStyleList(formattedMap);
+      }
+      if (props?.lists.fabricMap) {
+        const formattedMap = Object.keys(props?.lists.fabricMap).map(key => ({
+          id: key,
+          name: props?.lists.fabricMap[key],
+        }));
+        set_filteredFabric(formattedMap);
+        setFabricList(formattedMap);
+      }
+      if (props?.lists.rawMaterialMap) {
+        const formattedMap = Object.keys(props?.lists.rawMaterialMap).map(
+          key => ({
+            id: key,
+            name: props?.lists.rawMaterialMap[key],
+          }),
+        );
+        set_filteredRawMaterial(formattedMap);
+        setRawMaterialList(formattedMap);
+      }
+      if (props?.lists.rawMaterialTypeMap) {
+        const formattedMap = Object.keys(props?.lists.rawMaterialTypeMap).map(
+          key => ({
+            id: key,
+            name: props?.lists.rawMaterialTypeMap[key],
+          }),
+        );
+        set_filteredRawMaterialType(formattedMap);
+        setRawMaterialTypeList(formattedMap);
+      }
+      if (props?.lists.companyLocationsMap) {
+        const formattedMap = Object.keys(props?.lists.companyLocationsMap).map(
+          key => ({
+            id: key,
+            name: props?.lists.companyLocationsMap[key],
+          }),
+        );
+        set_filteredLocation(formattedMap);
+        setLocationList(formattedMap);
+      }
+    }
+  }, [props?.lists]);
 
-  //   useEffect(() => {
-  //     if (props?.lists) {
-  //       setData(props?.lists);
-  //     }
-  //   }, [props?.lists]);
+  useEffect(() => {
+    if (props?.rmTypeList) {
+      const list = props?.rmTypeList.rmTypes || [];
+      const formattedMap = list.map(item => ({
+        id: item.FABRICRM_ID,
+        name: item.FABRICRM_VAL,
+      }));
+      set_filteredRawMaterial(formattedMap);
+      setRawMaterialList(formattedMap);
+      set_rawMaterialId('');
+      set_rawMaterialName('');
+    }
+  }, [props?.rmTypeList]);
 
   const backBtnAction = () => {
     props.backBtnAction();
@@ -109,35 +157,33 @@ const InventoryConsumptionReportUI = ({route, ...props}) => {
     props.popOkBtnAction();
   };
 
+  const formattedDateIntoYMD = date => {
+    let [d, m, y] = date.split('-');
+    let formatted = [y, m, d].join('-');
+    return formatted;
+  };
+
   const ApproveAction = () => {
     console.log('Approved');
 
-    const requestDetails = rows.map(detail => ({
-      stockType: detail.stockTypeId,
-      stockTypeName: detail.stockType,
-      stock: detail.stockId,
-      stock_rm_lot: 0,
-      stockLocationId: 1,
-      styleRmSizeId: detail.size,
-      inputQty: detail.inputQty,
-      uomstock: detail.uom,
-    }));
-
     let tempObj = {
-      processId: processId,
-      woStyleId: stylesId,
-      trimId: fabricId,
-      locationId: locationId,
-      unitMasterId: unitMasterId,
-      comments: remarks,
-      general: generalRadio === 'Yes' ? '1' : '0',
-      styleWise: displayStyleRadio === 'Yes' ? '1' : '0',
-      fabricQty: enteredFabQty,
-      uom: itemsObj?.uomfabric,
-      rmDetails: requestDetails,
+      startDate: formattedDateIntoYMD(startDate),
+      endDate: formattedDateIntoYMD(endDate),
+      fabricId: fabricId,
+      rawMaterialId: rawMaterialId,
+      rawMaterialTypeId: rawMaterialTypeId,
+      styleId: styleId,
+      itemType: fabric ==="Yes" ? "fabric" : rm==="Yes" ? "rm": "style",
+      procuredOrSupplied: rollWise === 'Yes'? '1' : '0' , 
+      location: locationId,
+      multiStyle: '',
+      multiRm: '',
+      isCombo: comboStyle ? '1' : '0',
+      comboSelectedStyleIds: selectedIndices.join(',') || '',
     };
 
-    // console.log("SAVING OBJ=====>   ", tempObj);
+    console.log("SAVING OBJ=====>   ", tempObj);
+    return;
     props.submitAction(tempObj);
   };
 
@@ -145,80 +191,81 @@ const InventoryConsumptionReportUI = ({route, ...props}) => {
     console.log('Rejected');
   };
 
-  const actionOnRawMaterialType = (id, name) => {
-    set_rawMaterialTypeId(id);
-    set_rawMaterialTypeName(name);
+  const actionOnRawMaterialType = item => {
+    set_rawMaterialTypeId(item.id);
+    set_rawMaterialTypeName(item.name);
     set_showRawMaterialTypeList(false);
+    props.getICReportTrimTypeList(item.id);
   };
-  const actionOnRawMaterial = (id, name) => {
-    set_rawMaterialId(id);
-    set_rawMaterialName(name);
+  const actionOnRawMaterial = item => {
+    set_rawMaterialId(item.id);
+    set_rawMaterialName(item.name);
     set_showRawMaterialList(false);
   };
-  const actionOnLocation = (id, name) => {
-    set_locationId(id);
-    set_locationName(name);
+  const actionOnLocation = item => {
+    set_locationId(item.id);
+    set_locationName(item.name);
     set_showLocationList(false);
   };
-  const actionOnStyle = (id, name) => {
-    set_styleId(id);
-    set_styleName(name);
+  const actionOnStyle = item => {
+    set_styleId(item.id);
+    set_styleName(item.name);
     set_showStyleList(false);
   };
-  const actionOnFabric = (id, name) => {
-    set_fabricId(id);
-    set_fabricName(name);
+  const actionOnFabric = item => {
+    set_fabricId(item.id);
+    set_fabricName(item.name);
     set_showFabricList(false);
   };
 
   const handleSearchRawMaterialType = text => {
     if (text.trim().length > 0) {
-      const filtered = props.lists.getStockFabrics.filter(fabric =>
+      const filtered = rawMaterialTypeList.filter(fabric =>
         fabric.name.toLowerCase().includes(text.toLowerCase()),
       );
       set_filteredRawMaterialType(filtered);
     } else {
-      set_filteredRawMaterialType(props.lists.getStockFabrics);
+      set_filteredRawMaterialType(rawMaterialTypeList);
     }
   };
   const handleSearchRawMaterial = text => {
     if (text.trim().length > 0) {
-      const filtered = props.lists.getStockFabrics.filter(fabric =>
+      const filtered = rawMaterialList.filter(fabric =>
         fabric.name.toLowerCase().includes(text.toLowerCase()),
       );
       set_filteredRawMaterial(filtered);
     } else {
-      set_filteredRawMaterial(props.lists.getStockFabrics);
+      set_filteredRawMaterial(rawMaterialList);
     }
   };
   const handleSearchLocation = text => {
     if (text.trim().length > 0) {
-      const filtered = props.lists.getStockFabrics.filter(fabric =>
+      const filtered = locationList.filter(fabric =>
         fabric.name.toLowerCase().includes(text.toLowerCase()),
       );
       set_filteredLocation(filtered);
     } else {
-      set_filteredLocation(props.lists.getStockFabrics);
+      set_filteredLocation(locationList);
     }
   };
   const handleSearchStyle = text => {
     if (text.trim().length > 0) {
-      const filtered = props.lists.getStockFabrics.filter(fabric =>
+      const filtered = styleList.filter(fabric =>
         fabric.name.toLowerCase().includes(text.toLowerCase()),
       );
       set_filteredLocation(filtered);
     } else {
-      set_filteredLocation(props.lists.getStockFabrics);
+      set_filteredLocation(styleList);
     }
   };
   const handleSearchFabric = text => {
     if (text.trim().length > 0) {
-      const filtered = props.lists.getStockFabrics.filter(fabric =>
+      const filtered = fabricList.filter(fabric =>
         fabric.name.toLowerCase().includes(text.toLowerCase()),
       );
       set_filteredLocation(filtered);
     } else {
-      set_filteredLocation(props.lists.getStockFabrics);
+      set_filteredLocation(fabricList);
     }
   };
 
@@ -259,7 +306,6 @@ const InventoryConsumptionReportUI = ({route, ...props}) => {
         value: 'General',
         selected: general === 'Yes',
         labelStyle: {color: '#000'},
-
       },
       {
         id: '2',
@@ -267,7 +313,6 @@ const InventoryConsumptionReportUI = ({route, ...props}) => {
         value: 'Custom Format',
         selected: customFormat === 'Yes',
         labelStyle: {color: '#000'},
-
       },
     ],
     [general, customFormat],
@@ -282,7 +327,6 @@ const InventoryConsumptionReportUI = ({route, ...props}) => {
         value: 'Fabric',
         selected: fabric === 'Yes',
         labelStyle: {color: '#000'},
-
       },
       {
         id: '2',
@@ -290,7 +334,6 @@ const InventoryConsumptionReportUI = ({route, ...props}) => {
         value: 'RM',
         selected: rm === 'Yes',
         labelStyle: {color: '#000'},
-
       },
       ...(general === 'Yes'
         ? [
@@ -300,7 +343,6 @@ const InventoryConsumptionReportUI = ({route, ...props}) => {
               value: 'Style',
               selected: style === 'Yes',
               labelStyle: {color: '#000'},
-
             },
           ]
         : []),
@@ -317,7 +359,6 @@ const InventoryConsumptionReportUI = ({route, ...props}) => {
         value: 'Yes',
         selected: rollWise === 'Yes',
         labelStyle: {color: '#000'},
-
       },
       {
         id: '2',
@@ -325,7 +366,6 @@ const InventoryConsumptionReportUI = ({route, ...props}) => {
         value: 'No',
         selected: rollWise === 'No',
         labelStyle: {color: '#000'},
-
       },
     ],
     [rollWise],
@@ -370,6 +410,18 @@ const InventoryConsumptionReportUI = ({route, ...props}) => {
     setrollWise(selectedOption.value);
   };
 
+   const actionOnMultipleStyles = id => {
+    setSelectedIndices(prevSelected => {
+      const exists = prevSelected.some(i => i === id);
+
+      if (exists) {
+        return prevSelected.filter(i => i !== id);
+      } else {
+        return [...prevSelected, id];
+      }
+    });
+  };
+
   return (
     <View style={[CommonStyles.mainComponentViewStyle]}>
       <View style={[CommonStyles.headerView]}>
@@ -395,90 +447,7 @@ const InventoryConsumptionReportUI = ({route, ...props}) => {
             width: '90%',
             marginHorizontal: wp('5%'),
           }}>
-          {/* <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              marginBottom: hp('1%'),
-              justifyContent: 'space-evenly',
-              marginTop: hp('2%'),
-            }}>
-            <View style={{flexDirection: 'row', alignItems: 'center', flex: 1}}>
-              <RadioButton
-                value="Yes"
-                status={general === 'Yes' ? 'checked' : 'unchecked'}
-                onPress={() => {
-                  set_general('Yes');
-                  setCustomFormat('No');
-                }}
-              />
-              <Text style={{fontWeight: 'bold', color: '#000'}}>General</Text>
-            </View>
-
-            <View style={{flexDirection: 'row', alignItems: 'center', flex: 1}}>
-              <RadioButton
-                value="No"
-                status={customFormat === 'Yes' ? 'checked' : 'unchecked'}
-                onPress={() => {
-                  setCustomFormat('Yes');
-                  set_general('No');
-                }}
-              />
-              <Text style={{fontWeight: 'bold', color: '#000'}}>
-                Custom Format
-              </Text>
-            </View>
-          </View>
-
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              marginBottom: hp('1%'),
-              justifyContent: 'space-evenly',
-              marginTop: hp('2%'),
-            }}>
-            <View style={{flexDirection: 'row', alignItems: 'center', flex: 1}}>
-              <RadioButton
-                value="Yes"
-                status={fabric === 'Yes' ? 'checked' : 'unchecked'}
-                onPress={() => {
-                  setFabric('Yes');
-                  setRm('No');
-                  setStyle('No');
-                }}
-              />
-
-              <Text style={{fontWeight: 'bold', color: '#000'}}>Fabric</Text>
-            </View>
-            <View style={{flexDirection: 'row', alignItems: 'center', flex: 1}}>
-              <RadioButton
-                value="Yes"
-                status={rm === 'Yes' ? 'checked' : 'unchecked'}
-                onPress={() => {
-                  setFabric('No');
-                  setRm('Yes');
-                  setStyle('No');
-                }}
-              />
-              <Text style={{fontWeight: 'bold', color: '#000'}}>{'RM'}</Text>
-            </View>
-            {general === 'Yes' && (
-              <View
-                style={{flexDirection: 'row', alignItems: 'center', flex: 1}}>
-                <RadioButton
-                  value="Yes"
-                  status={style === 'Yes' ? 'checked' : 'unchecked'}
-                  onPress={() => {
-                    setFabric('No');
-                    setRm('No');
-                    setStyle('Yes');
-                  }}
-                />
-                <Text style={{fontWeight: 'bold', color: '#000'}}>Style</Text>
-              </View>
-            )}
-          </View> */}
+          <View style={{height: 20}} />
 
           <RadioGroup
             style={{flexDirection: 'row'}}
@@ -495,7 +464,7 @@ const InventoryConsumptionReportUI = ({route, ...props}) => {
           />
 
           <RadioGroup
-            style={{flexDirection: 'row', color:'#000'}}
+            style={{flexDirection: 'row', color: '#000'}}
             radioButtons={categoryRadioButtons}
             onPress={handleCategoryChange}
             layout="row"
@@ -529,7 +498,7 @@ const InventoryConsumptionReportUI = ({route, ...props}) => {
               marginTop: hp('2%'),
               flexDirection: 'row',
             }}>
-            <View style={{width: '85%',paddingHorizontal: 10}}>
+            <View style={{width: '85%', paddingHorizontal: 10}}>
               <TextInput
                 label="Start Date"
                 value={startDate ? startDate : ''}
@@ -732,8 +701,21 @@ const InventoryConsumptionReportUI = ({route, ...props}) => {
               )}
             </View>
           )}
-
           {style === 'Yes' && (
+            <View
+              style={[
+                styles.checkboxItem,
+                {marginTop: hp('4%'), marginBottom: hp('0.5%')},
+              ]}>
+              <CustomCheckBox
+                isChecked={comboStyle}
+                onToggle={() => setComboStyle(!comboStyle)}
+              />
+              <Text style={styles.checkboxLabel}>{'Combo Style Inv'}</Text>
+            </View>
+          )}
+
+          {style === 'Yes' && !comboStyle && (
             <View
               style={{
                 alignItems: 'center',
@@ -807,6 +789,96 @@ const InventoryConsumptionReportUI = ({route, ...props}) => {
               )}
             </View>
           )}
+
+           {style === 'Yes' && comboStyle && <View
+            style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: '#fff',
+              marginTop: hp('2%'),
+              width: '95%',
+            }}>
+            <TouchableOpacity
+              style={{
+                flexDirection: 'row',
+                borderWidth: 0.5,
+                borderColor: '#D8D8D8',
+                borderRadius: hp('0.5%'),
+                width: '100%',
+                justifyContent: 'space-between',
+              }}
+              onPress={() => {
+                set_showStyleList(!showStyleList);
+              }}>
+              <View>
+                <View style={[styles.SectionStyle1, {}]}>
+                  <View style={{flexDirection: 'column'}}>
+                    <Text
+                      style={
+                        selectedIndices.length > 0
+                          ? [styles.dropTextLightStyle]
+                          : [styles.dropTextInputStyle]
+                      }>
+                      {'Style'}
+                    </Text>
+                    {selectedIndices.length > 0 ? (
+                      <Text style={[styles.dropTextInputStyle]}>
+                        {selectedIndices.length > 0 ? (
+                          <Text style={[styles.dropTextInputStyle]}>
+                            {styleList
+                              .filter(color =>
+                                selectedIndices.includes(color.id),
+                              )
+                              .map(color => color.name)
+                              .join(', ')}
+                          </Text>
+                        ) : null}
+                      </Text>
+                    ) : null}
+                  </View>
+                </View>
+              </View>
+
+              <View style={{justifyContent: 'center'}}>
+                <Image source={downArrowImg} style={styles.imageStyle} />
+              </View>
+            </TouchableOpacity>
+
+            {showStyleList && (
+              <View style={styles.dropdownContent1}>
+                <TextInput
+                  style={styles.searchInput}
+                  placeholder="Search "
+                  onChangeText={handleSearchStyle}
+                  placeholderTextColor="#000"
+                />
+                <ScrollView
+                  style={styles.scrollView}
+                  nestedScrollEnabled={true}>
+                  {filteredStyle.length === 0 ? (
+                    <Text style={styles.noCategoriesText}>
+                      Sorry, no results found!
+                    </Text>
+                  ) : (
+                    filteredStyle.map((item, index) => (
+                      <TouchableOpacity
+                        key={index}
+                        style={styles.itemContainer}
+                        onPress={() => actionOnMultipleStyles(item.id)}>
+                        <CustomCheckBox
+                          isChecked={selectedIndices.includes(item.id)}
+                          onToggle={() => actionOnMultipleStyles(item.id)}
+                        />
+                        <Text style={{color: '#000'}}>{item.name}</Text>
+                      </TouchableOpacity>
+                    ))
+                  )}
+                </ScrollView>
+              </View>
+            )}
+          </View>}
+
+          
 
           {fabric === 'Yes' && (
             <View
@@ -956,42 +1028,6 @@ const InventoryConsumptionReportUI = ({route, ...props}) => {
             )}
           </View>
 
-          {/* {fabric === 'Yes' && (
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                marginBottom: hp('1%'),
-                justifyContent: 'space-evenly',
-                marginTop: hp('2%'),
-              }}>
-              <Text style={{width: '50%', fontWeight: 'bold', color: '#000'}}>
-                Roll Wise
-              </Text>
-              <Text style={{marginRight: wp('2%'), color: '#000'}}>Yes</Text>
-              <RadioButton
-                value="Yes"
-                status={rollWise === 'Yes' ? 'checked' : 'unchecked'}
-                onPress={() => {
-                  setrollWise('Yes');
-                }}
-              />
-
-              <Text
-                style={{
-                  marginRight: wp('2%'),
-                  marginLeft: wp('4%'),
-                  color: '#000',
-                }}>
-                No
-              </Text>
-              <RadioButton
-                value="No"
-                status={rollWise === 'No' ? 'checked' : 'unchecked'}
-                onPress={() => setrollWise('No')}
-              />
-            </View>
-          )} */}
           {fabric === 'Yes' && (
             <View
               style={{
@@ -1090,7 +1126,7 @@ const getStyles = colors =>
     SectionStyle1: {
       flexDirection: 'row',
       alignItems: 'center',
-      height: hp('7%'),
+      minHeight: hp('7%'),
       width: wp('75%'),
       borderRadius: hp('0.5%'),
     },
@@ -1250,5 +1286,25 @@ const getStyles = colors =>
       fontWeight: 'bold',
       color: '#000',
       marginVertical: 8,
+    },
+    checkboxItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      width: '45%', // Adjust width for better alignment
+      marginVertical: 5,
+      marginHorizontal: 5,
+    },
+    checkboxLabel: {
+      marginLeft: 8,
+      fontSize: 14,
+      color: '#000',
+    },
+     itemContainer: {
+      borderBottomColor: '#e0e0e0',
+      flexDirection: 'row',
+      paddingHorizontal: 10,
+      paddingVertical: 12,
+      borderBottomWidth: 1,
+      borderBottomColor: '#ccc',
     },
   });
