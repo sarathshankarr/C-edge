@@ -4,6 +4,12 @@ import * as Constant from '../../../utils/constants/constant';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import InventoryConsumptionReportUI from './InventoryConsumptionReportUI';
+import axios from 'axios';
+import ReactNativeBlobUtil from 'react-native-blob-util';
+import XLSX from 'xlsx';
+import { Buffer } from 'buffer';
+import { PermissionsAndroid, Platform } from 'react-native';
+
 
 const InventoryConsumptionReport = ({navigation, route, ...props}) => {
   const [isLoading, set_isLoading] = useState(false);
@@ -64,7 +70,7 @@ const InventoryConsumptionReport = ({navigation, route, ...props}) => {
       );
     }
   };
-  const getICReportTrimTypeList = async (id) => {
+  const getICReportTrimTypeList = async id => {
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
@@ -79,8 +85,7 @@ const InventoryConsumptionReport = ({navigation, route, ...props}) => {
       project: id,
     };
 
-    let STOREDETAILSAPIObj =
-      await APIServiceCall.getICReportTrimTypeList(obj);
+    let STOREDETAILSAPIObj = await APIServiceCall.getICReportTrimTypeList(obj);
     set_isLoading(false);
 
     if (STOREDETAILSAPIObj && STOREDETAILSAPIObj.statusData) {
@@ -106,8 +111,6 @@ const InventoryConsumptionReport = ({navigation, route, ...props}) => {
     }
   };
 
-
-
   const popUpAction = (popMsg, popAlert, rBtnTitle, isPopup, isPopLeft) => {
     set_popUpMessage(popMsg);
     set_popUpAlert(popAlert);
@@ -120,6 +123,58 @@ const InventoryConsumptionReport = ({navigation, route, ...props}) => {
     popUpAction(undefined, undefined, '', false, false);
   };
 
+    const requestStoragePermission = async () => {
+      try {
+        if (Platform.OS === 'android') {
+          if (Platform.Version >= 33) {
+            // Android 13 and above
+            const granted = await PermissionsAndroid.request(
+              PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES,
+              {
+                title: 'Storage Permission Required',
+                message: 'This app needs access to your storage to download PDF',
+                buttonNeutral: 'Ask Me Later',
+                buttonNegative: 'Cancel',
+                buttonPositive: 'OK',
+              },
+            );
+            return granted === PermissionsAndroid.RESULTS.GRANTED;
+          } else if (Platform.Version >= 30) {
+            // Android 11 - 12 (Scoped Storage)
+            const granted = await PermissionsAndroid.request(
+              PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+              {
+                title: 'Storage Permission Required',
+                message: 'This app needs access to your storage to download PDF',
+                buttonNeutral: 'Ask Me Later',
+                buttonNegative: 'Cancel',
+                buttonPositive: 'OK',
+              },
+            );
+            return granted === PermissionsAndroid.RESULTS.GRANTED;
+          } else {
+            // Below Android 11
+            const granted = await PermissionsAndroid.request(
+              PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+              PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+              {
+                title: 'Storage Permission Required',
+                message: 'This app needs access to your storage to download PDF',
+                buttonNeutral: 'Ask Me Later',
+                buttonNegative: 'Cancel',
+                buttonPositive: 'OK',
+              },
+            );
+            return granted === PermissionsAndroid.RESULTS.GRANTED;
+          }
+        }
+        return false;
+      } catch (err) {
+        console.warn('Error requesting storage permission:', err);
+        return false;
+      }
+    };
+
   const submitAction = async tempObj => {
     try {
       const userName = await AsyncStorage.getItem('userName');
@@ -130,30 +185,56 @@ const InventoryConsumptionReport = ({navigation, route, ...props}) => {
 
       set_isLoading(true);
 
-      const obj = {
-        username: userName,
-        password: userPsd,
-        compIds: usercompanyId,
-        company: companyObj,
-        startDate: tempObj.startDate,
-        endDate: tempObj.endDate,
-        fabricId: tempObj.fabricId,
-        rawMaterialId: tempObj.rawMaterialId,
-        rawMaterialTypeId: tempObj.rawMaterialTypeId,
-        styleId: tempObj.styleId,
-        itemType: tempObj.itemType,
-        location: tempObj.location,
-        multiStyle: '',
-        multiRm: '',
-        procuredOrSupplied:tempObj.procuredOrSupplied, 
-        isCombo: tempObj.isCombo ,  
-        comboSelectedStyleIds: tempObj.comboSelectedStyleIds, 
-        nfsmBhairavFlag: companyObj?.newFlagSetupMasterDAO?.nfsm_bhairav_inv_consum_report_flag_rm || '0',
-      };
+      let obj, apiUrl;
 
-      let apiUrl = APIServiceCall.downloadInventoryConsumptionReport();
+      if (tempObj.type === 'general') {
+        obj = {
+          username: userName,
+          password: userPsd,
+          compIds: usercompanyId,
+          company: companyObj,
+          startDate: tempObj.startDate,
+          endDate: tempObj.endDate,
+          fabricId: tempObj.fabricId,
+          rawMaterialId: tempObj.rawMaterialId,
+          rawMaterialTypeId: tempObj.rawMaterialTypeId,
+          styleId: tempObj.styleId,
+          itemType: tempObj.itemType,
+          location: tempObj.location,
+          multiStyle: '',
+          multiRm: '',
+          procuredOrSupplied: tempObj.procuredOrSupplied,
+          isCombo: tempObj.isCombo,
+          comboSelectedStyleIds: tempObj.comboSelectedStyleIds,
+          nfsmBhairavFlag:
+            companyObj?.newFlagSetupMasterDAO
+              ?.nfsm_bhairav_inv_consum_report_flag_rm || '0',
+        };
+        apiUrl = APIServiceCall.downloadInventoryConsumptionReport();
+      } else {
+        obj = {
+          username: userName,
+          password: userPsd,
+          compIds: usercompanyId,
+          company: companyObj,
+          startDate: tempObj.startDate,
+          endDate: tempObj.endDate,
+          fabricId: tempObj.fabricId,
+          rawMaterialId: tempObj.rawMaterialId,
+          rawMaterialTypeId: tempObj.rawMaterialTypeId,
+          itemType: tempObj.itemType==="fabric"? "Fabric" : tempObj.itemType,
+          procuredOrSupplied: tempObj.procuredOrSupplied,
+          location: tempObj.location,
+          nfsmBhairavFlag:
+            companyObj?.newFlagSetupMasterDAO
+              ?.nfsm_bhairav_inv_consum_report_flag_rm || '0',
+        };
+        apiUrl =
+          APIServiceCall.downloadInventoryConsumptionReportCustomFormat();
+      }
 
-      console.log('API URL:', tempObj.type, apiUrl);
+      console.log('API URL:', obj, apiUrl);
+      
       const response = await axios.post(apiUrl, obj, {
         headers: {
           'Content-Type': 'application/json',
