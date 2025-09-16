@@ -162,28 +162,34 @@ const InventoryConsumptionReportUI = ({route, ...props}) => {
     let formatted = [y, m, d].join('-');
     return formatted;
   };
+  const formattedDateCustomFormat = date => {
+    let [d, m, y] = date.split('-');
+    let formatted = [d, m,y].join('/');
+    return formatted;
+  };
 
   const ApproveAction = () => {
     console.log('Approved');
 
     let tempObj = {
-      startDate: formattedDateIntoYMD(startDate),
-      endDate: formattedDateIntoYMD(endDate),
-      fabricId: fabricId,
-      rawMaterialId: rawMaterialId,
-      rawMaterialTypeId: rawMaterialTypeId,
-      styleId: styleId,
+      startDate: general==="Yes"? formattedDateIntoYMD(startDate) : formattedDateCustomFormat(startDate),
+      endDate:general==="Yes"? formattedDateIntoYMD(endDate) : formattedDateCustomFormat(endDate),
+      fabricId: fabricId || '0',
+      rawMaterialId: rawMaterialId || '0',
+      rawMaterialTypeId: rawMaterialTypeId || '0',
+      styleId: styleId || '0',
       itemType: fabric ==="Yes" ? "fabric" : rm==="Yes" ? "rm": "style",
       procuredOrSupplied: rollWise === 'Yes'? '1' : '0' , 
-      location: locationId,
+      location: locationId || '0',
       multiStyle: '',
       multiRm: '',
       isCombo: comboStyle ? '1' : '0',
       comboSelectedStyleIds: selectedIndices.join(',') || '',
+      type:general==="Yes"? "general" : "customFormat",
     };
 
     console.log("SAVING OBJ=====>   ", tempObj);
-    return;
+    // return;
     props.submitAction(tempObj);
   };
 

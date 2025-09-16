@@ -36,8 +36,8 @@ const ProductionProcessReportUI = ({route, ...props}) => {
 
 
 
-  const [total, setTotal] = useState('Yes');
-  const [dayWise, setDayWise] = useState('No');
+  const [total, setTotal] = useState('No');
+  const [dayWise, setDayWise] = useState('Yes');
   const [pendingQuantity, setPendingQuantity] = useState('No');
 
   //   Pending Quantity  ,Daywise    ,Total
@@ -130,34 +130,34 @@ const ProductionProcessReportUI = ({route, ...props}) => {
 
   const handleSearchProcessName = text => {
     if (text.trim().length > 0) {
-      const filtered = props.lists.getStockProcesses.filter(process =>
+      const filtered = processNameList.filter(process =>
         process.name.toLowerCase().includes(text.toLowerCase()),
       );
       set_filteredProcessName(filtered);
     } else {
-      set_filteredProcessName(props.lists.getStockProcesses);
+      set_filteredProcessName(processNameList);
     }
   };
 
   const handleSearchBrand = text => {
     if (text.trim().length > 0) {
-      const filtered = props.lists.getStockBrands.filter(brand =>
+      const filtered = brandList.filter(brand =>
         brand.name.toLowerCase().includes(text.toLowerCase()),
       );
       set_filteredBrand(filtered);
     } else {
-      set_filteredBrand(props.lists.getStockBrands);
+      set_filteredBrand(brandList);
     }
   };
 
   const handleSearchLocation = text => {
     if (text.trim().length > 0) {
-      const filtered = props.lists.getStockFabrics.filter(fabric =>
+      const filtered = locationList.filter(fabric =>
         fabric.name.toLowerCase().includes(text.toLowerCase()),
       );
       set_filteredLocation(filtered);
     } else {
-      set_filteredLocation(props.lists.getStockFabrics);
+      set_filteredLocation(locationList);
     }
   };
 
@@ -192,13 +192,13 @@ const ProductionProcessReportUI = ({route, ...props}) => {
 
   const categoryRadioButtons = useMemo(
     () => [
-      {
-        id: '1',
-        label: 'Total',
-        value: 'Total',
-        selected: total === 'Yes',
-        labelStyle: {color: '#000'},
-      },
+      // {
+      //   id: '1',
+      //   label: 'Total',
+      //   value: 'Total',
+      //   selected: total === 'Yes',
+      //   labelStyle: {color: '#000'},
+      // },
       {
         id: '2',
         label: 'Daywise',
@@ -206,13 +206,13 @@ const ProductionProcessReportUI = ({route, ...props}) => {
         selected: dayWise === 'Yes',
         labelStyle: {color: '#000'},
       },
-      {
-        id: '3',
-        label: 'Pending Qty',
-        value: 'pendingQuantity',
-        selected: pendingQuantity === 'Yes',
-        labelStyle: {color: '#000'},
-      },
+      // {
+      //   id: '3',
+      //   label: 'Pending Qty',
+      //   value: 'pendingQuantity',
+      //   selected: pendingQuantity === 'Yes',
+      //   labelStyle: {color: '#000'},
+      // },
     ],
     [total, dayWise, pendingQuantity],
   );

@@ -10727,6 +10727,10 @@ export const downloadInventoryConsumptionReport = () => {
   const URL = Environment.uri + 'inventoryconsumptionreport/getInventoryReport';
   return URL;
 };
+export const downloadInventoryConsumptionReportCustomFormat = () => {
+  const URL = Environment.uri + 'inventoryconsumptionreport/getCustomisedInventoryReport';
+  return URL;
+};
 
 export const downloadPoPdf1 = () => {
   const URL = Environment.uri + 'po/poPdf1';
