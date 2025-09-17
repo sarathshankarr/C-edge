@@ -34,8 +34,6 @@ const ProductionProcessReportUI = ({route, ...props}) => {
   const {colors} = useContext(ColorContext);
   const styles = getStyles(colors);
 
-
-
   const [total, setTotal] = useState('No');
   const [dayWise, setDayWise] = useState('Yes');
   const [pendingQuantity, setPendingQuantity] = useState('No');
@@ -66,26 +64,25 @@ const ProductionProcessReportUI = ({route, ...props}) => {
 
   const [processNameList1, setProcessNameList1] = useState([]);
 
-
-    useEffect(() => {
-      if (props?.lists) {
-        if (props.lists.productionlist1) {
-          setProcessNameList1(props.lists.productionlist1);
-        }
-        if (props.lists.companyLocationsMap) {
-          set_filteredLocation(props.lists.companyLocationsMap);
-          setLocationList(props.lists.companyLocationsMap);
-        }
-        if (props.lists.brandsMap) {
-          set_filteredBrand(props.lists.brandsMap);
-          setBrandList(props.lists.brandsMap);
-        }
-        if (props.lists.productionlist) {
-          set_filteredProcessName(props.lists.productionlist);
-          setProcessNameList(props.lists.productionlist);
-        }
+  useEffect(() => {
+    if (props?.lists) {
+      if (props.lists.productionlist1) {
+        setProcessNameList1(props.lists.productionlist1);
       }
-    }, [props.lists]);
+      if (props.lists.companyLocationsMap) {
+        set_filteredLocation(props.lists.companyLocationsMap);
+        setLocationList(props.lists.companyLocationsMap);
+      }
+      if (props.lists.brandsMap) {
+        set_filteredBrand(props.lists.brandsMap);
+        setBrandList(props.lists.brandsMap);
+      }
+      if (props.lists.productionlist) {
+        set_filteredProcessName(props.lists.productionlist);
+        setProcessNameList(props.lists.productionlist);
+      }
+    }
+  }, [props.lists]);
 
   const backBtnAction = () => {
     props.backBtnAction();
@@ -97,12 +94,26 @@ const ProductionProcessReportUI = ({route, ...props}) => {
 
   const ApproveAction = () => {
     console.log('Approved');
+
+    if(!startDate || !endDate){
+      Alert.alert("Alert", "Please select Start Date Date and End Date to Proceed");
+      return;
+    }
+
+    if(!processId){
+      Alert.alert("Alert", "Please select Process Name to Proceed");
+      return;
+    }
+
     let tempObj = {
-      startDate:formatDateIntoDMY(startDate),
-      endDate:formatDateIntoDMY(endDate)     
+      startDate: startDate,
+      endDate: endDate,
+      brandId: brandId || '0',
+      menuId: processId || '0',
+      batchId: 0,
+      location: locationId|| '0',
     };
 
-    // console.log("SAVING OBJ=====>   ", tempObj);
     props.submitAction(tempObj);
   };
 
@@ -110,19 +121,19 @@ const ProductionProcessReportUI = ({route, ...props}) => {
     console.log('Rejected');
   };
 
-  const actionOnLocation = (item) => {
+  const actionOnLocation = item => {
     set_locationId(item.id);
     set_locationName(item.name);
     set_showLocationList(false);
   };
 
-  const actionOnProcessName = (item) => {
+  const actionOnProcessName = item => {
     set_processId(item.id);
     set_processName(item.name);
     set_showProcessNameList(false);
   };
-  
-  const actionOnBrand = (item) => {
+
+  const actionOnBrand = item => {
     set_brandId(item.id);
     set_brandName(item.name);
     set_showBrandList(false);
@@ -184,9 +195,10 @@ const ProductionProcessReportUI = ({route, ...props}) => {
   };
 
   function formatDateIntoDMY(inp) {
+    console.log("inp date ", inp)
     const [y, m, d] = inp.split('-');
     let ans = [d, m, y];
-    ans = ans.join('-');
+    ans = ans.join('/');
     return ans;
   }
 
@@ -263,7 +275,7 @@ const ProductionProcessReportUI = ({route, ...props}) => {
             width: '90%',
             marginHorizontal: wp('5%'),
           }}>
-            <View style={{marginTop:20}}/>
+          <View style={{marginTop: 20}} />
           <RadioGroup
             style={{flexDirection: 'row'}}
             radioButtons={categoryRadioButtons}
@@ -299,7 +311,7 @@ const ProductionProcessReportUI = ({route, ...props}) => {
               marginTop: hp('3%'),
               flexDirection: 'row',
             }}>
-            <View style={{width: '85%',paddingHorizontal:10}}>
+            <View style={{width: '85%', paddingHorizontal: 10}}>
               <TextInput
                 label="Start Date"
                 value={startDate ? startDate : ''}
@@ -329,7 +341,7 @@ const ProductionProcessReportUI = ({route, ...props}) => {
               marginTop: hp('3%'),
               flexDirection: 'row',
             }}>
-            <View style={{width: '85%',paddingHorizontal:10}}>
+            <View style={{width: '85%', paddingHorizontal: 10}}>
               <TextInput
                 label="End Date"
                 value={endDate ? endDate : ''}
@@ -353,224 +365,230 @@ const ProductionProcessReportUI = ({route, ...props}) => {
 
           {/* drop down lists */}
 
-          {(dayWise==='Yes' || pendingQuantity==='Yes') && <View
-            style={{
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: '#fff',
-              marginTop: hp('3%'),
-            }}>
-            <TouchableOpacity
+          {(dayWise === 'Yes' || pendingQuantity === 'Yes') && (
+            <View
               style={{
-                flexDirection: 'row',
-                borderWidth: 0.5,
-                borderColor: '#D8D8D8',
-                borderRadius: hp('0.5%'),
-                width: wp('90%'),
-              }}
-              onPress={() => {
-                set_showProcessNameList(!showProcessNameList);
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: '#fff',
+                marginTop: hp('3%'),
               }}>
-              <View>
-                <View style={[styles.SectionStyle1, {}]}>
-                  <View style={{flexDirection: 'column'}}>
-                    <Text
-                      style={
-                        processId
-                          ? [styles.dropTextLightStyle]
-                          : [styles.dropTextInputStyle]
-                      }>
-                      {'Process Name *'}
-                    </Text>
-                    {processId ? (
-                      <Text style={[styles.dropTextInputStyle]}>
-                        {processName}
+              <TouchableOpacity
+                style={{
+                  flexDirection: 'row',
+                  borderWidth: 0.5,
+                  borderColor: '#D8D8D8',
+                  borderRadius: hp('0.5%'),
+                  width: wp('90%'),
+                }}
+                onPress={() => {
+                  set_showProcessNameList(!showProcessNameList);
+                }}>
+                <View>
+                  <View style={[styles.SectionStyle1, {}]}>
+                    <View style={{flexDirection: 'column'}}>
+                      <Text
+                        style={
+                          processId
+                            ? [styles.dropTextLightStyle]
+                            : [styles.dropTextInputStyle]
+                        }>
+                        {'Process Name *'}
                       </Text>
-                    ) : null}
+                      {processId ? (
+                        <Text style={[styles.dropTextInputStyle]}>
+                          {processName}
+                        </Text>
+                      ) : null}
+                    </View>
                   </View>
                 </View>
-              </View>
 
-              <View style={{justifyContent: 'center'}}>
-                <Image source={downArrowImg} style={styles.imageStyle} />
-              </View>
-            </TouchableOpacity>
+                <View style={{justifyContent: 'center'}}>
+                  <Image source={downArrowImg} style={styles.imageStyle} />
+                </View>
+              </TouchableOpacity>
 
-            {showProcessNameList && (
-              <View style={styles.dropdownContent1}>
-                <TextInput
-                  style={styles.searchInput}
-                  placeholder="Search "
-                  onChangeText={handleSearchProcessName}
-                  placeholderTextColor="#000"
-                />
-                <ScrollView
-                  style={styles.scrollView}
-                  nestedScrollEnabled={true}>
-                  {filteredProcessName.length === 0 ? (
-                    <Text style={styles.noCategoriesText}>
-                      Sorry, no results found!
-                    </Text>
-                  ) : (
-                    filteredProcessName.map((item, index) => (
-                      <TouchableOpacity
-                        key={index}
-                        style={styles.dropdownOption}
-                        onPress={() => actionOnProcessName(item)}>
-                        <Text style={{color: '#000'}}>{item.name}</Text>
-                      </TouchableOpacity>
-                    ))
-                  )}
-                </ScrollView>
-              </View>
-            )}
-          </View>}
-
-          {(total ==='Yes' || dayWise==='Yes') &&  <View
-            style={{
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: '#fff',
-              marginTop: hp('3%'),
-            }}>
-            <TouchableOpacity
-              style={{
-                flexDirection: 'row',
-                borderWidth: 0.5,
-                borderColor: '#D8D8D8',
-                borderRadius: hp('0.5%'),
-                width: wp('90%'),
-              }}
-              onPress={() => {
-                set_showBrandList(!showBrandList);
-              }}>
-              <View>
-                <View style={[styles.SectionStyle1, {}]}>
-                  <View style={{flexDirection: 'column'}}>
-                    <Text
-                      style={
-                        brandId
-                          ? [styles.dropTextLightStyle]
-                          : [styles.dropTextInputStyle]
-                      }>
-                      {'Brand/Project'}
-                    </Text>
-                    {brandId ? (
-                      <Text style={[styles.dropTextInputStyle]}>
-                        {brandName}
+              {showProcessNameList && (
+                <View style={styles.dropdownContent1}>
+                  <TextInput
+                    style={styles.searchInput}
+                    placeholder="Search "
+                    onChangeText={handleSearchProcessName}
+                    placeholderTextColor="#000"
+                  />
+                  <ScrollView
+                    style={styles.scrollView}
+                    nestedScrollEnabled={true}>
+                    {filteredProcessName.length === 0 ? (
+                      <Text style={styles.noCategoriesText}>
+                        Sorry, no results found!
                       </Text>
-                    ) : null}
+                    ) : (
+                      filteredProcessName.map((item, index) => (
+                        <TouchableOpacity
+                          key={index}
+                          style={styles.dropdownOption}
+                          onPress={() => actionOnProcessName(item)}>
+                          <Text style={{color: '#000'}}>{item.name}</Text>
+                        </TouchableOpacity>
+                      ))
+                    )}
+                  </ScrollView>
+                </View>
+              )}
+            </View>
+          )}
+
+          {(total === 'Yes' || dayWise === 'Yes') && (
+            <View
+              style={{
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: '#fff',
+                marginTop: hp('3%'),
+              }}>
+              <TouchableOpacity
+                style={{
+                  flexDirection: 'row',
+                  borderWidth: 0.5,
+                  borderColor: '#D8D8D8',
+                  borderRadius: hp('0.5%'),
+                  width: wp('90%'),
+                }}
+                onPress={() => {
+                  set_showBrandList(!showBrandList);
+                }}>
+                <View>
+                  <View style={[styles.SectionStyle1, {}]}>
+                    <View style={{flexDirection: 'column'}}>
+                      <Text
+                        style={
+                          brandId
+                            ? [styles.dropTextLightStyle]
+                            : [styles.dropTextInputStyle]
+                        }>
+                        {'Brand/Project'}
+                      </Text>
+                      {brandId ? (
+                        <Text style={[styles.dropTextInputStyle]}>
+                          {brandName}
+                        </Text>
+                      ) : null}
+                    </View>
                   </View>
                 </View>
-              </View>
 
-              <View style={{justifyContent: 'center'}}>
-                <Image source={downArrowImg} style={styles.imageStyle} />
-              </View>
-            </TouchableOpacity>
+                <View style={{justifyContent: 'center'}}>
+                  <Image source={downArrowImg} style={styles.imageStyle} />
+                </View>
+              </TouchableOpacity>
 
-            {showBrandList && (
-              <View style={styles.dropdownContent1}>
-                <TextInput
-                  style={styles.searchInput}
-                  placeholder="Search "
-                  onChangeText={handleSearchBrand}
-                  placeholderTextColor="#000"
-                />
-                <ScrollView
-                  style={styles.scrollView}
-                  nestedScrollEnabled={true}>
-                  {filteredBrand.length === 0 ? (
-                    <Text style={styles.noCategoriesText}>
-                      Sorry, no results found!
-                    </Text>
-                  ) : (
-                    filteredBrand.map((item, index) => (
-                      <TouchableOpacity
-                        key={index}
-                        style={styles.dropdownOption}
-                        onPress={() => actionOnBrand(item)}>
-                        <Text style={{color: '#000'}}>{item.name}</Text>
-                      </TouchableOpacity>
-                    ))
-                  )}
-                </ScrollView>
-              </View>
-            )}
-          </View>}
-
-          {(total ==='Yes' || dayWise==='Yes') &&  <View
-            style={{
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: '#fff',
-              marginTop: hp('3%'),
-            }}>
-            <TouchableOpacity
-              style={{
-                flexDirection: 'row',
-                borderWidth: 0.5,
-                borderColor: '#D8D8D8',
-                borderRadius: hp('0.5%'),
-                width: wp('90%'),
-              }}
-              onPress={() => {
-                set_showLocationList(!showLocationList);
-              }}>
-              <View>
-                <View style={[styles.SectionStyle1, {}]}>
-                  <View style={{flexDirection: 'column'}}>
-                    <Text
-                      style={
-                        locationId
-                          ? [styles.dropTextLightStyle]
-                          : [styles.dropTextInputStyle]
-                      }>
-                      {'Location'}
-                    </Text>
-                    {locationId ? (
-                      <Text style={[styles.dropTextInputStyle]}>
-                        {locationName}
+              {showBrandList && (
+                <View style={styles.dropdownContent1}>
+                  <TextInput
+                    style={styles.searchInput}
+                    placeholder="Search "
+                    onChangeText={handleSearchBrand}
+                    placeholderTextColor="#000"
+                  />
+                  <ScrollView
+                    style={styles.scrollView}
+                    nestedScrollEnabled={true}>
+                    {filteredBrand.length === 0 ? (
+                      <Text style={styles.noCategoriesText}>
+                        Sorry, no results found!
                       </Text>
-                    ) : null}
+                    ) : (
+                      filteredBrand.map((item, index) => (
+                        <TouchableOpacity
+                          key={index}
+                          style={styles.dropdownOption}
+                          onPress={() => actionOnBrand(item)}>
+                          <Text style={{color: '#000'}}>{item.name}</Text>
+                        </TouchableOpacity>
+                      ))
+                    )}
+                  </ScrollView>
+                </View>
+              )}
+            </View>
+          )}
+
+          {(total === 'Yes' || dayWise === 'Yes') && (
+            <View
+              style={{
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: '#fff',
+                marginTop: hp('3%'),
+              }}>
+              <TouchableOpacity
+                style={{
+                  flexDirection: 'row',
+                  borderWidth: 0.5,
+                  borderColor: '#D8D8D8',
+                  borderRadius: hp('0.5%'),
+                  width: wp('90%'),
+                }}
+                onPress={() => {
+                  set_showLocationList(!showLocationList);
+                }}>
+                <View>
+                  <View style={[styles.SectionStyle1, {}]}>
+                    <View style={{flexDirection: 'column'}}>
+                      <Text
+                        style={
+                          locationId
+                            ? [styles.dropTextLightStyle]
+                            : [styles.dropTextInputStyle]
+                        }>
+                        {'Location'}
+                      </Text>
+                      {locationId ? (
+                        <Text style={[styles.dropTextInputStyle]}>
+                          {locationName}
+                        </Text>
+                      ) : null}
+                    </View>
                   </View>
                 </View>
-              </View>
 
-              <View style={{justifyContent: 'center'}}>
-                <Image source={downArrowImg} style={styles.imageStyle} />
-              </View>
-            </TouchableOpacity>
+                <View style={{justifyContent: 'center'}}>
+                  <Image source={downArrowImg} style={styles.imageStyle} />
+                </View>
+              </TouchableOpacity>
 
-            {showLocationList && (
-              <View style={styles.dropdownContent1}>
-                <TextInput
-                  style={styles.searchInput}
-                  placeholder="Search "
-                  onChangeText={handleSearchLocation}
-                  placeholderTextColor="#000"
-                />
-                <ScrollView
-                  style={styles.scrollView}
-                  nestedScrollEnabled={true}>
-                  {filteredLocation.length === 0 ? (
-                    <Text style={styles.noCategoriesText}>
-                      Sorry, no results found!
-                    </Text>
-                  ) : (
-                    filteredLocation.map((item, index) => (
-                      <TouchableOpacity
-                        key={index}
-                        style={styles.dropdownOption}
-                        onPress={() => actionOnLocation(item)}>
-                        <Text style={{color: '#000'}}>{item.name}</Text>
-                      </TouchableOpacity>
-                    ))
-                  )}
-                </ScrollView>
-              </View>
-            )}
-          </View>}
+              {showLocationList && (
+                <View style={styles.dropdownContent1}>
+                  <TextInput
+                    style={styles.searchInput}
+                    placeholder="Search "
+                    onChangeText={handleSearchLocation}
+                    placeholderTextColor="#000"
+                  />
+                  <ScrollView
+                    style={styles.scrollView}
+                    nestedScrollEnabled={true}>
+                    {filteredLocation.length === 0 ? (
+                      <Text style={styles.noCategoriesText}>
+                        Sorry, no results found!
+                      </Text>
+                    ) : (
+                      filteredLocation.map((item, index) => (
+                        <TouchableOpacity
+                          key={index}
+                          style={styles.dropdownOption}
+                          onPress={() => actionOnLocation(item)}>
+                          <Text style={{color: '#000'}}>{item.name}</Text>
+                        </TouchableOpacity>
+                      ))
+                    )}
+                  </ScrollView>
+                </View>
+              )}
+            </View>
+          )}
 
           {/* <View style={{marginBottom: 150}} /> */}
         </View>

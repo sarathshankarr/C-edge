@@ -10702,6 +10702,20 @@ export const downloadProductionProcessReport = () => {
   const URL = Environment.uri + 'productionprocessreport/ppreport';
   return URL;
 };
+export const downloadProductionProcessReportCtrOff = () => {
+  const URL = Environment.uri + 'inventoryconsumptionreport/generateProdReport';
+  return URL;
+};
+
+export const downloadProductionProcessReportCtr2 = () => {
+  const URL = Environment.uri + 'inventoryconsumptionreport/generateProdReport2';
+  return URL;
+};
+export const downloadProductionProcessReportCtr3 = () => {
+  const URL = Environment.uri + 'inventoryconsumptionreport/generateProdReport3';
+  return URL;
+};
+
 export const downloadStyleBomReport = () => {
   const URL = Environment.uri + 'stylebom/generateStyleBomPDFAPI';
   // const URL = Environment.uri + 'stylebom/styleBomPdfReport';
