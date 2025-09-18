@@ -87,6 +87,7 @@ const CreateMasterBoxPackingUI = ({route, ...props}) => {
             Qty: '',
             childTable: [],
             PbuyerPoID: '',
+            Barcode: '',
           },
         ]);
       }
@@ -123,49 +124,76 @@ const CreateMasterBoxPackingUI = ({route, ...props}) => {
     }
   }, [props.quality]);
 
+  useEffect(() => {
+    if (props.barcodeData) {
+      console.log('barcodeData ====> ', props.barcodeData);
+      const len =props?.barcodeData?.length || '0'
+      if (len) {
+        setRows([
+          ...rows,
+          {
+            id: Date.now(),
+            BoxName: '',
+            BoxId: '',
+            showBoxList: false,
+            BoxList: lastestBoxList || [],
+            filteredBoxList: lastestBoxList || [],
+            CustomerStyleName: '',
+            size: '',
+            Qty: '',
+            childTable: [],
+            PbuyerPoID: '',
+            Barcode: '',
+          },
+        ]);
+      }
+    }
+  }, [props.barcodeData]);
+
   const backAction = async () => {
     props.backBtnAction();
   };
 
   const handleCallBarcodes = code => {
+    // if(code.length!==8) return;
+
     console.log('barcode scanned ', code);
+    setBarcode(code);
+    props.ValidateBarcode(code);
   };
 
-  const handleScannedCode = (text) => {
-    text =202213550;
+  const handleScannedCode = text => {
     if (!text) {
-      Alert.alert('Please Enter the Valid Barcode');
+      Alert.alert('Please Enter the Valid Barcode', text);
     }
-
     handleCallBarcodes(text);
 
-
-    if (text) {
-      setRows(prev => [
-        ...prev,
-        {
-          id: 1,
-          BoxId: 'box_001',
-          BoxName: 'Box Alpha',
-          CustomerStyleName: 'Style 101',
-          size: 'M',
-          Qty: 10,
-          showBoxList: false,
-          filteredBoxList: [
-            {id: 'box_001', name: 'Box Alpha'},
-            {id: 'box_002', name: 'Box Beta'},
-            {id: 'box_003', name: 'Box Gamma'},
-          ],
-          childTable: [
-            {SIZE_ID: 1, SIZE_VAL: 'XS', checked: true},
-            {SIZE_ID: 2, SIZE_VAL: 'S', checked: false},
-            {SIZE_ID: 3, SIZE_VAL: 'M', checked: true},
-          ],
-        },
-      ]);
-    } else {
-      Alert.alert('Please Enter the Valid Barcode');
-    }
+    // if (text) {
+    //   setRows(prev => [
+    //     ...prev,
+    //     {
+    //       id: 1,
+    //       BoxId: 'box_001',
+    //       BoxName: 'Box Alpha',
+    //       CustomerStyleName: 'Style 101',
+    //       size: 'M',
+    //       Qty: 10,
+    //       showBoxList: false,
+    //       filteredBoxList: [
+    //         {id: 'box_001', name: 'Box Alpha'},
+    //         {id: 'box_002', name: 'Box Beta'},
+    //         {id: 'box_003', name: 'Box Gamma'},
+    //       ],
+    //       childTable: [
+    //         {SIZE_ID: 1, SIZE_VAL: 'XS', checked: true},
+    //         {SIZE_ID: 2, SIZE_VAL: 'S', checked: false},
+    //         {SIZE_ID: 3, SIZE_VAL: 'M', checked: true},
+    //       ],
+    //     },
+    //   ]);
+    // } else {
+    //   Alert.alert('Please Enter the Valid Barcode');
+    // }
   };
 
   const submitAction = async () => {
@@ -427,7 +455,7 @@ const CreateMasterBoxPackingUI = ({route, ...props}) => {
               label="Barcode"
               value={barcode}
               mode="outlined"
-              onChangeText={text => setBarcode(text)}
+              onChangeText={text => handleCallBarcodes(text)}
             />
           </View>
 
@@ -687,7 +715,7 @@ const CreateMasterBoxPackingUI = ({route, ...props}) => {
                           }}>
                           {row?.childTable?.map((item, index) => (
                             <View
-                              key={item?.SIZE_ID}
+                              key={index}
                               style={{
                                 width: 100,
                                 margin: 5,

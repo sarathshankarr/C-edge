@@ -21,6 +21,7 @@ const CreateMasterBoxPacking = ({route}) => {
   const [isPopupLeft, set_isPopupLeft] = useState(false);
   const [lists, set_lists] = useState([]);
   const [quality, set_quality] = useState([]);
+  const [barcodeData, set_barcodeData] = useState([]);
 
   const backBtnAction = () => {
     navigation.goBack();
@@ -80,7 +81,7 @@ const CreateMasterBoxPacking = ({route}) => {
     }
   };
 
-  const api1 = async id => {
+  const ValidateBarcode = async id => {
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
@@ -92,10 +93,11 @@ const CreateMasterBoxPacking = ({route}) => {
       password: userPsd,
       compIds: usercompanyId,
       company: JSON.parse(companyObj),
-      barcode: '20222115',
+      barcode: id,
       multiPI: '',
     };
-    // console.log("barcode valid req body ", obj)
+
+    
     let LISTAPIOBJ = await APIServiceCall.api11(obj);
     set_isLoading(false);
 
@@ -106,10 +108,11 @@ const CreateMasterBoxPacking = ({route}) => {
       LISTAPIOBJ.responseData.status === true
     ) {
       console.log(
-        'barcode scanend succesfully  ',
-        LISTAPIOBJ.responseData.status,
+        'ValidateBarcode ',
+        LISTAPIOBJ.responseData,
       );
-      getBillGeneratonDataFromBarcode(id);
+      getDatafromBarcode(id, LISTAPIOBJ.responseData.rKey);
+
     } else {
       popUpAction(
         Constant.SERVICE_FAIL_MSG,
@@ -131,7 +134,7 @@ const CreateMasterBoxPacking = ({route}) => {
     }
   };
 
-  const api2 = async id => {
+  const getDatafromBarcode = async( id, key) => {
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
@@ -143,20 +146,18 @@ const CreateMasterBoxPacking = ({route}) => {
       password: userPsd,
       compIds: usercompanyId,
       company: JSON.parse(companyObj),
-      locId: 34,
-      barcode: '20222115',
+      locId: key,
+      barcode: id,
     };
+    console.log("get data req id ", id)
 
-    let LISTAPIOBJ;
-
-    LISTAPIOBJ = await APIServiceCall.getBillGeneratonDataFromBarcode(obj);
+    let LISTAPIOBJ = await APIServiceCall.api22(obj);
 
     set_isLoading(false);
 
     if (LISTAPIOBJ && LISTAPIOBJ.statusData) {
       if (LISTAPIOBJ && LISTAPIOBJ.responseData) {
-        let result = LISTAPIOBJ.responseData.myArrayList.map(item => item.map);
-        set_tableLists(result);
+       set_barcodeData({...LISTAPIOBJ.responseData, Barcode:id})
       }
     } else {
       popUpAction(
@@ -178,7 +179,7 @@ const CreateMasterBoxPacking = ({route}) => {
       );
     }
   };
-
+  
   const ValidateAction = async type => {
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
@@ -326,6 +327,8 @@ const CreateMasterBoxPacking = ({route}) => {
       submitAction={submitAction}
       getData={getData}
       quality={quality}
+      barcodeData={barcodeData}
+      ValidateBarcode={ValidateBarcode}
       backBtnAction={backBtnAction}
       popOkBtnAction={popOkBtnAction}
     />

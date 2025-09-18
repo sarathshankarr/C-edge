@@ -259,9 +259,9 @@ const InventoryConsumptionReportUI = ({route, ...props}) => {
       const filtered = styleList.filter(fabric =>
         fabric.name.toLowerCase().includes(text.toLowerCase()),
       );
-      set_filteredLocation(filtered);
+      set_filteredStyle(filtered);
     } else {
-      set_filteredLocation(styleList);
+      set_filteredStyle(styleList);
     }
   };
   const handleSearchFabric = text => {
@@ -269,9 +269,9 @@ const InventoryConsumptionReportUI = ({route, ...props}) => {
       const filtered = fabricList.filter(fabric =>
         fabric.name.toLowerCase().includes(text.toLowerCase()),
       );
-      set_filteredLocation(filtered);
+      set_filteredFabric(filtered);
     } else {
-      set_filteredLocation(fabricList);
+      set_filteredFabric(fabricList);
     }
   };
 

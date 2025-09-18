@@ -209,7 +209,7 @@ const ProductionProcessReport = ({navigation, route, ...props}) => {
         compIds: usercompanyId,
         company: JSON.parse(companyObj),
         startDate: tempObj.startDate,
-        endDate: tempObj.startDate,
+        endDate: tempObj.endDate,
         brandId: tempObj.brandId || '0',
         menuId: tempObj.menuId || '0',
         batchId: tempObj.batchId,
