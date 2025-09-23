@@ -81,7 +81,7 @@ const CreateMasterBoxPacking = ({route}) => {
     }
   };
 
-  const ValidateBarcode = async id => {
+  const ValidateBarcode = async (id, poflag) => {
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
@@ -97,7 +97,6 @@ const CreateMasterBoxPacking = ({route}) => {
       multiPI: '',
     };
 
-    
     let LISTAPIOBJ = await APIServiceCall.api11(obj);
     set_isLoading(false);
 
@@ -157,7 +156,7 @@ const CreateMasterBoxPacking = ({route}) => {
 
     if (LISTAPIOBJ && LISTAPIOBJ.statusData) {
       if (LISTAPIOBJ && LISTAPIOBJ.responseData) {
-       set_barcodeData({...LISTAPIOBJ.responseData, Barcode:id})
+       set_barcodeData({...LISTAPIOBJ.responseData, Barcode:id, boxKeyId:key})
       }
     } else {
       popUpAction(
@@ -185,12 +184,13 @@ const CreateMasterBoxPacking = ({route}) => {
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
     let companyObj = await AsyncStorage.getItem('companyObj');
+    console.log("validating masterbx exitsing ? ", type)
 
     let Obj = {
-      menuid: 82,
+      menuid: 384,
       username: userName,
       password: userPsd,
-      masterBox: '',
+      masterBox:type || '',
       compIds: usercompanyId,
       company: JSON.parse(companyObj),
     };
@@ -205,13 +205,13 @@ const CreateMasterBoxPacking = ({route}) => {
     return SAVEAPIObj?.responseData;
   };
 
-  const submitAction = async tempObj => {
-    const validateRMT = await ValidateAction();
+  const submitAction = async (tempObj) => {
+    const validateRMT = await ValidateAction(tempObj.masterBox);
 
-    if (validateRMT === 'no') {
+    if (validateRMT !== 'false') {
       console.log('failed  saving =====> ');
       popUpAction(
-        Constant.Fail_Validate_RMT_MSG,
+        "Entered MasterBox Name Already Exits !",
         Constant.DefaultAlert_MSG,
         'OK',
         true,
@@ -225,20 +225,20 @@ const CreateMasterBoxPacking = ({route}) => {
     let usercompanyId = await AsyncStorage.getItem('companyId');
     let companyObj = await AsyncStorage.getItem('companyObj');
 
+    console.log('saving obj b api ==>', tempObj);
     tempObj.menuId = 384;
     tempObj.username = userName;
     tempObj.password = userPsd;
     tempObj.compIds = usercompanyId;
     tempObj.company = JSON.parse(companyObj);
 
-    console.log('saving obj ==>', tempObj);
 
     set_isLoading(true);
 
     let SAVEAPIObj = await APIServiceCall.saveCreateMasterBoxPacking(tempObj);
     set_isLoading(false);
 
-    console.log('Sucess before returned obj ', SAVEAPIObj);
+    // console.log('Sucess before returned obj ', SAVEAPIObj);
 
     if (
       SAVEAPIObj &&

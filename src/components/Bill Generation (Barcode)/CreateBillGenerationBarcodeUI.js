@@ -124,14 +124,12 @@ const CreateBillGenerationBarcodeUI = ({route, ...props}) => {
     }
   }, [props.lists]);
 
-  // useEffect(() => {
-  //   if (props.modalLists) {
-  //     if (props.modalLists) {
-  //       setModalLists(props.modalLists);
-  //     }
-  //     console.log('modal lists ===>  ==> ', props.modalLists[0]);
-  //   }
-  // }, [props.modalLists]);
+  useEffect(() => {
+    if (props.tableLists) {
+      
+      console.log(' tableLists lists ===>  ==> ', props.tableLists);
+    }
+  }, [props.tableLists]);
 
   const [billNoList, setBillNoList] = useState([]);
   const [filteredBillNoList, setFilteredBillNoList] = useState([]);
@@ -255,15 +253,20 @@ const CreateBillGenerationBarcodeUI = ({route, ...props}) => {
       return;
     }
     props.validateBarCode(text);
-
-    Alert.alert('Valid Barcode', text);
-    //   if(text===barCode){
-    //     submitAction(1);
-    //  }else{
-    //    Alert.alert("Please Enter the Valid Barcode");
-    //    set_inputBarCode('');
-    //  }
   };
+
+   const handleSearchBarcode = () => {
+    if (!barCode) {
+      Alert.alert('Alert', 'Please Enter Barcode !');
+    }
+    handleScannedCode(barCode);
+  };
+
+    const handleBarcodeChange=(text)=>{
+    setBarcode(text)
+    if(text.trim().length!==9) return;
+    handleScannedCode(text);
+  }
 
   const handleScan = () => {
     navigation.navigate('ScanQRPage', {
@@ -460,12 +463,7 @@ return;
     props.getModalStyleFgList(id);
     setShowmodal(!showModal);
   };
-  const handleSearchBarcode = () => {
-    if (!barCode) {
-      Alert.alert('Alert', 'Please Enter Barcode !');
-    }
-    handleScannedCode(barCode);
-  };
+ 
 
   const totalGstAmount = rows.reduce(
     (sum, row) =>
@@ -482,6 +480,8 @@ return;
     0,
   );
   const totalTotalAmount = totalNetAmount + totalGstAmount;
+
+
 
   return (
     <View style={[CommonStyles.mainComponentViewStyle]}>
@@ -833,7 +833,7 @@ return;
                   label="Barcode *"
                   value={barCode}
                   mode="outlined"
-                  onChangeText={text => setBarcode(text)}
+                  onChangeText={text => handleBarcodeChange(text)}
                 />
               </View>
               <TouchableOpacity

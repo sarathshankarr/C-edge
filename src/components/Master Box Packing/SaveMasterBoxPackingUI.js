@@ -32,6 +32,7 @@ const SaveMasterBoxPackingUI = ({route, navigation, ...props}) => {
   const [masterBoxName, setMasterBoxName] = useState('');
   const [buyerPONo, setBuyerPONo] = useState('');
   const [buyerName, setBuyerName] = useState('');
+  const [totalQty, setTotalQty] = useState('0');
 
   const {colors} = useContext(ColorContext);
   const styles = getStyles(colors);
@@ -42,6 +43,9 @@ const SaveMasterBoxPackingUI = ({route, navigation, ...props}) => {
       if (props.itemsObj.masterboxname) {
         setMasterBoxName(props.itemsObj.masterboxname);
       }
+      if (props.itemsObj.qty) {
+        setTotalQty(props.itemsObj.qty);
+      }
       if (props.itemsObj.buyerpo) {
         setBuyerPONo(props.itemsObj.buyerpo);
       }
@@ -49,34 +53,34 @@ const SaveMasterBoxPackingUI = ({route, navigation, ...props}) => {
         setBuyerName(props.itemsObj.buyername);
       }
       if (props.itemsObj.child) {
-
         const mappedChildItems = props.itemsObj.child.map((item, index) => {
-          const barcodeArray = item.barcode ? item.barcode.split(",").map(b => b.trim()) : [];
+          const barcodeArray = item.barcode
+            ? item.barcode.split(',').map(b => b.trim())
+            : [];
           const sizeObjects = barcodeArray.map((code, idx) => ({
-            SIZE_ID: idx + 1,  
+            SIZE_ID: idx + 1,
             SIZE_VAL: code,
-            checked:true
+            checked: true,
           }));
-        
+
           return {
-            id: Date.now(), 
+            id: Date.now(),
             BoxName: props.itemsObj.boxid[item.masterboxId] || '',
             BoxId: item.masterboxId || '',
             showBoxList: false,
-            BoxList:  [], 
+            BoxList: [],
             filteredBoxList: [],
-            CustomerStyleName: item.style || '', 
-            size: item.size || '', 
-            Qty: item.qty || '', 
-            childTable: sizeObjects, 
-            PbuyerPoID: item.id || '' 
+            CustomerStyleName: item.style || '',
+            size: item.size || '',
+            Qty: item.qty || '',
+            childTable: sizeObjects,
+            PbuyerPoID: item.id || '',
           };
         });
-        console.log('child ===> ',mappedChildItems);
+        console.log('child ===> ', mappedChildItems);
 
         setRows(mappedChildItems);
       }
-
     }
   }, [props.itemsObj]);
 
@@ -153,7 +157,7 @@ const SaveMasterBoxPackingUI = ({route, navigation, ...props}) => {
           <View style={styles.wrapper}>
             <ScrollView nestedScrollEnabled={true} horizontal>
               <View style={styles.table}>
-                <View style={styles.table_head}> 
+                <View style={styles.table_head}>
                   <View style={{width: 200}}>
                     <Text style={styles.table_head_captions}>Box Name</Text>
                   </View>
@@ -173,7 +177,7 @@ const SaveMasterBoxPackingUI = ({route, navigation, ...props}) => {
 
                 {rows.map(row => (
                   <View key={row.id}>
-                    <View style={styles.table_body_single_row}>                  
+                    <View style={styles.table_body_single_row}>
                       <View style={{width: 200}}>
                         <View
                           style={{
@@ -191,7 +195,9 @@ const SaveMasterBoxPackingUI = ({route, navigation, ...props}) => {
                               width: '100%',
                               overflow: 'hidden',
                             }}
-                            onPress={() => {console.log("clicked open box list ")}}>
+                            onPress={() => {
+                              console.log('clicked open box list ');
+                            }}>
                             <View style={[styles.SectionStyle1]}>
                               <View style={{flexDirection: 'column'}}>
                                 <Text
@@ -227,7 +233,7 @@ const SaveMasterBoxPackingUI = ({route, navigation, ...props}) => {
                                 style={styles.searchInput}
                                 placeholder="Search "
                                 onChangeText={text =>
-                                  console.log("text, row.id")
+                                  console.log('text, row.id')
                                 }
                                 placeholderTextColor="#000"
                               />
@@ -241,7 +247,7 @@ const SaveMasterBoxPackingUI = ({route, navigation, ...props}) => {
                                     <TouchableOpacity
                                       key={item1?.id}
                                       onPress={() =>
-                                        console.log("item, row.id")
+                                        console.log('item, row.id')
                                       }>
                                       <View style={styles.dropdownOption}>
                                         <Text style={{color: '#000'}}>
@@ -326,7 +332,7 @@ const SaveMasterBoxPackingUI = ({route, navigation, ...props}) => {
                                 padding: 10,
                                 borderRadius: 5,
                                 flexDirection: 'row',
-                                alignItems:'center'
+                                alignItems: 'center',
                               }}>
                               <CustomCheckBox
                                 isChecked={item?.checked}
@@ -343,6 +349,24 @@ const SaveMasterBoxPackingUI = ({route, navigation, ...props}) => {
                     )}
                   </View>
                 ))}
+
+                <View style={styles.table_body_single_row}>
+                 
+                  <View style={{width: 200}}></View>
+                  <View style={{width: 5}}></View>
+                  <View style={{width: 100}}></View>
+
+                  <View style={{width: 5}}></View>
+                  <View style={{width: 100}}>
+                    <Text style={styles.dropTextInputStyle1}>Total Qty:</Text>
+                  </View>
+
+                  <View style={{width: 5}}></View>
+                  <View style={{width: 100}}>
+                    <Text style={styles.dropTextInputStyle1}>{totalQty}</Text>
+                  </View>
+                  
+                </View>
               </View>
             </ScrollView>
           </View>
@@ -564,5 +588,11 @@ const getStyles = colors =>
       resizeMode: 'contain',
       tintColor: 'red',
       alignSelf: 'center',
+    },
+      dropTextInputStyle1: {
+      fontWeight: 'normal',
+      fontSize: 18,
+      color: 'black',
+      textAlign: 'center',
     },
   });

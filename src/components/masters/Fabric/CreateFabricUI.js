@@ -239,20 +239,20 @@ const CreateFabricUI = ({route, navigation, ...props}) => {
 	     "fabricId":"0",
 	     "fabricType":addNewFabricType,
 	     "fabricDescription":addFabricTypeDescription,
-	     "fabricTypeId":fabricTypeId==="ADD_NEW_FABRIC_TYPE" ? '0' : fabricTypeId,
+	     "fabricTypeId":fabricTypeId==="ADD_NEW_FABRIC_TYPE" ? '0' : fabricTypeId ? fabricTypeId : '0',
 	     "rate":rate,
 	     "brandName":addBrandProjectName,
 	     "brandDescription":addBrandProjectDescription,
 	     "gsm":gsm,
        "fabricWidth":fabricWidth,
-       "colorid":colorId ==='ADD_NEW_COLOR' ? '0' : colorId,
-       "locationId":locationId,
-       "uomId":uomId ==='ADD_NEW_UOM' ? '0': uomId,
+       "colorid":colorId ==='ADD_NEW_COLOR' ? '0' : colorId ? colorId : '0',
+       "locationId":locationId || '0',
+       "uomId":uomId ==='ADD_NEW_UOM' ? '0': uomId ? uomId : '0',
        "hsn":hsn,
        "gstRate":gstRate,
        "inv_limit":inventoryLimit,
        "bomststatus":1,
-       "fabricBrandId":brandOrProjectId ==='ADD_NEW_BRAND' ? '0' : brandOrProjectId,
+       "fabricBrandId":brandOrProjectId ==='ADD_NEW_BRAND' ? '0' : brandOrProjectId ? brandOrProjectId : '0' ,
        "newcolor":newColor,
        "newcolorcode":colorCode,
        "umoType":uomType,
@@ -264,6 +264,8 @@ const CreateFabricUI = ({route, navigation, ...props}) => {
        "bomststatus":trimFabricRadio ==="Yes"?1:0,
        "aisbinSts":updateRollWiseQtyRadio ==="Yes"?1:0,
     }
+    console.log("save obj  ==> ", obj)
+    // return;
     props.submitAction(obj);
   };
 

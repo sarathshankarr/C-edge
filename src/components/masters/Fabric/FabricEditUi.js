@@ -119,6 +119,9 @@ const FabricEditUi = ({route, ...props}) => {
       if (props.itemsObj.gstRate) {
         setGstRate(props.itemsObj.gstRate);
       }
+      if (props.itemsObj.hsn) {
+        setHsn(props.itemsObj.hsn);
+      }
       if (props.itemsObj.gsm) {
         setGsm(props.itemsObj.gsm);
       }
@@ -416,7 +419,7 @@ const FabricEditUi = ({route, ...props}) => {
             style={{
               alignItems: 'center',
               justifyContent: 'center',
-              backgroundColor: uomId ? '#E8E8E8' : '#fff',
+              backgroundColor:  '#fff',
               marginTop: hp('2%'),
               width: '95%',
             }}>
