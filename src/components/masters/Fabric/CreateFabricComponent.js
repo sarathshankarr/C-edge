@@ -153,12 +153,12 @@ const CreateFabricComponent = ({ route }) => {
     let usercompanyId = await AsyncStorage.getItem('companyId');
     let companyObj = await AsyncStorage.getItem('companyObj');
 
+    console.log("saving obj ==>", tempObj);
     tempObj.username = userName;
     tempObj.password = userPsd;
     tempObj.compIds = usercompanyId;
     tempObj.company = JSON.parse(companyObj);
 
-    console.log("saving obj ==>", tempObj);
 
 
     set_isLoading(true);

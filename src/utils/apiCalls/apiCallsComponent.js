@@ -9072,6 +9072,7 @@ export async function saveCreateMasterBoxPacking(jsonValue) {
     };
     return obj;
   }
+  console.log(" saveCreateMasterBoxPacking ", Environment.uri + 'masterboxpacking/saveMasterBoxpacking')
   await fetch(Environment.uri + 'masterboxpacking/saveMasterBoxpacking', {
     method: 'POST',
     headers: {

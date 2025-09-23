@@ -102,19 +102,23 @@ const CreateBillGenerationBarcode = ({route}) => {
       company: JSON.parse(companyObj),
       barcodeNo: id,
     };
-    // console.log("barcode valid req body ", obj)
+    console.log("barcode valid req body ", id)
     let LISTAPIOBJ = await APIServiceCall.validateBillGenerationBarcode(obj);
     set_isLoading(false);
 
+    console.log(
+        'barcode scanend succesfully  ',
+        LISTAPIOBJ.responseData,
+      );
     if (
       LISTAPIOBJ &&
       LISTAPIOBJ.statusData &&
       LISTAPIOBJ.responseData &&
-      LISTAPIOBJ.responseData.status === true
+      LISTAPIOBJ.responseData.status === false
     ) {
       console.log(
         'barcode scanend succesfully  ',
-        LISTAPIOBJ.responseData.status,
+        LISTAPIOBJ.responseData,
       );
       getBillGeneratonDataFromBarcode(id);
     } else {
@@ -149,6 +153,8 @@ const CreateBillGenerationBarcode = ({route}) => {
       menuId: 346,
       userName: userName,
       userPwd: userPsd,
+      compIds: usercompanyId,
+      company: JSON.parse(companyObj),
       itemId: id,
       qty: '0',
       vendorPriceId: '0',
@@ -157,20 +163,19 @@ const CreateBillGenerationBarcode = ({route}) => {
       ratioType: 'S',
       masterbox: 'M',
       itemType: 'Barcode',
-      compIds: usercompanyId,
-      company: JSON.parse(companyObj),
     }
 
-    let LISTAPIOBJ;
 
-    LISTAPIOBJ = await APIServiceCall.getBillGeneratonDataFromBarcode(obj);
+    let LISTAPIOBJ = await APIServiceCall.getBillGeneratonDataFromBarcode(obj);
 
     set_isLoading(false);
 
     if (LISTAPIOBJ && LISTAPIOBJ.statusData) {
       if (LISTAPIOBJ && LISTAPIOBJ.responseData) {
-        let result = LISTAPIOBJ.responseData.myArrayList.map(item => item.map);
-        set_tableLists(result);
+        // let result = LISTAPIOBJ.responseData.myArrayList.map(item => item.map);
+        // set_tableLists(result);
+console.log("get data from barcode ==> ", LISTAPIOBJ.responseData)
+
       }
     } else {
       popUpAction(
@@ -256,8 +261,6 @@ const CreateBillGenerationBarcode = ({route}) => {
       lists={lists}
       modalLists={modalLists}
       tableLists={tableLists}
-      // getModalLists={getModalLists}
-      // getModalStyleFgList={getModalStyleFgList}
       submitAction={submitAction}
       getData={getData}
       validateBarCode={validateBarCode}

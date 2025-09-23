@@ -127,6 +127,7 @@ const CuttingReportUI = ({route, ...props}) => {
             width: '90%',
             marginHorizontal: wp('5%'),
           }}>
+            
           <View
             style={{
               alignItems: 'center',
