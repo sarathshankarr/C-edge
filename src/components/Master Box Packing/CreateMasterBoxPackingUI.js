@@ -67,16 +67,26 @@ const CreateMasterBoxPackingUI = ({route, ...props}) => {
     props.popOkBtnAction();
   };
 
-  useEffect(async () => {
-    let companyObj = await AsyncStorage.getItem('companyObj');
-    let flag =
-      JSON.parse(companyObj)?.newFlagSetupMasterDAO?.nfsm_pi_style_wise;
-    console.log('Po flag ', flag);
-    setPoFlag(flag=='1'? true : false);
+  useEffect(() => {
+    const fetchPoFlag = async () => {
+      try {
+        let companyObj = await AsyncStorage.getItem('companyObj');
+        let flag =
+          JSON.parse(companyObj)?.newFlagSetupMasterDAO?.nfsm_pi_style_wise;
+        console.log('Po flag ', flag);
+        setPoFlag(flag == '1');
+      } catch (err) {
+        console.error('Error fetching companyObj:', err);
+      }
+    };
+
+    fetchPoFlag();
   }, []);
 
   useEffect(() => {
     if (props.lists) {
+      // console.log(' props.lists ', props.lists);
+
       if (props.lists.buyerMap) {
         const buyerMapList = Object.keys(props.lists.buyerMap).map(key => ({
           id: key,
@@ -84,6 +94,16 @@ const CreateMasterBoxPackingUI = ({route, ...props}) => {
         }));
         setFilteredBuyerPo(buyerMapList);
         setBuyerPoList(buyerMapList);
+      }
+      if (props.lists.proformaInvoiceMap) {
+        const proformaInvoiceMapList = Object.keys(
+          props.lists.proformaInvoiceMap,
+        ).map(key => ({
+          id: key,
+          name: props.lists.proformaInvoiceMap[key],
+        }));
+        set_filteredProformaInvoice(proformaInvoiceMapList);
+        setProformaInvoiceList(proformaInvoiceMapList);
       }
       // console.log(" props.lists.boxid ")
       if (props.lists.boxid) {
@@ -93,6 +113,7 @@ const CreateMasterBoxPackingUI = ({route, ...props}) => {
           name: props.lists.boxid[key],
         }));
         setLastestBoxList(boxidList);
+
         // console.log("initial")
         // setRows([
         //   // ...rows,
@@ -200,7 +221,7 @@ const CreateMasterBoxPackingUI = ({route, ...props}) => {
     }
 
     console.log('barcode scanned ', code);
-    props.ValidateBarcode(code, poflag);
+    props.ValidateBarcode(code, poflag, selectedProformaIndices);
   };
 
   const handleScannedCode = text => {
@@ -274,9 +295,8 @@ const CreateMasterBoxPackingUI = ({route, ...props}) => {
       master_box_total_qty: totalQty || '0',
     };
 
-
     // return;
-    props.submitAction(tempObj, flag);
+    props.submitAction(tempObj);
   };
 
   const handleRemoveRow = id => {
@@ -393,12 +413,15 @@ const CreateMasterBoxPackingUI = ({route, ...props}) => {
   const actionOnProformaInvoiceToggle = id => {
     setSelectedProformaIndices(prevSelected => {
       const exists = prevSelected.some(i => i === id);
-
+      let updated;
       if (exists) {
-        return prevSelected.filter(i => i !== id);
+        updated = prevSelected.filter(i => i !== id);
       } else {
-        return [...prevSelected, id];
+        updated = [...prevSelected, id];
       }
+      const sIds = updated.join(',');
+      props.getDataFromSelectedCheckBox(sIds, poflag);
+      return updated;
     });
   };
 
@@ -448,95 +471,99 @@ const CreateMasterBoxPackingUI = ({route, ...props}) => {
             />
           </View>
 
-          {poflag &&  <View
-            style={{
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: '#fff',
-              marginTop: hp('2%'),
-              width: '100%',
-            }}>
-            <TouchableOpacity
+          {poflag && (
+            <View
               style={{
-                flexDirection: 'row',
-                borderWidth: 0.5,
-                borderColor: '#D8D8D8',
-                borderRadius: hp('0.5%'),
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: '#fff',
+                marginTop: hp('2%'),
                 width: '100%',
-                justifyContent: 'space-between',
-              }}
-              onPress={() => {
-                set_showProformaInvoiceList(!showProformaInvoiceList);
               }}>
-              <View>
-                <View style={[styles.SectionStyle1, {}]}>
-                  <View style={{flexDirection: 'column'}}>
-                    <Text
-                      style={
-                        proformaInvoiceId
-                          ? [styles.dropTextLightStyle]
-                          : [styles.dropTextInputStyle]
-                      }>
-                      {'Proforma Invoice ID'}
-                    </Text>
-                    {proformaInvoiceId ? (
-                      <Text style={[styles.dropTextInputStyle]}>
-                        {selectedProformaIndices.length > 0 ? (
-                          <Text style={[styles.dropTextInputStyle]}>
-                            {proformaInvoiceList
-                              .filter(item =>
-                                selectedProformaIndices.includes(item.id),
-                              )
-                              .map(item => item.name)
-                              .join(', ')}
-                          </Text>
-                        ) : null}
+              <TouchableOpacity
+                style={{
+                  flexDirection: 'row',
+                  borderWidth: 0.5,
+                  borderColor: '#D8D8D8',
+                  borderRadius: hp('0.5%'),
+                  width: '100%',
+                  justifyContent: 'space-between',
+                }}
+                onPress={() => {
+                  set_showProformaInvoiceList(!showProformaInvoiceList);
+                }}>
+                <View>
+                  <View style={[styles.SectionStyle1, {}]}>
+                    <View style={{flexDirection: 'column'}}>
+                      <Text
+                        style={
+                          proformaInvoiceId
+                            ? [styles.dropTextLightStyle]
+                            : [styles.dropTextInputStyle]
+                        }>
+                        {'Proforma Invoice ID'}
                       </Text>
-                    ) : null}
+                      {proformaInvoiceId ? (
+                        <Text style={[styles.dropTextInputStyle]}>
+                          {selectedProformaIndices.length > 0 ? (
+                            <Text style={[styles.dropTextInputStyle]}>
+                              {proformaInvoiceList
+                                .filter(item =>
+                                  selectedProformaIndices.includes(Number(item.id)),
+                                )
+                                .map(item => item.name)
+                                .join(', ')}
+                            </Text>
+                          ) : null}
+                        </Text>
+                      ) : null}
+                    </View>
                   </View>
                 </View>
-              </View>
 
-              <View style={{justifyContent: 'center'}}>
-                <Image source={downArrowImg} style={styles.imageStyle} />
-              </View>
-            </TouchableOpacity>
+                <View style={{justifyContent: 'center'}}>
+                  <Image source={downArrowImg} style={styles.imageStyle} />
+                </View>
+              </TouchableOpacity>
 
-            {showProformaInvoiceList && (
-              <View style={styles.dropdownContent1}>
-                <TextInput
-                  style={styles.searchInput}
-                  placeholder="Search "
-                  onChangeText={handleSearchProformaInvoice}
-                  placeholderTextColor="#000"
-                />
-                <ScrollView
-                  style={styles.scrollView}
-                  nestedScrollEnabled={true}>
-                  {filteredProformaInvoice.length === 0 ? (
-                    <Text style={styles.noCategoriesText}>
-                      Sorry, no results found!
-                    </Text>
-                  ) : (
-                    filteredProformaInvoice.map((item, index) => (
-                      <TouchableOpacity
-                        key={index}
-                        style={styles.itemContainer}
-                        onPress={() => actionOnProformaInvoice(item)}>
-                        <CustomCheckBox
-                          isChecked={selectedProformaIndices.includes(item.id)}
-                          onToggle={() =>
-                            actionOnProformaInvoiceToggle(item.id)
-                          }
-                        />
-                        <Text style={{color: '#000'}}>{item.name}</Text>
-                      </TouchableOpacity>
-                    ))
-                  )}
-                </ScrollView>
-              </View>
-            )}
-          </View>}
+              {showProformaInvoiceList && (
+                <View style={styles.dropdownContent1}>
+                  <TextInput
+                    style={styles.searchInput}
+                    placeholder="Search "
+                    onChangeText={handleSearchProformaInvoice}
+                    placeholderTextColor="#000"
+                  />
+                  <ScrollView
+                    style={styles.scrollView}
+                    nestedScrollEnabled={true}>
+                    {filteredProformaInvoice.length === 0 ? (
+                      <Text style={styles.noCategoriesText}>
+                        Sorry, no results found!
+                      </Text>
+                    ) : (
+                      filteredProformaInvoice.map((item, index) => (
+                        <TouchableOpacity
+                          key={index}
+                          style={styles.itemContainer}
+                          onPress={() => actionOnProformaInvoice(item)}>
+                          <CustomCheckBox
+                            isChecked={selectedProformaIndices.includes(
+                              item.id,
+                            )}
+                            onToggle={() =>
+                              actionOnProformaInvoiceToggle(item.id)
+                            }
+                          />
+                          <Text style={{color: '#000'}}>{item.name}</Text>
+                        </TouchableOpacity>
+                      ))
+                    )}
+                  </ScrollView>
+                </View>
+              )}
+            </View>
+          )}
 
           {/* <View
             style={{
@@ -837,6 +864,7 @@ const CreateMasterBoxPackingUI = ({route, ...props}) => {
                             style={styles.table_data_input}
                             value={row.CustomerStyleName}
                             editable={false}
+                            multiline={true}
                             onChangeText={text => {
                               setRows(
                                 rows.map(r =>
@@ -855,6 +883,7 @@ const CreateMasterBoxPackingUI = ({route, ...props}) => {
                             style={styles.table_data_input}
                             value={row.size}
                             editable={false}
+                            multiline={true}
                             onChangeText={text => {
                               setRows(
                                 rows.map(r =>
@@ -870,6 +899,7 @@ const CreateMasterBoxPackingUI = ({route, ...props}) => {
                           <TextInput
                             style={styles.table_data_input}
                             value={row.Qty.toString()}
+                           multiline={true}
                             onChangeText={text => {
                               setRows(
                                 rows.map(r =>
@@ -885,6 +915,7 @@ const CreateMasterBoxPackingUI = ({route, ...props}) => {
                           <TextInput
                             style={styles.table_data_input}
                             value={row.Barcode}
+                            multiline={true}
                             onChangeText={text => console.log(tex)}
                             editable={false}
                           />
@@ -1207,5 +1238,13 @@ const getStyles = colors =>
       fontSize: 16,
       fontWeight: '600',
       color: '#000000',
+    },
+    itemContainer: {
+      borderBottomColor: '#e0e0e0',
+      flexDirection: 'row',
+      paddingHorizontal: 10,
+      paddingVertical: 12,
+      borderBottomWidth: 1,
+      borderBottomColor: '#ccc',
     },
   });

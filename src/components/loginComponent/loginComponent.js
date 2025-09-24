@@ -63,6 +63,7 @@ const LoginComponent = ({ navigation, route, ...props }) => {
   }, []);
 
   const getCustomercode = async () => {
+    console.log("get code ")
     set_isLoading(true);
     handleEmptyInputs();
     try {
@@ -79,6 +80,7 @@ const LoginComponent = ({ navigation, route, ...props }) => {
       }
     } catch (error) {
       set_isLoading(false);
+      console.log("error in getting url ==> ", error.response)
       if (error.response && error.response.status === 400) {
         popUpAction(Constant.Wrong_Code_Msg, Constant.DefaultAlert_MSG, 'OK', true, false)
       } else if (error.response && (error.response.status === 502 || error.response.status === 404)) {

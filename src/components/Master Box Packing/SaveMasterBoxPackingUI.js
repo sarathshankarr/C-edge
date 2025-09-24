@@ -32,26 +32,26 @@ const SaveMasterBoxPackingUI = ({route, navigation, ...props}) => {
   const [masterBoxName, setMasterBoxName] = useState('');
   const [buyerPONo, setBuyerPONo] = useState('');
   const [buyerName, setBuyerName] = useState('');
-  const [totalQty, setTotalQty] = useState('0');
 
   const {colors} = useContext(ColorContext);
   const styles = getStyles(colors);
 
   useEffect(() => {
     if (props.itemsObj) {
-      console.log('items ===> ', props.itemsObj);
+      console.log('props.   items ===> ', props.itemsObj);
       if (props.itemsObj.masterboxname) {
         setMasterBoxName(props.itemsObj.masterboxname);
       }
-      if (props.itemsObj.qty) {
-        setTotalQty(props.itemsObj.qty);
-      }
+      // if (props.itemsObj.qty) {
+      //   setTotalQty(props.itemsObj.qty);
+      // }
       if (props.itemsObj.buyerpo) {
         setBuyerPONo(props.itemsObj.buyerpo);
       }
       if (props.itemsObj.buyername) {
         setBuyerName(props.itemsObj.buyername);
       }
+   
       if (props.itemsObj.child) {
         const mappedChildItems = props.itemsObj.child.map((item, index) => {
           const barcodeArray = item.barcode
@@ -75,6 +75,7 @@ const SaveMasterBoxPackingUI = ({route, navigation, ...props}) => {
             Qty: item.qty || '',
             childTable: sizeObjects,
             PbuyerPoID: item.id || '',
+            barcode: item.barcode || '',
           };
         });
         console.log('child ===> ', mappedChildItems);
@@ -102,6 +103,9 @@ const SaveMasterBoxPackingUI = ({route, navigation, ...props}) => {
   const backAction = async () => {
     props.backBtnAction();
   };
+
+    const totalQty = rows.reduce((acc, curr) => acc + Number(curr.Qty || '0'), 0);
+
 
   return (
     <View style={[CommonStyles.mainComponentViewStyle]}>
@@ -162,16 +166,20 @@ const SaveMasterBoxPackingUI = ({route, navigation, ...props}) => {
                     <Text style={styles.table_head_captions}>Box Name</Text>
                   </View>
                   <View style={{width: 5}}></View>
-                  <View style={{width: 100}}>
+                  <View style={{width: 120}}>
                     <Text style={styles.table_head_captions}>Style</Text>
                   </View>
                   <View style={{width: 5}}></View>
-                  <View style={{width: 100}}>
+                  <View style={{width: 120}}>
                     <Text style={styles.table_head_captions}>Size</Text>
                   </View>
                   <View style={{width: 5}}></View>
-                  <View style={{width: 100}}>
+                  <View style={{width: 50}}>
                     <Text style={styles.table_head_captions}>Qty</Text>
+                  </View>
+                  <View style={{width: 5}}></View>
+                  <View style={{width: 120}}>
+                    <Text style={styles.table_head_captions}>Barcode</Text>
                   </View>
                 </View>
 
@@ -263,59 +271,47 @@ const SaveMasterBoxPackingUI = ({route, navigation, ...props}) => {
                         </View>
                       </View>
                       <View style={{width: 5}}></View>
-                      <View style={{width: 100}}>
+                      <View style={{width: 120}}>
                         <TextInput
                           style={styles.table_data_input}
                           value={row.CustomerStyleName}
                           editable={false}
-                          // onChangeText={text => {
-                          //   setRows(
-                          //     rows.map(r =>
-                          //       r.id === row.id
-                          //         ? {...r, CustomerStyleName: text}
-                          //         : r,
-                          //     ),
-                          //   );
-                          // }}
+                          multiline={true}
                         />
                       </View>
 
                       <View style={{width: 5}}></View>
-                      <View style={{width: 100}}>
+                      <View style={{width: 120}}>
                         <TextInput
                           style={styles.table_data_input}
                           value={row.size}
                           editable={false}
-                          // onChangeText={text => {
-                          //   setRows(
-                          //     rows.map(r =>
-                          //       r.id === row.id ? {...r, size: text} : r,
-                          //     ),
-                          //   );
-                          // }}
+                          multiline={true}
                         />
                       </View>
 
                       <View style={{width: 5}}></View>
-                      <View style={{width: 100}}>
+                      <View style={{width: 50}}>
                         <TextInput
                           style={styles.table_data_input}
                           value={row.Qty.toString()}
-                          // onChangeText={text => {
-                          //   setRows(
-                          //     rows.map(r =>
-                          //       r.id === row.id ? {...r, Qty: text} : r,
-                          //     ),
-                          //   );
-                          // }}
                           editable={false}
+                          multiline={true}
+                        />
+                      </View>
+                      <View style={{width: 5}}></View>
+                      <View style={{width: 120}}>
+                        <TextInput
+                          style={styles.table_data_input}
+                          value={row.barcode}
+                          editable={false}
+                          multiline={true}
                         />
                       </View>
                     </View>
 
-                    {/* row2 */}
 
-                    {row?.childTable?.length >= 0 && (
+                    {/* {row?.childTable?.length >= 0 && (
                       <View style={styles.table_body_single_row}>
                         <View
                           style={{
@@ -346,7 +342,7 @@ const SaveMasterBoxPackingUI = ({route, navigation, ...props}) => {
                           ))}
                         </View>
                       </View>
-                    )}
+                    )} */}
                   </View>
                 ))}
 
@@ -354,16 +350,19 @@ const SaveMasterBoxPackingUI = ({route, navigation, ...props}) => {
                  
                   <View style={{width: 200}}></View>
                   <View style={{width: 5}}></View>
-                  <View style={{width: 100}}></View>
+                  <View style={{width: 120}}></View>
 
                   <View style={{width: 5}}></View>
-                  <View style={{width: 100}}>
+                  <View style={{width: 120}}>
                     <Text style={styles.dropTextInputStyle1}>Total Qty:</Text>
                   </View>
 
                   <View style={{width: 5}}></View>
-                  <View style={{width: 100}}>
+                  <View style={{width: 50}}>
                     <Text style={styles.dropTextInputStyle1}>{totalQty}</Text>
+                  </View>
+                  <View style={{width: 5}}></View>
+                  <View style={{width: 120}}>
                   </View>
                   
                 </View>
@@ -508,6 +507,7 @@ const getStyles = colors =>
       fontSize: 15,
       color: 'white',
       alignItems: 'center',
+      textAlign:'center'
     },
 
     table_body_single_row: {
@@ -593,6 +593,14 @@ const getStyles = colors =>
       fontWeight: 'normal',
       fontSize: 18,
       color: 'black',
+      textAlign: 'center',
+    },
+      table_data_input: {
+      fontSize: 16,
+      color: '#000',
+      borderBottomWidth: 1,
+      borderColor: '#ccc',
+      paddingHorizontal: 5,
       textAlign: 'center',
     },
   });
