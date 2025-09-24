@@ -22,6 +22,7 @@ const CreateMasterBoxPacking = ({route}) => {
   const [lists, set_lists] = useState([]);
   const [quality, set_quality] = useState([]);
   const [barcodeData, set_barcodeData] = useState([]);
+  const [checkBoxStyles, set_checkBoxStyles] = useState([]);
 
   const backBtnAction = () => {
     navigation.goBack();
@@ -81,7 +82,8 @@ const CreateMasterBoxPacking = ({route}) => {
     }
   };
 
-  const ValidateBarcode = async (id, poflag) => {
+  const getDataFromSelectedCheckBox = async (ids, poflag) => {
+    console.log('ids===> ', ids, poflag);
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
@@ -93,11 +95,11 @@ const CreateMasterBoxPacking = ({route}) => {
       password: userPsd,
       compIds: usercompanyId,
       company: JSON.parse(companyObj),
-      barcode: id,
-      multiPI: '',
+      multiPI: ids,
+      nfsm_pi_style_wise: poflag ? '1' : '0',
     };
 
-    let LISTAPIOBJ = await APIServiceCall.api11(obj);
+    let LISTAPIOBJ = await APIServiceCall.getCheckBoxesDataMasterBox(obj);
     set_isLoading(false);
 
     if (
@@ -106,12 +108,11 @@ const CreateMasterBoxPacking = ({route}) => {
       LISTAPIOBJ.responseData &&
       LISTAPIOBJ.responseData.status === true
     ) {
-      console.log(
-        'ValidateBarcode ',
-        LISTAPIOBJ.responseData,
-      );
-      getDatafromBarcode(id, LISTAPIOBJ.responseData.rKey);
-
+      // console.log(
+      //   'getDataFromSelectedCheckBox ==>  ',
+      //   LISTAPIOBJ.responseData.styles,
+      // );
+      set_checkBoxStyles(LISTAPIOBJ.responseData.styles);
     } else {
       popUpAction(
         Constant.SERVICE_FAIL_MSG,
@@ -133,30 +134,69 @@ const CreateMasterBoxPacking = ({route}) => {
     }
   };
 
-  const getDatafromBarcode = async( id, key) => {
+  const ValidateBarcode = async (id, poflag, piIds) => {
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
     let companyObj = await AsyncStorage.getItem('companyObj');
 
     set_isLoading(true);
-    let obj = {
+    let obj1 = {
       username: userName,
       password: userPsd,
       compIds: usercompanyId,
       company: JSON.parse(companyObj),
-      locId: key,
       barcode: id,
+      multiPI: '',
     };
-    console.log("get data req id ", id)
+    const styleQtyList = piIds.flatMap(piId => {
+      return checkBoxStyles
+        .filter(style => style.proforma_pi_id == piId)
+        .map(style => ({
+          style_id: style.style_id,
+          style_qty: style.total_qty,
+          pi_ID: Number(piId),
+        }));
+    });
+    console.log('style list -===> ', styleQtyList);
 
-    let LISTAPIOBJ = await APIServiceCall.api22(obj);
+    let obj2 = {
+      username: userName,
+      password: userPsd,
+      compIds: usercompanyId,
+      company: JSON.parse(companyObj),
+      barcode: id,
+      multiPI: piIds.join(':'),
+      styleQtyList: styleQtyList || [],
+    };
 
+    console.log('req body validate barcode pi ', obj2);
+    let LISTAPIOBJ;
+    if (!poflag) {
+      LISTAPIOBJ = await APIServiceCall.api11(obj1);
+    } else {
+      LISTAPIOBJ = await APIServiceCall.validBarcodePIFlag(obj2);
+    }
+
+    console.log('resp after validting barcode ', LISTAPIOBJ.responseData);
     set_isLoading(false);
 
-    if (LISTAPIOBJ && LISTAPIOBJ.statusData) {
-      if (LISTAPIOBJ && LISTAPIOBJ.responseData) {
-       set_barcodeData({...LISTAPIOBJ.responseData, Barcode:id, boxKeyId:key})
+    if (LISTAPIOBJ && LISTAPIOBJ.statusData && LISTAPIOBJ.responseData) {
+      if (LISTAPIOBJ.responseData.status == true) {
+        console.log('ValidateBarcode ', LISTAPIOBJ.responseData);
+        if (!poflag) {
+          getDatafromBarcode(id, LISTAPIOBJ.responseData?.rKey, poflag, piIds);
+        } else {
+          getDataForPIAfterValidation(
+            id,
+            LISTAPIOBJ.responseData,
+            poflag,
+            piIds,
+          );
+        }
+      } else {
+        let msg = LISTAPIOBJ.responseData?.message || Constant.SERVICE_FAIL_MSG;
+        popUpAction(msg, Constant.DefaultAlert_MSG, 'OK', true, false);
       }
     } else {
       popUpAction(
@@ -178,19 +218,71 @@ const CreateMasterBoxPacking = ({route}) => {
       );
     }
   };
-  
+
+  const getDatafromBarcode = async (id, key, poflag, piIds) => {
+    let userName = await AsyncStorage.getItem('userName');
+    let userPsd = await AsyncStorage.getItem('userPsd');
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
+
+    set_isLoading(true);
+    let obj = {};
+    let LISTAPIOBJ;
+
+    obj = {
+      username: userName,
+      password: userPsd,
+      compIds: usercompanyId,
+      company: JSON.parse(companyObj),
+      locId: key,
+      barcode: id,
+    };
+    console.log('req table data after validation ==> ', obj);
+    LISTAPIOBJ = await APIServiceCall.api22(obj);
+
+    set_isLoading(false);
+
+    if (LISTAPIOBJ && LISTAPIOBJ.statusData) {
+      if (LISTAPIOBJ && LISTAPIOBJ.responseData) {
+        set_barcodeData({
+          ...LISTAPIOBJ.responseData,
+          Barcode: id,
+          boxKeyId: key,
+        });
+      }
+    } else {
+      popUpAction(
+        Constant.SERVICE_FAIL_MSG,
+        Constant.DefaultAlert_MSG,
+        'OK',
+        true,
+        false,
+      );
+    }
+
+    if (LISTAPIOBJ && LISTAPIOBJ.error) {
+      popUpAction(
+        Constant.SERVICE_FAIL_MSG,
+        Constant.DefaultAlert_MSG,
+        'OK',
+        true,
+        false,
+      );
+    }
+  };
+
   const ValidateAction = async type => {
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
     let companyObj = await AsyncStorage.getItem('companyObj');
-    console.log("validating masterbx exitsing ? ", type)
+    console.log('validating masterbx exitsing ? ', type);
 
     let Obj = {
       menuid: 384,
       username: userName,
       password: userPsd,
-      masterBox:type || '',
+      masterBox: type || '',
       compIds: usercompanyId,
       company: JSON.parse(companyObj),
     };
@@ -211,7 +303,7 @@ const CreateMasterBoxPacking = ({route}) => {
     if (validateRMT !== 'false') {
       console.log('failed  saving =====> ');
       popUpAction(
-        "Entered MasterBox Name Already Exits !",
+        'Entered MasterBox Name Already Exits !',
         Constant.DefaultAlert_MSG,
         'OK',
         true,
@@ -231,7 +323,6 @@ const CreateMasterBoxPacking = ({route}) => {
     tempObj.password = userPsd;
     tempObj.compIds = usercompanyId;
     tempObj.company = JSON.parse(companyObj);
-
 
     set_isLoading(true);
 
@@ -313,6 +404,50 @@ const CreateMasterBoxPacking = ({route}) => {
     }
   };
 
+  const getDataForPIAfterValidation = async (id, data, poflag, piIds) => {
+    let userName = await AsyncStorage.getItem('userName');
+    let userPsd = await AsyncStorage.getItem('userPsd');
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
+
+    set_isLoading(true);
+    obj = {
+      username: userName,
+      password: userPsd,
+      compIds: usercompanyId,
+      company: JSON.parse(companyObj),
+      barcode: id,
+      multiPI: piIds.join(','),
+    };
+    let LISTAPIOBJ = await APIServiceCall.getDatafromBarcodePIMasterBox(obj);
+    set_isLoading(false);
+
+    if (LISTAPIOBJ && LISTAPIOBJ.statusData) {
+      if (LISTAPIOBJ && LISTAPIOBJ.responseData) {
+        console.log('getDataForPIAfterValidation ', LISTAPIOBJ.responseData);
+        getDatafromBarcode(id, LISTAPIOBJ.responseData.rKey, poflag, piIds);
+      }
+    } else {
+      popUpAction(
+        Constant.SERVICE_FAIL_MSG,
+        Constant.DefaultAlert_MSG,
+        'OK',
+        true,
+        false,
+      );
+    }
+
+    if (LISTAPIOBJ && LISTAPIOBJ.error) {
+      popUpAction(
+        Constant.SERVICE_FAIL_MSG,
+        Constant.DefaultAlert_MSG,
+        'OK',
+        true,
+        false,
+      );
+    }
+  };
+
   return (
     <CreateMasterBoxPackingUI
       isLoading={isLoading}
@@ -325,6 +460,7 @@ const CreateMasterBoxPacking = ({route}) => {
       isPopUp={isPopUp}
       lists={lists}
       submitAction={submitAction}
+      getDataFromSelectedCheckBox={getDataFromSelectedCheckBox}
       getData={getData}
       quality={quality}
       barcodeData={barcodeData}
