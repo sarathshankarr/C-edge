@@ -213,6 +213,10 @@ const CreateMasterBoxPackingUI = ({route, ...props}) => {
     console.log('code length ', code.length, code, code.length !== 8);
     if (code.length !== 9) return;
 
+    if (poflag && selectedProformaIndices.length === 0) {
+      Alert.alert('Alert', 'Please select proforma Invoice Id');
+      return;
+    }
     const isDuplicate = rows.some(row => row.Barcode == code.trim());
 
     if (isDuplicate) {
@@ -293,9 +297,9 @@ const CreateMasterBoxPackingUI = ({route, ...props}) => {
       buyerpoId: buyerPoId || '0',
       particulars: mappedRows || [],
       master_box_total_qty: totalQty || '0',
+      multiPI: poflag ? selectedProformaIndices.join(':') : '',
     };
-
-    // return;
+    console.log('temp obj ==> ', tempObj);
     props.submitAction(tempObj);
   };
 
@@ -497,19 +501,19 @@ const CreateMasterBoxPackingUI = ({route, ...props}) => {
                     <View style={{flexDirection: 'column'}}>
                       <Text
                         style={
-                          proformaInvoiceId
+                          selectedProformaIndices.length > 0
                             ? [styles.dropTextLightStyle]
                             : [styles.dropTextInputStyle]
                         }>
                         {'Proforma Invoice ID'}
                       </Text>
-                      {proformaInvoiceId ? (
+                      {selectedProformaIndices.length > 0 ? (
                         <Text style={[styles.dropTextInputStyle]}>
                           {selectedProformaIndices.length > 0 ? (
                             <Text style={[styles.dropTextInputStyle]}>
                               {proformaInvoiceList
                                 .filter(item =>
-                                  selectedProformaIndices.includes(Number(item.id)),
+                                  selectedProformaIndices.includes(item.id),
                                 )
                                 .map(item => item.name)
                                 .join(', ')}
@@ -546,7 +550,9 @@ const CreateMasterBoxPackingUI = ({route, ...props}) => {
                         <TouchableOpacity
                           key={index}
                           style={styles.itemContainer}
-                          onPress={() => actionOnProformaInvoice(item)}>
+                          onPress={() =>
+                            actionOnProformaInvoiceToggle(item.id)
+                          }>
                           <CustomCheckBox
                             isChecked={selectedProformaIndices.includes(
                               item.id,
@@ -899,7 +905,7 @@ const CreateMasterBoxPackingUI = ({route, ...props}) => {
                           <TextInput
                             style={styles.table_data_input}
                             value={row.Qty.toString()}
-                           multiline={true}
+                            multiline={true}
                             onChangeText={text => {
                               setRows(
                                 rows.map(r =>

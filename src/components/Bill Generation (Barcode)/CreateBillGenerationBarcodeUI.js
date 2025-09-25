@@ -36,46 +36,13 @@ let closeImg = require('./../../../assets/images/png/close1.png');
 
 const CreateBillGenerationBarcodeUI = ({route, ...props}) => {
   const navigation = useNavigation();
-  const [rows, setRows] = React.useState([
-    {
-      styleName: 'T-Shirt',
-      size: 'Small',
-      totolQty: '10',
-      hsn: '6109',
-      unitPrice: '50',
-      gst_percent: 5,
-      gross: 500,
-      gstAmount: 25,
-      totalRowAmount: 525,
-    },
-    {
-      styleName: 'T-Shirt',
-      size: 'Medium',
-      totolQty: '5',
-      hsn: '6109',
-      unitPrice: '100',
-      gst_percent: 12,
-      gross: 500,
-      gstAmount: 60,
-      totalRowAmount: 560,
-    },
-    {
-      styleName: 'T-Shirt',
-      size: 'Large',
-      totolQty: '2',
-      hsn: '6109',
-      unitPrice: '250',
-      gst_percent: 18,
-      gross: 500,
-      gstAmount: 90,
-      totalRowAmount: 590,
-    },
-  ]);
+  const [rows, setRows] = React.useState([]);
   const [selectedradiooption1, setSelectedradiooption1] = useState('StyleWise');
   const [totalQty, setTotalQty] = useState(false);
   const [invoiceNo, setInvoiceNo] = useState('');
   const [poNo, setPoNo] = useState('');
   const [barCode, setBarcode] = useState('');
+  const [transportCost, setTransportCost] = useState('0');
   const {colors} = useContext(ColorContext);
 
   const styles = getStyles(colors);
@@ -124,10 +91,33 @@ const CreateBillGenerationBarcodeUI = ({route, ...props}) => {
     }
   }, [props.lists]);
 
+  // useEffect(() => {
+  //   if (props.tableLists) {
+  //     console.log('table list ', props.tableLists);
+  //     setRows(props.tableLists);
+  //   }
+  // }, [props.tableLists]);
+
   useEffect(() => {
-    if (props.tableLists) {
-      
-      console.log(' tableLists lists ===>  ==> ', props.tableLists);
+    if (props.tableLists && props.tableLists.length > 0) {
+      const enrichedRows = props.tableLists.map(row => {
+        const qty = Number(row.RequiredQty || 0);
+        const price = Number(row.Price || 0);
+        const gstPercent = Number(row.Gst || 0);
+
+        const gross = qty * price;
+        const gstAmount = (gross * gstPercent) / 100;
+        const totalRowAmount = gross + gstAmount;
+
+        return {
+          ...row,
+          gross: gross.toFixed(2),
+          unitPricegstAmount: gstAmount.toFixed(2),
+          totalRowAmount: totalRowAmount.toFixed(2),
+        };
+      });
+
+      setRows(enrichedRows);
     }
   }, [props.tableLists]);
 
@@ -195,7 +185,7 @@ const CreateBillGenerationBarcodeUI = ({route, ...props}) => {
     setBillNoId(item.id);
     setBillNo(item.name);
     setShowBillNoList(false);
-    handleOpenModal(item.id);
+    // handleOpenModal(item.id);
   };
 
   const handleSearchBillNo = text => {
@@ -248,25 +238,27 @@ const CreateBillGenerationBarcodeUI = ({route, ...props}) => {
   };
 
   const handleScannedCode = text => {
+    if (text.trim().length !== 9) return;
+
     if (!text) {
       Alert.alert('Please Enter the Valid Barcode');
       return;
     }
+    console.log('calling validation api ');
     props.validateBarCode(text);
   };
 
-   const handleSearchBarcode = () => {
+  const handleSearchBarcode = () => {
     if (!barCode) {
       Alert.alert('Alert', 'Please Enter Barcode !');
     }
     handleScannedCode(barCode);
   };
 
-    const handleBarcodeChange=(text)=>{
-    setBarcode(text)
-    if(text.trim().length!==9) return;
+  const handleBarcodeChange = text => {
+    setBarcode(text);
     handleScannedCode(text);
-  }
+  };
 
   const handleScan = () => {
     navigation.navigate('ScanQRPage', {
@@ -279,76 +271,70 @@ const CreateBillGenerationBarcodeUI = ({route, ...props}) => {
 
   const submitAction = async () => {
     const filteredRows = rows.map(item => ({
-      gsCode: 'GS001',
-      prePackQuantity: '5',
-      quantity: 10,
-      price: 200.5,
-      gstAmount: 18.5,
-      sizeCapacity: 'L',
-      itemId: 112,
-      barcodeNo: '11111',
-      other: 'remarks',
-      orderId: 1,
-      locationId: '9-1',
-      discountAmount: 5.0,
-      discountPercentage: 2.0,
-      colorCount: '1',
-      hsn: 'HSN001',
-      gstRate: '18%',
-      prePack: '1',
+      gsCode: item.GSCode,
+      prePackQuantity: item.EnteredPrePackQty || '0',
+      quantity: item.RequiredQty,
+      price: item.Price,
+      sizeCapacity: item.ItemSize,
+      itemId: item.ItemId,
+      barcodeNo: item.barcodeNo,
+      other: '',
+      orderId: item.orderId,
+      locationId: `${shipLocationId}-${item.Prepack}`,
+      discountAmount: 0,
+      discountPercentage: 0,
+      colorCount: item.ColorCount,
+      hsn: item.Hsn,
+      gstRate: item.Gst,
+      gstAmount: item.unitPricegstAmount,
+      prePack: item.Prepack,
     }));
     const Obj = {
       transactionDate: txnDate,
-      transportDate: '31/12/2023',
-      dueDate: '31/12/2023',
-      shipDate: '31/12/2023',
-      vendorCustomerId: 101,
-      billToId: 202,
-      poNumber: 'PO12345',
-      vendorId: 303,
-      companyLocationId: 404,
-      financialYear: 2025,
-      yearwiseId: 1,
-      transportName: 'DHL',
-      transportNo: 'TR123',
-      bookingNo: 'BK001',
-      cartonNo: 'CARTON01',
-      invoiceNo: 'INV001',
-      itemType: 'Garment',
-      agentId: 1,
-      subagentId: 2,
-      notes: 'Urgent delivery',
-      transportCost: 100.5,
-      totalDiscount: 5.25,
-      totalDiscountPer: 2.5,
-      soNumber: 555,
-      convRate: 1.25,
-      additionalAmount: 50.0,
-      roundtotal: 1200.0,
-      roundtotal2: 1200.0,
-      packages: '5',
-      packincharge: 'John Doe',
-      ackno: 'ACK123',
-      area: 'North',
-      eway: 'EWAY001',
-      allRolls: 'YES',
+      transportDate: '',
+      dueDate: '',
+      shipDate: deliveryDate,
+      vendorCustomerId: shipToId,
+      billToId: billNoId,
+      poNumber: poNo,
+      vendorId: shipToId,
+      companyLocationId: shipLocationId,
+      financialYear: new Date().getFullYear(),
+      yearwiseId: 0,
+      transportName: '',
+      transportNo: '',
+      bookingNo: '',
+      cartonNo: '',
+      invoiceNo: invoiceNo,
+      itemType: 'Style',
+      agentId: 0,
+      subagentId: 0,
+      notes: '',
+
+      transportCost: transportCost,
+      totalDiscount: 0,
+      totalDiscountPer: 0,
+      soNumber: 0,
+      convRate: 0,
+      additionalAmount: 0,
+      roundtotal: totalAmount.toFixed(2),
+      roundtotal2: totalAmount.toFixed(2),
+
+      packages: '',
+      packincharge: '',
+      ackno: '',
+      area: '',
+      eway: '',
+      allRolls: '',
       corg: 0,
-      pIids: 'PI123,PI124',
-      masterboxbarcode: 'MB001',
-      menuId: 10,
-      master_box_proforma_id: 'MBP001',
-      company: {
-        id: 1,
-      },
-      loginDTO: {
-        userId: 1001,
-        language_id: 1,
-      },
-      items: filteredRows,
+      pIids: '',
+      masterboxbarcode: '', // scanned barcodes string
+      master_box_proforma_id: '0',
+      items: filteredRows || [],
+
     };
 
     console.log('save Obj ==> ', Obj);
-return;
     props.submitAction(Obj);
   };
 
@@ -459,29 +445,51 @@ return;
     });
   };
 
-  const handleOpenModal = id => {
-    props.getModalStyleFgList(id);
-    setShowmodal(!showModal);
+  // const handleOpenModal = id => {
+  //   props.getModalStyleFgList(id);
+  //   setShowmodal(!showModal);
+  // };
+
+  const handleInputChange = (index, field, value) => {
+    const updatedRows = [...rows];
+
+    // Convert to number for numeric fields
+    let parsedValue = value;
+    if (field === 'RequiredQty' || field === 'Price' || field === 'Gst') {
+      parsedValue = value === '' ? '' : Number(value);
+    }
+
+    updatedRows[index][field] = parsedValue;
+
+    // Do your calculations
+    const qty = Number(updatedRows[index].RequiredQty || 0);
+    const price = Number(updatedRows[index].Price || 0);
+    const gstPercent = Number(updatedRows[index].Gst || 0);
+
+    const gross = qty * price;
+    const gstAmount = (gross * gstPercent) / 100;
+    const totalRowAmount = gross + gstAmount;
+
+    updatedRows[index].gross = gross.toFixed(2);
+    updatedRows[index].unitPricegstAmount = gstAmount.toFixed(2);
+    updatedRows[index].totalRowAmount = totalRowAmount.toFixed(2);
+
+    setRows(updatedRows);
   };
- 
 
-  const totalGstAmount = rows.reduce(
-    (sum, row) =>
-      sum +
-      (Number(row.input_Qty || 0) *
-        Number(row.input_UnitPrice || 0) *
-        Number(row.input_Gst || 0)) /
-        100,
+  const totalGross = rows.reduce((sum, row) => sum + Number(row.gross || 0), 0);
+  const totalGst = rows.reduce(
+    (sum, row) => sum + Number(row.unitPricegstAmount || 0),
     0,
   );
-  const totalNetAmount = rows.reduce(
-    (sum, row) =>
-      sum + Number(row.input_Qty || 0) * Number(row.input_UnitPrice || 0),
+  const totalAmount = rows.reduce(
+    (sum, row) => sum + Number(row.totalRowAmount || 0),
     0,
   );
-  const totalTotalAmount = totalNetAmount + totalGstAmount;
-
-
+  const totalQtyy = rows.reduce(
+    (sum, row) => sum + Number(row.RequiredQty || 0),
+    0,
+  );
 
   return (
     <View style={[CommonStyles.mainComponentViewStyle]}>
@@ -953,7 +961,7 @@ return;
                     </View>
                   </View>
 
-                  {rows.length > 0 &&
+                  {/* {rows.length > 0 &&
                     rows.map((row, index) => {
                       // const netAmount =
                       //   Number(row.input_Qty || 0) *
@@ -976,24 +984,24 @@ return;
 
                           <View style={{width: 100}}>
                             <Text style={styles.table_data}>
-                              {row.styleName}
+                              {row.Title}
                             </Text>
                           </View>
 
                           <View style={{width: 10}} />
                           <View style={{width: 100}}>
-                            <Text style={styles.table_data}>{row.size}</Text>
+                            <Text style={styles.table_data}>{row.ItemSize}</Text>
                           </View>
 
                           <View style={{width: 10}} />
                           <View style={{width: 100}}>
                             <TextInput
                               style={styles.table_data_input}
-                              value={row.totolQty}
+                              value={row?.RequiredQty.toString()}
                               onChangeText={text => {
                                 setRows(
                                   rows.map((r, i) =>
-                                    i === index ? {...r, totolQty: text} : r,
+                                    i === index ? {...r, totolQty: RequiredQty} : r,
                                   ),
                                 );
                               }}
@@ -1005,11 +1013,11 @@ return;
                           <View style={{width: 100}}>
                             <TextInput
                               style={styles.table_data_input}
-                              value={row.hsn}
+                              value={row?.Hsn}
                               onChangeText={text => {
                                 setRows(
                                   rows.map((r, i) =>
-                                    i === index ? {...r, hsn: text} : r,
+                                    i === index ? {...r, Hsn: text} : r,
                                   ),
                                 );
                               }}
@@ -1020,7 +1028,7 @@ return;
                           <View style={{width: 5}} />
                           <View style={{width: 100}}>
                             <Text style={styles.table_data}>
-                              {row.unitPrice}
+                              {row?.Price}
                             </Text>
                           </View>
 
@@ -1028,11 +1036,11 @@ return;
                           <View style={{width: 60}}>
                             <TextInput
                               style={styles.table_data_input}
-                              value={row.gst_percent.toString()}
+                              value={row?.Gst?.toString()}
                               onChangeText={text => {
                                 setRows(
                                   rows.map((r, i) =>
-                                    i === index ? {...r, gst_percent: text} : r,
+                                    i === index ? {...r, Gst: text} : r,
                                   ),
                                 );
                               }}
@@ -1044,7 +1052,7 @@ return;
                           <View style={{width: 60}}>
                             <TextInput
                               style={styles.table_data_input}
-                              value={row.gross}
+                              value={row?.gross}
                               editable={false}
                             />
                           </View>
@@ -1053,7 +1061,7 @@ return;
                           <View style={{width: 60}}>
                             <TextInput
                               style={styles.table_data_input}
-                              value={row.unitPricegstAmount}
+                              value={row?.unitPricegstAmount}
                               editable={false}
                             />
                           </View>
@@ -1062,13 +1070,160 @@ return;
                           <View style={{width: 60}}>
                             <TextInput
                               style={styles.table_data_input}
-                              value={row.totalRowAmount}
+                              value={row?.totalRowAmount}
                               editable={false}
                             />
                           </View>
                         </View>
                       );
-                    })}
+                    })} */}
+
+                  {rows.length > 0 &&
+                    rows.map((row, index) => (
+                      <View key={index} style={styles.table_body_single_row}>
+                        <View style={{width: 60}}>
+                          <TouchableOpacity
+                            onPress={() => handleRemoveRow(index)}>
+                            <Image
+                              source={closeImg}
+                              style={styles.imageStyle1}
+                            />
+                          </TouchableOpacity>
+                        </View>
+
+                        <View style={{width: 100}}>
+                          <Text style={styles.table_data}>{row.Title}</Text>
+                        </View>
+
+                        <View style={{width: 10}} />
+
+                        <View style={{width: 100}}>
+                          <Text style={styles.table_data}>{row.ItemSize}</Text>
+                        </View>
+
+                        <View style={{width: 10}} />
+
+                        {/* Required Qty */}
+                        <View style={{width: 100}}>
+                          <TextInput
+                            style={styles.table_data_input}
+                            value={String(row.RequiredQty || '')}
+                            onChangeText={text =>
+                              handleInputChange(index, 'RequiredQty', text)
+                            }
+                            keyboardType="numeric"
+                          />
+                        </View>
+
+                        <View style={{width: 10}} />
+
+                        {/* HSN */}
+                        <View style={{width: 100}}>
+                          <TextInput
+                            style={styles.table_data_input}
+                            value={row.Hsn}
+                            onChangeText={text =>
+                              handleInputChange(index, 'Hsn', text)
+                            }
+                          />
+                        </View>
+
+                        <View style={{width: 5}} />
+
+                        {/* Price */}
+                        <View style={{width: 100}}>
+                          <Text style={styles.table_data}>{row.Price}</Text>
+                        </View>
+
+                        <View style={{width: 5}} />
+
+                        {/* GST */}
+                        <View style={{width: 60}}>
+                          <TextInput
+                            style={styles.table_data_input}
+                            value={String(row.Gst || '')}
+                            onChangeText={text =>
+                              handleInputChange(index, 'Gst', text)
+                            }
+                            keyboardType="numeric"
+                          />
+                        </View>
+
+                        <View style={{width: 5}} />
+
+                        {/* Gross */}
+                        <View style={{width: 60}}>
+                          <TextInput
+                            style={styles.table_data_input}
+                            value={row.gross}
+                            editable={false}
+                          />
+                        </View>
+
+                        <View style={{width: 5}} />
+
+                        {/* GST Amount */}
+                        <View style={{width: 60}}>
+                          <TextInput
+                            style={styles.table_data_input}
+                            value={row.unitPricegstAmount}
+                            editable={false}
+                          />
+                        </View>
+
+                        <View style={{width: 5}} />
+
+                        {/* Total */}
+                        <View style={{width: 60}}>
+                          <TextInput
+                            style={styles.table_data_input}
+                            value={row.totalRowAmount}
+                            editable={false}
+                          />
+                        </View>
+                      </View>
+                    ))}
+
+                  <View
+                    style={[
+                      styles.table_body_single_row,
+                      {paddingVertical: 12},
+                    ]}>
+                    <View style={{width: 60}}></View>
+                    <View style={{width: 100}}></View>
+                    <View style={{width: 10}} />
+                    <View style={{width: 100}}></View>
+                    <View style={{width: 10}} />
+                    <View style={{width: 100}}>
+                      <Text style={styles.table_data}>
+                        {totalQtyy?.toFixed(2)}
+                      </Text>
+                    </View>
+                    <View style={{width: 10}} />
+                    <View style={{width: 100}}></View>
+                    <View style={{width: 5}} />
+                    <View style={{width: 100}}></View>
+                    <View style={{width: 5}} />
+                    <View style={{width: 60}}></View>
+                    <View style={{width: 5}} />
+                    <View style={{width: 60}}>
+                      <Text style={styles.table_data}>
+                        {totalGross?.toFixed(2)}
+                      </Text>
+                    </View>
+                    <View style={{width: 5}} />
+                    <View style={{width: 60}}>
+                      <Text style={styles.table_data}>
+                        {totalGst?.toFixed(2)}
+                      </Text>
+                    </View>
+                    <View style={{width: 5}} />
+                    <View style={{width: 60}}>
+                      <Text style={styles.table_data}>
+                        {totalAmount?.toFixed(2)}
+                      </Text>
+                    </View>
+                  </View>
 
                   <View
                     style={[
@@ -1097,10 +1252,10 @@ return;
                     <View style={{width: 60}}>
                       <TextInput
                         style={styles.table_data_input}
-                        value={'0'}
-                        // onChangeText={text =>
-                        //   setTransportCost(Number(text) || 0)
-                        // }
+                        value={transportCost}
+                        onChangeText={text =>
+                          setTransportCost(Number(text) || 0)
+                        }
                         keyboardType="numeric"
                       />
                     </View>
@@ -1132,8 +1287,7 @@ return;
                     <View style={{width: 5}} />
                     <View style={{width: 60}}>
                       <Text style={styles.table_data}>
-                        {'20'}
-                        {/* {(totalTotalAmount + transportCost).toFixed(2)} */}
+                        {totalAmount?.toFixed(2)}
                       </Text>
                     </View>
                   </View>
@@ -1141,215 +1295,6 @@ return;
               </ScrollView>
             </View>
           )}
-
-          <Modal
-            animationType="slide"
-            transparent={true}
-            visible={showModal}
-            onRequestClose={() => setShowmodal(false)}>
-            <TouchableWithoutFeedback onPress={() => setShowmodal(false)}>
-              <View style={styles.companyModalOverlay} />
-            </TouchableWithoutFeedback>
-            <View style={styles.companyModalContainer}>
-              <View style={styles.companyModalHeader}>
-                <View />
-                <Text style={styles.companyModalHeaderText}>
-                  {'Style Pop Up'}
-                </Text>
-                <TouchableOpacity
-                  onPress={() => {
-                    setShowmodal(false);
-                    setquery('');
-                  }}>
-                  <Image
-                    source={require('./../../../assets/images/png/close.png')}
-                    style={{width: 30, height: 30, tintColor: colors.color2}}
-                  />
-                </TouchableOpacity>
-              </View>
-
-              {/* <View
-                style={{
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  backgroundColor: '#eee',
-                  marginTop: hp('2%'),
-                }}>
-                <TouchableOpacity
-                  style={{
-                    flexDirection: 'row',
-                    borderWidth: 0.5,
-                    borderColor: '#D8D8D8',
-                    borderRadius: hp('0.5%'),
-                    width: '100%',
-                    justifyContent: 'space-between',
-                  }}
-                  onPress={() => {
-                    setShowStyleList(!showStyleList);
-                  }}>
-                  <View>
-                    <View style={[styles.SectionStyle1, {}]}>
-                      <View style={{flexDirection: 'column'}}>
-                        <Text
-                          style={
-                            styleId
-                              ? [styles.dropTextLightStyle]
-                              : [styles.dropTextInputStyle]
-                          }>
-                          {'Select Style '}
-                        </Text>
-                        {styleId ? (
-                          <Text style={[styles.dropTextInputStyle]}>
-                            {styleName}
-                          </Text>
-                        ) : null}
-                      </View>
-                    </View>
-                  </View>
-
-                  <View style={{justifyContent: 'center'}}>
-                    <Image source={downArrowImg} style={styles.imageStyle} />
-                  </View>
-                </TouchableOpacity>
-
-                {showStyleList && (
-                  <View style={styles.dropdownContent1}>
-                    <TextInput
-                      style={styles.searchInput}
-                      placeholder="Search "
-                      onChangeText={handleSearchStyle}
-                      placeholderTextColor="#000"
-                    />
-                    <ScrollView
-                      style={styles.scrollView}
-                      nestedScrollEnabled={true}>
-                      {filteredStyle.length === 0 ? (
-                        <Text style={styles.noCategoriesText}>
-                          Sorry, no results found!
-                        </Text>
-                      ) : (
-                        filteredStyle.map((item, index) => (
-                          <TouchableOpacity
-                            key={index}
-                            style={styles.dropdownOption}
-                            onPress={() => actionOnStyle(item)}>
-                            <Text style={{color: '#000'}}>{item.name}</Text>
-                          </TouchableOpacity>
-                        ))
-                      )}
-                    </ScrollView>
-                  </View>
-                )}
-              </View> */}
-
-              <View style={styles.companyModalSearchBarContainer}>
-                <View style={styles.companyModalSearchBarContainer}>
-                  <View style={{flex: 1, marginRight: 10}}>
-                    <TextInput
-                      style={styles.companyModalSearchBar}
-                      placeholder="Search ..."
-                      placeholderTextColor="#aaa"
-                      onChangeText={text => setquery(text)}
-                    />
-                  </View>
-
-                  <TouchableOpacity
-                    style={styles.searchButton1}
-                    onPress={handleSelectFromModal}>
-                    <Text style={styles.searchbuttonText}>Select</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-
-              <View style={styles.companyModalItemContentHeader}>
-                <View
-                  style={[
-                    styles.checkboxItem,
-                    {marginTop: hp('2%'), marginBottom: hp('2%'), flex: 0.5},
-                  ]}>
-                  <CustomCheckBox
-                    isChecked={selectAllCheckBox}
-                    onToggle={updateAllIndexes}
-                  />
-                </View>
-
-                {/* Conditionally Render Table Headers Based on Selected Option */}
-
-                <Text style={styles.companyModalDropdownItemTextHeader}>
-                  Style No
-                </Text>
-                <View style={{flex: 0.2}} />
-
-                <Text style={styles.companyModalDropdownItemTextHeader}>
-                  fabric No
-                </Text>
-                <View style={{flex: 0.2}} />
-
-                <Text style={styles.companyModalDropdownItemTextHeader}>
-                  Avail Qty
-                </Text>
-                <View style={{flex: 0.2}} />
-                <Text style={styles.companyModalDropdownItemTextHeader}>
-                  Price
-                </Text>
-              </View>
-
-              <View style={styles.companyModalListContainer}>
-                {filteredCompanyList.length === 0 ? (
-                  <Text style={styles.companyModalNoResultsText}>
-                    No results found
-                  </Text>
-                ) : (
-                  <FlatList
-                    data={filteredCompanyList}
-                    keyExtractor={(_, index) => index.toString()}
-                    renderItem={({item, index}) => (
-                      <TouchableOpacity
-                        style={styles.companyModalDropdownItem}
-                        onPress={() => toggleSelection(index)}>
-                        <View style={styles.companyModalItemContent}>
-                          <View
-                            style={[
-                              styles.checkboxItem,
-                              {
-                                marginTop: hp('2%'),
-                                marginBottom: hp('2%'),
-                                flex: 0.5,
-                              },
-                            ]}>
-                            <CustomCheckBox
-                              isChecked={selectedIdxs.includes(index)}
-                              onToggle={() => toggleSelection(index)}
-                            />
-                          </View>
-
-                          <Text style={styles.companyModalDropdownItemText}>
-                            {item.styleNo}
-                          </Text>
-                          <View style={{flex: 0.2}} />
-                          <Text style={styles.companyModalDropdownItemText}>
-                            {item.fabricNo}
-                          </Text>
-                          <View style={{flex: 0.2}} />
-                          <Text style={styles.companyModalDropdownItemText}>
-                            {item.availQty}
-                          </Text>
-                          <View style={{flex: 0.2}} />
-                          <Text style={styles.companyModalDropdownItemText}>
-                            {item.priceStr}
-                          </Text>
-                        </View>
-                      </TouchableOpacity>
-                    )}
-                    ItemSeparatorComponent={() => (
-                      <View style={styles.companyModalSeparator} />
-                    )}
-                    contentContainerStyle={styles.companyModalFlatListContent}
-                  />
-                )}
-              </View>
-            </View>
-          </Modal>
         </View>
       </KeyboardAwareScrollView>
 
