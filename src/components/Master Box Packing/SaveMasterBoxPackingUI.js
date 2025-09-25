@@ -32,6 +32,7 @@ const SaveMasterBoxPackingUI = ({route, navigation, ...props}) => {
   const [masterBoxName, setMasterBoxName] = useState('');
   const [buyerPONo, setBuyerPONo] = useState('');
   const [buyerName, setBuyerName] = useState('');
+  const [piNo, setPiNO] = useState('');
 
   const {colors} = useContext(ColorContext);
   const styles = getStyles(colors);
@@ -50,6 +51,9 @@ const SaveMasterBoxPackingUI = ({route, navigation, ...props}) => {
       }
       if (props.itemsObj.buyername) {
         setBuyerName(props.itemsObj.buyername);
+      }
+      if (props.itemsObj.proforma_ids) {
+        setPiNO(props.itemsObj.proforma_ids);
       }
    
       if (props.itemsObj.child) {
@@ -143,16 +147,16 @@ const SaveMasterBoxPackingUI = ({route, navigation, ...props}) => {
           </View>
           <View style={{marginTop: hp('2%')}}>
             <TextInput
-              label=" Buyer PO No"
-              value={buyerPONo}
+              label="PI No "
+              value={piNo}
               mode="outlined"
               onChangeText={text => console.log(text)}
             />
           </View>
           <View style={{marginTop: hp('2%')}}>
             <TextInput
-              label="Buyer Name"
-              value={buyerName}
+              label=" Total Qty"
+              value={totalQty?.toString()}
               mode="outlined"
               onChangeText={text => console.log(text)}
             />

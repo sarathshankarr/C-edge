@@ -102,25 +102,24 @@ const CreateBillGenerationBarcode = ({route}) => {
       company: JSON.parse(companyObj),
       barcodeNo: id,
     };
-    console.log("barcode valid req body ", id)
+    // console.log("barcode valid req body ", id)
     let LISTAPIOBJ = await APIServiceCall.validateBillGenerationBarcode(obj);
     set_isLoading(false);
 
-    console.log(
-        'barcode scanend succesfully  ',
-        LISTAPIOBJ.responseData,
-      );
-    if (
-      LISTAPIOBJ &&
-      LISTAPIOBJ.statusData &&
-      LISTAPIOBJ.responseData &&
-      LISTAPIOBJ.responseData.status === false
-    ) {
-      console.log(
-        'barcode scanend succesfully  ',
-        LISTAPIOBJ.responseData,
-      );
-      getBillGeneratonDataFromBarcode(id);
+    console.log('barcode valid resp ===>  ', LISTAPIOBJ.responseData);
+    if (LISTAPIOBJ && LISTAPIOBJ.statusData && LISTAPIOBJ.responseData) {
+      if (LISTAPIOBJ.responseData.status == false) {
+        console.log('barcode scanend succesfully  ', LISTAPIOBJ.responseData);
+        getBillGeneratonDataFromBarcode(id);
+      } else {
+        popUpAction(
+          'Barcode Scanned is Already Used!',
+          Constant.DefaultAlert_MSG,
+          'OK',
+          true,
+          false,
+        );
+      }
     } else {
       popUpAction(
         Constant.SERVICE_FAIL_MSG,
@@ -150,21 +149,20 @@ const CreateBillGenerationBarcode = ({route}) => {
 
     set_isLoading(true);
     let obj = {
-      menuId: 346,
-      userName: userName,
-      userPwd: userPsd,
+      menuId: 271,
+      username: userName,
+      password: userPsd,
       compIds: usercompanyId,
       company: JSON.parse(companyObj),
       itemId: id,
-      qty: '0',
+      qty: '0', //
       vendorPriceId: '0',
       trimId: '0',
       sizeId: '0',
       ratioType: 'S',
       masterbox: 'M',
       itemType: 'Barcode',
-    }
-
+    };
 
     let LISTAPIOBJ = await APIServiceCall.getBillGeneratonDataFromBarcode(obj);
 
@@ -172,10 +170,9 @@ const CreateBillGenerationBarcode = ({route}) => {
 
     if (LISTAPIOBJ && LISTAPIOBJ.statusData) {
       if (LISTAPIOBJ && LISTAPIOBJ.responseData) {
-        // let result = LISTAPIOBJ.responseData.myArrayList.map(item => item.map);
-        // set_tableLists(result);
-console.log("get data from barcode ==> ", LISTAPIOBJ.responseData)
-
+        let result = LISTAPIOBJ.responseData;
+        set_tableLists(result);
+        console.log('get data from barcode ==> ');
       }
     } else {
       popUpAction(
@@ -203,21 +200,28 @@ console.log("get data from barcode ==> ", LISTAPIOBJ.responseData)
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
     let companyObj = await AsyncStorage.getItem('companyObj');
-    tempObj.menuId = 787;
+    let userId = await AsyncStorage.getItem('userId');
+
+    let loginDTO = {
+      userId: userId,
+      language_id: 0
+    };
+
+    tempObj.menuId = 346;
     tempObj.username = userName;
     tempObj.password = userPsd;
     tempObj.compIds = usercompanyId;
-    tempObj.checkedData = checkedData;
     tempObj.company = JSON.parse(companyObj);
+    tempObj.loginDTO = loginDTO;
 
     console.log('saving obj ==>', tempObj);
 
     set_isLoading(true);
 
-    let SAVEAPIObj = await APIServiceCall.saveCreateBillGenerationBarcode(tempObj);
+    let SAVEAPIObj = await APIServiceCall.saveCreateBillGenerationBarcode(
+      tempObj,
+    );
     set_isLoading(false);
-
-    console.log('Sucess before returned obj ', SAVEAPIObj);
 
     if (
       SAVEAPIObj &&
