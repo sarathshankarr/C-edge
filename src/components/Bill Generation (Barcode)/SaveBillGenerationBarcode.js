@@ -19,8 +19,8 @@ const SaveBillGenerationBarcode = ({navigation, route, ...props}) => {
   React.useEffect(() => {
     if (route.params) {
       if (route.params?.item) {
-        console.log('Route Params ===> ', route.params?.item);
-        // getInitialData(route.params?.item?.id);
+        // console.log('Route initial ===> ', route.params?.item);
+        getInitialData(route.params?.item?.soNumber);
       }
     }
   }, [route.params]);
@@ -29,22 +29,23 @@ const SaveBillGenerationBarcode = ({navigation, route, ...props}) => {
     navigation.goBack();
   };
 
-  const getInitialData = async id => {
+  const getInitialData = async (soNo) => {
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
     let companyObj = await AsyncStorage.getItem('companyObj');
     set_isLoading(true);
     let obj = {
-      userName: userName,
-      userPwd: userPsd,
+      username: userName,
+      password: userPsd,
       compIds: usercompanyId,
       company: JSON.parse(companyObj),
-      menuId: 7,
-      soNumber: id,
+      soId: soNo,
+      vendorId: 0,
+      loginType: 'Admin',
     };
     let EditFabricProcessInObj =
-      await APIServiceCall.getEditDetailsBillGeneration(obj);
+      await APIServiceCall.getEditDetailsBillGenerationBarcode(obj);
     set_isLoading(false);
 
     if (EditFabricProcessInObj && EditFabricProcessInObj.statusData) {
@@ -86,8 +87,7 @@ const SaveBillGenerationBarcode = ({navigation, route, ...props}) => {
     popUpAction(undefined, undefined, '', false, false);
   };
 
-
-   const submitAction = async tempObj => {
+  const submitAction = async tempObj => {
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
@@ -103,7 +103,9 @@ const SaveBillGenerationBarcode = ({navigation, route, ...props}) => {
 
     set_isLoading(true);
 
-    let SAVEAPIObj = await APIServiceCall.saveCreateBillGenerationBarcode(tempObj);
+    let SAVEAPIObj = await APIServiceCall.saveCreateBillGenerationBarcode(
+      tempObj,
+    );
     set_isLoading(false);
 
     console.log('Sucess before returned obj ', SAVEAPIObj);
@@ -137,7 +139,6 @@ const SaveBillGenerationBarcode = ({navigation, route, ...props}) => {
     }
   };
 
-
   return (
     <SaveBillGenerationBarcodeUI
       itemsObj={itemsObj}
@@ -156,4 +157,3 @@ const SaveBillGenerationBarcode = ({navigation, route, ...props}) => {
 };
 
 export default SaveBillGenerationBarcode;
-

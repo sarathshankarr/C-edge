@@ -37,11 +37,13 @@ let closeImg = require('./../../../assets/images/png/close1.png');
 const CreateBillGenerationBarcodeUI = ({route, ...props}) => {
   const navigation = useNavigation();
   const [rows, setRows] = React.useState([]);
-  const [selectedradiooption1, setSelectedradiooption1] = useState('StyleWise');
+  const [selectedradiooption1, setSelectedradiooption1] = useState('MasterBox');
   const [totalQty, setTotalQty] = useState(false);
   const [invoiceNo, setInvoiceNo] = useState('');
   const [poNo, setPoNo] = useState('');
   const [barCode, setBarcode] = useState('');
+  const [prefix, setPrefix] = useState('');
+  const [suffix, setSuffix] = useState('');
   const [transportCost, setTransportCost] = useState('0');
   const {colors} = useContext(ColorContext);
 
@@ -87,6 +89,14 @@ const CreateBillGenerationBarcodeUI = ({route, ...props}) => {
         );
         setFilteredBillNoList(billNoList);
         setBillNoList(billNoList);
+      }
+      if(props.lists.viewDTOList){
+        setPrefix(props.lists.viewDTOList[0].invoice);
+        console.log("prefix ", props.lists.viewDTOList[0].invoice)
+      }
+      if(props.lists.company){
+        setSuffix(props.lists.company?.posuffix);
+        console.log("suffix ", props.lists.company?.posuffix)
       }
     }
   }, [props.lists]);
@@ -240,6 +250,11 @@ const CreateBillGenerationBarcodeUI = ({route, ...props}) => {
   const handleScannedCode = text => {
     if (text.trim().length !== 9) return;
 
+    if (!shipToId) {
+      Alert.alert('Alert','Please select the Vendor/Customer');
+      return;
+    }
+
     if (!text) {
       Alert.alert('Please Enter the Valid Barcode');
       return;
@@ -269,6 +284,14 @@ const CreateBillGenerationBarcodeUI = ({route, ...props}) => {
     });
   };
 
+  const formattedDate = text => {
+    console.log('date before  formating', text);
+    const [d, m, y] = text.split('-');
+    const f = [d, m, y].join('/');
+    console.log('date formating', f);
+    return f;
+  };
+
   const submitAction = async () => {
     const filteredRows = rows.map(item => ({
       gsCode: item.GSCode,
@@ -290,10 +313,10 @@ const CreateBillGenerationBarcodeUI = ({route, ...props}) => {
       prePack: item.Prepack,
     }));
     const Obj = {
-      transactionDate: txnDate,
+      transactionDate: formattedDate(txnDate),
       transportDate: '',
       dueDate: '',
-      shipDate: deliveryDate,
+      shipDate: formattedDate(deliveryDate),
       vendorCustomerId: shipToId,
       billToId: billNoId,
       poNumber: poNo,
@@ -305,8 +328,8 @@ const CreateBillGenerationBarcodeUI = ({route, ...props}) => {
       transportNo: '',
       bookingNo: '',
       cartonNo: '',
-      invoiceNo: invoiceNo,
-      itemType: 'Style',
+      invoiceNo: `${prefix}${invoiceNo}${suffix}`,
+      itemType: 'STYLE',
       agentId: 0,
       subagentId: 0,
       notes: '',
@@ -317,8 +340,8 @@ const CreateBillGenerationBarcodeUI = ({route, ...props}) => {
       soNumber: 0,
       convRate: 0,
       additionalAmount: 0,
-      roundtotal: totalAmount.toFixed(2),
-      roundtotal2: totalAmount.toFixed(2),
+      roundtotal:'0',
+      roundtotal2: '0',
 
       packages: '',
       packincharge: '',
@@ -331,10 +354,9 @@ const CreateBillGenerationBarcodeUI = ({route, ...props}) => {
       masterboxbarcode: '', // scanned barcodes string
       master_box_proforma_id: '0',
       items: filteredRows || [],
-
     };
 
-    console.log('save Obj ==> ', Obj);
+    // console.log('save Obj ==> ', Obj);
     props.submitAction(Obj);
   };
 
@@ -372,13 +394,13 @@ const CreateBillGenerationBarcodeUI = ({route, ...props}) => {
   }
   const radiogroup1 = useMemo(
     () => [
-      {
-        id: '1',
-        label: 'Box',
-        value: 'Box',
-        selected: selectedradiooption1 === 'Box',
-        labelStyle: {color: '#000'},
-      },
+      // {
+      //   id: '1',
+      //   label: 'Box',
+      //   value: 'Box',
+      //   selected: selectedradiooption1 === 'Box',
+      //   labelStyle: {color: '#000'},
+      // },
       {
         id: '2',
         label: 'Master Box',
@@ -744,15 +766,43 @@ const CreateBillGenerationBarcodeUI = ({route, ...props}) => {
             onCancel={hideDatePicker}
           />
 
-          <View style={{marginTop: hp('2%')}}>
-            {/* <Text> SC- </Text> */}
+          {/* <View style={{marginTop: hp('2%')}}>
             <TextInput
               label="Invoice No *"
               value={invoiceNo}
               mode="outlined"
               onChangeText={text => setInvoiceNo(text)}
             />
-            {/* <Text>/25-26 </Text> */}
+          </View> */}
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              marginTop: hp('2%'),
+            }}>
+            {/* Label */}
+            <Text style={{color: 'red'}}>*</Text>
+            <Text style={{fontWeight: 'bold',marginLeft: 2}}>InvoiceNo :</Text>
+
+            {/* Prefix */}
+            <Text style={{fontWeight: 'bold', marginLeft: 5}}>{prefix}</Text>
+
+            {/* Input box */}
+            <TextInput
+              style={{
+                borderWidth: 1,
+                borderColor: '#ccc',
+                paddingHorizontal: 8,
+                paddingVertical: 4,
+                width: '50%',
+                marginHorizontal: 5,
+              }}
+              value={invoiceNo}
+              onChangeText={text => setInvoiceNo(text)}
+            />
+
+            {/* Suffix */}
+            <Text style={{fontWeight: 'bold'}}>{suffix}</Text>
           </View>
 
           <View
@@ -766,7 +816,7 @@ const CreateBillGenerationBarcodeUI = ({route, ...props}) => {
               <TextInput
                 label="Txn Date *"
                 value={txnDate ? txnDate : ''}
-                placeholder="Order Date"
+                placeholder=""
                 placeholderTextColor="#000"
                 mode="outlined"
                 color="#000"
@@ -795,7 +845,7 @@ const CreateBillGenerationBarcodeUI = ({route, ...props}) => {
               <TextInput
                 label="Delivery Date "
                 value={deliveryDate ? deliveryDate : ''}
-                placeholder="Delivery Date"
+                placeholder=""
                 placeholderTextColor="#000"
                 mode="outlined"
                 color="#000"

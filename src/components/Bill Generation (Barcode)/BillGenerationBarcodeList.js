@@ -196,7 +196,7 @@ const BillGenerationBarcodeList = ({route}) => {
   };
 
   const actionOnRow = (item, index) => {
-    navigation.navigate('SavePurchaseOrderDraft', {item: item});
+    navigation.navigate('SaveBillGenerationBarcode', {item: item});
   };
 
   const handleNavigation = () => {
