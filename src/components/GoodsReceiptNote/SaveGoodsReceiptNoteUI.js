@@ -81,7 +81,10 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
           props.itemsObj?.pomaster?.referenceDateStr,
         );
         if (props.itemsObj.pomaster.referenceDateStr) {
-          setReferenceDate(props.itemsObj.pomaster.referenceDateStr);
+          const date=props.itemsObj.pomaster.referenceDateStr;
+          const formatted=date.split('/').join('-');
+          setReferenceDate(formatted);
+          console.log(" ref date ", props.itemsObj.pomaster.referenceDateStr, formatted)
         }
         // if (props.itemsObj.grnImgFile) {
         //   console.log("============> ", props.itemsObj.grnImgFile);

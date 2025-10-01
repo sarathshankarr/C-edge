@@ -64,6 +64,7 @@ const POApproveUI = ({route, ...props}) => {
 
   React.useEffect(() => {
     if (props.itemsArray) {
+      console.log('props.itemsArray ==> ', props.itemsArray);
       set_filterArray(props.itemsArray);
       set_ItemsArray(props.itemsArray);
     }
