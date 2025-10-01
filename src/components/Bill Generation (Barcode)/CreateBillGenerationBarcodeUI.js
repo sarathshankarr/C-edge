@@ -90,13 +90,17 @@ const CreateBillGenerationBarcodeUI = ({route, ...props}) => {
         setFilteredBillNoList(billNoList);
         setBillNoList(billNoList);
       }
-      if(props.lists.viewDTOList){
-        setPrefix(props.lists.viewDTOList[0].invoice);
-        console.log("prefix ", props.lists.viewDTOList[0].invoice)
-      }
+      // if(props.lists.viewDTOList){
+      //   setPrefix(props.lists.viewDTOList[0].invoice);
+      //   console.log("prefix ", props.lists.viewDTOList[0].invoice)
+      // }
       if(props.lists.company){
-        setSuffix(props.lists.company?.posuffix);
+        setSuffix(props.lists.company?.posuffix || '');
         console.log("suffix ", props.lists.company?.posuffix)
+      }
+      if(props.lists?.invoice){
+        setPrefix(props.lists.invoice || '');
+        console.log("suffix ", props.lists.invoice)
       }
     }
   }, [props.lists]);
