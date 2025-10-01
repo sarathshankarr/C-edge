@@ -55,7 +55,7 @@ const SaveGoodsReceiptNote = ({navigation, route, ...props}) => {
       userPwd: userPsd,
       poNumber: id,
     };
-    // console.log("req body ===> ", obj);
+    console.log("req body grn ===> ", obj);
     let EditFabricProcessInObj =
       await APIServiceCall.getEditDetailsGoodsReceiptNote(obj);
     set_isLoading(false);
