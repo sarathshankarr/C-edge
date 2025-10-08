@@ -172,7 +172,7 @@ const CreateBillGenerationBarcode = ({route}) => {
       if (LISTAPIOBJ && LISTAPIOBJ.responseData) {
         let result = LISTAPIOBJ.responseData;
         set_tableLists(result);
-        console.log('get data from barcode ==> ',result);
+        console.log('get data from barcode ==> ', result);
       }
     } else {
       popUpAction(
@@ -194,6 +194,57 @@ const CreateBillGenerationBarcode = ({route}) => {
       );
     }
   };
+  const getDuplicateInvoiceStatus = async tempObj => {
+    let userName = await AsyncStorage.getItem('userName');
+    let userPsd = await AsyncStorage.getItem('userPsd');
+    let usercompanyId = await AsyncStorage.getItem('companyId');
+    let companyObj = await AsyncStorage.getItem('companyObj');
+
+    set_isLoading(true);
+    let obj = {
+      username: userName,
+      password: userPsd,
+      compIds: usercompanyId,
+      company: JSON.parse(companyObj),
+      companyInvoice: tempObj.prefix,
+      postInvoice: tempObj.suffix,
+      invoiceNo: tempObj.invoiceNo,
+      itemId: 0,
+    };
+
+    let LISTAPIOBJ = await APIServiceCall.getDuplicateInvoiceStatusBGB(obj);
+
+    set_isLoading(false);
+
+    if (LISTAPIOBJ && LISTAPIOBJ.error) {
+      popUpAction(
+        Constant.SERVICE_FAIL_MSG,
+        Constant.DefaultAlert_MSG,
+        'OK',
+        true,
+        false,
+      );
+      return "error";
+    }
+
+    if (LISTAPIOBJ && LISTAPIOBJ.statusData) {
+      if (LISTAPIOBJ && LISTAPIOBJ.responseData) {
+        let result = LISTAPIOBJ.responseData;
+       return result;
+      }
+    } else {
+      popUpAction(
+        Constant.SERVICE_FAIL_MSG,
+        Constant.DefaultAlert_MSG,
+        'OK',
+        true,
+        false,
+      );
+      return "error";
+    }
+
+      return "error";
+  };
 
   const submitAction = async tempObj => {
     let userName = await AsyncStorage.getItem('userName');
@@ -204,7 +255,7 @@ const CreateBillGenerationBarcode = ({route}) => {
 
     let loginDTO = {
       userId: userId,
-      language_id: 0
+      language_id: 0,
     };
 
     tempObj.menuId = 346;
@@ -270,6 +321,7 @@ const CreateBillGenerationBarcode = ({route}) => {
       validateBarCode={validateBarCode}
       backBtnAction={backBtnAction}
       popOkBtnAction={popOkBtnAction}
+      getDuplicateInvoiceStatus={getDuplicateInvoiceStatus}
     />
   );
 };

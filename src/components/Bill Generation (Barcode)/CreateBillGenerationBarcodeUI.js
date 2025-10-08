@@ -45,6 +45,8 @@ const CreateBillGenerationBarcodeUI = ({route, ...props}) => {
   const [prefix, setPrefix] = useState('');
   const [suffix, setSuffix] = useState('');
   const [transportCost, setTransportCost] = useState('0');
+  const [proformaIds, setProformaIds] = useState([]);
+  const [scannedBarcodes, setScannedBarcodes] = useState([]);
   const {colors} = useContext(ColorContext);
 
   const styles = getStyles(colors);
@@ -105,35 +107,99 @@ const CreateBillGenerationBarcodeUI = ({route, ...props}) => {
     }
   }, [props.lists]);
 
+  
+
   // useEffect(() => {
-  //   if (props.tableLists) {
-  //     console.log('table list ', props.tableLists);
-  //     setRows(props.tableLists);
+  //   if (props.tableLists && props.tableLists.length > 0) {
+  //     const enrichedRows = props.tableLists.map(row => {
+  //       const qty = Number(row.RequiredQty || 0);
+  //       const price = Number(row.Price || 0);
+  //       const gstPercent = Number(row.Gst || 0);
+
+  //       const gross = qty * price;
+  //       const gstAmount = (gross * gstPercent) / 100;
+  //       const totalRowAmount = gross + gstAmount;
+
+  //       return {
+  //         ...row,
+  //         gross: gross.toFixed(2),
+  //         unitPricegstAmount: gstAmount.toFixed(2),
+  //         totalRowAmount: totalRowAmount.toFixed(2),
+  //       };
+  //     });
+  //     console.log("enrichedRows ==> ", enrichedRows)
+  //     setRows(enrichedRows);
   //   }
   // }, [props.tableLists]);
 
   useEffect(() => {
-    if (props.tableLists && props.tableLists.length > 0) {
-      const enrichedRows = props.tableLists.map(row => {
-        const qty = Number(row.RequiredQty || 0);
-        const price = Number(row.Price || 0);
-        const gstPercent = Number(row.Gst || 0);
+  if (props.tableLists && props.tableLists.length > 0) {
 
-        const gross = qty * price;
-        const gstAmount = (gross * gstPercent) / 100;
-        const totalRowAmount = gross + gstAmount;
+      const newBarcode = props.tableLists[0]?.barcodeNo;
 
-        return {
-          ...row,
-          gross: gross.toFixed(2),
-          unitPricegstAmount: gstAmount.toFixed(2),
-          totalRowAmount: totalRowAmount.toFixed(2),
-        };
+       const newProformaIds = props.tableLists
+    .map(item => item.proforma_ids)
+    .filter(Boolean) || []; 
+
+    setRows(prevRows => {
+      // Make a copy of previous rows
+      const updatedRows = [...prevRows];
+
+      props.tableLists.forEach(newRow => {
+        const qty = Number(newRow.RequiredQty || 0);
+        const price = Number(newRow.Price || 0);
+        const gstPercent = Number(newRow.Gst || 0);
+
+        const existingIndex = updatedRows.findIndex(
+          r => r.GSCode === newRow.GSCode && r.ItemId === newRow.ItemId
+        );
+
+        if (existingIndex !== -1) {
+          const existing = updatedRows[existingIndex];
+          const newQty = Number(existing.RequiredQty || 0) + qty;
+
+          const gross = newQty * price;
+          const gstAmount = (gross * gstPercent) / 100;
+          const totalRowAmount = gross + gstAmount;
+
+          updatedRows[existingIndex] = {
+            ...existing,
+            RequiredQty: newQty,
+            gross: gross.toFixed(2),
+            unitPricegstAmount: gstAmount.toFixed(2),
+            totalRowAmount: totalRowAmount.toFixed(2),
+          };
+        } else {
+          const gross = qty * price;
+          const gstAmount = (gross * gstPercent) / 100;
+          const totalRowAmount = gross + gstAmount;
+
+          updatedRows.push({
+            ...newRow,
+            gross: gross.toFixed(2),
+            unitPricegstAmount: gstAmount.toFixed(2),
+            totalRowAmount: totalRowAmount.toFixed(2),
+          });
+        }
       });
 
-      setRows(enrichedRows);
-    }
-  }, [props.tableLists]);
+      console.log("Updated Rows => ", updatedRows);
+      return updatedRows;
+    });
+
+     if (newBarcode) {
+    setScannedBarcodes(prev => [...prev, newBarcode]);
+  }
+   if (newProformaIds.length > 0) {
+    setProformaIds(prev => {
+      const merged = [...prev, ...newProformaIds];
+      const unique = [...new Set(merged)];
+      return unique;
+    });
+  }
+  }
+}, [props.tableLists]);
+
 
   const [billNoList, setBillNoList] = useState([]);
   const [filteredBillNoList, setFilteredBillNoList] = useState([]);
@@ -263,7 +329,11 @@ const CreateBillGenerationBarcodeUI = ({route, ...props}) => {
       return;
     }
 
-     if (text.trim().length !== 9) return;
+    // console.log("scanned barcode ", text, scannedBarcodes, scannedBarcodes.includes(text), typeof (text)  , typeof (scannedBarcodes[0])  )
+    if (scannedBarcodes.includes(Number(text))) {
+      Alert.alert('Alert', 'Barcode already scanned !');
+      return;
+    }
 
     console.log('calling validation api ');
     props.validateBarCode(text);
@@ -301,11 +371,34 @@ const CreateBillGenerationBarcodeUI = ({route, ...props}) => {
 
   const submitAction = async () => {
 
+
+
     if(!shipLocationId || !shipToId  || !invoiceNo || !txnDate){
 Alert.alert("Alert","Please fill all mandatory fields!");
 return;
     }
+    if(scannedBarcodes.length<=0){
+Alert.alert("Alert","Please Scan barcode !");
+return;
+    }
 
+
+    let tempObj = {
+      prefix: prefix,
+      suffix: suffix,
+      invoiceNo: invoiceNo,
+    }
+let invoiceStatus = await props.getDuplicateInvoiceStatus(tempObj);
+
+if(invoiceStatus === "error"){
+  Alert.alert("Alert","Something went wrong, please try again !");
+  return;
+}else if(invoiceStatus.status){
+  Alert.alert("Alert","Invoice number already exists, please use different invoice number !");
+  return;
+}
+
+console.log("returnning invoiceStatus ", invoiceStatus.status, typeof(invoiceStatus.status) )
 
     const filteredRows = rows.map(item => ({
       gsCode: item.GSCode,
@@ -365,12 +458,12 @@ return;
       allRolls: '',
       corg: 0,
       pIids: '',
-      masterboxbarcode: '', // scanned barcodes string
-      master_box_proforma_id: '0',
+      masterboxbarcode: scannedBarcodes.join(',')||'', 
+      master_box_proforma_id: proformaIds.join(',') || '', 
       items: filteredRows || [],
     };
 
-    // console.log('save Obj ==> ', Obj);
+    console.log('save Obj ==> ', Obj);
     props.submitAction(Obj);
   };
 
@@ -883,6 +976,15 @@ return;
               value={poNo}
               mode="outlined"
               onChangeText={text => setPoNo(text)}
+            />
+          </View>
+          <View style={{marginTop: hp('2%')}}>
+            <TextInput
+              label="Master Box Barcode"
+              value={scannedBarcodes?.join(',')}
+              mode="outlined"
+              editable={false}
+              onChangeText={text => console.log(text)}
             />
           </View>
 

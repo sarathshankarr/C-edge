@@ -278,6 +278,18 @@ const CreateMasterBoxPackingUI = ({route, ...props}) => {
     //   );
     // });
 
+
+
+     if(rows.length<=0){
+    Alert.alert("Alert","Please Scan barcode !");
+    return;
+        }
+
+     if(poflag && selectedProformaIndices.length===0){
+    Alert.alert("Alert","Please Select Proforma Invoice ID !");
+    return;
+        }
+
     console.log('rows child==> ', rows);
     const mappedRows =
       rows.map(row => ({

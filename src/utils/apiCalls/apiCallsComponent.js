@@ -8243,6 +8243,56 @@ export async function getBillGeneratonDataFromBarcode(jsonValue) {
   };
   return obj;
 }
+export async function getDuplicateInvoiceStatusBGB(jsonValue) {
+  let returnError = undefined;
+  let statusData = undefined;
+  let responseData = undefined;
+  let logoutData = false;
+  let obj = undefined;
+
+  let internet = await internetCheck();
+  if (!internet) {
+    obj = {
+      logoutData: logoutData,
+      statusData: statusData,
+      responseData: responseData,
+      error: returnError,
+      isInternet: internet,
+    };
+    return obj;
+  }
+  console.log('URL', Environment.uri + 'buyerpoapicon/checkCodeTitle');
+  await fetch(Environment.uri + 'buyerpoapicon/checkCodeTitle', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    body: JSON.stringify(jsonValue),
+  })
+    .then(response => response.json())
+    .then(async data => {
+      if (data) {
+        statusData = true;
+        responseData = data;
+      } else {
+        statusData = undefined;
+      }
+    })
+    .catch(error => {
+      console.log('getPartsProcessingCreateList error ', error);
+      returnError = error;
+    });
+
+  obj = {
+    logoutData: logoutData,
+    statusData: statusData,
+    responseData: responseData,
+    error: returnError,
+    isInternet: internet,
+  };
+  return obj;
+}
 export async function api22(jsonValue) {
   let returnError = undefined;
   let statusData = undefined;

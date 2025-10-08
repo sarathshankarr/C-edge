@@ -59,10 +59,10 @@ const SaveBillGenerationBarcodeUI = ({route, ...props}) => {
 
   useEffect(() => {
     if (props.itemsObj) {
-      // console.log(
-      //   'itemsObj po ====>  ',
-      //   props.itemsObj.viewBuyerPOList.soChildMappingDao,
-      // );
+      console.log(
+        'itemsObj po ====>  ',
+        props.itemsObj.viewBuyerPOList,
+      );
       if (props.itemsObj) {
         if (props.itemsObj.viewBuyerPOList) {
           if (props.itemsObj.viewBuyerPOList.master_box_barcode) {
@@ -71,6 +71,7 @@ const SaveBillGenerationBarcodeUI = ({route, ...props}) => {
             );
           }
           if (props.itemsObj.viewBuyerPOList.master_box_proforma_id) {
+            // console.log("master_box_proforma_id ====> ",props.itemsObj.viewBuyerPOList)
             setPiNo(props.itemsObj.viewBuyerPOList.master_box_proforma_id);
           }
           if (props.itemsObj.viewBuyerPOList.invoiceNo) {
