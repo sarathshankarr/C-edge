@@ -172,7 +172,7 @@ const CreateBillGenerationBarcode = ({route}) => {
       if (LISTAPIOBJ && LISTAPIOBJ.responseData) {
         let result = LISTAPIOBJ.responseData;
         set_tableLists(result);
-        console.log('get data from barcode ==> ');
+        console.log('get data from barcode ==> ',result);
       }
     } else {
       popUpAction(
