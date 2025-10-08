@@ -252,17 +252,19 @@ const CreateBillGenerationBarcodeUI = ({route, ...props}) => {
   };
 
   const handleScannedCode = text => {
-    if (text.trim().length !== 9) return;
 
     if (!shipToId) {
       Alert.alert('Alert','Please select the Vendor/Customer');
       return;
     }
 
-    if (!text) {
+    if (!text || text.trim().length !== 9) {
       Alert.alert('Please Enter the Valid Barcode');
       return;
     }
+
+     if (text.trim().length !== 9) return;
+
     console.log('calling validation api ');
     props.validateBarCode(text);
   };
@@ -275,8 +277,9 @@ const CreateBillGenerationBarcodeUI = ({route, ...props}) => {
   };
 
   const handleBarcodeChange = text => {
-    setBarcode(text);
-    handleScannedCode(text);
+    // setBarcode(text);
+    // handleScannedCode(text);
+    conosole.log("scan barcode text ", text )
   };
 
   const handleScan = () => {
@@ -297,6 +300,13 @@ const CreateBillGenerationBarcodeUI = ({route, ...props}) => {
   };
 
   const submitAction = async () => {
+
+    if(!shipLocationId || !shipToId  || !invoiceNo || !txnDate){
+Alert.alert("Alert","Please fill all mandatory fields!");
+return;
+    }
+
+
     const filteredRows = rows.map(item => ({
       gsCode: item.GSCode,
       prePackQuantity: item.EnteredPrePackQty || '0',
@@ -1165,6 +1175,7 @@ const CreateBillGenerationBarcodeUI = ({route, ...props}) => {
                             onChangeText={text =>
                               handleInputChange(index, 'RequiredQty', text)
                             }
+                            editable={false}
                             keyboardType="numeric"
                           />
                         </View>
