@@ -259,7 +259,7 @@ const CreateBillGenerationBarcodeUI = ({route, ...props}) => {
     }
 
     if (!text || text.trim().length !== 9) {
-      Alert.alert('Please Enter the Valid Barcode');
+      Alert.alert('Alert','Please Enter the Valid Barcode');
       return;
     }
 
@@ -277,9 +277,9 @@ const CreateBillGenerationBarcodeUI = ({route, ...props}) => {
   };
 
   const handleBarcodeChange = text => {
-    // setBarcode(text);
+    setBarcode(text);
     // handleScannedCode(text);
-    conosole.log("scan barcode text ", text )
+    console.log("scan barcode text ", text )
   };
 
   const handleScan = () => {
