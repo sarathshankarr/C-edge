@@ -130,8 +130,8 @@ const StyleBomReportUI = ({route, ...props}) => {
 
     let tempObj = {
       multistyle: IdsList+",",
-      QtyVal: balanceQty ? 1 :0 ,
-      soId: buyerPOId ? buyerPOId : 0 ,
+      QtyVal: balanceQty ? 1 : 0 ,
+      soId: buyerPOId ? buyerPOId : "" ,
     };
 
     console.log("SAVING OBJ=====>   ", tempObj);
@@ -194,34 +194,34 @@ const StyleBomReportUI = ({route, ...props}) => {
 
   const handleSearchStyles = text => {
     if (text.trim().length > 0) {
-      const filtered = props.lists.getStockStyles.filter(style =>
+      const filtered = stylesList.filter(style =>
         style.name.toLowerCase().includes(text.toLowerCase()),
       );
       set_filteredStyles(filtered);
     } else {
-      set_filteredStyles(props.lists.getStockStyles);
+      set_filteredStyles(stylesList);
     }
   };
 
   const handleSearchFabricOrTrims = text => {
     if (text.trim().length > 0) {
-      const filtered = props.lists.getStockFabricOrTrims.filter(item =>
+      const filtered = fabricOrTrimsList.filter(item =>
         item.name.toLowerCase().includes(text.toLowerCase()),
       );
       setFilteredFabricOrTrims(filtered);
     } else {
-      setFilteredFabricOrTrims(props.lists.getStockFabricOrTrims);
+      setFilteredFabricOrTrims(fabricOrTrimsList);
     }
   };
 
   const handleSearchRMName = text => {
     if (text.trim().length > 0) {
-      const filtered = props.lists.getStockRMNames.filter(rmName =>
+      const filtered = rmNameList.filter(rmName =>
         rmName.name.toLowerCase().includes(text.toLowerCase()),
       );
       set_filteredRMName(filtered);
     } else {
-      set_filteredRMName(props.lists.getStockRMNames);
+      set_filteredRMName(rmNameList);
     }
   };
 
