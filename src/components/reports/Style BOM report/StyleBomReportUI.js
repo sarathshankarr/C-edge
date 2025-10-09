@@ -8,6 +8,7 @@ import {
   ScrollView,
   Image,
   TextInput,
+  Alert,
 } from 'react-native';
 import {
   heightPercentageToDP as hp,
@@ -122,6 +123,11 @@ const StyleBomReportUI = ({route, ...props}) => {
 
     const IdsList = rows.map(item => item.ids).join(",");
 
+     if(rows.length === 0){
+      Alert.alert("Alert","Please add atleast one record to proceed");
+      return;
+    }
+
     let tempObj = {
       multistyle: IdsList+",",
       QtyVal: balanceQty ? 1 :0 ,
@@ -140,6 +146,10 @@ const StyleBomReportUI = ({route, ...props}) => {
     set_buyerPOId(item.id);
     set_buyerPOName(item.name);
     set_showBuyerPOList(false);
+
+    set_stylesId('');
+    set_stylesName('');
+    setRows([]);
 
     props.getStyleListFromBuyerPo(item.id);
   };
@@ -274,6 +284,8 @@ const StyleBomReportUI = ({route, ...props}) => {
     console.log('changed radio ==> ', selectedId);
 
     const newList = selectedId === '1' ? initialStyleList : BuyerPOStyleList;
+    set_stylesId('');
+    set_stylesName('');
 
     set_filteredStyles(newList);
     setStylesList(newList);
@@ -706,7 +718,7 @@ const StyleBomReportUI = ({route, ...props}) => {
                   </View>
                   <View style={{width: 5}}></View>
                   <View style={{width: 150}}>
-                    <Text style={styles.table_head_captions}>Total Qty</Text>
+                    <Text style={styles.table_head_captions}>Selected Style</Text>
                   </View>
                 </View>
 
