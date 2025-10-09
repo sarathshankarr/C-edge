@@ -1421,7 +1421,7 @@ console.log("returnning invoiceStatus ", invoiceStatus.status, typeof(invoiceSta
                         style={styles.table_data_input}
                         value={transportCost}
                         onChangeText={text =>
-                          setTransportCost(Number(text) || 0)
+                          setTransportCost(text || '0')
                         }
                         keyboardType="numeric"
                       />
@@ -1454,10 +1454,12 @@ console.log("returnning invoiceStatus ", invoiceStatus.status, typeof(invoiceSta
                     <View style={{width: 5}} />
                     <View style={{width: 60}}>
                       <Text style={styles.table_data}>
-                        {totalAmount?.toFixed(2)}
+                        {/* {totalAmount?.toFixed(2)} */}
+                         {(totalAmount + Number(transportCost || '0'))?.toFixed(2)}
                       </Text>
                     </View>
                   </View>
+
                 </View>
               </ScrollView>
             </View>
