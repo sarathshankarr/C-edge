@@ -1160,7 +1160,7 @@ const SaveBillGenerationBarcodeUI = ({route, ...props}) => {
                     <View style={{width: 100}}>
                       <TextInput
                         style={styles.table_data_input}
-                        value={transportCost}
+                        value={transportCost?.toString() || '0'}
                         onChangeText={text =>
                           setTransportCost(Number(text) || 0)
                         }
