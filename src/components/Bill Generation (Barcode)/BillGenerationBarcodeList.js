@@ -386,8 +386,8 @@ const BillGenerationBarcodeList = ({route}) => {
 
       const pdfPath =
         Platform.OS === 'android'
-          ? `/storage/emulated/0/Download/Outprocess_IN_DC_${item.outprocessId}.pdf`
-          : `${ReactNativeBlobUtil.fs.dirs.DocumentDir}/Outprocess_IN_DC_${item.outprocessId}.pdf`;
+          ? `/storage/emulated/0/Download/BillGeneration_Barcode_${item?.soId}.pdf`
+          : `${ReactNativeBlobUtil.fs.dirs.DocumentDir}/BillGeneration_Barcode_${item?.soId}.pdf`;
 
       await ReactNativeBlobUtil.fs.writeFile(pdfPath, base64Data, 'base64');
 

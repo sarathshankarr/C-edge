@@ -8,6 +8,8 @@ import {
   ScrollView,
   Image,
   TextInput,
+  Alert,
+  
 } from 'react-native';
 import {
   heightPercentageToDP as hp,
@@ -64,6 +66,12 @@ const CuttingReportUI = ({route, ...props}) => {
 
   const ApproveAction = () => {
     console.log('Approved');
+
+    if(selectedIndices.length === 0){
+      Alert.alert("Alert","Please add atleast one record to proceed");
+      return;
+    }
+
 
     const ids = selectedIndices.join(',');
     props.submitAction(ids);
@@ -153,13 +161,13 @@ const CuttingReportUI = ({route, ...props}) => {
                   <View style={{flexDirection: 'column'}}>
                     <Text
                       style={
-                        stylesId
+                        selectedIndices.length > 0
                           ? [styles.dropTextLightStyle]
                           : [styles.dropTextInputStyle]
                       }>
                       {'Styles'}
                     </Text>
-                    {stylesId ? (
+                    {selectedIndices.length > 0 ? (
                       <Text style={[styles.dropTextInputStyle]}>
                         {selectedIndices.length > 0 ? (
                           <Text style={[styles.dropTextInputStyle]}>
@@ -202,7 +210,7 @@ const CuttingReportUI = ({route, ...props}) => {
                       <TouchableOpacity
                         key={index}
                         style={styles.itemContainer}
-                        onPress={() => actionOnStyles(item)}>
+                        onPress={() => actionOnColor(item.id)}>
                         <CustomCheckBox
                           isChecked={selectedIndices.includes(item.id)}
                           onToggle={() => actionOnColor(item.id)}
@@ -291,7 +299,7 @@ const getStyles = colors =>
     SectionStyle1: {
       flexDirection: 'row',
       alignItems: 'center',
-      height: hp('7%'),
+      minHeight: hp('7%'),
       width: wp('75%'),
       borderRadius: hp('0.5%'),
     },
