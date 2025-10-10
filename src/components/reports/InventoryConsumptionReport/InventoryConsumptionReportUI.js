@@ -8,6 +8,7 @@ import {
   ScrollView,
   Image,
   TextInput,
+  Alert
 } from 'react-native';
 import {
   heightPercentageToDP as hp,
@@ -170,6 +171,24 @@ const InventoryConsumptionReportUI = ({route, ...props}) => {
 
   const ApproveAction = () => {
     console.log('Approved');
+ if (fabric === 'Yes' && !fabricId) {
+      Alert.alert("Alert", "Please select a Fabric before proceeding !");
+      return;
+    }
+
+    // rm selected but id missing
+    if (rm === 'Yes' && !rawMaterialId) {
+      Alert.alert("Alert", "Please select an Raw Material before proceeding !");
+      return;
+    }
+
+    // style selected but id missing
+    if (style === 'Yes' && !styleId) {
+      Alert.alert("Alert", "Please select a Style before proceeding !");
+      return;
+    }
+
+
 
     let tempObj = {
       startDate: general==="Yes"? formattedDateIntoYMD(startDate) : formattedDateCustomFormat(startDate),
@@ -189,7 +208,7 @@ const InventoryConsumptionReportUI = ({route, ...props}) => {
     };
 
     console.log("SAVING OBJ=====>   ", tempObj);
-    // return;
+    return;
     props.submitAction(tempObj);
   };
 

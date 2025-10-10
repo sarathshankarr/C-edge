@@ -109,8 +109,12 @@ const SalesOrderReportUI = ({route, ...props}) => {
 
   const ApproveAction = () => {
 
-    if(!startDate || !endDate){
-      Alert.alert("Alert", "Please select Start Date Date and End Date to Proceed");
+    if(!startDate){
+      Alert.alert("Alert", "Please select Start Date Date to Proceed !");
+      return;
+    }
+    if(!endDate){
+      Alert.alert("Alert", "Please select End Date to Proceed !");
       return;
     }
     console.log('Approved');
@@ -256,7 +260,7 @@ const SalesOrderReportUI = ({route, ...props}) => {
               <TextInput
                 label="Start Date *"
                 value={startDate ? startDate : ''}
-                placeholder="Start Date"
+                placeholder="* Start Date"
                 placeholderTextColor="#000"
                 mode="outlined"
                 color="#000"
@@ -284,10 +288,10 @@ const SalesOrderReportUI = ({route, ...props}) => {
             }}>
             <View style={{width: '85%', paddingHorizontal: 10}}>
               <TextInput
-                label="End Date *"
+                label="End Date"
                 value={endDate ? endDate : ''}
                 placeholderTextColor="#000"
-                placeholder="End Date"
+                placeholder="* End Date"
                 mode="outlined"
                 color="#000"
               />
