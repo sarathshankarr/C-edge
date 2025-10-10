@@ -208,7 +208,6 @@ const InventoryConsumptionReportUI = ({route, ...props}) => {
     };
 
     console.log("SAVING OBJ=====>   ", tempObj);
-    return;
     props.submitAction(tempObj);
   };
 
