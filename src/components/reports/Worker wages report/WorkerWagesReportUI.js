@@ -98,10 +98,15 @@ const WorkerWagesReportUI = ({route, ...props}) => {
 
   const ApproveAction = () => {
   
-    if(!startDate || !endDate){
-      Alert.alert("Alert", "Please select Start Date Date and End Date to Proceed");
-      return;
-    }
+
+     if(!startDate){
+          Alert.alert("Alert", "Please select Start Date Date to Proceed !");
+          return;
+        }
+        if(!endDate){
+          Alert.alert("Alert", "Please select End Date to Proceed !");
+          return;
+        }
 
     console.log('Approved');
 
