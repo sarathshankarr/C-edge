@@ -141,51 +141,113 @@ const CreateBillGenerationBarcodeUI = ({route, ...props}) => {
     .map(item => item.proforma_ids)
     .filter(Boolean) || []; 
 
+    // setRows(prevRows => {
+    //   const updatedRows = [...prevRows];
+
+    //   props.tableLists.forEach(newRow => {
+    //     const qty = Number(newRow.RequiredQty || 0);
+    //     const price = Number(newRow.Price || 0);
+    //     const gstPercent = Number(newRow.Gst || 0);
+
+    //     const existingIndex = updatedRows.findIndex(
+    //       r => r.GSCode === newRow.GSCode && r.ItemId === newRow.ItemId
+    //     );
+
+    //     if (existingIndex !== -1) {
+    //       const existing = updatedRows[existingIndex];
+    //       const newQty = Number(existing.RequiredQty || 0) + qty;
+
+    //       const gross = newQty * price;
+    //       const gstAmount = (gross * gstPercent) / 100;
+    //       const totalRowAmount = gross + gstAmount;
+
+    //       updatedRows[existingIndex] = {
+    //         ...existing,
+    //         RequiredQty: newQty,
+    //         gross: gross.toFixed(2),
+    //         unitPricegstAmount: gstAmount.toFixed(2),
+    //         totalRowAmount: totalRowAmount.toFixed(2),
+    //       };
+    //     } else {
+    //       const gross = qty * price;
+    //       const gstAmount = (gross * gstPercent) / 100;
+    //       const totalRowAmount = gross + gstAmount;
+
+    //       updatedRows.push({
+    //         ...newRow,
+    //         gross: gross.toFixed(2),
+    //         unitPricegstAmount: gstAmount.toFixed(2),
+    //         totalRowAmount: totalRowAmount.toFixed(2),
+    //       });
+    //     }
+    //   });
+
+    //   console.log("Updated Rows => ", updatedRows);
+    //   return updatedRows;
+    // });
+  
     setRows(prevRows => {
-      // Make a copy of previous rows
-      const updatedRows = [...prevRows];
+  const updatedRows = [...prevRows];
 
-      props.tableLists.forEach(newRow => {
-        const qty = Number(newRow.RequiredQty || 0);
-        const price = Number(newRow.Price || 0);
-        const gstPercent = Number(newRow.Gst || 0);
+  props.tableLists.forEach(newRow => {
+    const qty = Number(newRow.RequiredQty || 0);
+    const price = Number(newRow.Price || 0);
+    const gstPercent = Number(newRow.Gst || 0);
+    const discPercent = Number(newRow.DiscPercent || 0); // new field
 
-        const existingIndex = updatedRows.findIndex(
-          r => r.GSCode === newRow.GSCode && r.ItemId === newRow.ItemId
-        );
+    // --- Discount calculations ---
+    const unitPriceAfterDisc = price - (price * discPercent) / 100;
+    const discAmount = (price * discPercent * qty) / 100;
 
-        if (existingIndex !== -1) {
-          const existing = updatedRows[existingIndex];
-          const newQty = Number(existing.RequiredQty || 0) + qty;
+    // --- Main totals ---
+    const gross = qty * unitPriceAfterDisc;
+    const gstAmount = (gross * gstPercent) / 100;
+    const totalRowAmount = gross + gstAmount;
 
-          const gross = newQty * price;
-          const gstAmount = (gross * gstPercent) / 100;
-          const totalRowAmount = gross + gstAmount;
+    const existingIndex = updatedRows.findIndex(
+      r => r.GSCode === newRow.GSCode && r.ItemId === newRow.ItemId
+    );
 
-          updatedRows[existingIndex] = {
-            ...existing,
-            RequiredQty: newQty,
-            gross: gross.toFixed(2),
-            unitPricegstAmount: gstAmount.toFixed(2),
-            totalRowAmount: totalRowAmount.toFixed(2),
-          };
-        } else {
-          const gross = qty * price;
-          const gstAmount = (gross * gstPercent) / 100;
-          const totalRowAmount = gross + gstAmount;
+    if (existingIndex !== -1) {
+      // If same item already exists, accumulate quantities
+      const existing = updatedRows[existingIndex];
+      const newQty = Number(existing.RequiredQty || 0) + qty;
 
-          updatedRows.push({
-            ...newRow,
-            gross: gross.toFixed(2),
-            unitPricegstAmount: gstAmount.toFixed(2),
-            totalRowAmount: totalRowAmount.toFixed(2),
-          });
-        }
+      const newGross = newQty * unitPriceAfterDisc;
+      const newGstAmount = (newGross * gstPercent) / 100;
+      const newTotal = newGross + newGstAmount;
+
+      updatedRows[existingIndex] = {
+        ...existing,
+        RequiredQty: newQty,
+        UnitPrice: price.toString(),
+        DiscPercent: discPercent.toString(),
+        DiscAmount: discAmount.toFixed(2).toString(),
+        UnitPriceAfterDisc: unitPriceAfterDisc.toFixed(2).toString(),
+        gross: newGross.toFixed(2).toString(),
+        unitPricegstAmount: newGstAmount.toFixed(2).toString(),
+        totalRowAmount: newTotal.toFixed(2).toString(),
+      };
+    } else {
+      // New item entry
+      updatedRows.push({
+        ...newRow,
+        UnitPrice: price.toString(),
+        DiscPercent: discPercent.toString(),
+        DiscAmount: discAmount.toFixed(2).toString(),
+        UnitPriceAfterDisc: unitPriceAfterDisc.toFixed(2).toString(),
+        gross: gross.toFixed(2).toString(),
+        unitPricegstAmount: gstAmount.toFixed(2).toString(),
+        totalRowAmount: totalRowAmount.toFixed(2).toString(),
       });
+    }
+  });
 
-      console.log("Updated Rows => ", updatedRows);
-      return updatedRows;
-    });
+  console.log('Updated Rows => ', updatedRows);
+  return updatedRows;
+});
+
+    
 
      if (newBarcode) {
     setScannedBarcodes(prev => [...prev, newBarcode]);
@@ -411,8 +473,8 @@ console.log("returnning invoiceStatus ", invoiceStatus.status, typeof(invoiceSta
       other: '',
       orderId: item.orderId,
       locationId: `${shipLocationId}-${item.Prepack}`,
-      discountAmount: 0,
-      discountPercentage: 0,
+      discountAmount: item.DiscAmount || 0, 
+      discountPercentage:item.DiscPercent ||  0, 
       colorCount: item.ColorCount,
       hsn: item.Hsn,
       gstRate: item.Gst,
@@ -442,8 +504,8 @@ console.log("returnning invoiceStatus ", invoiceStatus.status, typeof(invoiceSta
       notes: '',
 
       transportCost: transportCost,
-      totalDiscount: 0,
-      totalDiscountPer: 0,
+      totalDiscount:  totalDiscAmount|| 0,
+      totalDiscountPer: totalDiscPercent || 0,
       soNumber: 0,
       convRate: 0,
       additionalAmount: 0,
@@ -579,32 +641,65 @@ console.log("returnning invoiceStatus ", invoiceStatus.status, typeof(invoiceSta
   //   setShowmodal(!showModal);
   // };
 
-  const handleInputChange = (index, field, value) => {
-    const updatedRows = [...rows];
+  // const handleInputChange1 = (index, field, value) => {
+  //   const updatedRows = [...rows];
 
-    // Convert to number for numeric fields
-    let parsedValue = value;
-    if (field === 'RequiredQty' || field === 'Price' || field === 'Gst') {
-      parsedValue = value === '' ? '' : Number(value);
-    }
+  //   // Convert to number for numeric fields
+  //   let parsedValue = value;
+  //   if (field === 'RequiredQty' || field === 'Price' || field === 'Gst') {
+  //     parsedValue = value === '' ? '' : Number(value);
+  //   }
 
-    updatedRows[index][field] = parsedValue;
+  //   updatedRows[index][field] = parsedValue;
 
-    // Do your calculations
-    const qty = Number(updatedRows[index].RequiredQty || 0);
-    const price = Number(updatedRows[index].Price || 0);
-    const gstPercent = Number(updatedRows[index].Gst || 0);
+  //   // Do your calculations
+  //   const qty = Number(updatedRows[index].RequiredQty || 0);
+  //   const price = Number(updatedRows[index].Price || 0);
+  //   const gstPercent = Number(updatedRows[index].Gst || 0);
 
-    const gross = qty * price;
-    const gstAmount = (gross * gstPercent) / 100;
-    const totalRowAmount = gross + gstAmount;
+  //   const gross = qty * price;
+  //   const gstAmount = (gross * gstPercent) / 100;
+  //   const totalRowAmount = gross + gstAmount;
 
-    updatedRows[index].gross = gross.toFixed(2);
-    updatedRows[index].unitPricegstAmount = gstAmount.toFixed(2);
-    updatedRows[index].totalRowAmount = totalRowAmount.toFixed(2);
+  //   updatedRows[index].gross = gross.toFixed(2);
+  //   updatedRows[index].unitPricegstAmount = gstAmount.toFixed(2);
+  //   updatedRows[index].totalRowAmount = totalRowAmount.toFixed(2);
 
-    setRows(updatedRows);
-  };
+  //   setRows(updatedRows);
+  // };
+
+const handleInputChange = (index, field, value) => {
+  const updatedRows = [...rows];
+
+  // Parse numeric inputs properly
+  let parsedValue = value;
+  if (['RequiredQty', 'UnitPrice', 'Gst', 'DiscPercent'].includes(field)) {
+    parsedValue = value === '' ? '' : Number(value);
+  }
+
+  updatedRows[index][field] = parsedValue;
+
+  const qty = Number(updatedRows[index].RequiredQty || 0);
+  const unitPrice = Number(updatedRows[index].UnitPrice || 0);
+  const discPercent = Number(updatedRows[index].DiscPercent || 0);
+  const gstPercent = Number(updatedRows[index].Gst || 0);
+
+  const unitPriceAfterDisc = unitPrice - (unitPrice * discPercent) / 100;
+  const discAmount = unitPrice * (discPercent / 100) * qty;
+
+  const gross = qty * unitPriceAfterDisc;
+  const gstAmount = (gross * gstPercent) / 100;
+  const totalRowAmount = gross + gstAmount;
+
+  updatedRows[index].DiscAmount = discAmount.toFixed(2).toString();
+  updatedRows[index].UnitPriceAfterDisc = unitPriceAfterDisc.toFixed(2).toString();
+  updatedRows[index].gross = gross.toFixed(2).toString();
+  updatedRows[index].unitPricegstAmount = gstAmount.toFixed(2).toString();
+  updatedRows[index].totalRowAmount = totalRowAmount.toFixed(2).toString();
+
+  setRows(updatedRows);
+};
+
 
   const totalGross = rows.reduce((sum, row) => sum + Number(row.gross || 0), 0);
   const totalGst = rows.reduce(
@@ -619,6 +714,20 @@ console.log("returnning invoiceStatus ", invoiceStatus.status, typeof(invoiceSta
     (sum, row) => sum + Number(row.RequiredQty || 0),
     0,
   );
+
+const totalUnitPriceAfterDisc = rows.reduce(
+  (sum, row) => sum + Number(row.UnitPriceAfterDisc || 0),
+  0
+);
+
+const totalDiscAmount = rows.reduce(
+  (sum, row) => sum + Number(row.DiscAmount || 0),
+  0
+);
+const totalDiscPercent = rows.reduce(
+  (sum, row) => sum + Number(row.DiscPercent || 0),
+  0
+);
 
   return (
     <View style={[CommonStyles.mainComponentViewStyle]}>
@@ -1098,11 +1207,25 @@ console.log("returnning invoiceStatus ", invoiceStatus.status, typeof(invoiceSta
                     <View style={{width: 100}}>
                       <Text style={styles.table_head_captions}>HSN</Text>
                     </View>
+                    <View style={{width: 10}} />
+                    <View style={{width: 100}}>
+                      <Text style={styles.table_head_captions}>Unit Price</Text>
+                    </View>
+                    <View style={{width: 10}} />
+                    <View style={{width: 100}}>
+                      <Text style={styles.table_head_captions}>Disc %</Text>
+                    </View>
 
                     <View style={{width: 5}} />
                     <View style={{width: 100}}>
                       <Text style={styles.table_head_captions}>
                         Unit Price After Disc
+                      </Text>
+                    </View>
+                    <View style={{width: 5}} />
+                    <View style={{width: 100}}>
+                      <Text style={styles.table_head_captions}>
+                       Disc Amount
                       </Text>
                     </View>
 
@@ -1127,122 +1250,6 @@ console.log("returnning invoiceStatus ", invoiceStatus.status, typeof(invoiceSta
                     </View>
                   </View>
 
-                  {/* {rows.length > 0 &&
-                    rows.map((row, index) => {
-                      // const netAmount =
-                      //   Number(row.input_Qty || 0) *
-                      //   Number(row.input_UnitPrice || 0);
-                      // const gstAmount =
-                      //   (netAmount * Number(row.input_Gst || 0)) / 100;
-                      // const totalAmount = netAmount + gstAmount;
-
-                      return (
-                        <View key={index} style={styles.table_body_single_row}>
-                          <View style={{width: 60}}>
-                            <TouchableOpacity
-                              onPress={() => handleRemoveRow(index)}>
-                              <Image
-                                source={closeImg}
-                                style={styles.imageStyle1}
-                              />
-                            </TouchableOpacity>
-                          </View>
-
-                          <View style={{width: 100}}>
-                            <Text style={styles.table_data}>
-                              {row.Title}
-                            </Text>
-                          </View>
-
-                          <View style={{width: 10}} />
-                          <View style={{width: 100}}>
-                            <Text style={styles.table_data}>{row.ItemSize}</Text>
-                          </View>
-
-                          <View style={{width: 10}} />
-                          <View style={{width: 100}}>
-                            <TextInput
-                              style={styles.table_data_input}
-                              value={row?.RequiredQty.toString()}
-                              onChangeText={text => {
-                                setRows(
-                                  rows.map((r, i) =>
-                                    i === index ? {...r, totolQty: RequiredQty} : r,
-                                  ),
-                                );
-                              }}
-                              keyboardType="numeric"
-                            />
-                          </View>
-
-                          <View style={{width: 10}} />
-                          <View style={{width: 100}}>
-                            <TextInput
-                              style={styles.table_data_input}
-                              value={row?.Hsn}
-                              onChangeText={text => {
-                                setRows(
-                                  rows.map((r, i) =>
-                                    i === index ? {...r, Hsn: text} : r,
-                                  ),
-                                );
-                              }}
-                              keyboardType="numeric"
-                            />
-                          </View>
-
-                          <View style={{width: 5}} />
-                          <View style={{width: 100}}>
-                            <Text style={styles.table_data}>
-                              {row?.Price}
-                            </Text>
-                          </View>
-
-                          <View style={{width: 5}} />
-                          <View style={{width: 60}}>
-                            <TextInput
-                              style={styles.table_data_input}
-                              value={row?.Gst?.toString()}
-                              onChangeText={text => {
-                                setRows(
-                                  rows.map((r, i) =>
-                                    i === index ? {...r, Gst: text} : r,
-                                  ),
-                                );
-                              }}
-                              keyboardType="numeric"
-                            />
-                          </View>
-
-                          <View style={{width: 5}} />
-                          <View style={{width: 60}}>
-                            <TextInput
-                              style={styles.table_data_input}
-                              value={row?.gross}
-                              editable={false}
-                            />
-                          </View>
-
-                          <View style={{width: 5}} />
-                          <View style={{width: 60}}>
-                            <TextInput
-                              style={styles.table_data_input}
-                              value={row?.unitPricegstAmount}
-                              editable={false}
-                            />
-                          </View>
-
-                          <View style={{width: 5}} />
-                          <View style={{width: 60}}>
-                            <TextInput
-                              style={styles.table_data_input}
-                              value={row?.totalRowAmount}
-                              editable={false}
-                            />
-                          </View>
-                        </View>
-                      );
-                    })} */}
 
                   {rows.length > 0 &&
                     rows.map((row, index) => (
@@ -1295,16 +1302,42 @@ console.log("returnning invoiceStatus ", invoiceStatus.status, typeof(invoiceSta
                           />
                         </View>
 
-                        <View style={{width: 5}} />
-
-                        {/* Price */}
+                       {/* Unit Price */}
+                        <View style={{width: 10}} />
                         <View style={{width: 100}}>
-                          <Text style={styles.table_data}>{row.Price}</Text>
+                         <TextInput
+                           style={styles.table_data_input}
+                           value={String(row.UnitPrice || '')}
+                           onChangeText={text => handleInputChange(index, 'UnitPrice', text)}
+                           keyboardType="numeric"
+                         />
+                        </View>
+                        
+                        {/* Disc % */}
+                        <View style={{width: 10}} />
+                        <View style={{width: 100}}>
+                          <TextInput
+                            style={styles.table_data_input}
+                            value={String(row.DiscPercent || '')}
+                            onChangeText={text => handleInputChange(index, 'DiscPercent', text)}
+                            keyboardType="numeric"
+                          />
                         </View>
 
+                        {/* Unit Price After Disc (read-only) */}
                         <View style={{width: 5}} />
+                        <View style={{width: 100}}>
+                         <Text style={styles.table_data}>{row.UnitPriceAfterDisc}</Text>
+                        </View>
+                        
+                        {/* Disc Amount  */}
+                        <View style={{width: 5}} />
+                        <View style={{width: 100}}>
+                          <Text style={styles.table_data}>{row.DiscAmount}</Text>
+                        </View>
 
                         {/* GST */}
+                        <View style={{width: 5}} />
                         <View style={{width: 60}}>
                           <TextInput
                             style={styles.table_data_input}
@@ -1317,7 +1350,6 @@ console.log("returnning invoiceStatus ", invoiceStatus.status, typeof(invoiceSta
                         </View>
 
                         <View style={{width: 5}} />
-
                         {/* Gross */}
                         <View style={{width: 60}}>
                           <TextInput
@@ -1368,8 +1400,24 @@ console.log("returnning invoiceStatus ", invoiceStatus.status, typeof(invoiceSta
                     </View>
                     <View style={{width: 10}} />
                     <View style={{width: 100}}></View>
-                    <View style={{width: 5}} />
+                    <View style={{width: 10}} />
                     <View style={{width: 100}}></View>
+                    <View style={{width: 10}} />
+                    <View style={{width: 100}}>
+                     
+                    </View>
+                    <View style={{width: 5}} />
+                    <View style={{width: 100}}>
+                       <Text style={styles.table_data}>
+                        {totalUnitPriceAfterDisc?.toFixed(2)}
+                      </Text>
+                    </View>
+                    <View style={{width: 5}} />
+                    <View style={{width: 100}}>
+                       <Text style={styles.table_data}>
+                        {totalDiscAmount?.toFixed(2)}
+                      </Text>
+                    </View>
                     <View style={{width: 5}} />
                     <View style={{width: 60}}></View>
                     <View style={{width: 5}} />
@@ -1404,6 +1452,12 @@ console.log("returnning invoiceStatus ", invoiceStatus.status, typeof(invoiceSta
                     <View style={{width: 10}} />
                     <View style={{width: 100}}></View>
                     <View style={{width: 10}} />
+                    <View style={{width: 100}}></View>
+                    <View style={{width: 10}} />
+                    <View style={{width: 100}}></View>
+                    <View style={{width: 10}} />
+                    <View style={{width: 100}}></View>
+                    <View style={{width: 5}} />
                     <View style={{width: 100}}></View>
                     <View style={{width: 5}} />
                     <View style={{width: 100}}></View>
@@ -1440,6 +1494,12 @@ console.log("returnning invoiceStatus ", invoiceStatus.status, typeof(invoiceSta
                     <View style={{width: 10}} />
                     <View style={{width: 100}}></View>
                     <View style={{width: 10}} />
+                    <View style={{width: 100}}></View>
+                    <View style={{width: 10}} />
+                    <View style={{width: 100}}></View>
+                    <View style={{width: 10}} />
+                    <View style={{width: 100}}></View>
+                    <View style={{width: 5}} />
                     <View style={{width: 100}}></View>
                     <View style={{width: 5}} />
                     <View style={{width: 100}}></View>
