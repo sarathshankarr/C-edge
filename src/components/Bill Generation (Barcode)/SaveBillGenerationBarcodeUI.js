@@ -94,6 +94,7 @@ const SaveBillGenerationBarcodeUI = ({route, ...props}) => {
 
           if (props.itemsObj.viewBuyerPOList.soChildMappingDao) {
             setRows(props.itemsObj.viewBuyerPOList.soChildMappingDao);
+            console.log("child ==> ",props.itemsObj.viewBuyerPOList.soChildMappingDao)
           }
           if (props.itemsObj.viewBuyerPOList.vendorCustomerId) {
             setShipToId(props.itemsObj.viewBuyerPOList.vendorCustomerId);
@@ -943,6 +944,13 @@ const SaveBillGenerationBarcodeUI = ({route, ...props}) => {
                     <View style={{width: 5}} />
                     <View style={{width: 100}}>
                       <Text style={styles.table_head_captions}>
+                       Unit Price
+                      </Text>
+                    </View>
+
+                    <View style={{width: 5}} />
+                    <View style={{width: 100}}>
+                      <Text style={styles.table_head_captions}>
                         Unit Price After Disc
                       </Text>
                     </View>
@@ -1041,6 +1049,14 @@ const SaveBillGenerationBarcodeUI = ({route, ...props}) => {
 
                           <View style={{width: 100}}>
                             <Text style={styles.table_data}>
+                              {price.toFixed(2)}
+                            </Text>
+                          </View>
+
+                          <View style={{width: 5}} />
+
+                          <View style={{width: 100}}>
+                            <Text style={styles.table_data}>
                               {unitPriceAfterDisc.toFixed(2)}
                             </Text>
                           </View>
@@ -1114,6 +1130,8 @@ const SaveBillGenerationBarcodeUI = ({route, ...props}) => {
                     <View style={{width: 5}} />
                     <View style={{width: 100}}></View>
                     <View style={{width: 5}} />
+                    <View style={{width: 100}}></View>
+                    <View style={{width: 5}} />
                     <View style={{width: 100}}>
                       <Text style={styles.table_data}>
                         {totals.totalGross.toFixed(2)}
@@ -1153,6 +1171,8 @@ const SaveBillGenerationBarcodeUI = ({route, ...props}) => {
                     <View style={{width: 5}} />
                     <View style={{width: 100}}></View>
                     <View style={{width: 5}} />
+                    <View style={{width: 100}}></View>
+                    <View style={{width: 5}} />
                     <View style={{width: 100}}>
                       <Text style={styles.table_data}>Transport Cost</Text>
                     </View>
@@ -1182,6 +1202,8 @@ const SaveBillGenerationBarcodeUI = ({route, ...props}) => {
                     <View style={{width: 10}} />
                     <View style={{width: 100}}></View>
                     <View style={{width: 10}} />
+                    <View style={{width: 100}}></View>
+                    <View style={{width: 5}} />
                     <View style={{width: 100}}></View>
                     <View style={{width: 5}} />
                     <View style={{width: 100}}></View>
