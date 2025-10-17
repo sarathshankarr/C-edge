@@ -503,7 +503,7 @@ console.log("returnning invoiceStatus ", invoiceStatus.status, typeof(invoiceSta
       subagentId: 0,
       notes: '',
 
-      transportCost: transportCost,
+      transportCost: transportCost || '0',
       totalDiscount:  totalDiscAmount|| 0,
       totalDiscountPer: totalDiscPercent || 0,
       soNumber: 0,
@@ -1475,7 +1475,7 @@ const totalDiscPercent = rows.reduce(
                         style={styles.table_data_input}
                         value={transportCost}
                         onChangeText={text =>
-                          setTransportCost(text || '0')
+                          setTransportCost(text)
                         }
                         keyboardType="numeric"
                       />
