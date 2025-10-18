@@ -134,6 +134,7 @@ const CreateBillGenerationBarcodeUI = ({route, ...props}) => {
 
   useEffect(() => {
   if (props.tableLists && props.tableLists.length > 0) {
+    console.log("tables ", props.tableLists)
 
       const newBarcode = props.tableLists[0]?.barcodeNo;
 
@@ -193,7 +194,7 @@ const CreateBillGenerationBarcodeUI = ({route, ...props}) => {
     const qty = Number(newRow.RequiredQty || 0);
     const price = Number(newRow.Price || 0);
     const gstPercent = Number(newRow.Gst || 0);
-    const discPercent = Number(newRow.DiscPercent || 0); // new field
+    const discPercent = Number(newRow.discper || 0); // new field
 
     // --- Discount calculations ---
     const unitPriceAfterDisc = price - (price * discPercent) / 100;
@@ -1235,18 +1236,18 @@ const totalDiscPercent = rows.reduce(
                     </View>
 
                     <View style={{width: 5}} />
-                    <View style={{width: 60}}>
+                    <View style={{width: 100}}>
                       <Text style={styles.table_head_captions}>Gross</Text>
                     </View>
 
                     <View style={{width: 5}} />
-                    <View style={{width: 60}}>
+                    <View style={{width: 100}}>
                       <Text style={styles.table_head_captions}>GST Amount</Text>
                     </View>
 
                     <View style={{width: 5}} />
-                    <View style={{width: 60}}>
-                      <Text style={styles.table_head_captions}>Total</Text>
+                    <View style={{width: 100}}>
+                      <Text style={styles.table_head_captions}>Totals</Text>
                     </View>
                   </View>
 
@@ -1351,7 +1352,7 @@ const totalDiscPercent = rows.reduce(
 
                         <View style={{width: 5}} />
                         {/* Gross */}
-                        <View style={{width: 60}}>
+                        <View style={{width: 100}}>
                           <TextInput
                             style={styles.table_data_input}
                             value={row.gross}
@@ -1362,7 +1363,7 @@ const totalDiscPercent = rows.reduce(
                         <View style={{width: 5}} />
 
                         {/* GST Amount */}
-                        <View style={{width: 60}}>
+                        <View style={{width: 100}}>
                           <TextInput
                             style={styles.table_data_input}
                             value={row.unitPricegstAmount}
@@ -1373,7 +1374,7 @@ const totalDiscPercent = rows.reduce(
                         <View style={{width: 5}} />
 
                         {/* Total */}
-                        <View style={{width: 60}}>
+                        <View style={{width: 100}}>
                           <TextInput
                             style={styles.table_data_input}
                             value={row.totalRowAmount}
@@ -1421,19 +1422,19 @@ const totalDiscPercent = rows.reduce(
                     <View style={{width: 5}} />
                     <View style={{width: 60}}></View>
                     <View style={{width: 5}} />
-                    <View style={{width: 60}}>
+                    <View style={{width: 100}}>
                       <Text style={styles.table_data}>
                         {totalGross?.toFixed(2)}
                       </Text>
                     </View>
                     <View style={{width: 5}} />
-                    <View style={{width: 60}}>
+                    <View style={{width: 100}}>
                       <Text style={styles.table_data}>
                         {totalGst?.toFixed(2)}
                       </Text>
                     </View>
                     <View style={{width: 5}} />
-                    <View style={{width: 60}}>
+                    <View style={{width: 100}}>
                       <Text style={styles.table_data}>
                         {totalAmount?.toFixed(2)}
                       </Text>
@@ -1464,13 +1465,13 @@ const totalDiscPercent = rows.reduce(
                     <View style={{width: 5}} />
                     <View style={{width: 60}}></View>
                     <View style={{width: 5}} />
-                    <View style={{width: 60}}></View>
+                    <View style={{width: 100}}></View>
                     <View style={{width: 5}} />
-                    <View style={{width: 60}}>
+                    <View style={{width: 100}}>
                       <Text style={styles.table_data}>Transport Cost</Text>
                     </View>
                     <View style={{width: 5}} />
-                    <View style={{width: 60}}>
+                    <View style={{width: 100}}>
                       <TextInput
                         style={styles.table_data_input}
                         value={transportCost}
@@ -1506,13 +1507,13 @@ const totalDiscPercent = rows.reduce(
                     <View style={{width: 5}} />
                     <View style={{width: 60}}></View>
                     <View style={{width: 5}} />
-                    <View style={{width: 60}}></View>
+                    <View style={{width: 100}}></View>
                     <View style={{width: 5}} />
-                    <View style={{width: 60}}>
+                    <View style={{width: 100}}>
                       <Text style={styles.table_data}>{'Total Amount'}</Text>
                     </View>
                     <View style={{width: 5}} />
-                    <View style={{width: 60}}>
+                    <View style={{width: 100}}>
                       <Text style={styles.table_data}>
                         {/* {totalAmount?.toFixed(2)} */}
                          {(totalAmount + Number(transportCost || '0'))?.toFixed(2)}
