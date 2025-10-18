@@ -236,7 +236,7 @@ const BillGenerationBarcodeList = ({route}) => {
       );
       if (stichingOutAPIObj && stichingOutAPIObj.responseData !== 'false') {
         popUpAction(
-          'WhatsApp Sent',
+          'Qty shipped successfully ..!',
           Constant.DefaultAlert_MSG,
           'OK',
           true,
@@ -244,7 +244,7 @@ const BillGenerationBarcodeList = ({route}) => {
         );
       } else {
         popUpAction(
-          'WhatsApp Message not sent,something goes wrong..!!',
+          'Qty not shipped,something goes wrong..!!',
           Constant.DefaultAlert_MSG,
           'OK',
           true,
