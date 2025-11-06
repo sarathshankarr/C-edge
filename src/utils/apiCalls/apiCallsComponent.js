@@ -6062,6 +6062,58 @@ export async function LoadAllBillGenerationBarcodeList(jsonValue) {
   };
   return obj;
 }
+export async function LoadAllBoxWiseStyleTransferList(jsonValue) {
+  let returnError = undefined;
+  let statusData = undefined;
+  let responseData = undefined;
+  let logoutData = false;
+  let obj = undefined;
+
+  let internet = await internetCheck();
+  if (!internet) {
+    obj = {
+      logoutData: logoutData,
+      statusData: statusData,
+      responseData: responseData,
+      error: returnError,
+      isInternet: internet,
+    };
+    return obj;
+  }
+  console.log('URL', Environment.uri + 'styletransferapi/loadAllBoxTransferStyles');
+  await fetch(Environment.uri + 'styletransferapi/loadAllBoxTransferStyles', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    body: JSON.stringify(jsonValue),
+  })
+    .then(response => response.json())
+    .then(async data => {
+      if (data) {
+        statusData = true;
+        responseData = data;
+      } else {
+        statusData = undefined;
+      }
+    })
+    .catch(error => {
+      console.log('LoadAllBillGenerationBarcodeList error ', error);
+      returnError = error;
+    });
+
+  obj = {
+    logoutData: logoutData,
+    statusData: statusData,
+    responseData: responseData,
+    error: returnError,
+    isInternet: internet,
+  };
+  return obj;
+}
+
+
 export async function LoadAllWorkOrderBuyerPoList(jsonValue) {
   let returnError = undefined;
   let statusData = undefined;
@@ -7103,6 +7155,60 @@ export async function getBillGenerationBarcodeCreateList(jsonValue) {
   };
   return obj;
 }
+export async function getBoxWiseStyleTransferCreateList(jsonValue) {
+  let returnError = undefined;
+  let statusData = undefined;
+  let responseData = undefined;
+  let logoutData = false;
+  let obj = undefined;
+
+  let internet = await internetCheck();
+  if (!internet) {
+    obj = {
+      logoutData: logoutData,
+      statusData: statusData,
+      responseData: responseData,
+      error: returnError,
+      isInternet: internet,
+    };
+    return obj;
+  }
+  console.log('URL', Environment.uri + 'styletransferapi/transferboxcreate');
+  await fetch(
+    Environment.uri + 'styletransferapi/transferboxcreate',
+
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+      body: JSON.stringify(jsonValue),
+    },
+  )
+    .then(response => response.json())
+    .then(async data => {
+      if (data) {
+        statusData = true;
+        responseData = data;
+      } else {
+        statusData = undefined;
+      }
+    })
+    .catch(error => {
+      console.log('getPartsProcessingCreateList error ', error);
+      returnError = error;
+    });
+
+  obj = {
+    logoutData: logoutData,
+    statusData: statusData,
+    responseData: responseData,
+    error: returnError,
+    isInternet: internet,
+  };
+  return obj;
+}
 
 export async function validateBillGenerationBarcode(jsonValue) {
   let returnError = undefined;
@@ -7161,6 +7267,68 @@ export async function validateBillGenerationBarcode(jsonValue) {
   };
   return obj;
 }
+
+
+export async function validateBoxWiseStyleTransferBarcode(jsonValue) {
+  let returnError = undefined;
+  let statusData = undefined;
+  let responseData = undefined;
+  let logoutData = false;
+  let obj = undefined;
+
+  let internet = await internetCheck();
+  if (!internet) {
+    obj = {
+      logoutData: logoutData,
+      statusData: statusData,
+      responseData: responseData,
+      error: returnError,
+      isInternet: internet,
+    };
+    return obj;
+  }
+  console.log(
+    'URL',
+    Environment.uri + 'styletransferapi/validateBarcodewithFromLocation',
+  );
+  await fetch(
+    Environment.uri + 'styletransferapi/validateBarcodewithFromLocation',
+
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+      body: JSON.stringify(jsonValue),
+    },
+  )
+    .then(response => response.json())
+    .then(async data => {
+      if (data) {
+        statusData = true;
+        responseData = data;
+      } else {
+        statusData = undefined;
+      }
+    })
+    .catch(error => {
+      console.log('getPartsProcessingCreateList error ', error);
+      returnError = error;
+    });
+
+  obj = {
+    logoutData: logoutData,
+    statusData: statusData,
+    responseData: responseData,
+    error: returnError,
+    isInternet: internet,
+  };
+  return obj;
+}
+
+
+
 export async function api11(jsonValue) {
   let returnError = undefined;
   let statusData = undefined;
@@ -8243,6 +8411,56 @@ export async function getBillGeneratonDataFromBarcode(jsonValue) {
   };
   return obj;
 }
+export async function getBoxWiseStyleTransferDetailsFromBarcode(jsonValue) {
+  let returnError = undefined;
+  let statusData = undefined;
+  let responseData = undefined;
+  let logoutData = false;
+  let obj = undefined;
+
+  let internet = await internetCheck();
+  if (!internet) {
+    obj = {
+      logoutData: logoutData,
+      statusData: statusData,
+      responseData: responseData,
+      error: returnError,
+      isInternet: internet,
+    };
+    return obj;
+  }
+  console.log('URL', Environment.uri + 'styletransferapi/getbarcodeDetails');
+  await fetch(Environment.uri + 'styletransferapi/getbarcodeDetails', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    body: JSON.stringify(jsonValue),
+  })
+    .then(response => response.json())
+    .then(async data => {
+      if (data) {
+        statusData = true;
+        responseData = data;
+      } else {
+        statusData = undefined;
+      }
+    })
+    .catch(error => {
+      console.log('getPartsProcessingCreateList error ', error);
+      returnError = error;
+    });
+
+  obj = {
+    logoutData: logoutData,
+    statusData: statusData,
+    responseData: responseData,
+    error: returnError,
+    isInternet: internet,
+  };
+  return obj;
+}
 export async function getDuplicateInvoiceStatusBGB(jsonValue) {
   let returnError = undefined;
   let statusData = undefined;
@@ -9172,6 +9390,112 @@ export async function saveCreateBillGenerationBarcode(jsonValue) {
   };
   return obj;
 }
+export async function saveCreateBoxWiseStyleTransfer(jsonValue) {
+  let returnError = undefined;
+  let statusData = undefined;
+  let responseData = undefined;
+  let logoutData = false;
+  let obj = undefined;
+
+  let internet = await internetCheck();
+  if (!internet) {
+    obj = {
+      logoutData: logoutData,
+      statusData: statusData,
+      responseData: responseData,
+      error: returnError,
+      isInternet: internet,
+    };
+    return obj;
+  }
+  
+  await fetch(Environment.uri + 'styletransferapi/saveBoxTransferDetails', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    body: JSON.stringify(jsonValue),
+  })
+    .then(response => response.json())
+    .then(async data => {
+      // console.log('saveCreatePartsProcessing ', data)
+
+      if (data) {
+        statusData = true;
+        responseData = data;
+      } else {
+        statusData = undefined;
+      }
+    })
+    .catch(error => {
+      console.log('saveCreatePartsProcessing', error);
+      returnError = error;
+    });
+
+  obj = {
+    logoutData: logoutData,
+    statusData: statusData,
+    responseData: responseData,
+    error: returnError,
+    isInternet: internet,
+  };
+  return obj;
+}
+
+export async function saveEditBoxWiseStyleTransfer(jsonValue) {
+  let returnError = undefined;
+  let statusData = undefined;
+  let responseData = undefined;
+  let logoutData = false;
+  let obj = undefined;
+
+  let internet = await internetCheck();
+  if (!internet) {
+    obj = {
+      logoutData: logoutData,
+      statusData: statusData,
+      responseData: responseData,
+      error: returnError,
+      isInternet: internet,
+    };
+    return obj;
+  }
+
+  await fetch(Environment.uri + 'styletransferapi/receiveBoxTransferDetails', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    body: JSON.stringify(jsonValue),
+  })
+    .then(response => response.json())
+    .then(async data => {
+      // console.log('saveCreatePartsProcessing ', data)
+      if (data) {
+        statusData = true;
+        responseData = data;
+      } else {
+        statusData = undefined;
+      }
+    })
+    .catch(error => {
+      console.log('saveCreatePartsProcessing', error);
+      returnError = error;
+    });
+
+  obj = {
+    logoutData: logoutData,
+    statusData: statusData,
+    responseData: responseData,
+    error: returnError,
+    isInternet: internet,
+  };
+  return obj;
+}
+
+
 export async function saveCreatePODraft(jsonValue) {
   let returnError = undefined;
   let statusData = undefined;
@@ -10430,6 +10754,58 @@ export async function getEditDetailsBillGenerationBarcode(jsonValue) {
   };
   return obj;
 }
+export async function getEditDetailsBoxWiseStyleTransfer(jsonValue) {
+  let returnError = undefined;
+  let statusData = undefined;
+  let responseData = undefined;
+  let logoutData = false;
+  let obj = undefined;
+
+  let internet = await internetCheck();
+  if (!internet) {
+    obj = {
+      logoutData: logoutData,
+      statusData: statusData,
+      responseData: responseData,
+      error: returnError,
+      isInternet: internet,
+    };
+    return obj;
+  }
+  
+  await fetch(Environment.uri + 'styletransferapi/boxStyleTransferEdit', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    body: JSON.stringify(jsonValue),
+  })
+    .then(response => response.json())
+    .then(async data => {
+      // console.log('getEditDetailsPartsProcessing', '', data)
+
+      if (data) {
+        statusData = true;
+        responseData = data;
+      } else {
+        statusData = undefined;
+      }
+    })
+    .catch(error => {
+      console.log('getEditDetailsPartsProcessing error ', error);
+      returnError = error;
+    });
+
+  obj = {
+    logoutData: logoutData,
+    statusData: statusData,
+    responseData: responseData,
+    error: returnError,
+    isInternet: internet,
+  };
+  return obj;
+}
 export async function getEditDetailsGoodsReceiptNote(jsonValue) {
   let returnError = undefined;
   let statusData = undefined;
@@ -11056,6 +11432,10 @@ export const downloadBillGenBarcodeInvoiceAndPackingF1 = () => {
 };
 export const downloadBillGenBarcodeInvoiceAndPackingF2 = () => {
   const URL = Environment.uri + 'buyerpoapicon/generateFormatTwoInvoiceAPI';
+  return URL;
+};
+export const downloadBoxWieStyleTransferInOutDcPdfs = () => {
+  const URL = Environment.uri + 'styletransferapi/generateBoxTransferDC';
   return URL;
 };
 
