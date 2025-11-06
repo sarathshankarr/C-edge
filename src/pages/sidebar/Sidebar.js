@@ -309,6 +309,12 @@ const Sidebar = ({navigation}) => {
           menu_id: 49,
           src: require('../../../assets/images/png/acknowledge.png'),
         },
+        {
+          label: 'Box wise Style Transfer',
+          route: 'BoxwiseStyleTransferList',
+          menu_id: 49,
+          src: require('../../../assets/images/png/acknowledge.png'),
+        },
       ],
     },
     reports: {

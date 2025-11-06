@@ -143,6 +143,9 @@ import DeliveryChallanEdit from '../components/Delivery Challan Out/DeliveryChal
 import CreateBillGenerationBarcode from '../components/Bill Generation (Barcode)/CreateBillGenerationBarcode';
 import BillGenerationBarcodeList from '../components/Bill Generation (Barcode)/BillGenerationBarcodeList';
 import SaveBillGenerationBarcode from '../components/Bill Generation (Barcode)/SaveBillGenerationBarcode';
+import CreateBoxwiseStyleTransfer from '../components/Box wise Style Transfer/CreateBoxwiseStyleTransfer';
+import BoxwiseStyleTransferList from '../components/Box wise Style Transfer/BoxwiseStyleTransferList';
+import SaveBoxwiseStyleTransfer from '../components/Box wise Style Transfer/SaveBoxwiseStyleTransfer';
 
 
 const Stack = createNativeStackNavigator();
@@ -289,6 +292,9 @@ const AppStack = () => {
       <Stack.Screen name="CreateBillGenerationBarcode" component={CreateBillGenerationBarcode} options={{ headerShown: false }} /> 
       <Stack.Screen name="BillGenerationBarcodeList" component={BillGenerationBarcodeList} options={{ headerShown: false }} /> 
       <Stack.Screen name="SaveBillGenerationBarcode" component={SaveBillGenerationBarcode} options={{ headerShown: false }} /> 
+      <Stack.Screen name="CreateBoxwiseStyleTransfer" component={CreateBoxwiseStyleTransfer} options={{ headerShown: false }} /> 
+      <Stack.Screen name="BoxwiseStyleTransferList" component={BoxwiseStyleTransferList} options={{ headerShown: false }} /> 
+      <Stack.Screen name="SaveBoxwiseStyleTransfer" component={SaveBoxwiseStyleTransfer} options={{ headerShown: false }} /> 
     </Stack.Navigator>
   );
 };
