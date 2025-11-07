@@ -244,7 +244,7 @@ const SaveBoxwiseStyleTransferUI = ({route, ...props}) => {
   };
 
   const handleScannedCode = text => {
-    if (disableBasedOnFlag) return;
+    // if (disableBasedOnFlag) return;
 
     if (!text?.trim()) {
       Alert.alert('Error', 'Please enter a valid barcode');
