@@ -120,7 +120,7 @@ const SaveBoxwiseStyleTransferUI = ({route, ...props}) => {
 
          if (props.itemsObj.transferDetails.returnable) {
           console.log("isretunable ==> ", props.itemsObj.transferDetails.returnable, props.itemsObj.transferDetails.returnable=="Y" ? true : false);
-          setShowSaveBtn(props.itemsObj.transferDetails.returnable=="Y" ? true : false);
+          setShowSaveBtn2(props.itemsObj.transferDetails.returnable=="Y" ? true : false);
         }
       }
     }
@@ -178,6 +178,7 @@ const SaveBoxwiseStyleTransferUI = ({route, ...props}) => {
   const [inHouse, setInHouse] = useState(true);
   const [vehicleNo, setVehicleNo] = useState('');
   const [showSaveBtn, setShowSaveBtn] = useState(true);
+  const [showSaveBtn2, setShowSaveBtn2] = useState(true);
   const [transferDetailss, setTransferDetailss] = useState([]);
 
   const [disableBasedOnFlag, setDisableBasedOnFlag] = useState(false);
@@ -1033,8 +1034,8 @@ const SaveBoxwiseStyleTransferUI = ({route, ...props}) => {
           rightBtnTitle={'Save'}
           leftBtnTitle={'Back'}
           isLeftBtnEnable={true}
-          rigthBtnState={showSaveBtn}
-          isRightBtnEnable={showSaveBtn}
+          rigthBtnState={showSaveBtn && showSaveBtn2}
+          isRightBtnEnable={showSaveBtn && showSaveBtn2}
           rightButtonAction={async () => submitAction()}
           leftButtonAction={async () => backAction()}
         />
