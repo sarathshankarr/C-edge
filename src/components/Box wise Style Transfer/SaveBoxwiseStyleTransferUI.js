@@ -107,6 +107,7 @@ const SaveBoxwiseStyleTransferUI = ({route, ...props}) => {
         if (props.itemsObj.transferDetails.bstpRate) {
           setRate(props.itemsObj.transferDetails.bstpRate);
         }
+       
         if (props.itemsObj.transferDetails.bstStatus) {
           setShowSaveBtn(
             props.itemsObj.transferDetails.bstStatus == 1 ? false : true,
@@ -115,6 +116,11 @@ const SaveBoxwiseStyleTransferUI = ({route, ...props}) => {
             'setShowSaveBtn ',
             props.itemsObj.transferDetails.bstStatus,
           );
+        }
+
+         if (props.itemsObj.transferDetails.returnable) {
+          console.log("isretunable ==> ", props.itemsObj.transferDetails.returnable, props.itemsObj.transferDetails.returnable=="Y" ? true : false);
+          setShowSaveBtn(props.itemsObj.transferDetails.returnable=="Y" ? true : false);
         }
       }
     }
@@ -238,31 +244,40 @@ const SaveBoxwiseStyleTransferUI = ({route, ...props}) => {
   };
 
   const handleScannedCode = text => {
-    if (!shipToId) {
-      Alert.alert('Alert', 'Please select the Vendor/Customer');
+    if (disableBasedOnFlag) return;
+
+    if (!text?.trim()) {
+      Alert.alert('Error', 'Please enter a valid barcode');
       return;
     }
 
-    if (!text || text.trim().length !== 9) {
-      Alert.alert('Alert', 'Please Enter the Valid Barcode');
+    const matchingRows = rows.filter(
+      row => row.bstpBarcode?.toString().trim() === text.trim(),
+    );
+
+    if (matchingRows.length === 0) {
+      Alert.alert('Not Found', 'No matching barcode found !');
       return;
     }
 
-    // console.log("scanned barcode ", text, scannedBarcodes, scannedBarcodes.includes(text), typeof (text)  , typeof (scannedBarcodes[0])  )
-    if (scannedBarcodes.includes(Number(text))) {
-      Alert.alert('Alert', 'Barcode already scanned !');
+    const allSelected = matchingRows.every(row =>
+      selectedIdxs.includes(row.bstId),
+    );
+
+    if (allSelected) {
+      Alert.alert('Alert', 'This barcode is already Selected!!');
       return;
     }
 
-    console.log('calling validation api ');
-    props.validateBarCode(text);
-  };
+    const newSelected = [
+      ...selectedIdxs,
+      ...matchingRows
+        .filter(row => !selectedIdxs.includes(row.bstId))
+        .map(row => row.bstId),
+    ];
 
-  const handleSearchBarcode = () => {
-    if (!barCode) {
-      Alert.alert('Alert', 'Please Enter Barcode !');
-    }
-    handleScannedCode(barCode);
+    setSelectedIdxs(newSelected);
+    setBarcode('');
   };
 
   const handleBarcodeChange = text => {
@@ -274,7 +289,7 @@ const SaveBoxwiseStyleTransferUI = ({route, ...props}) => {
     navigation.navigate('ScanQRPage', {
       onScanSuccess: scannedValue => {
         console.log('Scanned Code: ', scannedValue);
-        handleSelectBarcode(scannedValue);
+        handleScannedCode(scannedValue);
       },
     });
   };
@@ -328,8 +343,9 @@ const SaveBoxwiseStyleTransferUI = ({route, ...props}) => {
 
     console.log('sumOfCurrentReceivedQty==> ', sumOfCurrentReceivedQty);
 
-    const finalTotalQty =Number(sumOfCurrentReceivedQty || 0) +
-          Number(transferDetailss?.totalRecQty || 0) || 0
+    const finalTotalQty =
+      Number(sumOfCurrentReceivedQty || 0) +
+        Number(transferDetailss?.totalRecQty || 0) || 0;
 
     const Obj = {
       vendorId: toCustomerId || 0,
@@ -340,13 +356,16 @@ const SaveBoxwiseStyleTransferUI = ({route, ...props}) => {
       vehicleNo: vehicleNo || '',
       billno: transferDetailss?.ewayBillNo || '',
       remarks: remarks || '',
-      totalRecQty:finalTotalQty || 0,
+      totalRecQty: finalTotalQty || 0,
       totalQty: transferDetailss?.totalQty || 0,
       customerId: toCustomerId || 0,
       transferType: transferDetailss?.bstdTypeTransfer || '',
       isReturnable: transferDetailss?.returnable || '', //
       bstdDcNoStr: transferDetailss?.bstdDcNoStr || '',
-      bstStatus: finalTotalQty == transferDetailss?.totalQty ? 1 : transferDetailss?.bstStatus || '',
+      bstStatus:
+        finalTotalQty == transferDetailss?.totalQty
+          ? 1
+          : transferDetailss?.bstStatus || '',
       deliveryDate: deliveryDate,
       boxStyleTransferParticulars: filteredRows || [],
     };
@@ -503,7 +522,7 @@ const SaveBoxwiseStyleTransferUI = ({route, ...props}) => {
               justifyContent: 'center',
               backgroundColor: '#fff',
               marginTop: hp('2%'),
-              opacity: 0.8
+              opacity: 0.8,
             }}>
             <TouchableOpacity
               style={{
@@ -579,7 +598,7 @@ const SaveBoxwiseStyleTransferUI = ({route, ...props}) => {
                 justifyContent: 'center',
                 backgroundColor: '#fff',
                 marginTop: hp('2%'),
-                opacity: 0.8
+                opacity: 0.8,
               }}>
               <TouchableOpacity
                 style={{
@@ -656,7 +675,7 @@ const SaveBoxwiseStyleTransferUI = ({route, ...props}) => {
                 justifyContent: 'center',
                 backgroundColor: '#fff',
                 marginTop: hp('2%'),
-                opacity: 0.8
+                opacity: 0.8,
               }}>
               <TouchableOpacity
                 style={{
@@ -695,7 +714,7 @@ const SaveBoxwiseStyleTransferUI = ({route, ...props}) => {
                 </View>
               </TouchableOpacity>
 
-              {showToCustomerList&& false && (
+              {showToCustomerList && false && (
                 <View style={styles.dropdownContent1}>
                   <TextInput
                     style={styles.searchInput}
@@ -871,7 +890,7 @@ const SaveBoxwiseStyleTransferUI = ({route, ...props}) => {
               <ScrollView nestedScrollEnabled={true} horizontal>
                 <View style={styles.table}>
                   <View style={styles.table_head}>
-                    <View style={{width: 60}}>
+                    <View style={{width: 60, opacity:!disableBasedOnFlag ? 1 : 0.4}}>
                       <Text style={styles.table_head_captions}>Action</Text>
                       <CustomCheckBox
                         isChecked={selectAllCheckBox}
@@ -991,7 +1010,7 @@ const SaveBoxwiseStyleTransferUI = ({route, ...props}) => {
                     </View>
                     <View style={{width: 10}} />
                     <View style={{width: 100}}>
-                       <Text style={styles.table_data}>{'Total Send Qty'}</Text>
+                      <Text style={styles.table_data}>{'Total Send Qty'}</Text>
                     </View>
                     <View style={{width: 10}} />
                     <View style={{width: 100}}>
@@ -1000,9 +1019,7 @@ const SaveBoxwiseStyleTransferUI = ({route, ...props}) => {
                       </Text>
                     </View>
                     <View style={{width: 10}} />
-                    <View style={{width: 100}}>
-                     
-                    </View>
+                    <View style={{width: 100}}></View>
                   </View>
                 </View>
               </ScrollView>

@@ -255,7 +255,7 @@ const CreateBoxwiseStyleTransferUI = ({route, ...props}) => {
       return;
     }
 
-    if (inHouse === 'Yes' && !toLocationId && fromLocationId === toLocationId) {
+    if (inHouse === 'Yes'  && fromLocationId == toLocationId) {
       Alert.alert(
         'Alert',
         'From Location and To Location should not be the same!!!',
