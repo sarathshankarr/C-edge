@@ -219,7 +219,7 @@ const BoxwiseStyleTransferListUI = ({route, navigation, ...props}) => {
                   source={require('./../../../assets/images/png/pdf2.png')}
                   style={{width: 18, height: 18, resizeMode: 'contain'}}
                 />
-                <Text style={{fontSize: 8, fontWeight: 'bold'}}>OUT DC</Text>
+                <Text style={{fontSize: 8, fontWeight: 'bold',color:'#000'}}>OUT DC</Text>
               </TouchableOpacity>
 
               {/* IN DC */}
@@ -235,7 +235,7 @@ const BoxwiseStyleTransferListUI = ({route, navigation, ...props}) => {
                     marginBottom: 2,
                   }}
                 />
-                <Text style={{fontSize: 8, fontWeight: 'bold'}}>IN DC</Text>
+                <Text style={{fontSize: 8, fontWeight: 'bold',color:'#000'}}>IN DC</Text>
               </TouchableOpacity>
             </View>
           </View>
