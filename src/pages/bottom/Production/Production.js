@@ -13,6 +13,8 @@ const Production = ({navigation}) => {
   const {colors, subMenuItemsIds, menuIds} = useContext(ColorContext);
   const styles = getStyles(colors);
 
+  console.log('Sub Menu IDs:', subMenuItemsIds,menuIds);
+
   const inwardProcess = [
     {
       id: 9,
@@ -63,6 +65,12 @@ const Production = ({navigation}) => {
       id: 759,
       name: 'Gate Pass Acknowledgement',
       component: 'GatePassAckList',
+      image: require('../../../../assets/images/png/acknowledge.png'),
+    },
+    {
+      id: 753,
+      name: 'Box wise Style Transfer',
+      component: 'BoxwiseStyleTransferList',
       image: require('../../../../assets/images/png/acknowledge.png'),
     },
   ];
