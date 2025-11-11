@@ -79,25 +79,25 @@ const Sidebar = ({navigation}) => {
         {
           label: 'Box Packing',
           route: 'BoxPackingList',
-          menu_id: 4,
+          menu_id: 345,
           src: require('../../../assets/images/png/stamp.png'),
         },
         {
           label: 'Master Box Packing',
           route: 'masterBoxPackingList',
-          menu_id: 4,
+          menu_id: 384,
           src: require('../../../assets/images/png/stamp.png'),
         },
         {
           label: 'Bill Generation',
           route: 'BillGenerationList',
-          menu_id: 4,
+          menu_id: 346,
           src: require('../../../assets/images/png/stamp.png'),
         },
         {
           label: 'Bill Generation (Barcode)',
           route: 'BillGenerationBarcodeList',
-          menu_id: 4,
+          menu_id: 346,
           src: require('../../../assets/images/png/stamp.png'),
         },
       ],
@@ -312,7 +312,7 @@ const Sidebar = ({navigation}) => {
         {
           label: 'Box wise Style Transfer',
           route: 'BoxwiseStyleTransferList',
-          menu_id: 49,
+          menu_id: 752,
           src: require('../../../assets/images/png/acknowledge.png'),
         },
       ],
@@ -368,19 +368,17 @@ const Sidebar = ({navigation}) => {
     },
   };
 
-  const filteredMenus = Object.fromEntries(
+  const filteredMenus1 = Object.fromEntries(
     Object.entries(dropdownMenus).filter(([key, menu]) =>
       menuIds.includes(menu.menu_id)
     )
   );
 
-  const filteredMenus1 = Object.fromEntries(
+  const filteredMenus = Object.fromEntries(
     Object.entries(dropdownMenus)
       .map(([key, menu]) => {
         // Filter submenu items based on subMenuItemsIds
         const filteredStyle = menu.style.filter(item => subMenuItemsIds.includes(item.menu_id));
-        // console.log("filtered menus ==> ", filteredStyle)
-        // Include main menu ONLY if it has filtered submenus
         if (filteredStyle.length > 0) {
           return [key, { ...menu, style: filteredStyle }];
         }
@@ -587,10 +585,22 @@ const Sidebar = ({navigation}) => {
         source={require('../../../assets/images/png/profile.png')}
       />
     </TouchableOpacity>
-    <View>
+
+    {/* <View>
       <Text style={styles.headerSubtitle}>{userName}</Text>
       <Text style={styles.headerSubtitle}>{admin ? admin : "Profile"}</Text>
-    </View>
+    </View> */}
+
+    <View style={{ flexShrink: 1, width: '80%' }}>
+  <Text style={styles.headerSubtitle} numberOfLines={2}>
+    {userName}
+  </Text>
+  <Text style={styles.headerSubtitle} numberOfLines={2}>
+    {admin ? admin : "Profile"}
+  </Text>
+</View>
+
+
   </View>
 
   {companyName && <View style={styles.companyInfo}>
@@ -754,6 +764,7 @@ const getStyles = (colors) => StyleSheet.create({
     color: '#ffffffcc',
     fontSize: 14,
     marginTop: 2,
+    flexWrap: 'wrap',
   },
   companyInfo: {
     flexDirection: 'row',
