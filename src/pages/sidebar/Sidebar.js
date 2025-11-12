@@ -21,6 +21,8 @@ import { useFocusEffect } from '@react-navigation/native';
 const Sidebar = ({navigation}) => {
 
   const { colors,menuIds,subMenuItemsIds} = useContext(ColorContext);
+
+
   const dropdownMenus = {
     style: {
       label: 'Style Management',
@@ -41,13 +43,13 @@ const Sidebar = ({navigation}) => {
         },
         {
           label: 'Work Order (style)',
-          menu_id: 728,
+          menu_id: 144,
           route: 'WorkOrderStyleList',
           src: require('../../../assets/images/png/website.png'),
         },
         {
           label: 'Work Order (Buyer PO)',
-          menu_id: 728,
+          menu_id: 167,
           route: 'WorkOrderBuyerPoList',
           src: require('../../../assets/images/png/website.png'),
         },
@@ -67,13 +69,13 @@ const Sidebar = ({navigation}) => {
         // {
         //   label: ' Purchase Order Draft',
         //   route: 'PurchaseOrderDraftList',
-        //   menu_id: 4,
+        //   menu_id: 145,
         //   src: require('../../../assets/images/png/stamp.png'),
         // },
         {
           label: 'Goods Receipt Note (GRN)',
           route: 'GoodsReceiptNoteList',
-          menu_id: 4,
+          menu_id: 5,
           src: require('../../../assets/images/png/stamp.png'),
         },
         {
@@ -91,7 +93,7 @@ const Sidebar = ({navigation}) => {
         {
           label: 'Bill Generation',
           route: 'BillGenerationList',
-          menu_id: 346,
+          menu_id: 7,
           src: require('../../../assets/images/png/stamp.png'),
         },
         {
@@ -245,7 +247,7 @@ const Sidebar = ({navigation}) => {
         {
           label: 'Fabric Process in',
           route: 'FabricProcessInList',
-          menu_id: 568,
+          menu_id: 587,
           src: require('../../../assets/images/png/fabricProce.png'),
         },
         {
@@ -257,13 +259,13 @@ const Sidebar = ({navigation}) => {
         {
           label: 'New Process In',
           route: 'NewProcessInList',
-          menu_id: 787,
+          menu_id: 362,
           src: require('../../../assets/images/png/fabricProce.png'),
         },
         {
           label: 'New Process Out',
           route: 'NewProcessOutList',
-          menu_id: 787,
+          menu_id: 363,
           src: require('../../../assets/images/png/fabricProce.png'),
         },
       ],
@@ -300,13 +302,13 @@ const Sidebar = ({navigation}) => {
         {
           label: 'New In Process',
           route: 'NewOutInProcessList',
-          menu_id: 49,
+          menu_id: 247,
           src: require('../../../assets/images/png/acknowledge.png'),
         },
         {
           label: 'Delivery Challan ',
           route: 'DeliveryChallanList',
-          menu_id: 49,
+          menu_id: 65,
           src: require('../../../assets/images/png/acknowledge.png'),
         },
         {
@@ -337,7 +339,7 @@ const Sidebar = ({navigation}) => {
         {
           label: 'Production Process Report',
           route: 'ProductionProcessReport',
-          menu_id: 127,
+          menu_id: 125,
           src: require('../../../assets/images/png/report.png'),
         },
         {
@@ -368,11 +370,11 @@ const Sidebar = ({navigation}) => {
     },
   };
 
-  const filteredMenus1 = Object.fromEntries(
-    Object.entries(dropdownMenus).filter(([key, menu]) =>
-      menuIds.includes(menu.menu_id)
-    )
-  );
+  // const filteredMenus1 = Object.fromEntries(
+  //   Object.entries(dropdownMenus).filter(([key, menu]) =>
+  //     menuIds.includes(menu.menu_id)
+  //   )
+  // );
 
   const filteredMenus = Object.fromEntries(
     Object.entries(dropdownMenus)
@@ -386,6 +388,20 @@ const Sidebar = ({navigation}) => {
       })
       .filter(Boolean) 
   );
+
+  const filteredMenus1 = Object.fromEntries(
+  Object.entries(dropdownMenus)
+    .filter(([key, menu]) => menuIds.includes(menu.menu_id)) // only valid parents
+    .map(([key, menu]) => [
+      key,
+      {
+        ...menu,
+        style: menu.style.filter(item => subMenuItemsIds.includes(item.menu_id)), // only valid children
+      },
+    ])
+    .filter(([key, menu]) => menu.style.length > 0) // ❗ remove parents with no children
+);
+
   
   const [userName, set_userName] = useState('');
   const [admin, set_admin] = useState('');
@@ -491,21 +507,46 @@ const Sidebar = ({navigation}) => {
     const hasTempBackgroundEffect = tempBackgroundEffect[key];
     const animationValue = useRef(new Animated.Value(0)).current;
 
+    // const handleDropdownPress = () => {
+    //   setSelectedDropdown(isSelected ? null : key);
+    //   toggleDropdown(key);
+
+    //   // Trigger background color effect for this dropdown
+    //   setTempBackgroundEffect({[key]: true});
+    //   setTimeout(() => setTempBackgroundEffect({[key]: false}), 2000);
+
+    //   // Animate dropdown height
+    //   Animated.timing(animationValue, {
+    //     toValue: isSelected ? 0 : menu.style[0].label==="Location Wise Style Inventory" ? menu.style.length * 80 : menu.style.length * 60, 
+    //     duration: 300,
+    //     useNativeDriver: false, 
+    //   }).start();
+    // };
+
     const handleDropdownPress = () => {
-      setSelectedDropdown(isSelected ? null : key);
-      toggleDropdown(key);
+  setSelectedDropdown(isSelected ? null : key);
+  toggleDropdown(key);
 
-      // Trigger background color effect for this dropdown
-      setTempBackgroundEffect({[key]: true});
-      setTimeout(() => setTempBackgroundEffect({[key]: false}), 2000);
+  setTempBackgroundEffect({ [key]: true });
+  setTimeout(() => setTempBackgroundEffect({ [key]: false }), 2000);
 
-      // Animate dropdown height
-      Animated.timing(animationValue, {
-        toValue: isSelected ? 0 : menu.style[0].label==="Location Wise Style Inventory" ? menu.style.length * 80 : menu.style.length * 60, 
-        duration: 300,
-        useNativeDriver: false, 
-      }).start();
-    };
+  // 🧠 Safe animation height calculation
+  const hasChildren = menu.style && menu.style.length > 0;
+  const firstLabel = hasChildren ? menu.style[0].label : '';
+
+  Animated.timing(animationValue, {
+    toValue: !hasChildren
+      ? 0
+      : isSelected
+      ? 0
+      : firstLabel === 'Location Wise Style Inventory'
+      ? menu.style.length * 80
+      : menu.style.length * 60,
+    duration: 300,
+    useNativeDriver: false,
+  }).start();
+};
+ 
 
     return (
       <View>

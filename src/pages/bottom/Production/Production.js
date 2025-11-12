@@ -116,10 +116,16 @@ const Production = ({navigation}) => {
         </View>}
         {menuIds.includes(46) && <View style={styles.section}>
           <Text style={styles.heading}>Outward Production</Text>
-          <ScrollView
+          {/* <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.iconsContainer}>
+            contentContainerStyle={styles.iconsContainer}> */}
+                <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'flex-start',
+              flexWrap: 'wrap',
+            }}>
             {filteredoutwardProcess.map(item => (
               <TouchableOpacity
                 key={item.id}
@@ -131,7 +137,8 @@ const Production = ({navigation}) => {
                 <Text style={styles.iconText}>{item.name}</Text>
               </TouchableOpacity>
             ))}
-          </ScrollView>
+            </View>
+          {/* </ScrollView> */}
         </View>}
       </View>
     </ScrollView>
