@@ -185,7 +185,7 @@ const CreateBoxwiseStyleTransferUI = ({route, ...props}) => {
       return;
     }
 
-    if (!text || text.trim().length !== 9) {
+    if (!text || text.trim().length === 0) {
       Alert.alert('Alert', 'Please Enter the Valid Barcode');
       return;
     }
