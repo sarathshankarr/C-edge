@@ -884,7 +884,19 @@ const SaveBoxwiseStyleTransferUI = ({route, ...props}) => {
             </TouchableOpacity>
           </View>
 
-          <View style={{marginBottom: 20}} />
+            <View style={{marginTop: 20}}>
+            <TextInput
+              label="Total Send Qty "
+              value={
+                totalQtyy ? totalQtyy?.toFixed(2)?.toString() : '0'
+              }
+              mode="outlined"
+              editable={false}
+              onChangeText={text => console.log(text)}
+            />
+          </View>
+
+          {/* <View style={{marginBottom: 20}} /> */}
 
           {rows.length > 0 && (
             <View style={styles.wrapper}>
