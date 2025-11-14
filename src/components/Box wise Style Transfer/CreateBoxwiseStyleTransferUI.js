@@ -255,7 +255,7 @@ const CreateBoxwiseStyleTransferUI = ({route, ...props}) => {
       return;
     }
 
-    if (inHouse === 'Yes'  && fromLocationId == toLocationId) {
+    if (inHouse === 'Yes' && fromLocationId == toLocationId) {
       Alert.alert(
         'Alert',
         'From Location and To Location should not be the same!!!',
@@ -754,17 +754,7 @@ const CreateBoxwiseStyleTransferUI = ({route, ...props}) => {
             />
           </View>
 
-          <View style={{marginTop: hp('2%')}}>
-            <TextInput
-              label="Total Send Qty "
-              value={
-                totalSentQtyy ? totalSentQtyy?.toFixed(2)?.toString() : '0'
-              }
-              mode="outlined"
-              editable={false}
-              onChangeText={text => console.log(text)}
-            />
-          </View>
+       
 
           {/* <View style={{marginTop: hp('2%')}}>
             <TextInput
@@ -848,7 +838,19 @@ const CreateBoxwiseStyleTransferUI = ({route, ...props}) => {
             </TouchableOpacity>
           </View>
 
-          <View style={{marginBottom: 20}} />
+            <View style={{marginTop: 20}}>
+            <TextInput
+              label="Total Send Qty "
+              value={
+                totalSentQtyy ? totalSentQtyy?.toFixed(2)?.toString() : '0'
+              }
+              mode="outlined"
+              editable={false}
+              onChangeText={text => console.log(text)}
+            />
+          </View>
+
+          {/* <View style={{marginBottom: 10}} /> */}
 
           {rows.length > 0 && (
             <View style={styles.wrapper}>
@@ -857,6 +859,11 @@ const CreateBoxwiseStyleTransferUI = ({route, ...props}) => {
                   <View style={styles.table_head}>
                     <View style={{width: 60}}>
                       <Text style={styles.table_head_captions}>Action</Text>
+                    </View>
+                    <View style={{width: 100}}>
+                      <Text style={styles.table_head_captions}>
+                        Garmet Image{' '}
+                      </Text>
                     </View>
                     <View style={{width: 100}}>
                       <Text style={styles.table_head_captions}>Box Name </Text>
@@ -897,9 +904,17 @@ const CreateBoxwiseStyleTransferUI = ({route, ...props}) => {
                           </TouchableOpacity>
                         </View>
 
+                         <View style={{width: 100}}>
+                          <Image
+                            source={{uri: row.garmentImage}}
+                            style={{height: 35, width: 30, alignSelf: 'center'}}
+                          />
+                        </View>
+
                         <View style={{width: 100}}>
                           <Text style={styles.table_data}>{row.boxname}</Text>
                         </View>
+                       
 
                         <View style={{width: 10}} />
                         <View style={{width: 100}}>
@@ -946,6 +961,7 @@ const CreateBoxwiseStyleTransferUI = ({route, ...props}) => {
                       {paddingVertical: 12},
                     ]}>
                     <View style={{width: 60}}></View>
+                    <View style={{width: 100}}></View>
                     <View style={{width: 100}}></View>
                     <View style={{width: 10}} />
                     <View style={{width: 100}}></View>
