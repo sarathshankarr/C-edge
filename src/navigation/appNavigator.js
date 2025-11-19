@@ -52,6 +52,7 @@ import StockRecieveEdit from '../components/storeComponents/stockRecieve/stockRe
 import CreateRequest from '../components/storeComponents/StockRequest/CreateRequest/CreateRequest';
 import StyleProcessWorkFlow from '../components/styleProcessWorkFlow/StyleProcessWorkFlow';
 import ScanQRPage from '../components/qrScanner/ScanQRPage';
+import ScanQRPage2 from '../components/qrScanner2/ScanQRPage2';
 import CreateInProcessComponent from '../components/fabricProcessIn/fabricProcessIn/CreateInProcessComponent';
 import MailConfirmation from '../components/forgetPassword/MailConfirmation';
 import EnterOtp from '../components/forgetPassword/EnterOtp';
@@ -205,6 +206,7 @@ const AppStack = () => {
       <Stack.Screen name="CreateStockRequest" component={CreateRequest} options={{ headerShown: false }} /> 
       <Stack.Screen name="StyleProcessWorkFlow" component={StyleProcessWorkFlow} options={{ headerShown: false }} /> 
       <Stack.Screen name="ScanQRPage" component={ScanQRPage} options={{ headerShown: false }} /> 
+      <Stack.Screen name="ScanQRPage2" component={ScanQRPage2} options={{ headerShown: false }} /> 
       <Stack.Screen name="MailConfirmation" component={MailConfirmation} options={{ headerShown: false }} /> 
       <Stack.Screen name="EnterOtp" component={EnterOtp} options={{ headerShown: false }} /> 
       <Stack.Screen name="ConfirmPassword" component={ConfirmPassword} options={{ headerShown: false }} /> 
