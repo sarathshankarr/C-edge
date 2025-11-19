@@ -214,7 +214,7 @@ const CreateBoxwiseStyleTransferUI = ({route, ...props}) => {
   };
 
   const handleScan = () => {
-    navigation.navigate('ScanQRPage', {
+    navigation.navigate('ScanQRPage2', {
       onScanSuccess: scannedValue => {
         console.log('Scanned Code: ', scannedValue);
         handleScannedCode(scannedValue);
