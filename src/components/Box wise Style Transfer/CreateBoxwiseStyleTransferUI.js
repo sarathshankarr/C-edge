@@ -66,6 +66,11 @@ const CreateBoxwiseStyleTransferUI = ({route, ...props}) => {
 
   useEffect(() => {
     if (props.tableLists) {
+
+  if (alreadyscannedBarcodes.includes(props.tableLists.barcode)) {
+    Alert.alert('Alert', 'Barcode already scanned!');
+    return;
+  }
       console.log('data need to set ==> ', props.tableLists);
       setAlreadyScannedBarcodes(prev => [...prev, props.tableLists.barcode]);
       if (fromLocationId) {
@@ -179,7 +184,7 @@ const CreateBoxwiseStyleTransferUI = ({route, ...props}) => {
     props.backBtnAction();
   };
 
-  const handleScannedCode = text => {
+  const handleScannedCode1 = text => {
     if (!fromLocationId) {
       Alert.alert('Alert', 'Please select the From Location');
       return;
@@ -213,7 +218,12 @@ const CreateBoxwiseStyleTransferUI = ({route, ...props}) => {
     console.log('scan barcode text ', text);
   };
 
-  const handleScan = () => {
+  const handleScan1 = () => {
+      if (!fromLocationId) {
+      Alert.alert('Alert', 'Please select the From Location');
+      return;
+    }
+
     navigation.navigate('ScanQRPage2', {
       onScanSuccess: scannedValue => {
         console.log('Scanned Code: ', scannedValue);
@@ -221,6 +231,47 @@ const CreateBoxwiseStyleTransferUI = ({route, ...props}) => {
       },
     });
   };
+
+
+const handleScannedCode = async (text) => {
+
+  if (!fromLocationId) {
+    Alert.alert('Alert', 'Please select the From Location');
+    return; 
+  }
+
+  if (!text || text.trim() === "") {
+    Alert.alert('Alert', 'Please enter a valid barcode');
+    return;
+  }
+
+  if (alreadyscannedBarcodes.includes(text)) {
+    Alert.alert('Alert', 'Barcode already scanned!');
+    return;
+  }
+
+  console.log("Calling validate API...");
+
+  await props.validateBarCode(text, fromLocationId);
+
+  setBarcode("");
+};
+
+
+
+
+const handleScan = () => {
+  if (!fromLocationId) {
+    Alert.alert('Alert', 'Please select the From Location');
+    return;
+  }
+
+  navigation.navigate('ScanQRPage2', {
+    onScanSuccess: async scannedValue => {
+       await handleScannedCode(scannedValue);
+    },
+  });
+};
 
   const formattedDate = text => {
     console.log('date before  formating', text);

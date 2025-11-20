@@ -82,14 +82,26 @@ const clr1 = "mediumseagreen";
 const ScanQRPage2 = ({ navigation, route }) => {
   const [showQR, setShowQR] = useState(false);
 
-  const onQrRead = (qrtext) => {
-    setShowQR(false);
+  // const onQrRead = (qrtext) => {
+  //   setShowQR(false);
 
-    const { onScanSuccess } = route.params;
-    if (onScanSuccess) onScanSuccess(qrtext);
+  //   const { onScanSuccess } = route.params;
+  //   if (onScanSuccess) onScanSuccess(qrtext);
 
+  //   navigation.goBack();
+  // };
+
+  const onQrRead = async (qrtext) => {
+  if (qrtext === null) {
+    // user pressed close
     navigation.goBack();
-  };
+    return;
+  }
+
+  const { onScanSuccess } = route.params;
+  return await onScanSuccess(qrtext);
+};
+
 
   return (
     <View style={{ flex: 1 }}>

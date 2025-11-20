@@ -5,6 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import {useNavigation} from '@react-navigation/native';
 import CreateBoxwiseStyleTransferUI from './CreateBoxwiseStyleTransferUI';
+import {Alert} from 'react-native';
 
 const CreateBoxwiseStyleTransfer = ({route}) => {
   const navigation = useNavigation();
@@ -96,9 +97,11 @@ const CreateBoxwiseStyleTransfer = ({route}) => {
       company: JSON.parse(companyObj),
       barcode: id,
       fromLoc: fromLocationId,
-}
-    console.log("barcode valid req body ", id, fromLocationId)
-    let LISTAPIOBJ = await APIServiceCall.validateBoxWiseStyleTransferBarcode(obj);
+    };
+    console.log('barcode valid req body ', id, fromLocationId);
+    let LISTAPIOBJ = await APIServiceCall.validateBoxWiseStyleTransferBarcode(
+      obj,
+    );
     set_isLoading(false);
 
     console.log('barcode valid resp ===>  ', LISTAPIOBJ.responseData);
@@ -107,31 +110,43 @@ const CreateBoxwiseStyleTransfer = ({route}) => {
         console.log('barcode response after scan   ', LISTAPIOBJ.responseData);
         getDataFromBacode(id, fromLocationId);
       } else {
-        popUpAction(
+        // popUpAction(
+        //   'Scanned barcode not available for the selected Location.',
+        //   Constant.DefaultAlert_MSG,
+        //   'OK',
+        //   true,
+        //   false,
+        // );
+        Alert.alert(
+          'Alert',
           'Scanned barcode not available for the selected Location.',
-          Constant.DefaultAlert_MSG,
-          'OK',
-          true,
-          false,
         );
       }
     } else {
-      popUpAction(
-        Constant.SERVICE_FAIL_MSG,
-        Constant.DefaultAlert_MSG,
-        'OK',
-        true,
-        false,
+      // popUpAction(
+      //   Constant.SERVICE_FAIL_MSG,
+      //   Constant.DefaultAlert_MSG,
+      //   'OK',
+      //   true,
+      //   false,
+      // );
+      Alert.alert(
+        'Alert',
+        ' Woof! There seems to be a problem. Please try after sometime.',
       );
     }
 
     if (LISTAPIOBJ && LISTAPIOBJ.error) {
-      popUpAction(
-        Constant.SERVICE_FAIL_MSG,
-        Constant.DefaultAlert_MSG,
-        'OK',
-        true,
-        false,
+      // popUpAction(
+      //   Constant.SERVICE_FAIL_MSG,
+      //   Constant.DefaultAlert_MSG,
+      //   'OK',
+      //   true,
+      //   false,
+      // );
+      Alert.alert(
+        'Alert',
+        ' Woof! There seems to be a problem. Please try after sometime.',
       );
     }
   };
@@ -150,10 +165,10 @@ const CreateBoxwiseStyleTransfer = ({route}) => {
       company: JSON.parse(companyObj),
       barcode: id,
       fromLoc: fromLocationId,
-  
     };
 
-    let LISTAPIOBJ = await APIServiceCall.getBoxWiseStyleTransferDetailsFromBarcode(obj);
+    let LISTAPIOBJ =
+      await APIServiceCall.getBoxWiseStyleTransferDetailsFromBarcode(obj);
 
     set_isLoading(false);
 
@@ -164,25 +179,34 @@ const CreateBoxwiseStyleTransfer = ({route}) => {
         console.log('get data from barcode ==> ', result);
       }
     } else {
-      popUpAction(
-        Constant.SERVICE_FAIL_MSG,
-        Constant.DefaultAlert_MSG,
-        'OK',
-        true,
-        false,
+      // popUpAction(
+      //   Constant.SERVICE_FAIL_MSG,
+      //   Constant.DefaultAlert_MSG,
+      //   'OK',
+      //   true,
+      //   false,
+      // );
+      Alert.alert(
+        'Alert',
+        ' Woof! There seems to be a problem. Please try after sometime.',
       );
     }
 
     if (LISTAPIOBJ && LISTAPIOBJ.error) {
-      popUpAction(
-        Constant.SERVICE_FAIL_MSG,
-        Constant.DefaultAlert_MSG,
-        'OK',
-        true,
-        false,
+      // popUpAction(
+      //   Constant.SERVICE_FAIL_MSG,
+      //   Constant.DefaultAlert_MSG,
+      //   'OK',
+      //   true,
+      //   false,
+      // );
+      Alert.alert(
+        'Alert',
+        ' Woof! There seems to be a problem. Please try after sometime.',
       );
     }
   };
+
   const getDuplicateInvoiceStatus = async tempObj => {
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
@@ -213,13 +237,13 @@ const CreateBoxwiseStyleTransfer = ({route}) => {
         true,
         false,
       );
-      return "error";
+      return 'error';
     }
 
     if (LISTAPIOBJ && LISTAPIOBJ.statusData) {
       if (LISTAPIOBJ && LISTAPIOBJ.responseData) {
         let result = LISTAPIOBJ.responseData;
-       return result;
+        return result;
       }
     } else {
       popUpAction(
@@ -229,10 +253,10 @@ const CreateBoxwiseStyleTransfer = ({route}) => {
         true,
         false,
       );
-      return "error";
+      return 'error';
     }
 
-      return "error";
+    return 'error';
   };
 
   const submitAction = async tempObj => {
@@ -241,7 +265,6 @@ const CreateBoxwiseStyleTransfer = ({route}) => {
     let usercompanyId = await AsyncStorage.getItem('companyId');
     let companyObj = await AsyncStorage.getItem('companyObj');
     let userId = await AsyncStorage.getItem('userId');
-
 
     tempObj.username = userName;
     tempObj.password = userPsd;
