@@ -296,92 +296,317 @@
 // });
 
 //functionality + UI
+
+// import React, { useState, useEffect } from "react";
+// import { StyleSheet, Text, TouchableOpacity, View, Alert } from "react-native";
+// import {
+//   Camera,
+//   useCameraDevice,
+//   useCodeScanner,
+// } from "react-native-vision-camera";
+// import Icon from "react-native-vector-icons/Ionicons";
+
+// const QRScanner2 = ({ onRead }) => {
+//   const [hasPermission, setHasPermission] = useState(false);
+//   const [latestScannedData, setLatestScannedData] = useState(null);
+//   const device = useCameraDevice("back");
+
+//   const codeScanner = useCodeScanner({
+//     codeTypes: ["qr", "ean-13", "ean-8", "code-128", "code-39"],
+//     onCodeScanned: (codes) => {
+//       if (codes && codes.length > 0 && codes[0]?.value) {
+//         setLatestScannedData(codes[0]?.value);
+//       }
+//     },
+//   });
+
+//   useEffect(() => {
+//     const requestCameraPermission = async () => {
+//       try {
+//         const permission = await Camera.requestCameraPermission();
+//         setHasPermission(permission === "granted");
+//       } catch {
+//         Alert.alert("Permission Error", "Enable camera permission in settings.");
+//       }
+//     };
+
+//     requestCameraPermission();
+//   }, []);
+
+//   if (!device || !hasPermission) {
+//     return (
+//       <View style={styles.noCamContainer}>
+//         <Text>Camera not available or not permitted</Text>
+//       </View>
+//     );
+//   }
+
+//   return (
+//     <View style={styles.container}>
+
+//       <Camera
+//         codeScanner={codeScanner}
+//         style={StyleSheet.absoluteFill}
+//         device={device}
+//         isActive={true}
+//       />
+
+//       {/* Screen Overlay */}
+//       <View style={styles.overlay} />
+
+//       {/* Header */}
+//       <View style={styles.topHeader}>
+//         <TouchableOpacity onPress={() => onRead(null)} style={styles.backBtn}>
+//           <Icon name="arrow-back" size={24} color="white" />
+//         </TouchableOpacity>
+//         <Text style={styles.headerText}>Scan QR Code</Text>
+//       </View>
+
+//       {/* Scanning Frame */}
+//       <View style={styles.frameWrapper}>
+//         <View style={styles.scanFrame}>
+//           <View style={styles.cornerTopLeft} />
+//           <View style={styles.cornerTopRight} />
+//           <View style={styles.cornerBottomLeft} />
+//           <View style={styles.cornerBottomRight} />
+//         </View>
+//         <Text style={styles.instructionText}>Align the QR code inside the frame</Text>
+//       </View>
+
+//       {/* Scanned Result */}
+//       <View style={styles.resultCard}>
+//         <Text style={styles.resultLabel}>Latest Scan</Text>
+//         <Text style={styles.resultValue}>{latestScannedData || "Scanning..."}</Text>
+//       </View>
+
+//       {/* CLOSE Button */}
+//       <TouchableOpacity
+//         style={styles.closeButton}
+//         onPress={() => onRead(latestScannedData || null)}
+//       >
+//         <Text style={styles.closeText}>Close Scanner</Text>
+//       </TouchableOpacity>
+//     </View>
+//   );
+// };
+
+// export default QRScanner2;
+
+// const green = "mediumseagreen";
+
+// const styles = StyleSheet.create({
+//   container: {
+//     flex: 1,
+//     backgroundColor: "black",
+//   },
+
+//   noCamContainer: {
+//     flex: 1,
+//     justifyContent: "center",
+//     alignItems: "center",
+//   },
+
+//   overlay: {
+//     ...StyleSheet.absoluteFillObject,
+//     backgroundColor: "rgba(0,0,0,0.3)",
+//   },
+
+//   topHeader: {
+//     position: "absolute",
+//     top: 40,
+//     left: 20,
+//     flexDirection: "row",
+//     alignItems: "center",
+//   },
+
+//   backBtn: {
+//     padding: 10,
+//   },
+
+//   headerText: {
+//     color: "white",
+//     fontSize: 18,
+//     marginLeft: 10,
+//     fontWeight: "600",
+//   },
+
+//   frameWrapper: {
+//     position: "absolute",
+//     top: "22%",
+//     left: 0,
+//     right: 0,
+//     alignItems: "center",
+//   },
+
+//   scanFrame: {
+//     width: 260,
+//     height: 260,
+//     borderRadius: 18,
+//     borderColor: "rgba(255,255,255,0.2)",
+//     borderWidth: 1.5,
+//   },
+
+//   cornerTopLeft: {
+//     position: "absolute",
+//     top: -2,
+//     left: -2,
+//     width: 40,
+//     height: 40,
+//     borderLeftWidth: 4,
+//     borderTopWidth: 4,
+//     borderColor: green,
+//     borderTopLeftRadius: 10,
+//   },
+
+//   cornerTopRight: {
+//     position: "absolute",
+//     top: -2,
+//     right: -2,
+//     width: 40,
+//     height: 40,
+//     borderRightWidth: 4,
+//     borderTopWidth: 4,
+//     borderColor: green,
+//     borderTopRightRadius: 10,
+//   },
+
+//   cornerBottomLeft: {
+//     position: "absolute",
+//     bottom: -2,
+//     left: -2,
+//     width: 40,
+//     height: 40,
+//     borderLeftWidth: 4,
+//     borderBottomWidth: 4,
+//     borderColor: green,
+//     borderBottomLeftRadius: 10,
+//   },
+
+//   cornerBottomRight: {
+//     position: "absolute",
+//     bottom: -2,
+//     right: -2,
+//     width: 40,
+//     height: 40,
+//     borderRightWidth: 4,
+//     borderBottomWidth: 4,
+//     borderColor: green,
+//     borderBottomRightRadius: 10,
+//   },
+
+//   instructionText: {
+//     color: "white",
+//     marginTop: 14,
+//     fontSize: 14,
+//   },
+
+//   resultCard: {
+//     position: "absolute",
+//     bottom: 140,
+//     left: 20,
+//     right: 20,
+//     padding: 16,
+//     backgroundColor: "rgba(0,0,0,0.55)",
+//     borderRadius: 10,
+//   },
+
+//   resultLabel: {
+//     color: "#bbb",
+//     fontSize: 13,
+//   },
+
+//   resultValue: {
+//     color: green,
+//     fontSize: 18,
+//     marginTop: 4,
+//     fontWeight: "600",
+//   },
+
+//   closeButton: {
+//     position: "absolute",
+//     bottom: 40,
+//     left: 40,
+//     right: 40,
+//     backgroundColor: green,
+//     paddingVertical: 14,
+//     borderRadius: 12,
+//     alignItems: "center",
+//   },
+
+//   closeText: {
+//     color: "white",
+//     fontSize: 16,
+//     fontWeight: "600",
+//   },
+// });
+
+//Contious scan
 import React, { useState, useEffect } from "react";
-import { StyleSheet, Text, TouchableOpacity, View, Alert } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View, ActivityIndicator } from "react-native";
 import {
   Camera,
   useCameraDevice,
   useCodeScanner,
 } from "react-native-vision-camera";
-import Icon from "react-native-vector-icons/Ionicons";
 
 const QRScanner2 = ({ onRead }) => {
   const [hasPermission, setHasPermission] = useState(false);
-  const [latestScannedData, setLatestScannedData] = useState(null);
+  const [isProcessing, setIsProcessing] = useState(false);
   const device = useCameraDevice("back");
+
+  useEffect(() => {
+    Camera.requestCameraPermission().then(perm => {
+      setHasPermission(perm === "granted");
+    });
+  }, []);
 
   const codeScanner = useCodeScanner({
     codeTypes: ["qr", "ean-13", "ean-8", "code-128", "code-39"],
-    onCodeScanned: (codes) => {
-      if (codes && codes.length > 0 && codes[0]?.value) {
-        setLatestScannedData(codes[0]?.value);
+    onCodeScanned: async (codes) => {
+
+      if (isProcessing) return;
+
+      if (codes && codes.length > 0) {
+        const value = codes[0].value;
+
+        setIsProcessing(true);  // hard lock scanner
+
+        await onRead(value);    // your API logic runs
+
+        setTimeout(() => {
+          setIsProcessing(false); // restart scanner after processing
+        }, 800);
       }
     },
   });
 
-  useEffect(() => {
-    const requestCameraPermission = async () => {
-      try {
-        const permission = await Camera.requestCameraPermission();
-        setHasPermission(permission === "granted");
-      } catch {
-        Alert.alert("Permission Error", "Enable camera permission in settings.");
-      }
-    };
-
-    requestCameraPermission();
-  }, []);
-
   if (!device || !hasPermission) {
     return (
-      <View style={styles.noCamContainer}>
-        <Text>Camera not available or not permitted</Text>
+      <View style={styles.noCam}>
+        <Text>Camera unavailable</Text>
       </View>
     );
   }
 
   return (
     <View style={styles.container}>
-
       <Camera
-        codeScanner={codeScanner}
+        codeScanner={isProcessing ? null : codeScanner}
         style={StyleSheet.absoluteFill}
         device={device}
         isActive={true}
       />
 
-      {/* Screen Overlay */}
-      <View style={styles.overlay} />
-
-      {/* Header */}
-      <View style={styles.topHeader}>
-        <TouchableOpacity onPress={() => onRead(null)} style={styles.backBtn}>
-          <Icon name="arrow-back" size={24} color="white" />
-        </TouchableOpacity>
-        <Text style={styles.headerText}>Scan QR Code</Text>
-      </View>
-
-      {/* Scanning Frame */}
-      <View style={styles.frameWrapper}>
-        <View style={styles.scanFrame}>
-          <View style={styles.cornerTopLeft} />
-          <View style={styles.cornerTopRight} />
-          <View style={styles.cornerBottomLeft} />
-          <View style={styles.cornerBottomRight} />
+      {isProcessing && (
+        <View style={styles.loader}>
+          <ActivityIndicator size="large" color="white" />
+          <Text style={styles.loaderText}>Processing...</Text>
         </View>
-        <Text style={styles.instructionText}>Align the QR code inside the frame</Text>
-      </View>
+      )}
 
-      {/* Scanned Result */}
-      <View style={styles.resultCard}>
-        <Text style={styles.resultLabel}>Latest Scan</Text>
-        <Text style={styles.resultValue}>{latestScannedData || "Scanning..."}</Text>
-      </View>
-
-      {/* CLOSE Button */}
       <TouchableOpacity
-        style={styles.closeButton}
-        onPress={() => onRead(latestScannedData || null)}
+        style={styles.closeBtn}
+        onPress={() => onRead(null)}
       >
         <Text style={styles.closeText}>Close Scanner</Text>
       </TouchableOpacity>
@@ -391,142 +616,30 @@ const QRScanner2 = ({ onRead }) => {
 
 export default QRScanner2;
 
-const green = "mediumseagreen";
-
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "black",
-  },
+  container: { flex: 1, backgroundColor: "black" },
+  noCam: { flex: 1, alignItems: "center", justifyContent: "center" },
 
-  noCamContainer: {
-    flex: 1,
+  loader: {
+    position: "absolute",
+    top: 0, bottom: 0, left: 0, right: 0,
+    backgroundColor: "rgba(0,0,0,0.6)",
     justifyContent: "center",
     alignItems: "center",
   },
 
-  overlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0,0,0,0.3)",
-  },
-
-  topHeader: {
-    position: "absolute",
-    top: 40,
-    left: 20,
-    flexDirection: "row",
-    alignItems: "center",
-  },
-
-  backBtn: {
-    padding: 10,
-  },
-
-  headerText: {
+  loaderText: {
+    marginTop: 10,
     color: "white",
-    fontSize: 18,
-    marginLeft: 10,
-    fontWeight: "600",
+    fontSize: 16,
   },
 
-  frameWrapper: {
-    position: "absolute",
-    top: "22%",
-    left: 0,
-    right: 0,
-    alignItems: "center",
-  },
-
-  scanFrame: {
-    width: 260,
-    height: 260,
-    borderRadius: 18,
-    borderColor: "rgba(255,255,255,0.2)",
-    borderWidth: 1.5,
-  },
-
-  cornerTopLeft: {
-    position: "absolute",
-    top: -2,
-    left: -2,
-    width: 40,
-    height: 40,
-    borderLeftWidth: 4,
-    borderTopWidth: 4,
-    borderColor: green,
-    borderTopLeftRadius: 10,
-  },
-
-  cornerTopRight: {
-    position: "absolute",
-    top: -2,
-    right: -2,
-    width: 40,
-    height: 40,
-    borderRightWidth: 4,
-    borderTopWidth: 4,
-    borderColor: green,
-    borderTopRightRadius: 10,
-  },
-
-  cornerBottomLeft: {
-    position: "absolute",
-    bottom: -2,
-    left: -2,
-    width: 40,
-    height: 40,
-    borderLeftWidth: 4,
-    borderBottomWidth: 4,
-    borderColor: green,
-    borderBottomLeftRadius: 10,
-  },
-
-  cornerBottomRight: {
-    position: "absolute",
-    bottom: -2,
-    right: -2,
-    width: 40,
-    height: 40,
-    borderRightWidth: 4,
-    borderBottomWidth: 4,
-    borderColor: green,
-    borderBottomRightRadius: 10,
-  },
-
-  instructionText: {
-    color: "white",
-    marginTop: 14,
-    fontSize: 14,
-  },
-
-  resultCard: {
-    position: "absolute",
-    bottom: 140,
-    left: 20,
-    right: 20,
-    padding: 16,
-    backgroundColor: "rgba(0,0,0,0.55)",
-    borderRadius: 10,
-  },
-
-  resultLabel: {
-    color: "#bbb",
-    fontSize: 13,
-  },
-
-  resultValue: {
-    color: green,
-    fontSize: 18,
-    marginTop: 4,
-    fontWeight: "600",
-  },
-
-  closeButton: {
+  closeBtn: {
     position: "absolute",
     bottom: 40,
     left: 40,
     right: 40,
-    backgroundColor: green,
+    backgroundColor: "mediumseagreen",
     paddingVertical: 14,
     borderRadius: 12,
     alignItems: "center",
