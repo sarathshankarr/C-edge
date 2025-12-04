@@ -292,7 +292,7 @@ const SaveBoxwiseStyleTransferUI = ({route, ...props}) => {
     console.log('scan barcode text ', text);
   };
 
-  const handleScan = () => {
+  const handleScan1 = () => {
     // navigation.navigate('ScanQRPage', {
     //   onScanSuccess: scannedValue => {
     //     console.log('Scanned Code: ', scannedValue);
@@ -305,6 +305,26 @@ const SaveBoxwiseStyleTransferUI = ({route, ...props}) => {
       },
     });
   };
+  const handleScan = () => {
+
+  let scannedInSession = new Set();
+
+  navigation.navigate("ScanQRPage2", {
+    onScanSuccess: async scannedValue => {
+      if (!scannedValue) return;
+
+      if (scannedInSession.has(scannedValue)) {
+        Alert.alert('Alert', 'This barcode is already Selected!!');
+        return;
+      }
+
+      scannedInSession.add(scannedValue);
+
+      await handleScannedCode(scannedValue);
+    },
+  });
+};
+
 
   const formattedDate = text => {
     console.log('date before  formating', text);
