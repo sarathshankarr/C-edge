@@ -107,7 +107,7 @@ const SaveBoxwiseStyleTransferUI = ({route, ...props}) => {
         if (props.itemsObj.transferDetails.bstpRate) {
           setRate(props.itemsObj.transferDetails.bstpRate);
         }
-       
+
         if (props.itemsObj.transferDetails.bstStatus) {
           setShowSaveBtn(
             props.itemsObj.transferDetails.bstStatus == 1 ? false : true,
@@ -118,9 +118,15 @@ const SaveBoxwiseStyleTransferUI = ({route, ...props}) => {
           );
         }
 
-         if (props.itemsObj.transferDetails.returnable) {
-          console.log("isretunable ==> ", props.itemsObj.transferDetails.returnable, props.itemsObj.transferDetails.returnable=="Y" ? true : false);
-          setShowSaveBtn2(props.itemsObj.transferDetails.returnable=="Y" ? true : false);
+        if (props.itemsObj.transferDetails.returnable) {
+          console.log(
+            'isretunable ==> ',
+            props.itemsObj.transferDetails.returnable,
+            props.itemsObj.transferDetails.returnable == 'Y' ? true : false,
+          );
+          setShowSaveBtn2(
+            props.itemsObj.transferDetails.returnable == 'Y' ? true : false,
+          );
         }
       }
     }
@@ -287,10 +293,15 @@ const SaveBoxwiseStyleTransferUI = ({route, ...props}) => {
   };
 
   const handleScan = () => {
-    navigation.navigate('ScanQRPage', {
-      onScanSuccess: scannedValue => {
-        console.log('Scanned Code: ', scannedValue);
-        handleScannedCode(scannedValue);
+    // navigation.navigate('ScanQRPage', {
+    //   onScanSuccess: scannedValue => {
+    //     console.log('Scanned Code: ', scannedValue);
+    //     handleScannedCode(scannedValue);
+    //   },
+    // });
+    navigation.navigate('ScanQRPage2', {
+      onScanSuccess: async scannedValue => {
+        await handleScannedCode(scannedValue);
       },
     });
   };
@@ -884,12 +895,10 @@ const SaveBoxwiseStyleTransferUI = ({route, ...props}) => {
             </TouchableOpacity>
           </View>
 
-            <View style={{marginTop: 20}}>
+          <View style={{marginTop: 20}}>
             <TextInput
               label="Total Send Qty "
-              value={
-                totalQtyy ? totalQtyy?.toFixed(2)?.toString() : '0'
-              }
+              value={totalQtyy ? totalQtyy?.toFixed(2)?.toString() : '0'}
               mode="outlined"
               editable={false}
               onChangeText={text => console.log(text)}
@@ -903,7 +912,11 @@ const SaveBoxwiseStyleTransferUI = ({route, ...props}) => {
               <ScrollView nestedScrollEnabled={true} horizontal>
                 <View style={styles.table}>
                   <View style={styles.table_head}>
-                    <View style={{width: 60, opacity:!disableBasedOnFlag ? 1 : 0.4}}>
+                    <View
+                      style={{
+                        width: 60,
+                        opacity: !disableBasedOnFlag ? 1 : 0.4,
+                      }}>
                       <Text style={styles.table_head_captions}>Action</Text>
                       <CustomCheckBox
                         isChecked={selectAllCheckBox}
