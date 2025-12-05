@@ -250,42 +250,79 @@ const SaveBoxwiseStyleTransferUI = ({route, ...props}) => {
     props.backBtnAction();
   };
 
-  const handleScannedCode = text => {
-    // if (disableBasedOnFlag) return;
+  // const handleScannedCode = text => {
+  //   // if (disableBasedOnFlag) return;
 
-    if (!text?.trim()) {
-      Alert.alert('Error', 'Please enter a valid barcode');
-      return;
-    }
+  //   if (!text?.trim()) {
+  //     Alert.alert('Error', 'Please enter a valid barcode');
+  //     return;
+  //   }
 
-    const matchingRows = rows.filter(
-      row => row.bstpBarcode?.toString().trim() === text.trim(),
+  //   const matchingRows = rows.filter(
+  //     row => row.bstpBarcode?.toString().trim() === text.trim(),
+  //   );
+
+  //   if (matchingRows.length === 0) {
+  //     Alert.alert('Not Found', 'No matching barcode found !');
+  //     return;
+  //   }
+
+  //   const allSelected = matchingRows.every(row =>
+  //     selectedIdxs.includes(row.bstId),
+  //   );
+
+  //   if (allSelected) {
+  //     Alert.alert('Alert', 'This barcode is already Selected!!');
+  //     return;
+  //   }
+
+  //   const newSelected = [
+  //     ...selectedIdxs,
+  //     ...matchingRows
+  //       .filter(row => !selectedIdxs.includes(row.bstId))
+  //       .map(row => row.bstId),
+  //   ];
+
+  //   setSelectedIdxs(newSelected);
+  //   setBarcode('');
+  // };
+const handleScannedCode = text => {
+  if (!text?.trim()) {
+    Alert.alert('Error', 'Enter valid barcode');
+    return;
+  }
+
+  const matchingRows = rows.filter(
+    row => row.bstpBarcode?.toString().trim() === text.trim()
+  );
+
+  if (matchingRows.length === 0) {
+    Alert.alert('Not Found', 'No matching barcode found!');
+    return;
+  }
+
+  setSelectedIdxs(prev => {
+    const alreadySelected = matchingRows.every(row =>
+      prev.includes(row.bstId)
     );
 
-    if (matchingRows.length === 0) {
-      Alert.alert('Not Found', 'No matching barcode found !');
-      return;
+    if (alreadySelected) {
+      Alert.alert('Alert', 'Already Selected!');
+      return prev;
     }
 
-    const allSelected = matchingRows.every(row =>
-      selectedIdxs.includes(row.bstId),
-    );
-
-    if (allSelected) {
-      Alert.alert('Alert', 'This barcode is already Selected!!');
-      return;
-    }
-
-    const newSelected = [
-      ...selectedIdxs,
+    const updated = [
+      ...prev,
       ...matchingRows
-        .filter(row => !selectedIdxs.includes(row.bstId))
+        .filter(row => !prev.includes(row.bstId))
         .map(row => row.bstId),
     ];
 
-    setSelectedIdxs(newSelected);
-    setBarcode('');
-  };
+    return updated;
+  });
+
+  setBarcode('');
+};
 
   const handleBarcodeChange = text => {
     setBarcode(text);

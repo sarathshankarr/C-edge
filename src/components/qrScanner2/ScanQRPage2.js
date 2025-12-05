@@ -7,26 +7,14 @@
 // const ScanQRPage2 = ({ navigation, route }) => {
 //   const [showQR, setShowQR] = useState(false);
 
-//   // const onQrRead = (qrtext) => {
-//   //   setShowQR(false);
-
-//   //   const { onScanSuccess } = route.params;
-//   //   if (onScanSuccess) onScanSuccess(qrtext);
-
-//   //   navigation.goBack();
-//   // };
-
 //   const onQrRead = async (qrtext) => {
-//   if (qrtext === null) {
-//     // user pressed close
-//     navigation.goBack();
-//     return;
-//   }
-
-//   const { onScanSuccess } = route.params;
-//   return await onScanSuccess(qrtext);
-// };
-
+//     if (qrtext === null) {
+//       navigation.goBack();
+//       return;
+//     }
+//     const { onScanSuccess } = route.params;
+//     return await onScanSuccess(qrtext);
+//   };
 
 //   return (
 //     <View style={{ flex: 1 }}>
@@ -66,6 +54,7 @@
 //     borderRadius: 10,
 //   },
 // });
+
 import React, { useState } from "react";
 import { StyleSheet, Text, View, TouchableOpacity, Image } from "react-native";
 import QRScanner2 from "./QrScanner2";
