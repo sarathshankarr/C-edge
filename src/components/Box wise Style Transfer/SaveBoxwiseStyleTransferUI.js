@@ -55,6 +55,9 @@ const SaveBoxwiseStyleTransferUI = ({route, ...props}) => {
           );
           setDeliveryDate(date);
         }
+        if (props.itemsObj.transferDetails.totalRecQty) {
+          setRecievedQty(props.itemsObj.transferDetails.totalRecQty);
+        }
         if (props.itemsObj?.transferDetails.particulars) {
           const list = props.itemsObj.transferDetails.particulars || [];
 
@@ -188,7 +191,7 @@ const SaveBoxwiseStyleTransferUI = ({route, ...props}) => {
   const [transferDetailss, setTransferDetailss] = useState([]);
 
   const [disableBasedOnFlag, setDisableBasedOnFlag] = useState(false);
-
+  const [recievedQty, setRecievedQty] = useState(0);
   // Function to handle selection for From Location
   const actionOnFromLocation = item => {
     setFromLocationId(item.id);
@@ -311,6 +314,9 @@ const handleScannedCode = text => {
       return prev;
     }
 
+    if(!alreadySelected && matchingRows.length > 0){
+      setRecievedQty(recievedQty => Number(recievedQty) + 1);
+    }
     const updated = [
       ...prev,
       ...matchingRows
@@ -320,7 +326,7 @@ const handleScannedCode = text => {
 
     return updated;
   });
-
+  setRecievedQty(setSelectedIdxs.length);
   setBarcode('');
 };
 
@@ -425,7 +431,7 @@ const handleScannedCode = text => {
       vehicleNo: vehicleNo || '',
       billno: transferDetailss?.ewayBillNo || '',
       remarks: remarks || '',
-      totalRecQty: finalTotalQty || 0,
+      totalRecQty: recievedQty || 0,
       totalQty: transferDetailss?.totalQty || 0,
       customerId: toCustomerId || 0,
       transferType: transferDetailss?.bstdTypeTransfer || '',
@@ -483,8 +489,10 @@ const handleScannedCode = text => {
 
     setSelectedIdxs(prevIds => {
       if (prevIds.includes(item.bstId)) {
+        setRecievedQty(recievedQty => Number(recievedQty) - 1);
         return prevIds.filter(id => id !== item.bstId);
       } else {
+        setRecievedQty(recievedQty => Number(recievedQty) + 1);
         return [...prevIds, item.bstId];
       }
     });
@@ -521,6 +529,11 @@ const handleScannedCode = text => {
 
     setSelectedIdxs(newSelected);
     setSelectAllCheckBox(!selectAllCheckBox);
+    if(selectAllCheckBox){
+      setRecievedQty(rows.filter(r => !(r.editable)).length);
+    } else {
+      setRecievedQty(rows.length);
+    }
   };
 
   const handleSelectBarcode = () => {
@@ -542,10 +555,14 @@ const handleScannedCode = text => {
       selectedIdxs.includes(row.bstId),
     );
 
-    if (allSelected) {
+    const recievedItems = matchingRows.every(row =>
+      rows.filter(r => r.bstId===row.bstId && !r.editable).length > 0,
+    );
+    if (allSelected || recievedItems) {
       Alert.alert('Alert', 'This barcode is already Selected!!');
       return;
     }
+
 
     const newSelected = [
       ...selectedIdxs,
@@ -554,6 +571,9 @@ const handleScannedCode = text => {
         .map(row => row.bstId),
     ];
 
+    if(!allSelected && matchingRows.length > 0){
+      setRecievedQty(recievedQty => Number(recievedQty) + 1);
+    }
     setSelectedIdxs(newSelected);
     setBarcode('');
   };
@@ -954,8 +974,8 @@ const handleScannedCode = text => {
 
           <View style={{marginTop: 20}}>
             <TextInput
-              label="Total Send Qty "
-              value={totalQtyy ? totalQtyy?.toFixed(2)?.toString() : '0'}
+              label="Total Recieve Qty "
+              value={recievedQty ? recievedQty?.toFixed(2)?.toString() : '0'}
               mode="outlined"
               editable={false}
               onChangeText={text => console.log(text)}
@@ -1093,12 +1113,12 @@ const handleScannedCode = text => {
                     </View>
                     <View style={{width: 10}} />
                     <View style={{width: 100}}>
-                      <Text style={styles.table_data}>{'Total Send Qty'}</Text>
+                      <Text style={styles.table_data}>{'Total Recieve Qty'}</Text>
                     </View>
                     <View style={{width: 10}} />
                     <View style={{width: 100}}>
                       <Text style={styles.table_data}>
-                        {totalQtyy?.toFixed(2)}
+                        {recievedQty?.toFixed(2)}
                       </Text>
                     </View>
                     <View style={{width: 10}} />
