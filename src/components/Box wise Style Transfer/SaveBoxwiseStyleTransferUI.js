@@ -56,6 +56,7 @@ const SaveBoxwiseStyleTransferUI = ({route, ...props}) => {
           setDeliveryDate(date);
         }
         if (props.itemsObj.transferDetails.totalRecQty) {
+          // console.log(props.itemsObj.transferDetails.totalRecQty)
           setRecievedQty(props.itemsObj.transferDetails.totalRecQty);
         }
         if (props.itemsObj?.transferDetails.particulars) {
@@ -315,7 +316,10 @@ const handleScannedCode = text => {
     }
 
     if(!alreadySelected && matchingRows.length > 0){
-      setRecievedQty(recievedQty => Number(recievedQty) + 1);
+      const matchedRow = matchingRows[0];
+      // console.log('matchedRow ', matchedRow);
+      const rcQty = matchedRow?.bstpQty || 0;
+      setRecievedQty(recievedQty => Number(recievedQty) + rcQty);
     }
     const updated = [
       ...prev,
@@ -326,7 +330,7 @@ const handleScannedCode = text => {
 
     return updated;
   });
-  setRecievedQty(setSelectedIdxs.length);
+  // setRecievedQty(setSelectedIdxs.length);
   setBarcode('');
 };
 
@@ -489,10 +493,12 @@ const handleScannedCode = text => {
 
     setSelectedIdxs(prevIds => {
       if (prevIds.includes(item.bstId)) {
-        setRecievedQty(recievedQty => Number(recievedQty) - 1);
+        const rcQty = item?.bstpQty || 0;
+        setRecievedQty(recievedQty => Number(recievedQty) - rcQty);
         return prevIds.filter(id => id !== item.bstId);
       } else {
-        setRecievedQty(recievedQty => Number(recievedQty) + 1);
+        const rcQty = item?.bstpQty || 0;
+        setRecievedQty(recievedQty => Number(recievedQty) + rcQty);
         return [...prevIds, item.bstId];
       }
     });
@@ -530,9 +536,9 @@ const handleScannedCode = text => {
     setSelectedIdxs(newSelected);
     setSelectAllCheckBox(!selectAllCheckBox);
     if(selectAllCheckBox){
-      setRecievedQty(rows.filter(r => !(r.editable)).length);
+      setRecievedQty(rows.filter(r => !(r.editable)).reduce((sum, r) => sum + Number(r.bstpQty || 0), 0));
     } else {
-      setRecievedQty(rows.length);
+      setRecievedQty(rows.reduce((sum, r) => sum + Number(r.bstpQty || 0), 0));
     }
   };
 
@@ -572,7 +578,10 @@ const handleScannedCode = text => {
     ];
 
     if(!allSelected && matchingRows.length > 0){
-      setRecievedQty(recievedQty => Number(recievedQty) + 1);
+      const matchedRow = matchingRows[0];
+      // console.log('matchedRow ', matchedRow);
+      const rcQty = matchedRow?.bstpQty || 0;
+      setRecievedQty(recievedQty => Number(recievedQty) + rcQty);
     }
     setSelectedIdxs(newSelected);
     setBarcode('');
@@ -974,7 +983,7 @@ const handleScannedCode = text => {
 
           <View style={{marginTop: 20}}>
             <TextInput
-              label="Total Recieve Qty "
+              label="Total Recieved Qty "
               value={recievedQty ? recievedQty?.toFixed(2)?.toString() : '0'}
               mode="outlined"
               editable={false}
@@ -1113,7 +1122,7 @@ const handleScannedCode = text => {
                     </View>
                     <View style={{width: 10}} />
                     <View style={{width: 100}}>
-                      <Text style={styles.table_data}>{'Total Recieve Qty'}</Text>
+                      <Text style={styles.table_data}>{'Total Recieved Qty'}</Text>
                     </View>
                     <View style={{width: 10}} />
                     <View style={{width: 100}}>

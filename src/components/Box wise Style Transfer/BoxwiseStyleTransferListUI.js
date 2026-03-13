@@ -151,9 +151,9 @@ const BoxwiseStyleTransferListUI = ({route, navigation, ...props}) => {
 
   const handleActions = (item, type) => {
     if (type === 'OUT') {
-      props.handleInandOutDcPdfs(item.id, 1);
-    } else {
       props.handleInandOutDcPdfs(item.id, 0);
+    } else {
+      props.handleInandOutDcPdfs(item.id, 1);
     }
   };
 
