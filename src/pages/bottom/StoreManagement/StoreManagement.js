@@ -13,6 +13,7 @@ const StoreManagement = ({ navigation }) => {
     { id: 97, name: 'Stock Request ', component: 'StockRequestList', image: require('../../../../assets/images/png/stockRequest.png') },
     { id: 98, name: 'Stock Approval', component: 'StoreApproveListComponent', image: require('../../../../assets/images/png/stockApproval.png') },
     { id: 99, name: 'Stock Receive ', component: 'StockRecieveList', image: require('../../../../assets/images/png/stockRecieve.png') },
+    { id: 750, name: 'Stock Receive ', component: 'StockRecieveList', image: require('../../../../assets/images/png/stockRecieve.png') },
   ];
 
   const filteredinwardProcess = inwardProcess.filter((menu) => 

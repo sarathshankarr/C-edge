@@ -299,8 +299,8 @@ const BoxwiseStyleTransferList = ({route}) => {
 
       const pdfPath =
         Platform.OS === 'android'
-          ? `/storage/emulated/0/Download/BoxWiseStyleTransfer_${type===1? "OUT" :"IN"}_${transferId}.pdf`
-          : `${ReactNativeBlobUtil.fs.dirs.DocumentDir}/BoxWiseStyleTransfer_${type===1? "OUT" :"IN"}_${transferId}.pdf`;
+          ? `/storage/emulated/0/Download/BoxWiseStyleTransfer_${type===1? "IN" :"OUT"}_${transferId}.pdf`
+          : `${ReactNativeBlobUtil.fs.dirs.DocumentDir}/BoxWiseStyleTransfer_${type===1? "IN" :"OUT"}_${transferId}.pdf`;
 
       await ReactNativeBlobUtil.fs.writeFile(pdfPath, base64Data, 'base64');
 

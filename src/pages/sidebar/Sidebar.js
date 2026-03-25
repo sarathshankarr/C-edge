@@ -194,6 +194,12 @@ const Sidebar = ({navigation}) => {
           menu_id: 99,
           src: require('../../../assets/images/png/stockRecieve.png'),
         },
+        {
+          label: 'Stock Issue',
+          route: 'StockIssueList',
+          menu_id: 750,
+          src: require('../../../assets/images/png/stockissue11.png'),
+        },
       ],
     },
     inventory: {
@@ -299,18 +305,18 @@ const Sidebar = ({navigation}) => {
           menu_id: 49,
           src: require('../../../assets/images/png/acknowledge.png'),
         },
-        {
-          label: 'New In Process',
-          route: 'NewOutInProcessList',
-          menu_id: 247,
-          src: require('../../../assets/images/png/acknowledge.png'),
-        },
-        {
-          label: 'Delivery Challan ',
-          route: 'DeliveryChallanList',
-          menu_id: 65,
-          src: require('../../../assets/images/png/acknowledge.png'),
-        },
+        // {
+        //   label: 'New In Process',
+        //   route: 'NewOutInProcessList',
+        //   menu_id: 247,
+        //   src: require('../../../assets/images/png/acknowledge.png'),
+        // },
+        // {
+        //   label: 'Delivery Challan ',
+        //   route: 'DeliveryChallanList',
+        //   menu_id: 65,
+        //   src: require('../../../assets/images/png/acknowledge.png'),
+        // },
         {
           label: 'Box wise Style Transfer',
           route: 'BoxwiseStyleTransferList',

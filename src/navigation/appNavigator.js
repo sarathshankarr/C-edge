@@ -147,6 +147,9 @@ import SaveBillGenerationBarcode from '../components/Bill Generation (Barcode)/S
 import CreateBoxwiseStyleTransfer from '../components/Box wise Style Transfer/CreateBoxwiseStyleTransfer';
 import BoxwiseStyleTransferList from '../components/Box wise Style Transfer/BoxwiseStyleTransferList';
 import SaveBoxwiseStyleTransfer from '../components/Box wise Style Transfer/SaveBoxwiseStyleTransfer';
+import StockIssueList from '../components/storeComponents/StockIssue/StockIssueList';
+import CreateStockIssue from '../components/storeComponents/StockIssue/CreateStockIssue';
+import ViewStockIssue from '../components/storeComponents/StockIssue/ViewStockIssue';
 
 
 const Stack = createNativeStackNavigator();
@@ -201,6 +204,9 @@ const AppStack = () => {
       <Stack.Screen name="storeApproveEdit" component={StoreApproveEdit} options={{ headerShown: false }} /> 
       <Stack.Screen name="StockRequestList" component={StockRequestList} options={{ headerShown: false }} /> 
       <Stack.Screen name="StockRecieveList" component={StockRecieveList} options={{ headerShown: false }} /> 
+      <Stack.Screen name="StockIssueList" component={StockIssueList} options={{ headerShown: false }} />
+      <Stack.Screen name="CreateStockIssue" component={CreateStockIssue} options={{ headerShown: false }} />  
+      <Stack.Screen name="ViewStockIssue" component={ViewStockIssue} options={{ headerShown: false }} />  
       <Stack.Screen name="StockRequestEdit" component={StockRequestEdit} options={{ headerShown: false }} /> 
       <Stack.Screen name="StockRecieveEdit" component={StockRecieveEdit} options={{ headerShown: false }} /> 
       <Stack.Screen name="CreateStockRequest" component={CreateRequest} options={{ headerShown: false }} /> 
