@@ -11438,6 +11438,10 @@ export const downloadBoxWieStyleTransferInOutDcPdfs = () => {
   const URL = Environment.uri + 'styletransferapi/generateBoxTransferDC';
   return URL;
 };
+export const downloadStockIssuePdf = () => {
+  const URL = Environment.uri + 'stockIssue/generateStockIssueInvoice';
+  return URL;
+};
 
 export async function getBatchListAfterPriniting(jsonValue) {
   let returnError = undefined;
@@ -13764,6 +13768,439 @@ export async function getFiltered_DDA(jsonValue) {
     })
     .catch(error => {
       console.log('finshing out search  error ', error);
+      returnError = error;
+    });
+
+  obj = {
+    logoutData: logoutData,
+    statusData: statusData,
+    responseData: responseData,
+    error: returnError,
+    isInternet: internet,
+  };
+  return obj;
+}
+
+
+export async function stockIssuesListApi(jsonValue) {
+  let returnError = undefined;
+  let statusData = undefined;
+  let responseData = undefined;
+  let logoutData = false;
+  let obj = undefined;
+
+  let internet = await internetCheck();
+  if (!internet) {
+    obj = {
+      logoutData: logoutData,
+      statusData: statusData,
+      responseData: responseData,
+      error: returnError,
+      isInternet: internet,
+    };
+    return obj;
+  }
+  await fetch(Environment.uri + 'stockIssue/loadAllIssueStockList', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    body: JSON.stringify(jsonValue),
+  })
+    .then(response => response.json())
+    .then(async data => {
+      // console.log('stockRecieveListApi ', data)
+
+      if (data) {
+        statusData = true;
+        responseData = data;
+      } else {
+        statusData = undefined;
+      }
+    })
+    .catch(error => {
+      console.log('stockIssuesListApi error ', error);
+      returnError = error;
+    });
+
+  obj = {
+    logoutData: logoutData,
+    statusData: statusData,
+    responseData: responseData,
+    error: returnError,
+    isInternet: internet,
+  };
+  return obj;
+}
+
+export async function stockIssueViewApi(jsonValue) {
+  let returnError = undefined;
+  let statusData = undefined;
+  let responseData = undefined;
+  let logoutData = false;
+  let obj = undefined;
+
+  let internet = await internetCheck();
+  if (!internet) {
+    obj = {
+      logoutData: logoutData,
+      statusData: statusData,
+      responseData: responseData,
+      error: returnError,
+      isInternet: internet,
+    };
+    return obj;
+  }
+  await fetch(Environment.uri + 'stockIssue/stockissueview', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    body: JSON.stringify(jsonValue),
+  })
+    .then(response => response.json())
+    .then(async data => {
+      // console.log('stockRecieveListApi ', data)
+
+      if (data) {
+        statusData = true;
+        responseData = data;
+      } else {
+        statusData = undefined;
+      }
+    })
+    .catch(error => {
+      console.log('stockIssueViewApi error ', error);
+      returnError = error;
+    });
+
+  obj = {
+    logoutData: logoutData,
+    statusData: statusData,
+    responseData: responseData,
+    error: returnError,
+    isInternet: internet,
+  };
+  return obj;
+}
+
+export async function getStockIssueCreateData(jsonValue) {
+  let returnError = undefined;
+  let statusData = undefined;
+  let responseData = undefined;
+  let logoutData = false;
+  let obj = undefined;
+
+  let internet = await internetCheck();
+  if (!internet) {
+    obj = {
+      logoutData: logoutData,
+      statusData: statusData,
+      responseData: responseData,
+      error: returnError,
+      isInternet: internet,
+    };
+    return obj;
+  }
+  console.log('URL', Environment.uri + 'stockIssue/transferboxcreate');
+  await fetch(
+    Environment.uri + 'stockIssue/stockIssueCreateApi',
+
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+      body: JSON.stringify(jsonValue),
+    },
+  )
+    .then(response => response.json())
+    .then(async data => {
+      if (data) {
+        statusData = true;
+        responseData = data;
+      } else {
+        statusData = undefined;
+      }
+    })
+    .catch(error => {
+      console.log('stockIssueCreateApi error ', error);
+      returnError = error;
+    });
+
+  obj = {
+    logoutData: logoutData,
+    statusData: statusData,
+    responseData: responseData,
+    error: returnError,
+    isInternet: internet,
+  };
+  return obj;
+}
+
+
+
+export async function getWosByLocApi(jsonValue) {
+  let returnError = undefined;
+  let statusData = undefined;
+  let responseData = undefined;
+  let logoutData = false;
+  let obj = undefined;
+
+  let internet = await internetCheck();
+  if (!internet) {
+    obj = {
+      logoutData: logoutData,
+      statusData: statusData,
+      responseData: responseData,
+      error: returnError,
+      isInternet: internet,
+    };
+    return obj;
+  }
+  
+  await fetch(Environment.uri + 'stockIssue/getWosByLocApi', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    body: JSON.stringify(jsonValue),
+  })
+    .then(response => response.json())
+    .then(async data => {
+      // console.log('saveCreatePartsProcessing ', data)
+
+      if (data) {
+        statusData = true;
+        responseData = data;
+      } else {
+        statusData = undefined;
+      }
+    })
+    .catch(error => {
+      console.log('getWosByLocApi', error);
+      returnError = error;
+    });
+
+  obj = {
+    logoutData: logoutData,
+    statusData: statusData,
+    responseData: responseData,
+    error: returnError,
+    isInternet: internet,
+  };
+  return obj;
+}
+
+
+export async function getTrimValuesApi(jsonValue) {
+  let returnError = undefined;
+  let statusData = undefined;
+  let responseData = undefined;
+  let logoutData = false;
+  let obj = undefined;
+
+  let internet = await internetCheck();
+  if (!internet) {
+    obj = {
+      logoutData: logoutData,
+      statusData: statusData,
+      responseData: responseData,
+      error: returnError,
+      isInternet: internet,
+    };
+    return obj;
+  }
+  console.log('URL', Environment.uri + 'stockIssue/getTrimValuesApi');
+  await fetch(
+    Environment.uri + 'stockIssue/getTrimValuesApi',
+
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+      body: JSON.stringify(jsonValue),
+    },
+  )
+    .then(response => response.json())
+    .then(async data => {
+      if (data) {
+        statusData = true;
+        responseData = data;
+      } else {
+        statusData = undefined;
+      }
+    })
+    .catch(error => {
+      console.log('getTrimValuesApi error ', error);
+      returnError = error;
+    });
+
+  obj = {
+    logoutData: logoutData,
+    statusData: statusData,
+    responseData: responseData,
+    error: returnError,
+    isInternet: internet,
+  };
+  return obj;
+}
+
+export async function approveStockIssueItems(jsonValue) {
+  let returnError = undefined;
+  let statusData = undefined;
+  let responseData = undefined;
+  let logoutData = false;
+  let obj = undefined;
+
+  let internet = await internetCheck();
+  if (!internet) {
+    obj = {
+      logoutData: logoutData,
+      statusData: statusData,
+      responseData: responseData,
+      error: returnError,
+      isInternet: internet,
+    };
+    return obj;
+  }
+
+  console.log('jsonValue approveStockIssueItems ', jsonValue);
+
+  await fetch(Environment.uri + 'stockIssue/approveStockIssue', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    body: JSON.stringify(jsonValue),
+  })
+    .then(response => response.json())
+    .then(async data => {
+      // console.log('saveCreatePartsProcessing ', data)
+      if (data) {
+        statusData = true;
+        responseData = data;
+      } else {
+        statusData = undefined;
+      }
+    })
+    .catch(error => {
+      console.log('approveStockIssueItems', error);
+      returnError = error;
+    });
+
+  obj = {
+    logoutData: logoutData,
+    statusData: statusData,
+    responseData: responseData,
+    error: returnError,
+    isInternet: internet,
+  };
+  return obj;
+}
+
+export async function saveStockIssue(jsonValue) {
+  let returnError = undefined;
+  let statusData = undefined;
+  let responseData = undefined;
+  let logoutData = false;
+  let obj = undefined;
+
+  let internet = await internetCheck();
+  if (!internet) {
+    obj = {
+      logoutData: logoutData,
+      statusData: statusData,
+      responseData: responseData,
+      error: returnError,
+      isInternet: internet,
+    };
+    return obj;
+  }
+  
+  await fetch(Environment.uri + 'stockIssue/saveStockIssue', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    body: JSON.stringify(jsonValue),
+  })
+    .then(response => response.json())
+    .then(async data => {
+      // console.log('saveCreatePartsProcessing ', data)
+
+      if (data) {
+        statusData = true;
+        responseData = data;
+      } else {
+        statusData = undefined;
+      }
+    })
+    .catch(error => {
+      console.log('saveStockIssue', error);
+      returnError = error;
+    });
+
+  obj = {
+    logoutData: logoutData,
+    statusData: statusData,
+    responseData: responseData,
+    error: returnError,
+    isInternet: internet,
+  };
+  return obj;
+}
+
+export async function getfabricRollbasedOnBarcode(jsonValue) {
+  let returnError = undefined;
+  let statusData = undefined;
+  let responseData = undefined;
+  let logoutData = false;
+  let obj = undefined;
+
+  let internet = await internetCheck();
+  if (!internet) {
+    obj = {
+      logoutData: logoutData,
+      statusData: statusData,
+      responseData: responseData,
+      error: returnError,
+      isInternet: internet,
+    };
+    return obj;
+  }
+  console.log('URL', Environment.uri + 'stockIssue/getfabricRollbasedOnBarcode');
+  let endPoint = "getbarcodebasedonformat";
+  if(!jsonValue?.barcode?.startsWith('12345')) {
+    endPoint = "getfabricRollbasedOnBarcode"
+  }
+  await fetch(Environment.uri + 'stockIssue/'+endPoint, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    body: JSON.stringify(jsonValue),
+  })
+    .then(response => response.json())
+    .then(async data => {
+      if (data) {
+        statusData = true;
+        responseData = data;
+      } else {
+        statusData = undefined;
+      }
+    })
+    .catch(error => {
+      console.log('getPartsProcessingCreateList error ', error);
       returnError = error;
     });
 
