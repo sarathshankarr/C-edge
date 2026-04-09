@@ -141,6 +141,7 @@ const CreateStockIssueUI = props => {
   const [selectAllCheckBox, setSelectAllCheckBox] = useState(false);
   const [lastScannedBarcode, setLastScannedBarcode] = useState({});
   const scannedBarcodes = useRef(new Map());
+  const scannedBarcodesForItem = useRef(new Map());
 
 
 
@@ -371,11 +372,12 @@ const CreateStockIssueUI = props => {
       bpId: 0,
       itemId: item.itemId,
       qty: Number(item.issuedQty || 0),
+      barcodedetails: (
+        scannedBarcodesForItem.current.get(item.itemId +"_"+ (item.sizeId?item.sizeId:'')) ?? []
+      ).join(','),
       sizeId: item.sizeId || 0,
       type: item.type,
-      barcodedetails: item.barcode || '',
     }));
-
     submitObj.items = particulars;
 
     props.submitAction(submitObj);
@@ -386,16 +388,16 @@ const CreateStockIssueUI = props => {
 
   const toggleSelection = item => {
     setSelectedIdxs(prevIds => {
-      const key = item.itemId+(item.sizeId?item.sizeId:'')
+      const key = item.itemId+"_"+(item.sizeId?item.sizeId:'')
       let updated;
       if (prevIds.includes(key)) {
         updated = prevIds.filter(id => id !== key);
-        const row = rows.find(r => r.itemId+(r.sizeId?r.sizeId:'') === key);
+        const row = rows.find(r => r.itemId+"_"+(r.sizeId?r.sizeId:'') === key);
         if(row) {
           row.issuedQty = 0;
         }
       } else {
-        const row = rows.find((r => r.itemId+(r.sizeId?r.sizeId:'') === key));
+        const row = rows.find((r => r.itemId+"_"+(r.sizeId?r.sizeId:'') === key));
         if(row && row?.styleavailQty === 0) {
           Alert.alert('Alert', 'No Availiable Qty to Process...');
           return prevIds; // Don't change selection if styleavailQty is 0
@@ -415,7 +417,7 @@ const CreateStockIssueUI = props => {
     };
 
     const updateAllIndexes = () => {
-      const ids = rows.map(r => r.itemId+(r.sizeId?r.sizeId:''));
+      const ids = rows.map(r => r.itemId+"_"+(r.sizeId?r.sizeId:''));
       console.log('selectallcheckbox before', selectAllCheckBox);
       let newSelected = selectAllCheckBox
         ? []
@@ -426,10 +428,10 @@ const CreateStockIssueUI = props => {
       if(newSelected.length>0) {
         rows.forEach(row => {
           if(row.styleavailQty <= 0) {
-            newSelected = newSelected.filter(id => id !== row.itemId+(row.sizeId?row.sizeId:''));
+            newSelected = newSelected.filter(id => id !== row.itemId+"_"+(row.sizeId?row.sizeId:''));
             lessAvailQty = true;
           }
-          if(newSelected.includes(row.itemId+(row.sizeId?row.sizeId:''))) {
+          if(newSelected.includes(row.itemId+"_"+(row.sizeId?row.sizeId:''))) {
             if(row?.styleavailQty<row?.allowQty) {
               row.issuedQty = row?.styleavailQty;
             } else {
@@ -441,7 +443,7 @@ const CreateStockIssueUI = props => {
         })
       } else {
         rows.forEach(row => {
-          if(!newSelected.includes(row.itemId+(row.sizeId?row.sizeId:''))) {
+          if(!newSelected.includes(row.itemId+"_"+(row.sizeId?row.sizeId:''))) {
             row.issuedQty = 0;
           }
         })
@@ -528,13 +530,14 @@ const CreateStockIssueUI = props => {
           itemId: barcodeDetails.fabricId || 0,
           itemGeneratedBarcode: barcodeDetails.fmlgeneratedbarcode || '0',
           qty: barcodeDetails.rollwiseQty || 0,
+          styleId: barcodeDetails.styleId || 0,
           editQty: barcodeDetails.rollwiseQty || 0,
           sizeId: ''
         };
       }
     // fabricId, fmlgeneratedbarcode, rollwiseQty
       // Bug 4 fix — guard matchedRow
-      const matchedRow = rows.find(r => r.itemId+(r.sizeId?r.sizeId:'') === barcodeDetails.itemId+(barcodeDetails.sizeId?barcodeDetails.sizeId:''));
+      const matchedRow = rows.find(r => r.itemId+"_"+(r.sizeId?r.sizeId:'') === barcodeDetails.itemId+"_"+(barcodeDetails.sizeId?barcodeDetails.sizeId:''));
       if (!matchedRow) {
         Alert.alert('Error', 'No matching item found for scanned barcode');
         return;
@@ -546,7 +549,8 @@ const CreateStockIssueUI = props => {
         barcodeDetails.editQty = barcodeDetails.qty; // ✅ safe fallback
       }
       // Bug 3 fix — default barcodeQty to 0
-      const barcodeQty = scannedBarcodes.current.get(matchedRow.itemId+matchedRow.sizeId) ?? 0;
+      const bKey = matchedRow.itemId+"_"+(matchedRow.sizeId?matchedRow.sizeId:'')
+      const barcodeQty = scannedBarcodes.current.get(bKey) ?? 0;
       const newTotalQty = barcodeQty + barcodeDetails.editQty;
 
       let issuedQty = newTotalQty
@@ -561,12 +565,15 @@ const CreateStockIssueUI = props => {
 
     
       // Update scanned barcodes map
-      scannedBarcodes.current.set(matchedRow.itemId+matchedRow.sizeId, newTotalQty);
-    
-      // Bug 1 fix — update rows immutably, not by direct mutation
+      scannedBarcodes.current.set(bKey, newTotalQty);
+      const barcodeList = scannedBarcodesForItem.current.get(matchedRow.itemId+"_"+(matchedRow.sizeId?matchedRow.sizeId:'')) ?? [];
+      const bDetails = barcodeDetails.itemGeneratedBarcode+"_"+barcodeDetails.qty+"_"+(barcodeDetails.styleId == 0 ? 1 :0);
+      barcodeList.push(bDetails);
+      scannedBarcodesForItem.current.set(matchedRow.itemId+"_"+(matchedRow.sizeId?matchedRow.sizeId:''), barcodeList);
+      console.log([...scannedBarcodesForItem.current.entries()]);      // Bug 1 fix — update rows immutably, not by direct mutation
       setRows(prevRows =>
         prevRows.map(row =>
-          row.itemId+(row.sizeId?row.sizeId:'') === barcodeDetails.itemId+(barcodeDetails.sizeId?barcodeDetails.sizeId:'')
+          row.itemId+"_"+(row.sizeId?row.sizeId:'') === barcodeDetails.itemId+"_"+(barcodeDetails.sizeId?barcodeDetails.sizeId:'')
             ? {...row, issuedQty, editable: false, barcode: barcodeDetails?.itemGeneratedBarcode}  // ← new object, not mutation
             : row,
         ),
@@ -576,8 +583,8 @@ const CreateStockIssueUI = props => {
     
       setSelectedIdxs(prevs => {
         const safeIds = prevs ?? [];
-        if (safeIds.includes(barcodeDetails.itemId+(barcodeDetails.sizeId?barcodeDetails.sizeId:''))) return safeIds;
-        return [...safeIds, barcodeDetails.itemId+(barcodeDetails.sizeId?barcodeDetails.sizeId:'')];
+        if (safeIds.includes(barcodeDetails.itemId+"_"+(barcodeDetails.sizeId?barcodeDetails.sizeId:''))) return safeIds;
+        return [...safeIds, barcodeDetails.itemId+"_"+(barcodeDetails.sizeId?barcodeDetails.sizeId:'')];
       });
     };
 
@@ -621,7 +628,7 @@ const handleEditScannedQty = (qty) => {
   if (qty === '' || qty === null) {
     setLastScannedBarcode(prev => ({ ...prev, editQty: 0 }));
     setRows(prev => prev.map(r =>
-      r.itemId + (r.sizeId ?? '') === currentBarcode.itemId + (currentBarcode.sizeId ?? '')
+      r.itemId +"_"+ (r.sizeId?r.sizeId: '') === currentBarcode.itemId +"_"+ (currentBarcode.sizeId?currentBarcode.sizeId: '')
         ? { ...r, issuedQty: r.issuedQty - currentBarcode.editQty }
         : r
     ));
@@ -635,8 +642,8 @@ const handleEditScannedQty = (qty) => {
   const barcodeEditQty = parseFloat(currentBarcode.editQty) || 0; // ✅ from ref
 
   const row = rows.find(r =>
-    r.itemId + (r.sizeId ?? '') ===
-    currentBarcode.itemId + (currentBarcode.sizeId ?? '')
+    r.itemId +"_"+ (r.sizeId?r.sizeId: '') ===
+    currentBarcode.itemId +"_"+ (currentBarcode.sizeId?currentBarcode.sizeId:'')
   );
 
   if (row) {
@@ -657,13 +664,13 @@ const handleEditScannedQty = (qty) => {
       return;
     } else {
       setRows(prev => prev.map(r =>
-        r.itemId + (r.sizeId ?? '') ===
-        currentBarcode.itemId + (currentBarcode.sizeId ?? '')
+        r.itemId +"_"+ (r.sizeId?r.sizeId: '') ===
+        currentBarcode.itemId +"_"+ (currentBarcode.sizeId?currentBarcode.sizeId:'')
           ? { ...r, issuedQty: copiedIssuedQty + parsedQty }
           : r
       ));
       setLastScannedBarcode(prev => ({ ...prev, editQty: parsedQty }));
-      scannedBarcodes.current.set(row.itemId + row.sizeId, copiedIssuedQty + parsedQty);
+      scannedBarcodes.current.set(row.itemId+"_"+(row.sizeId?matchedRow.sizeId:''), copiedIssuedQty + parsedQty);
     }
   }
 };
@@ -913,7 +920,7 @@ const handleEditScannedQty = (qty) => {
                       <CustomCheckBox2
                            style={styles.table_data}
                             isChecked={
-                              selectedIdxs?.includes(row.itemId+(row.sizeId?row.sizeId:''))
+                              selectedIdxs?.includes(row.itemId+"_"+(row.sizeId?row.sizeId:''))
                             }
                             isIndeterminate={false}
                             onToggle={() => toggleSelection(row)}

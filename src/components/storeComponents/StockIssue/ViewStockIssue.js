@@ -69,7 +69,8 @@ const ViewStockIssue = ({navigation, route, ...props}) => {
       SAVEAPIObj?.responseData !== 0
     ) {
       console.log('Sucessfully saved ===> ');
-      backBtnAction();
+      // backBtnAction();
+      navigation.navigate('StockIssueList', {refresh: Date.now()});
     } else {
       console.log('failed  saving =====> ');
       popUpAction(
