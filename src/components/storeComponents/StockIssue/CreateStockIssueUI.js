@@ -140,6 +140,8 @@ const CreateStockIssueUI = props => {
   const [selectedIdxs, setSelectedIdxs] = useState([]);
   const [selectAllCheckBox, setSelectAllCheckBox] = useState(false);
   const [lastScannedBarcode, setLastScannedBarcode] = useState({});
+  const [uniqueBarcodes, setUniqueBarcodes] = useState([]);
+  const barcodesRef = useRef([]);  // ✅ always has latest value
   const scannedBarcodes = useRef(new Map());
   const scannedBarcodesForItem = useRef(new Map());
 
@@ -504,7 +506,11 @@ const CreateStockIssueUI = props => {
         Alert.alert('Error', 'Enter valid barcode');
         return;
       }
-    
+       // ✅ Check ref instead of state
+      if (barcodesRef.current.includes(text.trim())) {
+        Alert.alert('Alert', 'This barcode is Scanned!!');
+        return;
+      }
       const parts = workOrderId.toString().split('_');
       const styleId = parts[0]?.trim();
     
@@ -580,7 +586,9 @@ const CreateStockIssueUI = props => {
       );
     
       setLastScannedBarcode(barcodeDetails);
-    
+      barcodesRef.current = [...barcodesRef.current, text.trim()];
+      setUniqueBarcodes(barcodesRef.current);
+      
       setSelectedIdxs(prevs => {
         const safeIds = prevs ?? [];
         if (safeIds.includes(barcodeDetails.itemId+"_"+(barcodeDetails.sizeId?barcodeDetails.sizeId:''))) return safeIds;
@@ -588,7 +596,9 @@ const CreateStockIssueUI = props => {
       });
     };
 
-
+useEffect(() => {
+  console.log('uniqueBarcodes updated:', uniqueBarcodes);
+}, [uniqueBarcodes]);
     
       const handleBarcodeChange = text => {
         setBarcode(text);

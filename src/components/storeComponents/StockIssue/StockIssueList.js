@@ -28,6 +28,12 @@ const StockIssueList = ({navigation, route, ...props}) => {
     getInitialData(0, true);
   }, []);
 
+  React.useEffect(() => {
+    if (route?.params?.refresh) {
+      getInitialData(0, true);
+    }
+  }, [route?.params?.refresh]);
+
   const backBtnAction = () => {
     navigation.navigate('Main');
   };
