@@ -211,7 +211,7 @@ const CreateMasterBoxPackingUI = ({route, ...props}) => {
   const handleCallBarcodes = code => {
     setBarcode(code);
     console.log('code length ', code.length, code, code.length !== 8);
-    if (code.length !== 9) return;
+    if (code.length !== 8) return;
 
     if (poflag && selectedProformaIndices.length === 0) {
       Alert.alert('Alert', 'Please select proforma Invoice Id');

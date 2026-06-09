@@ -387,7 +387,7 @@ const CreateBillGenerationBarcodeUI = ({route, ...props}) => {
       return;
     }
 
-    if (!text || text.trim().length !== 9) {
+    if (!text || text.trim().length !== 8) {
       Alert.alert('Alert','Please Enter the Valid Barcode');
       return;
     }
