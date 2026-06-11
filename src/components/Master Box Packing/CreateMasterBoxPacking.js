@@ -23,6 +23,8 @@ const CreateMasterBoxPacking = ({route}) => {
   const [quality, set_quality] = useState([]);
   const [barcodeData, set_barcodeData] = useState([]);
   const [checkBoxStyles, set_checkBoxStyles] = useState([]);
+  const [locationList, set_locationList] = useState([]);
+  const packedQtyByStyle = useRef({});
 
   const backBtnAction = () => {
     navigation.goBack();
@@ -80,6 +82,28 @@ const CreateMasterBoxPacking = ({route}) => {
         false,
       );
     }
+
+    // Fetch location list from the same API used in Stock Issue
+    set_isLoading(true);
+    const locObj = {
+      username: userName,
+      password: userPsd,
+      menuId: 750,
+      woId: 0,
+      woLocId: 0,
+      woStyleId: 0,
+      company: JSON.parse(companyObj),
+    };
+    const locAPIObj = await APIServiceCall.getStockIssueCreateData(locObj);
+    set_isLoading(false);
+
+    if (locAPIObj?.statusData && locAPIObj?.responseData?.locationsMap) {
+      const list = Object.keys(locAPIObj.responseData.locationsMap).map(key => ({
+        id: key,
+        name: locAPIObj.responseData.locationsMap[key],
+      }));
+      set_locationList(list);
+    }
   };
 
   const getDataFromSelectedCheckBox = async (ids, poflag) => {
@@ -134,7 +158,7 @@ const CreateMasterBoxPacking = ({route}) => {
     }
   };
 
-  const ValidateBarcode = async (id, poflag, piIds) => {
+  const ValidateBarcode = async (id, poflag, piIds, locationId) => {
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
@@ -152,13 +176,15 @@ const CreateMasterBoxPacking = ({route}) => {
     const styleQtyList = piIds.flatMap(piId => {
       return checkBoxStyles
         .filter(style => style.proforma_pi_id == piId)
-        .map(style => ({
-          style_id: style.style_id,
-          style_qty: style.total_qty,
-          pi_ID: Number(piId),
-        }));
+        .map(style => {
+          const alreadyPackedQty = packedQtyByStyle.current[style.style_id] || 0;
+          return {
+            style_id: style.style_id,
+            style_qty: style.total_qty - alreadyPackedQty,
+            pi_ID: Number(piId),
+          };
+        });
     });
-    console.log('style list -===> ', styleQtyList);
 
     let obj2 = {
       username: userName,
@@ -168,6 +194,7 @@ const CreateMasterBoxPacking = ({route}) => {
       barcode: id,
       multiPI: piIds.join(':'),
       styleQtyList: styleQtyList || [],
+      locationId: locationId ? Number(locationId) : 0,
     };
 
     console.log('req body validate barcode pi ', obj2);
@@ -219,7 +246,7 @@ const CreateMasterBoxPacking = ({route}) => {
     }
   };
 
-  const getDatafromBarcode = async (id, key, poflag, piIds) => {
+  const getDatafromBarcode = async (id, key, poflag, piIds, styleId) => {
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
@@ -248,7 +275,13 @@ const CreateMasterBoxPacking = ({route}) => {
           ...LISTAPIOBJ.responseData,
           Barcode: id,
           boxKeyId: key,
+          styleId: styleId || 0,
         });
+        if (styleId) {
+          packedQtyByStyle.current[styleId] =
+            (packedQtyByStyle.current[styleId] || 0) +
+            Number(LISTAPIOBJ.responseData.qty || 0);
+        }
       }
     } else {
       popUpAction(
@@ -295,6 +328,15 @@ const CreateMasterBoxPacking = ({route}) => {
     console.log('Sucess before returned obj ', SAVEAPIObj);
 
     return SAVEAPIObj?.responseData;
+  };
+
+  const onRowRemove = (styleId, qty) => {
+    if (styleId && packedQtyByStyle.current[styleId] !== undefined) {
+      packedQtyByStyle.current[styleId] = Math.max(
+        0,
+        (packedQtyByStyle.current[styleId] || 0) - Number(qty || 0),
+      );
+    }
   };
 
   const submitAction = async (tempObj) => {
@@ -424,8 +466,7 @@ const CreateMasterBoxPacking = ({route}) => {
 
     if (LISTAPIOBJ && LISTAPIOBJ.statusData) {
       if (LISTAPIOBJ && LISTAPIOBJ.responseData) {
-        console.log('getDataForPIAfterValidation ', LISTAPIOBJ.responseData);
-        getDatafromBarcode(id, LISTAPIOBJ.responseData.rKey, poflag, piIds);
+        getDatafromBarcode(id, LISTAPIOBJ.responseData.rKey, poflag, piIds, data.style_id);
       }
     } else {
       popUpAction(
@@ -467,6 +508,8 @@ const CreateMasterBoxPacking = ({route}) => {
       ValidateBarcode={ValidateBarcode}
       backBtnAction={backBtnAction}
       popOkBtnAction={popOkBtnAction}
+      locationList={locationList}
+      onRowRemove={onRowRemove}
     />
   );
 };
