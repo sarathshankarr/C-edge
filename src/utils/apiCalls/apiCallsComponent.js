@@ -465,7 +465,7 @@ export async function loadAllStylesAPI(jsonValue) {
   }
 
   try {
-    console.log('Style Api ', Environment.uri + 'styleapi/loadAllStyles');
+    console.log('Style Api ', Environment.uri + 'styleapi/loadAllStyles', jsonValue);
     const response = await fetch(Environment.uri + 'styleapi/loadAllStyles', {
       method: 'POST',
       headers: {
@@ -6330,16 +6330,20 @@ export async function LoadAllBoxPacking(jsonValue) {
 
   let internet = await internetCheck();
   if (!internet) {
-    obj = {
-      logoutData: logoutData,
-      statusData: statusData,
-      responseData: responseData,
+    return {
+      logoutData,
+      statusData,
+      responseData,
       error: returnError,
       isInternet: internet,
     };
-    return obj;
   }
-  console.log('URL', Environment.uri + 'boxpacking/loadAllBoxpacking');
+
+  console.log('URL', Environment.uri + 'boxpacking/loadAllBoxpacking', jsonValue);
+console.log('***********************************************************************')
+  console.log('Request Body:', JSON.stringify(jsonValue)); // ✅ log the request body
+    console.log('***********************************************************************')
+
   await fetch(Environment.uri + 'boxpacking/loadAllBoxpacking', {
     method: 'POST',
     headers: {
@@ -6348,28 +6352,36 @@ export async function LoadAllBoxPacking(jsonValue) {
     },
     body: JSON.stringify(jsonValue),
   })
-    .then(response => response.json())
-    .then(async data => {
-      if (data) {
-        statusData = true;
-        responseData = data;
-      } else {
-        statusData = undefined;
+    .then(async response => {
+      console.log('STATUS:', response.status); // ✅ response accessible here
+      
+      const text = await response.text();
+      
+      try {
+        const data = JSON.parse(text);
+        if (data) {
+          statusData = true;
+          responseData = data;
+        } else {
+          statusData = undefined;
+        }
+      } catch (e) {
+        console.log('RAW RESPONSE:', text); // ✅ see what server actually returned
+        returnError = 'Invalid JSON response from server';
       }
     })
     .catch(error => {
-      console.log('LoadAllPoDraft error ', error);
+      console.log('LoadAllBoxPacking error:', error);
       returnError = error;
     });
 
-  obj = {
-    logoutData: logoutData,
-    statusData: statusData,
-    responseData: responseData,
+  return {
+    logoutData,
+    statusData,
+    responseData,
     error: returnError,
     isInternet: internet,
   };
-  return obj;
 }
 export async function LoadAllMasterBoxPacking(jsonValue) {
   let returnError = undefined;
@@ -6393,6 +6405,10 @@ export async function LoadAllMasterBoxPacking(jsonValue) {
     'URL',
     Environment.uri + 'masterboxpacking/loadAllMasterBoxpacking',
   );
+  console.log('***********************************************************************')
+  console.log('Request Body:', JSON.stringify(jsonValue)); // ✅ log the request body
+    console.log('***********************************************************************')
+
   await fetch(Environment.uri + 'masterboxpacking/loadAllMasterBoxpacking', {
     method: 'POST',
     headers: {
@@ -12581,30 +12597,27 @@ export async function getFiltered_StockRecieve(jsonValue) {
     'URL',
     Environment.uri + 'stockapprove/loadAllStockRecSearchCategoryType',
   );
-  await fetch(
-    Environment.uri + 'stockapprove/loadAllStockRecSearchCategoryType',
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
+  try {
+    const response = await fetch(
+      Environment.uri + 'stockapprove/loadAllStockRecSearchCategoryType',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify(jsonValue),
       },
-      body: JSON.stringify(jsonValue),
-    },
-  )
-    .then(response => response.json())
-    .then(async data => {
-      if (data) {
-        statusData = true;
-        responseData = data;
-      } else {
-        statusData = undefined;
-      }
-    })
-    .catch(error => {
-      console.log('GatePassAckList error ', error);
-      returnError = error;
-    });
+    );
+    const data = await response.json();
+    if (data) {
+      statusData = true;
+      responseData = data;
+    }
+  } catch (error) {
+    console.log('getFiltered_StockRecieve error ', error);
+    returnError = error;
+  }
 
   obj = {
     logoutData: logoutData,
@@ -13800,29 +13813,29 @@ export async function stockIssuesListApi(jsonValue) {
     };
     return obj;
   }
-  await fetch(Environment.uri + 'stockIssue/loadAllIssueStockList', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-    },
-    body: JSON.stringify(jsonValue),
-  })
-    .then(response => response.json())
-    .then(async data => {
-      // console.log('stockRecieveListApi ', data)
-
-      if (data) {
-        statusData = true;
-        responseData = data;
-      } else {
-        statusData = undefined;
-      }
-    })
-    .catch(error => {
-      console.log('stockIssuesListApi error ', error);
-      returnError = error;
-    });
+  console.log('URL', Environment.uri + 'stockIssue/loadAllIssueStockList');
+  console.log('stockIssuesListApi jsonValue ', jsonValue);
+  try {
+    const response = await fetch(
+      Environment.uri + 'stockIssue/loadAllIssueStockList',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify(jsonValue),
+      },
+    );
+    const data = await response.json();
+    if (data) {
+      statusData = true;
+      responseData = data;
+    }
+  } catch (error) {
+    console.log('stockIssuesListApi error ', error);
+    returnError = error;
+  }
 
   obj = {
     logoutData: logoutData,
@@ -13852,29 +13865,27 @@ export async function stockIssueViewApi(jsonValue) {
     };
     return obj;
   }
-  await fetch(Environment.uri + 'stockIssue/stockissueview', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-    },
-    body: JSON.stringify(jsonValue),
-  })
-    .then(response => response.json())
-    .then(async data => {
-      // console.log('stockRecieveListApi ', data)
-
-      if (data) {
-        statusData = true;
-        responseData = data;
-      } else {
-        statusData = undefined;
-      }
-    })
-    .catch(error => {
-      console.log('stockIssueViewApi error ', error);
-      returnError = error;
-    });
+  try {
+    const response = await fetch(
+      Environment.uri + 'stockIssue/stockissueview',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify(jsonValue),
+      },
+    );
+    const data = await response.json();
+    if (data) {
+      statusData = true;
+      responseData = data;
+    }
+  } catch (error) {
+    console.log('stockIssueViewApi error ', error);
+    returnError = error;
+  }
 
   obj = {
     logoutData: logoutData,
