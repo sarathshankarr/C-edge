@@ -29,6 +29,7 @@ import {RadioGroup} from 'react-native-radio-buttons-group';
 import {ColorContext} from '../colorTheme/colorTheme';
 import CustomCheckBox from '../../utils/commonComponents/CustomCheckBox';
 import {useNavigation} from '@react-navigation/native';
+import * as APIServiceCall from '../../utils/apiCalls/apiCallsComponent';
 
 let downArrowImg = require('./../../../assets/images/png/dropDownImg.png');
 let closeImg = require('./../../../assets/images/png/close1.png');
@@ -288,7 +289,7 @@ const handleScan = () => {
     }
 
     if (inHouse === 'Yes' && !toLocationId) {
-      Alert.alert('Alert', 'Please Select To Location');
+      Alert.alert('Alert', 'Please Select From Location');
       return;
     }
     if (customer === 'Yes' && !toCustomerId) {
@@ -344,7 +345,23 @@ const handleScan = () => {
       isReturnable: inHouse === 'Yes' ? 'Y' : returnable ? 'Y' : 'N',
     };
     console.log('save obj ===========> ', Obj);
-    props.submitAction(Obj);
+
+    const barcodeList = [...new Set(filteredRows.map(p => p.bstpBarcode))].join(',');
+    props.set_isLoading(true);
+    const checkObj = await APIServiceCall.checkStyleWiseLocationInv(barcodeList, String(Obj.fromLoc));
+    props.set_isLoading(false);
+
+    if (!checkObj || !checkObj.statusData || checkObj.error) {
+      props.popUpAction(Constant.SERVICE_FAIL_MSG, Constant.DefaultAlert_MSG, 'OK', true, false);
+      return;
+    }
+
+    if (checkObj.responseData?.message !== 'Inventory available.') {
+      props.popUpAction(checkObj.responseData?.message, Constant.DefaultAlert_MSG, 'OK', true, false);
+      return;
+    }
+
+    await props.submitAction(Obj);
   };
 
   // const handleRemoveRow = id => {

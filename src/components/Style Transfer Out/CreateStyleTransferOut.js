@@ -109,20 +109,6 @@ const CreateStyleTransferOut = ({route}) => {
   };
 
   const submitAction = async tempObj => {
-    // const validateRMT = await ValidateAction();
-
-    // if (validateRMT === 'no') {
-    //   console.log('failed  saving =====> ');
-    //   popUpAction(
-    //     Constant.Fail_Validate_RMT_MSG,
-    //     Constant.DefaultAlert_MSG,
-    //     'OK',
-    //     true,
-    //     false,
-    //   );
-    //   return;
-    // }
-
     let userName = await AsyncStorage.getItem('userName');
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');

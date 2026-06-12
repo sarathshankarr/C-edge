@@ -1,4 +1,5 @@
 import NetInfo from '@react-native-community/netinfo';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 // import BuildEnv from './../../config/environment/environmentConfig';
 
 // const Environment= JSON.parse(BuildEnv.Environment());
@@ -9424,7 +9425,7 @@ export async function saveCreateBoxWiseStyleTransfer(jsonValue) {
     };
     return obj;
   }
-  
+  console.log("Environment.uri + 'styletransferapi/saveBoxTransferDetails");
   await fetch(Environment.uri + 'styletransferapi/saveBoxTransferDetails', {
     method: 'POST',
     headers: {
@@ -14212,6 +14213,78 @@ export async function getfabricRollbasedOnBarcode(jsonValue) {
     })
     .catch(error => {
       console.log('getPartsProcessingCreateList error ', error);
+      returnError = error;
+    });
+
+  obj = {
+    logoutData: logoutData,
+    statusData: statusData,
+    responseData: responseData,
+    error: returnError,
+    isInternet: internet,
+  };
+  return obj;
+}
+export async function checkStyleWiseLocationInv(barcodeList, fromLoc) {
+  let returnError = undefined;
+  let statusData = undefined;
+  let responseData = undefined;
+  let logoutData = false;
+  let obj = undefined;
+
+  let internet = await internetCheck();
+  if (!internet) {
+    obj = {
+      logoutData: logoutData,
+      statusData: statusData,
+      responseData: responseData,
+      error: returnError,
+      isInternet: internet,
+    };
+    return obj;
+  }
+
+  const userName = await AsyncStorage.getItem('userName');
+  const userPsd = await AsyncStorage.getItem('userPsd');
+  const companyObj = await AsyncStorage.getItem('companyObj');
+  console.log('URL', Environment.uri + 'styletransferapi/checkStyleWiseLocationInv');
+  console.log('paload', JSON.stringify({
+      barcodeList: String(barcodeList),
+      fromLocation: String(fromLoc),
+      username: userName,
+      password: userPsd,
+      company: JSON.parse(companyObj),
+    }));
+  await fetch(Environment.uri + 'styletransferapi/checkStyleWiseLocationInv', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    body: JSON.stringify({
+      barcodeList: String(barcodeList),
+      fromLocation: String(fromLoc),
+      username: userName,
+      password: userPsd,
+      company: JSON.parse(companyObj),
+    }),
+  })
+    .then(response => response.text())
+    .then(async data => {
+      statusData = true;
+      try {
+        responseData = JSON.parse(data);
+      } catch (e) {
+        const msgMatch = data.match(/message=(.+),\s*status=(true|false)/);
+        if (msgMatch) {
+          responseData = {message: msgMatch[1].trim(), status: msgMatch[2] === 'true'};
+        } else {
+          responseData = {message: data, status: false};
+        }
+      }
+    })
+    .catch(error => {
+      console.log('checkStyleWiseLocationInv error ', error);
       returnError = error;
     });
 
