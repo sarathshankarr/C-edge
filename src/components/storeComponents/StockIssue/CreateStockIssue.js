@@ -155,7 +155,7 @@ const CreateStockIssue = ({route}) => {
     set_isLoading(false);
 
     if (res?.statusData && res?.responseData !== 0) {
-      backBtnAction();
+      navigation.navigate('StockIssueList', {refresh: Date.now()});
     } else {
       popUpAction(
         Constant.Fail_Save_Dtls_MSG,

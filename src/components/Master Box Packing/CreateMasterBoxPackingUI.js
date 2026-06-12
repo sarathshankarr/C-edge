@@ -55,6 +55,12 @@ const CreateMasterBoxPackingUI = ({route, ...props}) => {
 
   const [poflag, setPoFlag] = useState(false);
 
+  const [locationList, setLocationList] = useState([]);
+  const [filteredLocationList, setFilteredLocationList] = useState([]);
+  const [showLocationList, setShowLocationList] = useState(false);
+  const [locationName, setLocationName] = useState('');
+  const [locationId, setLocationId] = useState('');
+
   const {colors} = useContext(ColorContext);
 
   const styles = getStyles(colors);
@@ -137,6 +143,13 @@ const CreateMasterBoxPackingUI = ({route, ...props}) => {
   }, [props.lists]);
 
   useEffect(() => {
+    if (props.locationList && props.locationList.length > 0) {
+      setLocationList(props.locationList);
+      setFilteredLocationList(props.locationList);
+    }
+  }, [props.locationList]);
+
+  useEffect(() => {
     if (props.quality) {
       console.log('quality ====> ', props.quality);
 
@@ -192,6 +205,7 @@ const CreateMasterBoxPackingUI = ({route, ...props}) => {
           showBoxList: false,
           BoxList: lastestBoxList || [],
           filteredBoxList: lastestBoxList || [],
+          styleId: props.barcodeData.styleId || 0,
           CustomerStyleName: props.barcodeData.size || '',
           size: props.barcodeData.styleNo || '',
           Qty: props.barcodeData.qty || '',
@@ -211,10 +225,15 @@ const CreateMasterBoxPackingUI = ({route, ...props}) => {
   const handleCallBarcodes = code => {
     setBarcode(code);
     console.log('code length ', code.length, code, code.length !== 8);
-    if (code.length !== 9) return;
+    if (code.length !== 8) return;
+
+    if (!locationId) {
+      Alert.alert('Alert', 'Please select a location');
+      return;
+    }
 
     if (poflag && selectedProformaIndices.length === 0) {
-      Alert.alert('Alert', 'Please select proforma Invoice Id');
+      Alert.alert('Alert', 'Please select at least one Proforma Invoice.');
       return;
     }
     const isDuplicate = rows.some(row => row.Barcode == code.trim());
@@ -225,7 +244,7 @@ const CreateMasterBoxPackingUI = ({route, ...props}) => {
     }
 
     console.log('barcode scanned ', code);
-    props.ValidateBarcode(code, poflag, selectedProformaIndices);
+    props.ValidateBarcode(code, poflag, selectedProformaIndices, locationId);
   };
 
   const handleScannedCode = text => {
@@ -316,9 +335,11 @@ const CreateMasterBoxPackingUI = ({route, ...props}) => {
   };
 
   const handleRemoveRow = id => {
-    console.log('ROW ID ===> ', id);
-    const filtered = rows.filter(item => item.id !== id);
-    setRows(filtered);
+    const rowToRemove = rows.find(item => item.id === id);
+    if (rowToRemove) {
+      props.onRowRemove(rowToRemove.styleId, rowToRemove.Qty);
+    }
+    setRows(rows.filter(item => item.id !== id));
   };
 
   const handleSearchboxName = async (text, rowId) => {
@@ -442,6 +463,14 @@ const CreateMasterBoxPackingUI = ({route, ...props}) => {
   };
 
   const handleScan = () => {
+    if (!locationId) {
+      Alert.alert('Alert', 'Please select a location');
+      return;
+    }
+    if (poflag && selectedProformaIndices.length === 0) {
+      Alert.alert('Alert', 'Please select at least one Proforma Invoice.');
+      return;
+    }
     navigation.navigate('ScanQRPage', {
       onScanSuccess: scannedValue => {
         console.log('Scanned Code: ', scannedValue);
@@ -665,6 +694,94 @@ const CreateMasterBoxPackingUI = ({route, ...props}) => {
               onChangeText={text => setbuyerName(text)}
             />
           </View> */}
+
+          {/* Location Dropdown */}
+          <View
+            style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: '#fff',
+              marginTop: hp('2%'),
+              width: '100%',
+            }}>
+            <TouchableOpacity
+              disabled={rows.length > 0}
+              style={{
+                flexDirection: 'row',
+                borderWidth: 0.5,
+                borderColor: '#D8D8D8',
+                borderRadius: hp('0.5%'),
+                width: '100%',
+                justifyContent: 'space-between',
+                backgroundColor: rows.length > 0 ? '#f0f0f0' : '#fff',
+                opacity: rows.length > 0 ? 0.6 : 1,
+              }}
+              onPress={() => setShowLocationList(!showLocationList)}>
+              <View>
+                <View style={[styles.SectionStyle1, {}]}>
+                  <View style={{flexDirection: 'column'}}>
+                    <Text
+                      style={
+                        locationId
+                          ? [styles.dropTextLightStyle]
+                          : [styles.dropTextInputStyle]
+                      }>
+                      {'Location'}
+                    </Text>
+                    {locationId ? (
+                      <Text style={[styles.dropTextInputStyle]}>
+                        {locationName}
+                      </Text>
+                    ) : null}
+                  </View>
+                </View>
+              </View>
+              <View style={{justifyContent: 'center'}}>
+                <Image source={downArrowImg} style={styles.imageStyle} />
+              </View>
+            </TouchableOpacity>
+
+            {showLocationList && (
+              <View style={styles.dropdownContent1}>
+                <TextInput
+                  style={styles.searchInput}
+                  placeholder="Search"
+                  onChangeText={text => {
+                    if (text.trim().length > 0) {
+                      setFilteredLocationList(
+                        locationList.filter(item =>
+                          item.name.toLowerCase().includes(text.toLowerCase()),
+                        ),
+                      );
+                    } else {
+                      setFilteredLocationList(locationList);
+                    }
+                  }}
+                  placeholderTextColor="#000"
+                />
+                <ScrollView style={styles.scrollView} nestedScrollEnabled={true}>
+                  {filteredLocationList.length === 0 ? (
+                    <Text style={styles.noCategoriesText}>
+                      Sorry, no results found!
+                    </Text>
+                  ) : (
+                    filteredLocationList.map((item, index) => (
+                      <TouchableOpacity
+                        key={index}
+                        style={styles.dropdownOption}
+                        onPress={() => {
+                          setLocationId(item.id);
+                          setLocationName(item.name);
+                          setShowLocationList(false);
+                        }}>
+                        <Text style={{color: '#000'}}>{item.name}</Text>
+                      </TouchableOpacity>
+                    ))
+                  )}
+                </ScrollView>
+              </View>
+            )}
+          </View>
 
           <View style={{marginTop: hp('2%')}}>
             <TextInput

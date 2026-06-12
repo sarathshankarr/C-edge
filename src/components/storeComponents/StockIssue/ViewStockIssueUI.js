@@ -40,7 +40,19 @@ const ViewStockIssueUI = ({route, ...props}) => {
         }
       }
       if (props.itemsObj?.issueList) {
-        setRows(props.itemsObj?.issueList);
+        const isBarcodeWise = props.itemsObj?.isbarcodewise ?? false;
+
+        const updatedRows = props.itemsObj.issueList.map(row => {
+          if (isBarcodeWise) {
+            checkedItems.current.set(row.sic_id, row.sic_issue_qty);
+            return {
+              ...row,
+              sic_approve_qty: row.sic_issue_qty,
+            };
+          }
+          return row;
+        });
+        setRows(updatedRows);
       }
       console.log(stockIssueObject)
   }, [props.itemsObj]);
@@ -223,10 +235,10 @@ const ViewStockIssueUI = ({route, ...props}) => {
                   <View style={styles.table_head}>
                     <View style={{width: 60}}>
                         <CustomCheckBox2
-                            isChecked={(rows.filter(row => row.sic_is_checked === 0).length)===selectedIdxs.length}
+                            isChecked={((rows.filter(row => row.sic_is_checked === 0).length)===selectedIdxs.length || (stockIssueObject?.isbarcodewise ?? false))}
                             isIndeterminate={selectedIdxs.length>0 && (rows.filter(row => row.sic_is_checked === 0).length)>selectedIdxs.length}
                             onToggle={updateAllIndexes}
-                            disabled={stockIssueObject?.status === 0 ? false : true}
+                            disabled={stockIssueObject?.status === 0 &&  !(stockIssueObject?.isbarcodewise ?? false)? false : true}
                         />
                     </View>
                     <View style={{width: 100}}>
@@ -261,11 +273,11 @@ const ViewStockIssueUI = ({route, ...props}) => {
                         <CustomCheckBox2
                             isChecked={
                               selectedIdxs.includes(row.sic_id) ||
-                              row.sic_is_checked===1
+                              row.sic_is_checked===1 || (stockIssueObject?.isbarcodewise ?? false)
                             }
                             isIndeterminate={false}
                             onToggle={() => toggleSelection(row)}
-                            disabled={row.sic_is_checked === 0 ? false : true}
+                            disabled={(row.sic_is_checked === 0 && !(stockIssueObject?.isbarcodewise ?? false)) ? false : true}
                           />
                         </View>
 
@@ -316,7 +328,7 @@ const ViewStockIssueUI = ({route, ...props}) => {
                             onChangeText={input =>
                               handleInputChange(index, row.sic_id, 'sic_approve_qty', input)
                             }
-                            editable={row.sic_is_checked === 0 ? true : false}
+                            editable={(row.sic_is_checked === 0 && !(stockIssueObject?.isbarcodewise ?? false))? true : false}
                             keyboardType="numeric"
                           />
                         </View>
