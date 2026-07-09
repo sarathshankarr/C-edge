@@ -13828,10 +13828,15 @@ export async function stockIssuesListApi(jsonValue) {
         body: JSON.stringify(jsonValue),
       },
     );
-    const data = await response.json();
+    const text = await response.text();
+    console.log('stockIssuesListApi status ', response.status, ' body ', text);
+    const data = text ? JSON.parse(text) : null;    
     if (data) {
       statusData = true;
       responseData = data;
+    } else if (response.status === 200) {
+      statusData = true;
+      responseData = {aaData: []};
     }
   } catch (error) {
     console.log('stockIssuesListApi error ', error);
