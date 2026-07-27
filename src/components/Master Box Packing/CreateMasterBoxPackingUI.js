@@ -41,6 +41,7 @@ const CreateMasterBoxPackingUI = ({route, ...props}) => {
   const [rows, setRows] = useState([]);
   const [buyerName, setbuyerName] = React.useState('');
   const [barcode, setBarcode] = React.useState('');
+  const barcodeTimeoutRef = useRef(null);
 
   const [lastestBoxId, setLastestBoxId] = React.useState(0);
   const [lastestBuyerPoId, setLastestBuyerPoId] = React.useState(0);
@@ -224,61 +225,35 @@ const CreateMasterBoxPackingUI = ({route, ...props}) => {
 
   const handleCallBarcodes = code => {
     setBarcode(code);
-    console.log('code length ', code.length, code, code.length !== 8);
-    if (code.length !== 8) return;
 
-    if (!locationId) {
-      Alert.alert('Alert', 'Please select a location');
-      return;
+    if (barcodeTimeoutRef.current) {
+      clearTimeout(barcodeTimeoutRef.current);
+      barcodeTimeoutRef.current = null;
     }
 
-    if (poflag && selectedProformaIndices.length === 0) {
-      Alert.alert('Alert', 'Please select at least one Proforma Invoice.');
-      return;
-    }
-    const isDuplicate = rows.some(row => row.Barcode == code.trim());
+    if (code.length < 8) return;
 
-    if (isDuplicate) {
-      Alert.alert('This Barcode Is Already Selected...Please Check');
-      return;
-    }
+    barcodeTimeoutRef.current = setTimeout(() => {
+      barcodeTimeoutRef.current = null;
 
-    console.log('barcode scanned ', code);
-    props.ValidateBarcode(code, poflag, selectedProformaIndices, locationId);
-  };
+      if (!locationId) {
+        Alert.alert('Alert', 'Please select a location');
+        return;
+      }
 
-  const handleScannedCode = text => {
-    if (!text) {
-      Alert.alert('Please Enter the Valid Barcode', text);
-    }
-    handleCallBarcodes(text);
+      if (poflag && selectedProformaIndices.length === 0) {
+        Alert.alert('Alert', 'Please select at least one Proforma Invoice.');
+        return;
+      }
+      const isDuplicate = rows.some(row => row.Barcode == code.trim());
 
-    // if (text) {
-    //   setRows(prev => [
-    //     ...prev,
-    //     {
-    //       id: 1,
-    //       BoxId: 'box_001',
-    //       BoxName: 'Box Alpha',
-    //       CustomerStyleName: 'Style 101',
-    //       size: 'M',
-    //       Qty: 10,
-    //       showBoxList: false,
-    //       filteredBoxList: [
-    //         {id: 'box_001', name: 'Box Alpha'},
-    //         {id: 'box_002', name: 'Box Beta'},
-    //         {id: 'box_003', name: 'Box Gamma'},
-    //       ],
-    //       childTable: [
-    //         {SIZE_ID: 1, SIZE_VAL: 'XS', checked: true},
-    //         {SIZE_ID: 2, SIZE_VAL: 'S', checked: false},
-    //         {SIZE_ID: 3, SIZE_VAL: 'M', checked: true},
-    //       ],
-    //     },
-    //   ]);
-    // } else {
-    //   Alert.alert('Please Enter the Valid Barcode');
-    // }
+      if (isDuplicate) {
+        Alert.alert('This Barcode Is Already Selected...Please Check');
+        return;
+      }
+
+      props.ValidateBarcode(code, poflag, selectedProformaIndices, locationId);
+    }, 800);
   };
 
   const submitAction = async () => {
