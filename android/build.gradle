@@ -19,3 +19,26 @@ buildscript {
 }
 
 apply plugin: "com.facebook.react.rootproject"
+
+// --- 16 KB page-size compliance: react-native-screens (3.x line) ---
+// react-native-screens 3.x (through at least 3.37.0) does not add the
+// -DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON CMake flag itself (unlike
+// react-native-vision-camera >=4.7.0 and react-native-reanimated >=3.17.0,
+// which already carry it). We are intentionally staying on screens 3.x
+// (no New Architecture, no screens 4.x) per approved migration plan, so we
+// inject the same flag React Native's own NdkConfiguratorUtils uses for
+// New-Architecture builds, scoped ONLY to the react-native-screens module,
+// causing its native code to be genuinely recompiled 16 KB-aligned. This is
+// a legitimate Gradle/CMake configuration change, not a binary/ELF patch.
+subprojects { subproject ->
+    if (subproject.name == "react-native-screens") {
+        subproject.afterEvaluate {
+            if (subproject.hasProperty("android")) {
+                def cmakeArgs = subproject.android.defaultConfig.externalNativeBuild.cmake.arguments
+                if (cmakeArgs.every { !it.toString().startsWith("-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES") }) {
+                    cmakeArgs.add("-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON")
+                }
+            }
+        }
+    }
+}
