@@ -33,7 +33,7 @@
     "react-native-reanimated": "3.17.0",
     "react-native-responsive-fontsize": "^0.5.1",
     "react-native-responsive-screen": "^1.4.2",
-    "react-native-safe-area-context": "5.0.0",
+    "react-native-safe-area-context": "5.1.0",
     "react-native-screens": "3.36.0",
     "react-native-svg": "^15.15.3",
     "react-native-vision-camera": "4.7.0",
