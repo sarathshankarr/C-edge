@@ -256,6 +256,14 @@ const CreateMasterBoxPackingUI = ({route, ...props}) => {
     }, 800);
   };
 
+  const handleScannedCode = text => {
+    if (!text) {
+      Alert.alert('Please Enter the Valid Barcode', text);
+      return;
+    }
+    handleCallBarcodes(text);
+  };
+
   const submitAction = async () => {
     // const mappedRows = rows.flatMap(row => {
     //   const barcodeString = row.childTable?.length

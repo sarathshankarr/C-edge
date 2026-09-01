@@ -73,6 +73,7 @@ const QRScanner = (props) => {
         style={StyleSheet.absoluteFill}
         device={device}
         isActive={true}
+        androidPreviewViewType="texture-view"
       />
       <View style={styles.footer}>
         <TouchableOpacity
