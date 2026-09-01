@@ -122,6 +122,7 @@ const POApprovalUI = ({route, ...props}) => {
     ImageCropPicker.openPicker({
       multiple: true,
       mediaType: 'any',
+      maxFiles: 10,
     })
       .then(images => {
         const newImages = images.map(image => ({

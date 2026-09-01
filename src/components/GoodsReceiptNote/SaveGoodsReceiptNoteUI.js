@@ -516,6 +516,7 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
     ImageCropPicker.openPicker({
       multiple: true,
       mediaType: 'any',
+      maxFiles: 10,
     })
       .then(images => {
         const newImages = images.map(image => ({
