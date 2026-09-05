@@ -200,6 +200,12 @@ const Sidebar = ({navigation}) => {
           menu_id: 750,
           src: require('../../../assets/images/png/stockissue11.png'),
         },
+        {
+          label: 'Stock Issue Return',
+          route: 'StockIssueReturnList',
+          menu_id: 976,
+          src: require('../../../assets/images/png/stockissue11.png'),
+        },
       ],
     },
     inventory: {

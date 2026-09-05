@@ -13898,6 +13898,224 @@ export async function stockIssueViewApi(jsonValue) {
   return obj;
 }
 
+export async function stockIssueReturnListApi(jsonValue) {
+  let returnError = undefined;
+  let statusData = undefined;
+  let responseData = undefined;
+  let logoutData = false;
+  let obj = undefined;
+
+  let internet = await internetCheck();
+  if (!internet) {
+    obj = {
+      logoutData: logoutData,
+      statusData: statusData,
+      responseData: responseData,
+      error: returnError,
+      isInternet: internet,
+    };
+    return obj;
+  }
+  try {
+    const url = Environment.uri + 'stockIssueReturn/list';
+    console.log('stockIssueReturnListApi URL ', url);
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+      body: JSON.stringify(jsonValue),
+    });
+    const rawText = await response.text();
+    if (!response.ok) {
+      console.log(
+        'stockIssueReturnListApi non-OK response ',
+        response.status,
+        rawText?.slice(0, 300),
+      );
+    }
+    let data;
+    try {
+      data = JSON.parse(rawText);
+    } catch (parseErr) {
+      console.log(
+        'stockIssueReturnListApi non-JSON response ',
+        rawText?.slice(0, 300),
+      );
+      throw parseErr;
+    }
+    if (data) {
+      statusData = true;
+      responseData = data?.data;
+    }
+  } catch (error) {
+    console.log('stockIssueReturnListApi error ', error);
+    returnError = error;
+  }
+
+  obj = {
+    logoutData: logoutData,
+    statusData: statusData,
+    responseData: responseData,
+    error: returnError,
+    isInternet: internet,
+  };
+  return obj;
+}
+
+export async function stockIssueReturnViewApi(jsonValue) {
+  let returnError = undefined;
+  let statusData = undefined;
+  let responseData = undefined;
+  let logoutData = false;
+  let obj = undefined;
+
+  let internet = await internetCheck();
+  if (!internet) {
+    obj = {
+      logoutData: logoutData,
+      statusData: statusData,
+      responseData: responseData,
+      error: returnError,
+      isInternet: internet,
+    };
+    return obj;
+  }
+  try {
+    const response = await fetch(
+      Environment.uri + 'stockIssueReturn/view',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify(jsonValue),
+      },
+    );
+    const data = await response.json();
+    if (data) {
+      statusData = true;
+      responseData = data?.data;
+    }
+  } catch (error) {
+    console.log('stockIssueReturnViewApi error ', error);
+    returnError = error;
+  }
+
+  obj = {
+    logoutData: logoutData,
+    statusData: statusData,
+    responseData: responseData,
+    error: returnError,
+    isInternet: internet,
+  };
+  return obj;
+}
+
+export const downloadStockIssueReturnPdf = () => {
+  const URL = Environment.uri + 'stockIssueReturn/pdf';
+  return URL;
+};
+
+async function postStockIssueReturn(endpoint, jsonValue) {
+  let returnError = undefined;
+  let statusData = undefined;
+  let responseData = undefined;
+  let logoutData = false;
+  let obj = undefined;
+
+  let internet = await internetCheck();
+  console.log(`[StockIssueReturn] postStockIssueReturn(${endpoint}) internetCheck =`, internet);
+  if (!internet) {
+    console.log(`[StockIssueReturn] postStockIssueReturn(${endpoint}) aborted — no internet connection detected.`);
+    obj = {
+      logoutData: logoutData,
+      statusData: statusData,
+      responseData: responseData,
+      error: returnError,
+      isInternet: internet,
+    };
+    return obj;
+  }
+  try {
+    const url = Environment.uri + 'stockIssueReturn/' + endpoint;
+    console.log(`[StockIssueReturn] postStockIssueReturn(${endpoint}) requesting`, url, 'body =', JSON.stringify(jsonValue));
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+      body: JSON.stringify(jsonValue),
+    });
+    const rawText = await response.text();
+    if (!response.ok) {
+      console.log(
+        `${endpoint} non-OK response `,
+        url,
+        response.status,
+        rawText?.slice(0, 300),
+      );
+    }
+    let data;
+    try {
+      data = JSON.parse(rawText);
+    } catch (parseErr) {
+      console.log(`${endpoint} non-JSON response `, url, rawText?.slice(0, 300));
+      throw parseErr;
+    }
+    if (data) {
+      statusData = true;
+      // Some stockIssueReturn endpoints wrap the payload in a `data` key,
+      // others (e.g. getBarcodeDetails) return the fields flat at the top level.
+      responseData = data?.data !== undefined ? data.data : data;
+    }
+    console.log(`[StockIssueReturn] postStockIssueReturn(${endpoint}) parsed response =`, JSON.stringify(data));
+  } catch (error) {
+    console.log(`${endpoint} error `, error);
+    returnError = error;
+  }
+
+  obj = {
+    logoutData: logoutData,
+    statusData: statusData,
+    responseData: responseData,
+    error: returnError,
+    isInternet: internet,
+  };
+  return obj;
+}
+
+export async function getBarcodeDetailsForStockIssueReturn(jsonValue) {
+  return postStockIssueReturn('getBarcodeDetails', jsonValue);
+}
+
+export async function getFabricRmsForStockIssueReturn(jsonValue) {
+  return postStockIssueReturn('getFabricRms', jsonValue);
+}
+
+export async function getStockIdsForStockIssueReturn(jsonValue) {
+  return postStockIssueReturn('getStockIds', jsonValue);
+}
+
+export async function getStockApproveQtyForStockIssueReturn(jsonValue) {
+  return postStockIssueReturn('getStockApproveQty', jsonValue);
+}
+
+export async function getFabricRollsForStockIssueReturn(jsonValue) {
+  return postStockIssueReturn('getFabricRolls', jsonValue);
+}
+
+export async function getAlreadyReturnQtyForStockIssueReturn(jsonValue) {
+  return postStockIssueReturn('getAlreadyReturnQty', jsonValue);
+}
+
+export async function saveStockIssueReturn(jsonValue) {
+  return postStockIssueReturn('save', jsonValue);
+}
+
 export async function getStockIssueCreateData(jsonValue) {
   let returnError = undefined;
   let statusData = undefined;
