@@ -99,6 +99,8 @@ const StockIssueReturnList = ({navigation, route, ...props}) => {
     [loadCredentials, popUpAction],
   );
 
+  // sird_saveType: 0 = Approve, 1 = Edit, >= 2 = View — all three now open
+  // the Create screen in the matching mode (pre-filled), per the mapping.
   const actionOnRow = useCallback(
     async item => {
       const {userName, userPsd} = await loadCredentials();
@@ -113,8 +115,11 @@ const StockIssueReturnList = ({navigation, route, ...props}) => {
         const stockReturnViewObj =
           await APIServiceCall.stockIssueReturnViewApi(obj);
         if (stockReturnViewObj?.statusData && stockReturnViewObj?.responseData) {
-          navigation.navigate('ViewStockIssueReturn', {
+          const saveType = Number(item?.sird_saveType);
+          const mode = saveType === 0 ? 'approve' : saveType === 1 ? 'edit' : 'view';
+          navigation.navigate('CreateStockIssueReturn', {
             viewObject: stockReturnViewObj.responseData,
+            mode,
           });
         } else {
           popUpAction(
@@ -234,6 +239,64 @@ const StockIssueReturnList = ({navigation, route, ...props}) => {
     [loadCredentials, popUpAction],
   );
 
+  // Only shown for rows where hasBarcodeReturn === true (the return was
+  // done via barcode scan — a manual-entry return has nothing to print).
+  const downloadBarcodePrintPDF = useCallback(
+    async item => {
+      const {userName, userPsd} = await loadCredentials();
+      set_MainLoading(true);
+      const obj = {
+        username: userName,
+        password: userPsd,
+        sird_id: item?.sird_id,
+      };
+      const apiUrl = APIServiceCall.downloadStockIssueReturnBarcodePdf();
+      try {
+        const response = await axios.post(apiUrl, obj, {
+          headers: {'Content-Type': 'application/json'},
+          responseType: 'arraybuffer',
+        });
+        const base64Data = response?.request?._response;
+        if (Platform.OS === 'android') {
+          const hasPermission = await requestStoragePermission();
+          if (!hasPermission) {
+            Alert.alert(
+              'Permission Denied',
+              'Storage permission is required to save the PDF.',
+            );
+            return;
+          }
+        }
+        const pdfPath =
+          Platform.OS === 'android'
+            ? `/storage/emulated/0/Download/StockIssueReturnBarcode_${item?.sird_id}.pdf`
+            : `${ReactNativeBlobUtil.fs.dirs.DocumentDir}/StockIssueReturnBarcode_${item?.sird_id}.pdf`;
+        await ReactNativeBlobUtil.fs.writeFile(pdfPath, base64Data, 'base64');
+        popUpAction(
+          Platform.OS === 'android'
+            ? `PDF saved successfully at ${pdfPath}`
+            : 'PDF saved successfully',
+          Constant.DefaultAlert_MSG,
+          'OK',
+          true,
+          false,
+        );
+      } catch (error) {
+        console.error('Error generating or saving barcode PDF:', error);
+        popUpAction(
+          Constant.SERVICE_FAIL_PDF_MSG,
+          Constant.DefaultAlert_MSG,
+          'OK',
+          true,
+          false,
+        );
+      } finally {
+        set_MainLoading(false);
+      }
+    },
+    [loadCredentials, popUpAction],
+  );
+
   return (
     <StockIssueReturnListUI
       itemsArray={itemsArray}
@@ -249,6 +312,7 @@ const StockIssueReturnList = ({navigation, route, ...props}) => {
       fetchMore={getInitialData}
       MainLoading={MainLoading}
       downloadStockIssueReturnPDF={downloadStockIssueReturnPDF}
+      downloadBarcodePrintPDF={downloadBarcodePrintPDF}
     />
   );
 };

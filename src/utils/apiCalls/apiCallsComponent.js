@@ -14024,6 +14024,11 @@ export const downloadStockIssueReturnPdf = () => {
   return URL;
 };
 
+export const downloadStockIssueReturnBarcodePdf = () => {
+  const URL = Environment.uri + 'stockIssueReturn/barcode';
+  return URL;
+};
+
 async function postStockIssueReturn(endpoint, jsonValue) {
   let returnError = undefined;
   let statusData = undefined;
@@ -14119,6 +14124,14 @@ export async function getAlreadyReturnQtyForStockIssueReturn(jsonValue) {
 
 export async function saveStockIssueReturn(jsonValue) {
   return postStockIssueReturn('save', jsonValue);
+}
+
+export async function editSaveStockIssueReturn(jsonValue) {
+  return postStockIssueReturn('editSave', jsonValue);
+}
+
+export async function approveStockIssueReturn(jsonValue) {
+  return postStockIssueReturn('approve', jsonValue);
 }
 
 export async function getStockIssueCreateData(jsonValue) {

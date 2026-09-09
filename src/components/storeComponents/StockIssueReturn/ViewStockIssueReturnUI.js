@@ -6,31 +6,27 @@ import {
 } from 'react-native-responsive-screen';
 import CommonStyles from './../../../utils/commonStyles/commonStyles';
 import HeaderComponent from './../../../utils/commonComponents/headerComponent';
+import * as Constant from './../../../utils/constants/constant';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 
-// Fields that identify a row internally but aren't meaningful to show as a column
-const HIDDEN_KEYS = ['sic_id', 'sird_id', 'id'];
-
-const toLabel = key =>
-  key
-    .replace(/^[a-z]+_/i, '')
-    .replace(/([a-z])([A-Z])/g, '$1 $2')
-    .replace(/_/g, ' ')
-    .replace(/\b\w/g, c => c.toUpperCase());
+// Confirmed shape from POST stockIssueReturn/view:
+// {status, data: {sird_id, sird_date, sird_saveType, particulars: [{sirp_id,
+//   sirp_type, sirp_fabRmId, sirp_stockIssueId, sirp_approvedQty,
+//   sirp_returnQty, sirp_rollId, sirp_rollNo, fabRollData}]}}
+const PARTICULAR_COLUMNS = [
+  {key: 'sirp_type', label: 'Type', width: 90},
+  {key: 'sirp_fabRmId', label: 'Fabric/RM Id', width: 120},
+  {key: 'sirp_stockIssueId', label: 'Stock Issue Id', width: 130},
+  {key: 'sirp_approvedQty', label: 'Approved Qty', width: 120},
+  {key: 'sirp_returnQty', label: 'Return Qty', width: 110},
+  {key: 'sirp_rollId', label: 'Roll Id', width: 100},
+  {key: 'sirp_rollNo', label: 'Roll No', width: 110},
+  {key: 'fabRollData', label: 'Roll Data', width: 140},
+];
 
 const ViewStockIssueReturnUI = ({route, ...props}) => {
   const itemsObj = props.itemsObj || {};
-  const particulars = useMemo(
-    () => itemsObj?.particulars || itemsObj?.issueList || [],
-    [itemsObj],
-  );
-
-  const columns = useMemo(() => {
-    if (!particulars || particulars.length === 0) return [];
-    return Object.keys(particulars[0]).filter(
-      key => !HIDDEN_KEYS.includes(key),
-    );
-  }, [particulars]);
+  const particulars = useMemo(() => itemsObj?.particulars || [], [itemsObj]);
 
   const backBtnAction = () => {
     props.backBtnAction();
@@ -67,48 +63,43 @@ const ViewStockIssueReturnUI = ({route, ...props}) => {
           <View style={styles.infoRow}>
             <Text style={styles.infoLabel}>Stock Id</Text>
             <Text style={styles.infoColon}>:</Text>
+            <Text style={styles.infoValue}>{itemsObj?.sird_id}</Text>
+          </View>
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>Date</Text>
+            <Text style={styles.infoColon}>:</Text>
             <Text style={styles.infoValue}>
-              {itemsObj?.sird_id ?? itemsObj?.stockId}
+              {itemsObj?.sird_date
+                ? Constant.formatDateIntoDMY(itemsObj.sird_date)
+                : ''}
             </Text>
           </View>
           <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>Creation Date</Text>
+            <Text style={styles.infoLabel}>Save Type</Text>
             <Text style={styles.infoColon}>:</Text>
-            <Text style={styles.infoValue}>{itemsObj?.orderDate}</Text>
+            <Text style={styles.infoValue}>{itemsObj?.sird_saveType}</Text>
           </View>
-          <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>Created By</Text>
-            <Text style={styles.infoColon}>:</Text>
-            <Text style={styles.infoValue}>{itemsObj?.userName}</Text>
-          </View>
-          {itemsObj?.sird_saveType ? (
-            <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>Save Type</Text>
-              <Text style={styles.infoColon}>:</Text>
-              <Text style={styles.infoValue}>{itemsObj?.sird_saveType}</Text>
-            </View>
-          ) : null}
 
-          {columns.length > 0 && (
+          {particulars.length > 0 && (
             <View style={styles.wrapper}>
               <ScrollView nestedScrollEnabled={true} horizontal>
                 <View style={styles.table}>
                   <View style={styles.table_head}>
-                    {columns.map(col => (
-                      <View style={{width: 120}} key={col}>
+                    {PARTICULAR_COLUMNS.map(col => (
+                      <View style={{width: col.width}} key={col.key}>
                         <Text style={styles.table_head_captions}>
-                          {toLabel(col)}
+                          {col.label}
                         </Text>
                       </View>
                     ))}
                   </View>
 
                   {particulars.map((row, index) => (
-                    <View key={index} style={styles.table_body_single_row}>
-                      {columns.map(col => (
-                        <View style={{width: 120}} key={col}>
+                    <View key={row?.sirp_id ?? index} style={styles.table_body_single_row}>
+                      {PARTICULAR_COLUMNS.map(col => (
+                        <View style={{width: col.width}} key={col.key}>
                           <Text style={styles.table_data}>
-                            {row[col]?.toString()}
+                            {row?.[col.key] ?? ''}
                           </Text>
                         </View>
                       ))}

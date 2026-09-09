@@ -8,6 +8,11 @@ import CreateStockIssueReturnUI from './CreateStockIssueReturnUI';
 const CreateStockIssueReturn = ({route}) => {
   const navigation = useNavigation();
 
+  // mode: 'create' (default) | 'edit' | 'approve' | 'view' — set by the list
+  // screen based on sird_saveType (0=Approve, 1=Edit, >=2=View).
+  const mode = route?.params?.mode || 'create';
+  const viewObject = route?.params?.viewObject || null;
+
   const [isLoading, set_isLoading] = useState(false);
   const [isPopUp, set_isPopUp] = useState(false);
   const [popUpMessage, set_popUpMessage] = useState(undefined);
@@ -38,6 +43,7 @@ const CreateStockIssueReturn = ({route}) => {
     ]);
     return {username: userName, password: userPsd};
   };
+
 
   const showServiceError = () =>
     popUpAction(
@@ -195,19 +201,27 @@ const CreateStockIssueReturn = ({route}) => {
     }
   };
 
-  const submitAction = async saveObj => {
+  // Shared success/failure handling for save/editSave/approve — the server
+  // can return HTTP 200/500 either way, so the real signal is the response
+  // body's own `status` field, not just "did we get JSON back".
+  const submitToEndpoint = async (label, apiFn, payload) => {
     const auth = await getAuth();
+    const fullPayload = {...auth, ...payload};
+    console.log(`[StockIssueReturn][${label}] posting. payload =`, JSON.stringify(fullPayload));
     set_isLoading(true);
     try {
-      const res = await APIServiceCall.saveStockIssueReturn({
-        ...auth,
-        ...saveObj,
-      });
-      if (res?.statusData && res?.responseData) {
+      const res = await apiFn(fullPayload);
+      console.log(`[StockIssueReturn][${label}] raw result =`, JSON.stringify(res));
+      const bodyStatus = res?.responseData?.status;
+      const isSuccess =
+        res?.statusData && res?.responseData && bodyStatus !== 'false' && bodyStatus !== false;
+      if (isSuccess) {
+        console.log(`[StockIssueReturn][${label}] treated as SUCCESS — navigating back to list.`);
         navigation.navigate('StockIssueReturnList', {refresh: Date.now()});
       } else {
+        console.log(`[StockIssueReturn][${label}] treated as FAILURE.`);
         popUpAction(
-          Constant.Fail_Save_Dtls_MSG,
+          res?.responseData?.message || Constant.Fail_Save_Dtls_MSG,
           Constant.DefaultAlert_MSG,
           'OK',
           true,
@@ -219,6 +233,15 @@ const CreateStockIssueReturn = ({route}) => {
     }
   };
 
+  const submitAction = saveObj =>
+    submitToEndpoint('submitAction', APIServiceCall.saveStockIssueReturn, saveObj);
+
+  const editSaveAction = saveObj =>
+    submitToEndpoint('editSaveAction', APIServiceCall.editSaveStockIssueReturn, saveObj);
+
+  const approveAction = approveObj =>
+    submitToEndpoint('approveAction', APIServiceCall.approveStockIssueReturn, approveObj);
+
   return (
     <CreateStockIssueReturnUI
       isLoading={isLoading}
@@ -227,9 +250,13 @@ const CreateStockIssueReturn = ({route}) => {
       popUpRBtnTitle={popUpRBtnTitle}
       isPopupLeft={isPopupLeft}
       isPopUp={isPopUp}
+      mode={mode}
+      viewObject={viewObject}
       backBtnAction={backBtnAction}
       popOkBtnAction={popOkBtnAction}
       submitAction={submitAction}
+      editSaveAction={editSaveAction}
+      approveAction={approveAction}
       setLoading={set_isLoading}
       getBarcodeDetails={getBarcodeDetails}
       getFabricRmsByType={getFabricRmsByType}
