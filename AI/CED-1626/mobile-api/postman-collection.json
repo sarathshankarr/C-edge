@@ -1,0 +1,626 @@
+{
+  "info": {
+    "name": "GRN Checking -- Mobile API",
+    "_postman_id": "b9e2a1c4-9f3d-4b1a-9c1e-grncheck-mobile",
+    "description": "CED-1626 GRN Checking mobile API -- all 32 endpoints implemented in com.codeverse.stitch.api.controller.GrnCheckingMobileController. STATUS AS OF 2026-09-17: every single one of the 32 endpoints in this collection has now been individually live-tested end-to-end against a local deployment (real DB, real AI-extraction calls for every upload endpoint including the async job/poll/cancel/resume family for lot, bale, and RM -- resume specifically proven via a genuine fabric-mismatch-then-resume cycle, twice). Two real findings from that sweep: (1) a real bug in bale/move-to-lot (missing duplicate-Bale-No check against the destination lot) was found and fixed; (2) bale/save-draft's checkedMtrs field is taken literally, NOT auto-summed from pieces[] the way totalInMtrs is -- see that request's own description. Barcode features are explicitly OUT OF SCOPE and not included here.\n\nSee the sibling files in this same folder for everything a request body alone can't tell you:\n- openapi.yaml -- the same contract, machine-readable.\n- business-rules-and-flows.md -- every conditional gate and user-facing message a mobile client needs to reproduce.\n- sequence-diagrams.md -- the AI-upload async job/poll flow, Submit, and Approve, step by step.\n- ../mobile-api-technical-summary.md -- read this FIRST. Covers the two auth layers (credential check + the company-session-priming fix), both real bugs found across this whole effort, and the full verification record.\n\nAUTH: every request carries userName/userPwd (in the JSON/form body for POST calls, as X-User-Name/X-User-Pwd headers for GET calls, matching this codebase's existing stateless api.controller convention). Set the collection variables below once (userName, userPwd, companyId, userId) and every request already references them -- no per-request auth setup needed. Default variable values are pre-filled with real local test data confirmed working on 2026-09-16/17 (admin/Codeverse@demo, companyId=1, PO 11366, lot 12, bale 220, header 8) -- change baseUrl and re-check the IDs against your own database before running against a different environment.\n\nFile-upload requests (Lot/Bale/RM AI Upload folders) need a real file attached in Postman -- 'src' below points at this repo's own checked-in reference images (single_bale_ticket.png / multi_bale_sheet.png / rm_invoice_sample.png from bhairav-ai-extraction/app/extraction/reference_templates/) as ready-to-run local defaults; update the path if Postman is running on a different machine than this repo.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080/stitch/api/grncheck" },
+    { "key": "userName", "value": "admin" },
+    { "key": "userPwd", "value": "Codeverse@demo" },
+    { "key": "companyId", "value": "1" },
+    { "key": "userId", "value": "1" },
+    { "key": "menuId", "value": "981" },
+    { "key": "poNumber", "value": "11366" },
+    { "key": "headerId", "value": "8" },
+    { "key": "poLineitemId", "value": "27982" },
+    { "key": "fabricId", "value": "100" },
+    { "key": "rollNo", "value": "11366L1" },
+    { "key": "lotId", "value": "12" },
+    { "key": "newLotId", "value": "13" },
+    { "key": "baleId", "value": "220" },
+    { "key": "grnNo", "value": "BE/GRN/26-27/2128" },
+    { "key": "itemType", "value": "Fabric" },
+    { "key": "jobId", "value": "" },
+    { "key": "singleBaleTicketPath", "value": "/Users/apple/Marudham T S/Projects/Ex ERP Demo/bhairav-ai-extraction/app/extraction/reference_templates/packing_slip_v1/single_bale_ticket.png" },
+    { "key": "multiBaleSheetPath", "value": "/Users/apple/Marudham T S/Projects/Ex ERP Demo/bhairav-ai-extraction/app/extraction/reference_templates/packing_slip_v1/multi_bale_sheet.png" },
+    { "key": "rmInvoicePath", "value": "/Users/apple/Marudham T S/Projects/Ex ERP Demo/bhairav-ai-extraction/app/extraction/reference_templates/rm_invoice_v1/rm_invoice_sample.png" }
+  ],
+  "item": [
+    {
+      "name": "State (NEW endpoint)",
+      "item": [
+        {
+          "name": "GET /state -- full current GRN Checking state for one PO",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "X-User-Name", "value": "{{userName}}" },
+              { "key": "X-User-Pwd", "value": "{{userPwd}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/state?poNumber={{poNumber}}&companyId={{companyId}}&userId={{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["state"],
+              "query": [
+                { "key": "poNumber", "value": "{{poNumber}}" },
+                { "key": "companyId", "value": "{{companyId}}" },
+                { "key": "userId", "value": "{{userId}}" }
+              ]
+            },
+            "description": "The one genuinely NEW endpoint -- call this once when opening a PO for checking. Returns header + fabricLineItems + lots (nested bales/pieces) + rmItems + rmUploadHistory + vendorDetails + grnNumbers in one JSON object. NOTE: createdAt/updatedAt/lotDate come back as raw epoch milliseconds, not a date string -- prefer lotDateDisplay/uploadedAtDisplay wherever present. Confirmed working live 2026-09-16."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "List",
+      "item": [
+        {
+          "name": "POST /list -- paginated PO list (list page's data source)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "options": { "raw": { "language": "json" } },
+              "raw": "{\n  \"userName\": \"{{userName}}\",\n  \"userPwd\": \"{{userPwd}}\",\n  \"companyId\": {{companyId}},\n  \"menuId\": {{menuId}},\n  \"itemType\": null,\n  \"start\": 0,\n  \"length\": 25,\n  \"searchField\": null,\n  \"searchValue\": null,\n  \"dataFilter\": \"olderDays\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/list", "host": ["{{baseUrl}}"], "path": ["list"] },
+            "description": "dataFilter: '60Days' = 'Last 30 Day PO'S' radio; anything else ('olderDays' here) = 'All PO'S'. Response includes hasFabricBarcodes -- a leftover field from the shared row DTO, safe to ignore (barcode is out of scope for this API). Confirmed working live 2026-09-16."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /audit-history -- every AI-upload audit row for a header",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "options": { "raw": { "language": "json" } },
+              "raw": "{\n  \"userName\": \"{{userName}}\",\n  \"userPwd\": \"{{userPwd}}\",\n  \"companyId\": {{companyId}},\n  \"headerId\": {{headerId}}\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/audit-history", "host": ["{{baseUrl}}"], "path": ["audit-history"] },
+            "description": "CONFIRMED WORKING LIVE 2026-09-17. Newest first, lot- and bale-level upload attempts (success and failure) for this PO's checking header."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Fabric Core",
+      "item": [
+        {
+          "name": "POST /header/save-meta -- Checking Date + Remarks",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "options": { "raw": { "language": "json" } },
+              "raw": "{\n  \"userName\": \"{{userName}}\",\n  \"userPwd\": \"{{userPwd}}\",\n  \"companyId\": {{companyId}},\n  \"headerId\": {{headerId}},\n  \"remarks\": \"Checked via Postman\",\n  \"checkingDate\": \"2026-09-10\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/header/save-meta", "host": ["{{baseUrl}}"], "path": ["header", "save-meta"] },
+            "description": "checkingDate is yyyy-MM-dd; server defaults to today if omitted/unparseable. Confirmed working live 2026-09-16 (written, read back via direct DB query, then reverted)."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /lot/available-rolls -- rolls available under a PO line item",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "options": { "raw": { "language": "json" } },
+              "raw": "{\n  \"userName\": \"{{userName}}\",\n  \"userPwd\": \"{{userPwd}}\",\n  \"companyId\": {{companyId}},\n  \"poNumber\": {{poNumber}},\n  \"poLineitemId\": {{poLineitemId}}\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/lot/available-rolls", "host": ["{{baseUrl}}"], "path": ["lot", "available-rolls"] },
+            "description": "CONFIRMED WORKING LIVE 2026-09-17. Feeds the 'open a lot' roll picker. Fabric-only in practice; RM falls back to its own flat item flow (see the RM Item folder)."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /lot/open -- find-or-create a lot for one roll",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "options": { "raw": { "language": "json" } },
+              "raw": "{\n  \"userName\": \"{{userName}}\",\n  \"userPwd\": \"{{userPwd}}\",\n  \"companyId\": {{companyId}},\n  \"headerId\": {{headerId}},\n  \"poLineitemId\": {{poLineitemId}},\n  \"fabricId\": {{fabricId}},\n  \"rollNo\": \"{{rollNo}}\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/lot/open", "host": ["{{baseUrl}}"], "path": ["lot", "open"] },
+            "description": "CONFIRMED WORKING LIVE 2026-09-17, including the idempotent case. Idempotent -- calling this again for a rollNo that already has a lot just returns the existing one, does not create a duplicate."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /bale/save-draft -- save a bale's on-screen values as DRAFT",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "options": { "raw": { "language": "json" } },
+              "raw": "{\n  \"userName\": \"{{userName}}\",\n  \"userPwd\": \"{{userPwd}}\",\n  \"companyId\": {{companyId}},\n  \"baleId\": {{baleId}},\n  \"lotId\": {{lotId}},\n  \"baleNo\": \"1221\",\n  \"checkedMtrs\": 0,\n  \"damageMtrs\": null,\n  \"pieces\": [\n    { \"pcNo\": 1, \"totalInMtrs\": null, \"checkedMtrs\": null },\n    { \"pcNo\": 2, \"totalInMtrs\": null, \"checkedMtrs\": null }\n  ]\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/bale/save-draft", "host": ["{{baseUrl}}"], "path": ["bale", "save-draft"] },
+            "description": "CONFIRMED WORKING LIVE 2026-09-17. totalInMtrs on the bale itself is deliberately NOT part of the request -- the server always recomputes it as the sum of pieces[].totalInMtrs. checkedMtrs is DIFFERENT: it is taken literally from this field, NOT auto-summed from pieces[].checkedMtrs -- sum your own pieces[].checkedMtrs and send that total here, or the bale-level value will silently be whatever you sent (confirmed via live testing). Silently a no-op server-side if the bale is not currently DRAFT (matches the JSP's own field-locking rule -- see business-rules-and-flows.md)."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /bale/add -- create a new manual DRAFT bale (no AI document)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "options": { "raw": { "language": "json" } },
+              "raw": "{\n  \"userName\": \"{{userName}}\",\n  \"userPwd\": \"{{userPwd}}\",\n  \"companyId\": {{companyId}},\n  \"lotId\": {{lotId}},\n  \"baleNo\": \"POSTMAN-TEST-1\",\n  \"totalPcs\": 3\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/bale/add", "host": ["{{baseUrl}}"], "path": ["bale", "add"] },
+            "description": "CONFIRMED WORKING LIVE 2026-09-17. Returns 400 if the lot doesn't exist, the header isn't FABRIC, baleNo is blank, totalPcs isn't positive, or baleNo already exists in this lot."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /bale/remove-piece -- remove one piece row from a DRAFT bale",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "options": { "raw": { "language": "json" } },
+              "raw": "{\n  \"userName\": \"{{userName}}\",\n  \"userPwd\": \"{{userPwd}}\",\n  \"companyId\": {{companyId}},\n  \"baleId\": {{baleId}},\n  \"pcNo\": 1\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/bale/remove-piece", "host": ["{{baseUrl}}"], "path": ["bale", "remove-piece"] },
+            "description": "CONFIRMED WORKING LIVE 2026-09-17. Returns 400 if the bale isn't DRAFT, the pcNo doesn't exist on it, or it would remove the bale's last remaining piece."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /bale/submit -- move a bale DRAFT -> SUBMITTED",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "options": { "raw": { "language": "json" } },
+              "raw": "{\n  \"userName\": \"{{userName}}\",\n  \"userPwd\": \"{{userPwd}}\",\n  \"companyId\": {{companyId}},\n  \"baleId\": {{baleId}}\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/bale/submit", "host": ["{{baseUrl}}"], "path": ["bale", "submit"] },
+            "description": "CONFIRMED WORKING LIVE 2026-09-17. IMPORTANT: this endpoint only ever reads what's already saved in the database -- call bale/save-draft with the bale's current values FIRST, or you'll submit stale/empty data. Response may include a non-blocking 'warnings' array (e.g. Checked Mtrs exceeding Total In Mtrs) -- see business-rules-and-flows.md's Submit section."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /bale/unsubmit -- revert a SUBMITTED bale back to DRAFT",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "options": { "raw": { "language": "json" } },
+              "raw": "{\n  \"userName\": \"{{userName}}\",\n  \"userPwd\": \"{{userPwd}}\",\n  \"companyId\": {{companyId}},\n  \"baleId\": {{baleId}}\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/bale/unsubmit", "host": ["{{baseUrl}}"], "path": ["bale", "unsubmit"] },
+            "description": "CONFIRMED WORKING LIVE 2026-09-17. 400 if the bale is not currently SUBMITTED -- an APPROVED bale can never be reverted this way (its inventory cascade already ran)."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /bale/move-to-lot -- move a DRAFT bale to a different lot",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "options": { "raw": { "language": "json" } },
+              "raw": "{\n  \"userName\": \"{{userName}}\",\n  \"userPwd\": \"{{userPwd}}\",\n  \"companyId\": {{companyId}},\n  \"baleId\": {{baleId}},\n  \"newLotId\": {{newLotId}}\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/bale/move-to-lot", "host": ["{{baseUrl}}"], "path": ["bale", "move-to-lot"] },
+            "description": "CONFIRMED WORKING LIVE 2026-09-17 -- including a real bug this testing surfaced and fixed: this endpoint previously had no check for a duplicate Bale No already existing in the destination lot, so a move could silently leave two bales sharing one number in the same lot. Now returns 400 for that case (verified), while a legitimate no-clash move still succeeds (also verified). 400 if the bale isn't DRAFT, or if the destination lot belongs to a different PO line item than the bale's current lot."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /bale/approve-batch -- approve one or more bales as one batch",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "options": { "raw": { "language": "json" } },
+              "raw": "{\n  \"userName\": \"{{userName}}\",\n  \"userPwd\": \"{{userPwd}}\",\n  \"companyId\": {{companyId}},\n  \"userId\": {{userId}},\n  \"baleIds\": [{{baleId}}]\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/bale/approve-batch", "host": ["{{baseUrl}}"], "path": ["bale", "approve-batch"] },
+            "description": "CONFIRMED WORKING LIVE 2026-09-17 (real GRN No issued, real qty-ceiling warning surfaced). IRREVERSIBLE -- one-way, adds checked quantity to inventory, stamps one shared new GRN No onto every bale in baleIds. All-or-nothing: 400 with no partial writes if ANY listed bale is already APPROVED, has no Checked Mtrs recorded, or would push its lot's total checked qty past that lot's received qty. Response includes updatedLots and a non-blocking warnings array."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "RM Item",
+      "item": [
+        {
+          "name": "POST /rm/save-draft -- save one RM line item's Checked/Damage Qty",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "options": { "raw": { "language": "json" } },
+              "raw": "{\n  \"userName\": \"{{userName}}\",\n  \"userPwd\": \"{{userPwd}}\",\n  \"companyId\": {{companyId}},\n  \"headerId\": {{headerId}},\n  \"poLineitemId\": {{poLineitemId}},\n  \"checkedQty\": 10,\n  \"damageQty\": 0\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/rm/save-draft", "host": ["{{baseUrl}}"], "path": ["rm", "save-draft"] },
+            "description": "CONFIRMED WORKING LIVE 2026-09-17. Silently a no-op server-side if the row is already SUBMITTED/APPROVED. Also treat as read-only client-side any row whose totalReceivedQty is <= 0 -- shown as 'NOT RECEIVED' in the browser UI, a third lock reason with no Fabric-bale equivalent."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /rm/submit -- move one RM line item DRAFT -> SUBMITTED",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "options": { "raw": { "language": "json" } },
+              "raw": "{\n  \"userName\": \"{{userName}}\",\n  \"userPwd\": \"{{userPwd}}\",\n  \"companyId\": {{companyId}},\n  \"headerId\": {{headerId}},\n  \"poLineitemId\": {{poLineitemId}}\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/rm/submit", "host": ["{{baseUrl}}"], "path": ["rm", "submit"] },
+            "description": "CONFIRMED WORKING LIVE 2026-09-17. 400 if the item isn't currently DRAFT or has no Checked Qty recorded. Same 'save current values first' requirement as bale/submit."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /rm/approve-batch -- approve every eligible RM item under a header",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "options": { "raw": { "language": "json" } },
+              "raw": "{\n  \"userName\": \"{{userName}}\",\n  \"userPwd\": \"{{userPwd}}\",\n  \"companyId\": {{companyId}},\n  \"userId\": {{userId}},\n  \"headerId\": {{headerId}}\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/rm/approve-batch", "host": ["{{baseUrl}}"], "path": ["rm", "approve-batch"] },
+            "description": "CONFIRMED WORKING LIVE 2026-09-17 (approved every eligible item under the header in one call, reopened as DRAFT, real qty-exceeded warning surfaced). Unlike a Fabric bale, an RM item is never locked forever -- each approve round folds Checked Qty into a running alreadyCheckedQty total and the row REOPENS as DRAFT afterward (supports partial receiving across multiple GRN rounds). No-op (200, success, empty updatedItems) if nothing under this header is currently eligible (DRAFT/SUBMITTED with Checked Qty > 0)."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Lot AI Upload",
+      "item": [
+        {
+          "name": "POST /lot/upload -- synchronous lot-level AI upload",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "file", "type": "file", "src": "{{multiBaleSheetPath}}" },
+                { "key": "lotId", "value": "{{lotId}}", "type": "text" },
+                { "key": "expectedPoNumber", "value": "", "type": "text" },
+                { "key": "expectedVendorName", "value": "", "type": "text" },
+                { "key": "userName", "value": "{{userName}}", "type": "text" },
+                { "key": "userPwd", "value": "{{userPwd}}", "type": "text" },
+                { "key": "companyId", "value": "{{companyId}}", "type": "text" },
+                { "key": "userId", "value": "{{userId}}", "type": "text" }
+              ]
+            },
+            "url": { "raw": "{{baseUrl}}/lot/upload", "host": ["{{baseUrl}}"], "path": ["lot", "upload"] },
+            "description": "CONFIRMED WORKING LIVE 2026-09-16 with this exact file (real AI extraction round trip, real S3 write, real ai_extraction_audit row). Single-page-safe only -- use lot/upload/async for anything that may be multi-page. Returns 200 even on extraction failure; check the success/errorMessage fields, not the HTTP status."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /lot/upload/async -- start a background lot-level extraction job",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "file", "type": "file", "src": "{{multiBaleSheetPath}}" },
+                { "key": "lotId", "value": "{{lotId}}", "type": "text" },
+                { "key": "expectedPoNumber", "value": "", "type": "text" },
+                { "key": "expectedVendorName", "value": "", "type": "text" },
+                { "key": "bypassFabricMismatch", "value": "false", "type": "text" },
+                { "key": "userName", "value": "{{userName}}", "type": "text" },
+                { "key": "userPwd", "value": "{{userPwd}}", "type": "text" },
+                { "key": "companyId", "value": "{{companyId}}", "type": "text" },
+                { "key": "userId", "value": "{{userId}}", "type": "text" }
+              ]
+            },
+            "url": { "raw": "{{baseUrl}}/lot/upload/async", "host": ["{{baseUrl}}"], "path": ["lot", "upload", "async"] },
+            "description": "CONFIRMED WORKING LIVE 2026-09-17, including a genuine fabric-mismatch-then-resume cycle. Returns {success, jobId, totalPages, completedPages} -- copy the jobId into the {{jobId}} collection variable and use the Status/Cancel/Resume requests below to follow it. Poll status on a ~1.5s interval per sequence-diagrams.md."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /lot/upload/status -- poll a lot-upload job",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "X-User-Name", "value": "{{userName}}" },
+              { "key": "X-User-Pwd", "value": "{{userPwd}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/lot/upload/status?jobId={{jobId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["lot", "upload", "status"],
+              "query": [{ "key": "jobId", "value": "{{jobId}}" }]
+            },
+            "description": "jobStatus is one of running|done|error|cancelled. Confirmed live 2026-09-16 that an unknown/expired jobId returns a clean {success:false, jobStatus:'error', errorMessage:'Unknown or expired job.'}, not a 500."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /lot/upload/cancel -- cancel a running lot-upload job",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "options": { "raw": { "language": "json" } },
+              "raw": "{\n  \"userName\": \"{{userName}}\",\n  \"userPwd\": \"{{userPwd}}\",\n  \"companyId\": {{companyId}},\n  \"jobId\": \"{{jobId}}\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/lot/upload/cancel", "host": ["{{baseUrl}}"], "path": ["lot", "upload", "cancel"] },
+            "description": "CONFIRMED WORKING LIVE 2026-09-17. Stops further pages from being dispatched but keeps pages already completed -- the next status poll finalizes those with jobStatus='cancelled'. No-op if the job is unknown or already finished."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /lot/upload/resume -- resume a job stopped on a fabric mismatch",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "options": { "raw": { "language": "json" } },
+              "raw": "{\n  \"userName\": \"{{userName}}\",\n  \"userPwd\": \"{{userPwd}}\",\n  \"companyId\": {{companyId}},\n  \"jobId\": \"{{jobId}}\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/lot/upload/resume", "host": ["{{baseUrl}}"], "path": ["lot", "upload", "resume"] },
+            "description": "Only call this after a status poll returns fabricMismatchStopped:true AND the user has confirmed they want to process it anyway. Continues the SAME jobId (page 1's extraction is kept) -- does NOT re-upload the file. CONFIRMED WORKING LIVE 2026-09-17 -- deliberately tested with a genuinely mismatched document: the job stopped with fabricMismatchStopped:true and wrote nothing (confirmed via direct DB read), then this resume call completed the real write."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Bale AI Upload",
+      "item": [
+        {
+          "name": "POST /bale/upload -- synchronous bale-level AI upload",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "file", "type": "file", "src": "{{singleBaleTicketPath}}" },
+                { "key": "baleId", "value": "{{baleId}}", "type": "text" },
+                { "key": "userName", "value": "{{userName}}", "type": "text" },
+                { "key": "userPwd", "value": "{{userPwd}}", "type": "text" },
+                { "key": "companyId", "value": "{{companyId}}", "type": "text" },
+                { "key": "userId", "value": "{{userId}}", "type": "text" }
+              ]
+            },
+            "url": { "raw": "{{baseUrl}}/bale/upload", "host": ["{{baseUrl}}"], "path": ["bale", "upload"] },
+            "description": "CONFIRMED WORKING LIVE 2026-09-16 with this exact file (real AI extraction round trip -- extracted bale_no 40665 from this reference ticket didn't match bale 220's own baleNo '1221', so the service correctly matched/skipped against a different, already-SUBMITTED bale of that number in the same lot with an advisory errorMessage, exactly like the browser UI would). Locked once the bale leaves DRAFT."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /bale/upload/async -- start a background bale-level extraction job",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "file", "type": "file", "src": "{{singleBaleTicketPath}}" },
+                { "key": "baleId", "value": "{{baleId}}", "type": "text" },
+                { "key": "bypassFabricMismatch", "value": "false", "type": "text" },
+                { "key": "userName", "value": "{{userName}}", "type": "text" },
+                { "key": "userPwd", "value": "{{userPwd}}", "type": "text" },
+                { "key": "companyId", "value": "{{companyId}}", "type": "text" },
+                { "key": "userId", "value": "{{userId}}", "type": "text" }
+              ]
+            },
+            "url": { "raw": "{{baseUrl}}/bale/upload/async", "host": ["{{baseUrl}}"], "path": ["bale", "upload", "async"] },
+            "description": "CONFIRMED WORKING LIVE 2026-09-17. Same job/poll shape as Lot AI Upload's async endpoint -- copy the returned jobId into {{jobId}} and use the requests below."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /bale/upload/status -- poll a bale-upload job",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "X-User-Name", "value": "{{userName}}" },
+              { "key": "X-User-Pwd", "value": "{{userPwd}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/bale/upload/status?jobId={{jobId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["bale", "upload", "status"],
+              "query": [{ "key": "jobId", "value": "{{jobId}}" }]
+            },
+            "description": "jobStatus is one of running|done|error|cancelled."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /bale/upload/cancel -- cancel a running bale-upload job",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "options": { "raw": { "language": "json" } },
+              "raw": "{\n  \"userName\": \"{{userName}}\",\n  \"userPwd\": \"{{userPwd}}\",\n  \"companyId\": {{companyId}},\n  \"jobId\": \"{{jobId}}\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/bale/upload/cancel", "host": ["{{baseUrl}}"], "path": ["bale", "upload", "cancel"] },
+            "description": "CONFIRMED WORKING LIVE 2026-09-17."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /bale/upload/resume -- resume a bale job stopped on a fabric mismatch",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "options": { "raw": { "language": "json" } },
+              "raw": "{\n  \"userName\": \"{{userName}}\",\n  \"userPwd\": \"{{userPwd}}\",\n  \"companyId\": {{companyId}},\n  \"jobId\": \"{{jobId}}\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/bale/upload/resume", "host": ["{{baseUrl}}"], "path": ["bale", "upload", "resume"] },
+            "description": "CONFIRMED WORKING LIVE 2026-09-17 -- deliberately tested with a genuinely mismatched document: the job stopped with fabricMismatchStopped:true and wrote nothing (confirmed via direct DB read), then this resume call completed the real write."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "RM AI Upload",
+      "item": [
+        {
+          "name": "POST /rm/upload/async -- start a background RM invoice extraction job",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "file", "type": "file", "src": "{{rmInvoicePath}}" },
+                { "key": "headerId", "value": "{{headerId}}", "type": "text" },
+                { "key": "userName", "value": "{{userName}}", "type": "text" },
+                { "key": "userPwd", "value": "{{userPwd}}", "type": "text" },
+                { "key": "companyId", "value": "{{companyId}}", "type": "text" },
+                { "key": "userId", "value": "{{userId}}", "type": "text" }
+              ]
+            },
+            "url": { "raw": "{{baseUrl}}/rm/upload/async", "host": ["{{baseUrl}}"], "path": ["rm", "upload", "async"] },
+            "description": "CONFIRMED WORKING LIVE 2026-09-17 (real Claude vision call, correctly reported each extracted line item as not matching any RM item on the test PO -- clean skip, not a crash). No fabric-mismatch stop-early gate (an RM invoice has no fabric-description field to compare) -- no bypassFabricMismatch field and no resume endpoint for this family. Each extracted line item is matched independently against this header's own RM rows by description text; an unmatched line, or one matching a row that isn't DRAFT or has nothing received yet, is skipped with a warning rather than failing the whole upload."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /rm/upload/status -- poll an RM-invoice upload job",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "X-User-Name", "value": "{{userName}}" },
+              { "key": "X-User-Pwd", "value": "{{userPwd}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/rm/upload/status?jobId={{jobId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["rm", "upload", "status"],
+              "query": [{ "key": "jobId", "value": "{{jobId}}" }]
+            },
+            "description": "jobStatus is one of running|done|error|cancelled."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /rm/upload/cancel -- cancel a running RM-invoice upload job",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "options": { "raw": { "language": "json" } },
+              "raw": "{\n  \"userName\": \"{{userName}}\",\n  \"userPwd\": \"{{userPwd}}\",\n  \"companyId\": {{companyId}},\n  \"jobId\": \"{{jobId}}\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/rm/upload/cancel", "host": ["{{baseUrl}}"], "path": ["rm", "upload", "cancel"] },
+            "description": "CONFIRMED WORKING LIVE 2026-09-17."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "PDFs",
+      "item": [
+        {
+          "name": "GET /pdf/grn -- one approval batch's GRN PDF",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "X-User-Name", "value": "{{userName}}" },
+              { "key": "X-User-Pwd", "value": "{{userPwd}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/pdf/grn?grnNo={{grnNo}}&poNumber={{poNumber}}&itemType={{itemType}}&companyId={{companyId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["pdf", "grn"],
+              "query": [
+                { "key": "grnNo", "value": "{{grnNo}}" },
+                { "key": "poNumber", "value": "{{poNumber}}" },
+                { "key": "itemType", "value": "{{itemType}}" },
+                { "key": "companyId", "value": "{{companyId}}" }
+              ]
+            },
+            "description": "CONFIRMED WORKING LIVE 2026-09-17 (real valid PDF bytes returned for a real GRN No). In Postman, click 'Send and Download' (or check the response's Content-Type: application/pdf) to save the binary. itemType is 'Fabric' or 'RM' (mixed case, matching po_master.itemtrimstype), not FABRIC/RM."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /pdf/overall -- every approval batch ever approved for a PO",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "X-User-Name", "value": "{{userName}}" },
+              { "key": "X-User-Pwd", "value": "{{userPwd}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/pdf/overall?poNumber={{poNumber}}&companyId={{companyId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["pdf", "overall"],
+              "query": [
+                { "key": "poNumber", "value": "{{poNumber}}" },
+                { "key": "companyId", "value": "{{companyId}}" }
+              ]
+            },
+            "description": "CONFIRMED WORKING LIVE 2026-09-17. The list page's single 'PDF' button -- one combined PDF, itemType resolved server-side (never trusted from the client)."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /pdf/worksheet -- printable draft worksheet for one lot",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "X-User-Name", "value": "{{userName}}" },
+              { "key": "X-User-Pwd", "value": "{{userPwd}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/pdf/worksheet?lotId={{lotId}}&cols=2&draftOnly=false&companyId={{companyId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["pdf", "worksheet"],
+              "query": [
+                { "key": "lotId", "value": "{{lotId}}" },
+                { "key": "cols", "value": "2" },
+                { "key": "draftOnly", "value": "false" },
+                { "key": "companyId", "value": "{{companyId}}" }
+              ]
+            },
+            "description": "CONFIRMED WORKING LIVE 2026-09-16/17 -- byte-for-byte visually identical to the browser-downloaded version of the same lot; also verified with real 10-page, 200+ bale lot (no card ever split across a page break) and with draftOnly=true (correctly excludes SUBMITTED/APPROVED bales, keeping only DRAFT ones with real piece data). cols is the bale-grid column count, clamped server-side to [1,5], default 2. draftOnly is optional, default false -- true restricts the sheet to still-DRAFT bales only (mirrors the new 'Draft only' checkbox next to Download Worksheet PDF in the browser UI). A wrong password on this exact call was confirmed to return a clean 401 JSON body, not a broken/partial PDF stream."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

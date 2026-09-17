@@ -1,0 +1,1594 @@
+openapi: 3.0.3
+info:
+  title: GRN Checking -- Mobile API
+  version: "1.0.0-draft"
+  description: |
+    Mobile-facing contract for the GRN Checking module: list page, Fabric
+    edit core (lot/bale/piece CRUD, save/submit/approve, move-to-lot,
+    revert-to-draft), AI Doc Upload for lot/bale/RM (async job/poll
+    pattern), the RM item flow, and PDF downloads.
+
+    Barcode features are explicitly OUT OF SCOPE and not documented here.
+
+    Every path below is a NEW `/api/grncheck/...` endpoint, implemented in
+    com.codeverse.stitch.api.controller.GrnCheckingMobileController (request
+    DTOs in com.codeverse.stitch.api.request.grncheck.GrnMobileApiRequests),
+    NOT the existing browser-facing `/grncheck/...` paths (those stay
+    session-cookie-based for the current web UI and are unchanged -- both
+    controllers now run side by side in the same deployed app). Each new
+    endpoint wraps the exact same service-layer call its `/grncheck/...`
+    counterpart already makes -- see the `x-legacy-endpoint` extension on
+    each operation for that mapping, and business-rules-and-flows.md for
+    the conditional logic that must be reproduced client-side.
+
+    STATUS: implemented and live-tested (2026-09-16) -- every path below is
+    real, running code, not a proposed contract. Verified via curl against
+    a local deployment: /state (valid + invalid creds), /list, /pdf/worksheet
+    (valid + invalid creds, byte-identical PDF to the browser download),
+    a poll-status call against an unknown jobId (clean error, not a 500),
+    a real write (/header/save-meta, confirmed via direct DB read then
+    reverted), and a REAL end-to-end AI-extraction round trip through both
+    /lot/upload and /bale/upload (real file, real S3 write, real
+    ai_extraction_audit row, correct business-rule handling of an
+    already-SUBMITTED bale-name collision) -- this last one surfaced and
+    fixed a genuine bug (see README.md's auth section: a hidden
+    HttpSession.COMPANY_DETAILS read several layers down in the shared
+    service code, not satisfiable by stateless auth until
+    GrnCheckingMobileController#primeCompanySession was added). The
+    existing browser-facing GrnCheckingController and JSPs were
+    re-verified unaffected after deployment (same page, same data, same
+    rendering). NOT independently live-tested: the async job variants
+    (upload/async + status/cancel/resume for lot/bale, upload/async +
+    status/cancel for RM) -- see README.md's "Not yet done" section.
+
+    # CONFIRMED (2026-09-16, superseding the earlier "TODO: verify" note):
+    # java.util.Date field serialization is NOT uniform across this API,
+    # verified by a live GET /state call:
+    #   - GrnCheckingHeaderDTO.checkingDate -> serializes as a "yyyy-MM-dd"
+    #     STRING (e.g. "2026-09-10"), not epoch millis. Likely a
+    #     @JsonFormat/custom serializer on that one field specifically.
+    #   - GrnCheckingHeaderDTO.createdAt / updatedAt, and
+    #     GrnCheckingFabricLotDTO.lotDate -> serialize as RAW EPOCH
+    #     MILLISECONDS (e.g. 1789056129000), Jackson's default for
+    #     java.util.Date with no annotation.
+    # Do NOT assume one format for every `format: date-time` field below --
+    # they are genuinely mixed. Prefer each DTO's own pre-formatted display
+    # string (lotDateDisplay, uploadedAtDisplay) wherever one exists; where
+    # none exists (createdAt/updatedAt), expect raw epoch millis specifically,
+    # not an ISO-8601 string.
+  contact:
+    name: CED-1626 GRN Checking
+tags:
+  - name: List
+    description: The GRN Checking list page's data source.
+  - name: Fabric Core
+    description: Header, lot, bale, piece CRUD and the save/submit/approve/move/revert flow.
+  - name: RM Item
+    description: The flat (no lot/bale) RM checking flow.
+  - name: Lot AI Upload
+    description: AI extraction for a lot-level (multi-bale) vendor packing-slip document.
+  - name: Bale AI Upload
+    description: AI extraction for a bale-level (single-bale, checked-Mtrs) re-upload.
+  - name: RM AI Upload
+    description: AI extraction for an RM vendor tax invoice.
+  - name: PDFs
+    description: GRN No PDF, overall PO PDF, and lot worksheet PDF downloads.
+
+servers:
+  - url: /api/grncheck
+
+security:
+  - mobileCredentialsBody: []
+
+paths:
+  # ==================== NEW ENDPOINT ====================
+
+  /state:
+    get:
+      tags: [List, Fabric Core]
+      summary: Get the full current GRN Checking state for one PO (NEW endpoint)
+      description: |
+        **This is the one genuinely new endpoint in this package.** It wraps
+        the exact same service calls `GrnCheckingController.fabric()`
+        already makes server-side (`openHeader`, `getFabricLineItemsForPo`,
+        `getLotsForHeader`, `getRmItemsForHeader`,
+        `getUploadHistoryForRmHeader`, `getVendorDetailsForPo`,
+        `getGrnNumbersForHeader`) and returns the bundle as one JSON
+        response instead of baking it into a JSP's `<script>` tags. Call
+        this once when opening a PO for checking, and again after any
+        action whose response doesn't already carry the updated sub-object
+        (approveBatch and the AI-upload endpoints already return updated
+        lots/bales inline -- see business-rules-and-flows.md -- so this is a
+        full refresh, not something to poll).
+      x-legacy-endpoint: "GET /grncheck/fabric?itemId=&menuId= (HTML view; no prior JSON equivalent existed)"
+      security:
+        - mobileCredentialsHeader: []
+      parameters:
+        - $ref: '#/components/parameters/PoNumber'
+        - $ref: '#/components/parameters/CompanyIdQuery'
+        - $ref: '#/components/parameters/UserIdQueryOptional'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  header:
+                    $ref: '#/components/schemas/GrnCheckingHeader'
+                  itemType:
+                    type: string
+                    enum: [FABRIC, RM]
+                  fabricLineItems:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/FabricLineItem'
+                  lots:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/GrnCheckingFabricLot'
+                  rmItems:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/GrnCheckingRmItem'
+                  rmUploadHistory:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/UploadHistoryEntry'
+                  vendorDetails:
+                    $ref: '#/components/schemas/VendorDetails'
+                  grnNumbers:
+                    type: array
+                    items:
+                      type: string
+                    description: Every distinct batch GRN No ever issued under this header, ascending.
+        '401':
+          $ref: '#/components/responses/AuthFailed'
+
+  # ==================== LIST ====================
+
+  /list:
+    post:
+      tags: [List]
+      summary: Server-side paginated list of every eligible PO (Fabric + RM)
+      description: |
+        Call this once when the list screen loads, then again on every
+        page change, page-size change, filter toggle, or search-box
+        change -- pagination, filtering, and searching are all
+        server-side, not something a mobile client should try to do
+        itself over a locally-cached page. `dataFilter: "60Days"` maps to
+        the "Last 30 Day PO'S" radio; anything else (including
+        `"olderDays"` or omitted) maps to "All PO'S". `itemType` is
+        optional (`"Fabric"` / `"RM"` / omitted for both). Each row's
+        `hasFabricBarcodes` field is a leftover from the shared row DTO
+        the browser app also uses -- safe to ignore, barcode is out of
+        scope for this package.
+      x-legacy-endpoint: "POST /grncheck/loadAll (already JSON; reused as-is aside from auth)"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/MobileAuthBody'
+                - type: object
+                  required: [companyId, menuId, start, length]
+                  properties:
+                    companyId: { type: integer }
+                    menuId: { type: integer }
+                    itemType: { type: string, nullable: true, description: "Unused server-side today -- list mixes RM and Fabric regardless." }
+                    start: { type: integer, description: "DataTables-style row offset." }
+                    length: { type: integer, description: "Page size." }
+                    searchField:
+                      type: string
+                      nullable: true
+                      enum: [styleName, vendor_name, id, invoiceNo, status, type, grnno, rmfabric, rmcode, rollno]
+                    searchValue: { type: string, nullable: true }
+                    dataFilter:
+                      type: string
+                      nullable: true
+                      enum: [60Days, olderDays]
+                      description: "60Days = 'Last 30 Day PO'S' radio; anything else = 'All PO'S'."
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  recordsTotal: { type: integer }
+                  recordsFiltered: { type: integer }
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/GrnCheckingListRow'
+        '401':
+          $ref: '#/components/responses/AuthFailed'
+
+  /audit-history:
+    post:
+      tags: [Fabric Core]
+      summary: Every AI-extraction upload ever recorded for this header (lot- and bale-level), newest first
+      description: |
+        Call this to render a "view uploaded doc(s)" / upload-history
+        panel for a header -- it returns every attempt (success AND
+        failure) ever made against any lot or bale under that header,
+        not just the latest one. Each row's `extractionStatus` is one of
+        `OK`, `ERROR`, or `MISMATCH`; `rawExtractedJson` is the raw
+        model output for debugging, not something to render directly to
+        an end user.
+      x-legacy-endpoint: "POST /grncheck/auditHistory"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/MobileAuthBody'
+                - type: object
+                  required: [headerId]
+                  properties:
+                    headerId: { type: integer }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleResultWithRows'
+        '401':
+          $ref: '#/components/responses/AuthFailed'
+
+  # ==================== FABRIC CORE ====================
+
+  /header/save-meta:
+    post:
+      tags: [Fabric Core]
+      summary: Save the header's Checking Date and Remarks
+      description: |
+        Call this whenever the user edits the two free-form fields at
+        the top of the Fabric/RM edit page -- Checking Date and Remarks
+        -- independently of any bale/lot/RM-item action. `checkingDate`
+        is `yyyy-MM-dd`; if omitted or unparseable the server silently
+        defaults to today rather than rejecting the request.
+      x-legacy-endpoint: "POST /grncheck/saveHeaderMeta"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/MobileAuthBody'
+                - type: object
+                  required: [headerId]
+                  properties:
+                    headerId: { type: integer }
+                    remarks: { type: string, nullable: true }
+                    checkingDate:
+                      type: string
+                      format: date
+                      nullable: true
+                      description: "yyyy-MM-dd; defaults to today server-side if omitted/unparseable."
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleResult'
+        '401':
+          $ref: '#/components/responses/AuthFailed'
+
+  /lot/available-rolls:
+    post:
+      tags: [Fabric Core]
+      summary: Roll/lot numbers available under a PO line item, for the "open a lot" picker
+      description: |
+        Call this when the user picks a Fabric line item and needs to
+        choose which roll/lot to check next -- it's the data source
+        behind the "-- choose a lot / roll to check --" dropdown. Fabric
+        only in practice; RM has no roll concept and uses its own flat
+        item flow instead (see the RM Item folder/tag).
+      x-legacy-endpoint: "POST /grncheck/availableRolls"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/MobileAuthBody'
+                - type: object
+                  required: [poNumber, poLineitemId]
+                  properties:
+                    poNumber: { type: integer }
+                    poLineitemId: { type: integer }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    rollNo: { type: string }
+                    receivedQty: { type: number, format: double }
+                    lotDate:
+                      type: string
+                      format: date-time
+                      nullable: true
+        '401':
+          $ref: '#/components/responses/AuthFailed'
+
+  /lot/open:
+    post:
+      tags: [Fabric Core]
+      summary: Open (find-or-create) a lot for one roll under a PO line item
+      description: |
+        Call this right after the user picks a roll from
+        `/lot/available-rolls`'s results. Idempotent -- calling it again
+        for a `rollNo` that already has a lot returns that same existing
+        lot (with its current bales/pieces) rather than creating a
+        duplicate, so it's safe to call every time a roll is selected,
+        not just the first time.
+      x-legacy-endpoint: "POST /grncheck/openLot"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/MobileAuthBody'
+                - type: object
+                  required: [headerId, poLineitemId, fabricId, rollNo]
+                  properties:
+                    headerId: { type: integer }
+                    poLineitemId: { type: integer }
+                    fabricId: { type: integer }
+                    rollNo: { type: string }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GrnCheckingFabricLot'
+        '401':
+          $ref: '#/components/responses/AuthFailed'
+
+  /bale/save-draft:
+    post:
+      tags: [Fabric Core]
+      summary: Save a bale's current on-screen values as its DRAFT state
+      description: |
+        `totalInMtrs` is deliberately NOT part of the request -- the server
+        always recomputes it as the sum of `pieces[].totalInMtrs` (single
+        source of truth). Silently ignored server-side if the bale is not
+        DRAFT (matches the JSP's own field-locking rule -- see
+        business-rules-and-flows.md).
+      x-legacy-endpoint: "POST /grncheck/saveDraft"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/MobileAuthBody'
+                - type: object
+                  required: [baleId, lotId, pieces]
+                  properties:
+                    baleId: { type: integer }
+                    lotId: { type: integer }
+                    baleNo: { type: string }
+                    checkedMtrs:
+                      type: number
+                      format: double
+                      description: "CONFIRMED via live testing (2026-09-17), and different from totalInMtrs: this field is taken LITERALLY, not auto-summed server-side. totalInMtrs is always recomputed from the sum of pieces[].totalInMtrs, but checkedMtrs is not -- the client must sum its own pieces[].checkedMtrs and send that sum here itself, or the bale-level checkedMtrs will silently be whatever was sent (e.g. 0 if omitted/defaulted) even though every piece row is correctly filled in."
+                    damageMtrs: { type: number, format: double, nullable: true }
+                    pieces:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/BalePieceInput'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleResult'
+        '401':
+          $ref: '#/components/responses/AuthFailed'
+
+  /bale/add:
+    post:
+      tags: [Fabric Core]
+      summary: Create a brand-new DRAFT bale under a lot with no AI document (manual entry)
+      description: |
+        Throws (400) if the lot doesn't exist, the header isn't FABRIC,
+        `baleNo` is blank, `totalPcs` isn't positive, or `baleNo` already
+        exists in this lot.
+      x-legacy-endpoint: "POST /grncheck/addBale"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/MobileAuthBody'
+                - type: object
+                  required: [lotId, baleNo, totalPcs]
+                  properties:
+                    lotId: { type: integer }
+                    baleNo: { type: string }
+                    totalPcs: { type: integer, minimum: 1 }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GrnCheckingUploadResult'
+        '400':
+          description: Validation error (see `errorMessage`)
+        '401':
+          $ref: '#/components/responses/AuthFailed'
+
+  /bale/remove-piece:
+    post:
+      tags: [Fabric Core]
+      summary: Remove one piece row from a still-DRAFT bale
+      description: |
+        Throws (400) if the bale isn't DRAFT, the `pcNo` doesn't exist on
+        it, or it would remove the bale's last remaining piece.
+      x-legacy-endpoint: "POST /grncheck/removeBalePiece"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/MobileAuthBody'
+                - type: object
+                  required: [baleId, pcNo]
+                  properties:
+                    baleId: { type: integer }
+                    pcNo: { type: integer }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GrnCheckingUploadResult'
+        '401':
+          $ref: '#/components/responses/AuthFailed'
+
+  /bale/submit:
+    post:
+      tags: [Fabric Core]
+      summary: Move one bale from DRAFT to SUBMITTED
+      description: |
+        Returns a possibly-empty list of advisory (non-blocking) warnings --
+        see business-rules-and-flows.md's Submit section. The mobile client
+        MUST save the bale's current values first (bale/save-draft) before
+        calling this -- this endpoint only ever reads what's already in the
+        database, never anything in the request.
+      x-legacy-endpoint: "POST /grncheck/submit"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/MobileAuthBody'
+                - type: object
+                  required: [baleId]
+                  properties:
+                    baleId: { type: integer }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SimpleResult'
+                  - type: object
+                    properties:
+                      warnings:
+                        type: array
+                        items: { type: string }
+        '401':
+          $ref: '#/components/responses/AuthFailed'
+
+  /bale/unsubmit:
+    post:
+      tags: [Fabric Core]
+      summary: Revert a SUBMITTED bale back to DRAFT
+      description: |
+        Throws (400) if the bale is not currently SUBMITTED -- an APPROVED
+        bale can never be reverted this way (its inventory cascade already
+        ran).
+      x-legacy-endpoint: "POST /grncheck/unsubmitBale"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/MobileAuthBody'
+                - type: object
+                  required: [baleId]
+                  properties:
+                    baleId: { type: integer }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GrnCheckingUploadResult'
+        '401':
+          $ref: '#/components/responses/AuthFailed'
+
+  /bale/move-to-lot:
+    post:
+      tags: [Fabric Core]
+      summary: Move a DRAFT bale to a different lot under the same fabric line item
+      description: |
+        Throws (400) if the bale isn't DRAFT, or if the destination lot
+        belongs to a different PO line item.
+      x-legacy-endpoint: "POST /grncheck/moveBaleToLot"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/MobileAuthBody'
+                - type: object
+                  required: [baleId, newLotId]
+                  properties:
+                    baleId: { type: integer }
+                    newLotId: { type: integer }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleResult'
+        '401':
+          $ref: '#/components/responses/AuthFailed'
+
+  /bale/approve-batch:
+    post:
+      tags: [Fabric Core]
+      summary: Approve one or more checked bales together as one all-or-nothing batch
+      description: |
+        The one-way, irreversible action behind "Approve": every listed
+        bale is validated together first (none written until every one
+        passes), then approved as a single batch sharing exactly ONE new
+        GRN No. Rejects (400, no partial writes) if any selected bale is
+        already APPROVED, has no Checked Mtrs recorded, or would push its
+        lot's total checked qty past that lot's received qty (accounting
+        for every OTHER bale in this same batch against the same lot, not
+        just what's already committed).
+      x-legacy-endpoint: "POST /grncheck/approveBatch"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/MobileAuthBody'
+                - type: object
+                  required: [baleIds]
+                  properties:
+                    baleIds:
+                      type: array
+                      items: { type: integer }
+                      minItems: 1
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GrnCheckingBatchApproveResult'
+        '401':
+          $ref: '#/components/responses/AuthFailed'
+
+  # ==================== RM ITEM ====================
+
+  /rm/save-draft:
+    post:
+      tags: [RM Item]
+      summary: Save one RM line item's Checked Qty / Damage Qty as DRAFT
+      description: |
+        Silently ignored server-side if the row is already
+        SUBMITTED/APPROVED (same one-way lock as a Fabric bale). Also treat
+        as read-only client-side (see business-rules-and-flows.md) any row
+        whose `totalReceivedQty` is <= 0 -- there is nothing real to check
+        against yet.
+      x-legacy-endpoint: "POST /grncheck/saveRmDraft"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/MobileAuthBody'
+                - type: object
+                  required: [headerId, poLineitemId]
+                  properties:
+                    headerId: { type: integer }
+                    poLineitemId: { type: integer }
+                    checkedQty: { type: number, format: double, nullable: true }
+                    damageQty: { type: number, format: double, nullable: true }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SimpleResult'
+                  - type: object
+                    properties:
+                      item:
+                        $ref: '#/components/schemas/GrnCheckingRmItem'
+        '401':
+          $ref: '#/components/responses/AuthFailed'
+
+  /rm/submit:
+    post:
+      tags: [RM Item]
+      summary: Move one RM line item from DRAFT to SUBMITTED
+      description: |
+        Throws (400) if the item isn't currently DRAFT or has no Checked
+        Qty recorded. Same "save current values first" requirement as
+        bale/submit.
+      x-legacy-endpoint: "POST /grncheck/submitRm"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/MobileAuthBody'
+                - type: object
+                  required: [headerId, poLineitemId]
+                  properties:
+                    headerId: { type: integer }
+                    poLineitemId: { type: integer }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SimpleResult'
+                  - type: object
+                    properties:
+                      item:
+                        $ref: '#/components/schemas/GrnCheckingRmItem'
+                      warnings:
+                        type: array
+                        items: { type: string }
+        '401':
+          $ref: '#/components/responses/AuthFailed'
+
+  /rm/approve-batch:
+    post:
+      tags: [RM Item]
+      summary: Approve every eligible (DRAFT/SUBMITTED, Checked Qty > 0) RM item under this header, as one batch
+      description: |
+        Unlike a Fabric bale, an RM item is never locked forever -- each
+        approve round folds Checked Qty into a running "Already Checked
+        Qty" total and the row reopens as DRAFT, so the same line item can
+        be checked and approved again in a later partial-receiving round.
+        No-op (200, success, empty `updatedItems`) if nothing under this
+        header is currently eligible.
+      x-legacy-endpoint: "POST /grncheck/approveRmBatch"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/MobileAuthBody'
+                - type: object
+                  required: [headerId]
+                  properties:
+                    headerId: { type: integer }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GrnCheckingRmApproveResult'
+        '401':
+          $ref: '#/components/responses/AuthFailed'
+
+  # ==================== LOT AI UPLOAD ====================
+
+  /lot/upload:
+    post:
+      tags: [Lot AI Upload]
+      summary: Synchronous lot-level AI upload (single-page-safe; use lot/upload/async for anything that may be multi-page)
+      description: |
+        Use this when the user photographs/attaches a vendor packing
+        slip that you know is a single page (e.g. camera capture of one
+        ticket). Blocks until extraction finishes and returns the
+        reconciled lot/bale data directly -- no polling needed. For
+        anything that might be multiple pages (a multi-page PDF, or a
+        photo of a sheet covering several bales), prefer
+        `/lot/upload/async` instead, which processes page-by-page and
+        can be polled/cancelled. Returns HTTP 200 even when extraction
+        fails -- always check `success`/`errorMessage` in the body, not
+        just the status code.
+      x-legacy-endpoint: "POST /grncheck/uploadLotDoc"
+      requestBody:
+        $ref: '#/components/requestBodies/LotUploadMultipart'
+      responses:
+        '200':
+          description: OK (check `success`/`errorMessage` -- this endpoint returns 200 even on extraction failure)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GrnCheckingUploadResult'
+        '401':
+          $ref: '#/components/responses/AuthFailed'
+
+  /lot/upload/async:
+    post:
+      tags: [Lot AI Upload]
+      summary: Start a background lot-level extraction job (use for any multi-page document)
+      description: |
+        Returns immediately with a `jobId` + page count; poll
+        `GET /lot/upload/status` on a ~1.5s interval until `jobStatus` is
+        terminal (`done`/`error`/`cancelled`). See sequence-diagrams.md.
+      x-legacy-endpoint: "POST /grncheck/uploadLotDocAsync"
+      requestBody:
+        $ref: '#/components/requestBodies/LotUploadAsyncMultipart'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GrnCheckingUploadResult'
+        '401':
+          $ref: '#/components/responses/AuthFailed'
+
+  /lot/upload/status:
+    get:
+      tags: [Lot AI Upload]
+      summary: Poll a running/finished lot-upload job
+      description: |
+        Poll this on a ~1.5s interval after `/lot/upload/async` returns
+        a `jobId` (see sequence-diagrams.md for the full loop).
+        `jobStatus` is one of `running`, `done`, `error`, or
+        `cancelled`. Stop polling once it's anything other than
+        `running`. If `fabricMismatchStopped:true`, the job has stopped
+        WITHOUT writing anything -- confirm with the user before calling
+        `/lot/upload/resume`. An unknown/expired `jobId` returns a
+        clean `{success:false, jobStatus:"error", ...}`, not an
+        exception.
+      x-legacy-endpoint: "GET /grncheck/uploadLotDocAsync/status"
+      security:
+        - mobileCredentialsHeader: []
+      parameters:
+        - name: jobId
+          in: query
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GrnCheckingUploadResult'
+        '401':
+          $ref: '#/components/responses/AuthFailed'
+
+  /lot/upload/cancel:
+    post:
+      tags: [Lot AI Upload]
+      summary: Request cancellation of a running lot-upload job
+      description: |
+        Stops any further pages from being dispatched (the actual cost
+        saving) but does not discard pages already completed; the next
+        poll finalizes those with `jobStatus="cancelled"`. A no-op if the
+        job is unknown or already finished.
+      x-legacy-endpoint: "POST /grncheck/uploadLotDocAsync/cancel"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/MobileAuthBody'
+                - type: object
+                  required: [jobId]
+                  properties:
+                    jobId: { type: string }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleResult'
+        '401':
+          $ref: '#/components/responses/AuthFailed'
+
+  /lot/upload/resume:
+    post:
+      tags: [Lot AI Upload]
+      summary: Resume a job that stopped early on a fabric mismatch, after the user confirms
+      description: |
+        NOT the same as calling lot/upload/async again -- this continues
+        the SAME jobId (page 1's already-paid-for extraction is kept), it
+        does not re-upload the file. See sequence-diagrams.md for the
+        mismatch-stop-then-resume branch.
+      x-legacy-endpoint: "POST /grncheck/uploadLotDocAsync/resume"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/MobileAuthBody'
+                - type: object
+                  required: [jobId]
+                  properties:
+                    jobId: { type: string }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GrnCheckingUploadResult'
+        '401':
+          $ref: '#/components/responses/AuthFailed'
+
+  # ==================== BALE AI UPLOAD ====================
+
+  /bale/upload:
+    post:
+      tags: [Bale AI Upload]
+      summary: Synchronous bale-level AI upload (single-page-safe)
+      description: |
+        Use this when the user photographs/attaches a single bale's own
+        checked ticket. Same single-page-safe vs. async tradeoff as
+        `/lot/upload` -- prefer `/bale/upload/async` if the document
+        might be more than one page. Blocks until extraction finishes
+        and returns the reconciled bale (and its parent lot) directly.
+        Returns HTTP 200 even when extraction fails or the extracted
+        Bale No matches an already-SUBMITTED/APPROVED bale (skipped,
+        never silently overwritten) -- always check
+        `success`/`errorMessage`, not just the status code.
+      x-legacy-endpoint: "POST /grncheck/uploadBaleDoc"
+      requestBody:
+        $ref: '#/components/requestBodies/BaleUploadMultipart'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GrnCheckingUploadResult'
+        '401':
+          $ref: '#/components/responses/AuthFailed'
+
+  /bale/upload/async:
+    post:
+      tags: [Bale AI Upload]
+      summary: Start a background bale-level extraction job
+      description: |
+        Same async pattern as `/lot/upload/async`, applied to one bale's
+        ticket -- start here, then poll `/bale/upload/status` on that
+        job's `jobId`. Worth doing even for a bale ticket that's almost
+        always a single page, for a consistent client-side flow with the
+        lot-level path. `bypassFabricMismatch:true` skips the
+        stop-and-confirm step entirely (only pass it once the user has
+        already confirmed once for this upload).
+      x-legacy-endpoint: "POST /grncheck/uploadBaleDocAsync"
+      requestBody:
+        $ref: '#/components/requestBodies/BaleUploadAsyncMultipart'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GrnCheckingUploadResult'
+        '401':
+          $ref: '#/components/responses/AuthFailed'
+
+  /bale/upload/status:
+    get:
+      tags: [Bale AI Upload]
+      summary: Poll a running/finished bale-upload job
+      description: |
+        Same polling contract as `/lot/upload/status` -- `jobStatus` is
+        `running`/`done`/`error`/`cancelled`; a `fabricMismatchStopped:
+        true` response means nothing has been written yet, pending a
+        `/bale/upload/resume` call.
+      x-legacy-endpoint: "GET /grncheck/uploadBaleDocAsync/status"
+      security:
+        - mobileCredentialsHeader: []
+      parameters:
+        - name: jobId
+          in: query
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GrnCheckingUploadResult'
+        '401':
+          $ref: '#/components/responses/AuthFailed'
+
+  /bale/upload/cancel:
+    post:
+      tags: [Bale AI Upload]
+      summary: Request cancellation of a running bale-upload job
+      description: |
+        Fire-and-forget -- stops further pages from being dispatched but
+        keeps whatever page(s) already completed; the next status poll
+        finalizes the job as `jobStatus:"cancelled"`. A no-op (still
+        `success:true`) if the job is unknown or already finished.
+      x-legacy-endpoint: "POST /grncheck/uploadBaleDocAsync/cancel"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/MobileAuthBody'
+                - type: object
+                  required: [jobId]
+                  properties:
+                    jobId: { type: string }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleResult'
+        '401':
+          $ref: '#/components/responses/AuthFailed'
+
+  /bale/upload/resume:
+    post:
+      tags: [Bale AI Upload]
+      summary: Resume a bale-upload job that stopped early on a fabric mismatch
+      description: |
+        Only call this after a status poll returns
+        `fabricMismatchStopped:true` AND the user has explicitly
+        confirmed they want to process the document anyway. Continues
+        the SAME `jobId` (nothing is re-uploaded or re-extracted) --
+        confirmed live (2026-09-17) to correctly complete the write that
+        was withheld while the mismatch was pending confirmation.
+      x-legacy-endpoint: "POST /grncheck/uploadBaleDocAsync/resume"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/MobileAuthBody'
+                - type: object
+                  required: [jobId]
+                  properties:
+                    jobId: { type: string }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GrnCheckingUploadResult'
+        '401':
+          $ref: '#/components/responses/AuthFailed'
+
+  # ==================== RM AI UPLOAD ====================
+
+  /rm/upload/async:
+    post:
+      tags: [RM AI Upload]
+      summary: Start a background RM vendor-invoice extraction job
+      description: |
+        Same async job/poll shape as lot/bale uploads, minus
+        bypassFabricMismatch/resume -- an RM invoice has no fabric-mismatch
+        stop-early gate. Every extracted line item is matched independently
+        against this header's own RM rows by description text; an
+        unmatched line, or one matching a row that isn't DRAFT or has
+        nothing received yet, is skipped with a warning rather than
+        failing the whole upload.
+      x-legacy-endpoint: "POST /grncheck/uploadRmInvoiceAsync"
+      requestBody:
+        $ref: '#/components/requestBodies/RmUploadAsyncMultipart'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GrnCheckingUploadResult'
+        '401':
+          $ref: '#/components/responses/AuthFailed'
+
+  /rm/upload/status:
+    get:
+      tags: [RM AI Upload]
+      summary: Poll a running/finished RM-invoice upload job
+      description: |
+        Same polling contract as the lot/bale variants --
+        `jobStatus` is `running`/`done`/`error`/`cancelled`. There is no
+        fabric-mismatch-stop state for RM (an invoice has no single
+        fabric field to compare against), so `fabricMismatchStopped` is
+        always `false` here and there is no matching resume endpoint.
+      x-legacy-endpoint: "GET /grncheck/uploadRmInvoiceAsync/status"
+      security:
+        - mobileCredentialsHeader: []
+      parameters:
+        - name: jobId
+          in: query
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GrnCheckingUploadResult'
+        '401':
+          $ref: '#/components/responses/AuthFailed'
+
+  /rm/upload/cancel:
+    post:
+      tags: [RM AI Upload]
+      summary: Request cancellation of a running RM-invoice upload job
+      description: |
+        Same fire-and-forget semantics as `/lot/upload/cancel` and
+        `/bale/upload/cancel` -- stops further pages, keeps whatever
+        already completed, no-ops cleanly on an unknown/finished job.
+      x-legacy-endpoint: "POST /grncheck/uploadRmInvoiceAsync/cancel"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/MobileAuthBody'
+                - type: object
+                  required: [jobId]
+                  properties:
+                    jobId: { type: string }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SimpleResult'
+        '401':
+          $ref: '#/components/responses/AuthFailed'
+
+  # ==================== PDFs ====================
+
+  /pdf/grn:
+    get:
+      tags: [PDFs]
+      summary: Download the PDF for exactly one approval batch (GRN No)
+      description: |
+        Call this when the user taps one specific GRN No link (e.g. next
+        to an approved bale, or in the header's GRN No list) --
+        `itemType` must be `"Fabric"` or `"RM"` (mixed case, matching
+        `po_master.itemtrimstype`), not `FABRIC`/`RM`. Returns the raw
+        PDF bytes with a `Content-Disposition: attachment` header.
+      x-legacy-endpoint: "GET /grncheck/generateGrnPdf"
+      security:
+        - mobileCredentialsHeader: []
+      parameters:
+        - name: grnNo
+          in: query
+          required: true
+          schema: { type: string }
+        - $ref: '#/components/parameters/PoNumber'
+        - name: itemType
+          in: query
+          required: true
+          schema: { type: string, enum: [Fabric, RM] }
+        - $ref: '#/components/parameters/CompanyIdQuery'
+      responses:
+        '200':
+          description: PDF binary
+          content:
+            application/pdf:
+              schema: { type: string, format: binary }
+        '401':
+          $ref: '#/components/responses/AuthFailed'
+
+  /pdf/overall:
+    get:
+      tags: [PDFs]
+      summary: Download one combined PDF covering every approval batch ever approved for a PO
+      description: |
+        Call this for the list page's single "PDF" button (one PO, all
+        its approval batches combined) -- unlike `/pdf/grn`, `itemType`
+        is resolved server-side from the PO itself and is never trusted
+        from the client, so there's no itemType parameter to pass.
+      x-legacy-endpoint: "GET /grncheck/generateGrnCheckingOverallPdf"
+      security:
+        - mobileCredentialsHeader: []
+      parameters:
+        - $ref: '#/components/parameters/PoNumber'
+        - $ref: '#/components/parameters/CompanyIdQuery'
+      responses:
+        '200':
+          description: PDF binary
+          content:
+            application/pdf:
+              schema: { type: string, format: binary }
+        '401':
+          $ref: '#/components/responses/AuthFailed'
+
+  /pdf/worksheet:
+    get:
+      tags: [PDFs]
+      summary: Download one lot's printable "draft worksheet" PDF
+      description: |
+        A print-and-hand-write snapshot of exactly what that lot's expanded
+        section shows on screen right now, including still-DRAFT bales.
+      x-legacy-endpoint: "GET /grncheck/generateLotWorksheetPdf"
+      security:
+        - mobileCredentialsHeader: []
+      parameters:
+        - name: lotId
+          in: query
+          required: true
+          schema: { type: integer }
+        - name: cols
+          in: query
+          required: false
+          schema: { type: integer, minimum: 1, maximum: 5, default: 2 }
+          description: Bale-grid column count; clamped server-side to [1,5].
+        - $ref: '#/components/parameters/CompanyIdQuery'
+      responses:
+        '200':
+          description: PDF binary
+          content:
+            application/pdf:
+              schema: { type: string, format: binary }
+        '401':
+          $ref: '#/components/responses/AuthFailed'
+
+components:
+  securitySchemes:
+    mobileCredentialsBody:
+      type: apiKey
+      in: header
+      name: X-Placeholder-Body-Auth
+      description: |
+        Not a real header scheme -- credentials for POST/multipart
+        endpoints travel INSIDE the request body as `userName`/`userPwd`
+        fields (see `MobileAuthBody`), matching the existing
+        `com.codeverse.stitch.api.controller` package's convention
+        (`checkUsernameAndPassword`). This securityScheme entry exists only
+        so tooling has something to point at; the real requirement is the
+        body schema.
+    mobileCredentialsHeader:
+      type: apiKey
+      in: header
+      name: X-User-Name
+      description: |
+        Used for GET requests, which have no body. Two headers are
+        required together: `X-User-Name` and `X-User-Pwd`. Query strings
+        are avoided for credentials on GETs since they get written to
+        access logs.
+
+  parameters:
+    PoNumber:
+      name: poNumber
+      in: query
+      required: true
+      schema: { type: integer }
+    CompanyIdQuery:
+      name: companyId
+      in: query
+      required: true
+      schema: { type: integer }
+    UserIdQueryOptional:
+      name: userId
+      in: query
+      required: false
+      schema: { type: integer }
+
+  responses:
+    AuthFailed:
+      description: Invalid userName/userPwd.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success: { type: boolean, example: false }
+              errorMessage: { type: string, example: "Invalid credentials." }
+
+  requestBodies:
+    LotUploadMultipart:
+      required: true
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            required: [file, lotId, userName, userPwd, companyId]
+            properties:
+              file: { type: string, format: binary }
+              lotId: { type: integer }
+              expectedPoNumber: { type: string, nullable: true }
+              expectedVendorName: { type: string, nullable: true }
+              userName: { type: string }
+              userPwd: { type: string }
+              companyId: { type: integer }
+              userId: { type: integer, nullable: true }
+    LotUploadAsyncMultipart:
+      required: true
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            required: [file, lotId, userName, userPwd, companyId]
+            properties:
+              file: { type: string, format: binary }
+              lotId: { type: integer }
+              expectedPoNumber: { type: string, nullable: true }
+              expectedVendorName: { type: string, nullable: true }
+              bypassFabricMismatch:
+                type: boolean
+                default: false
+                description: "Set true only after the user has confirmed the fabric-mismatch dialog -- see business-rules-and-flows.md. Otherwise prefer /lot/upload/resume once a job has already stopped on a mismatch."
+              userName: { type: string }
+              userPwd: { type: string }
+              companyId: { type: integer }
+              userId: { type: integer, nullable: true }
+    BaleUploadMultipart:
+      required: true
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            required: [file, baleId, userName, userPwd, companyId]
+            properties:
+              file: { type: string, format: binary }
+              baleId: { type: integer }
+              userName: { type: string }
+              userPwd: { type: string }
+              companyId: { type: integer }
+              userId: { type: integer, nullable: true }
+    BaleUploadAsyncMultipart:
+      required: true
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            required: [file, baleId, userName, userPwd, companyId]
+            properties:
+              file: { type: string, format: binary }
+              baleId: { type: integer }
+              bypassFabricMismatch: { type: boolean, default: false }
+              userName: { type: string }
+              userPwd: { type: string }
+              companyId: { type: integer }
+              userId: { type: integer, nullable: true }
+    RmUploadAsyncMultipart:
+      required: true
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            required: [file, headerId, userName, userPwd, companyId]
+            properties:
+              file: { type: string, format: binary }
+              headerId: { type: integer }
+              userName: { type: string }
+              userPwd: { type: string }
+              companyId: { type: integer }
+              userId: { type: integer, nullable: true }
+
+  schemas:
+    MobileAuthBody:
+      type: object
+      required: [userName, userPwd, companyId]
+      properties:
+        userName: { type: string }
+        userPwd: { type: string }
+        companyId: { type: integer }
+        userId:
+          type: integer
+          nullable: true
+          description: "Required on write endpoints that record an actor (approve, upload) -- see each operation's legacy service-method signature."
+
+    SimpleResult:
+      type: object
+      properties:
+        success: { type: boolean }
+        errorMessage: { type: string, nullable: true }
+
+    SimpleResultWithRows:
+      allOf:
+        - $ref: '#/components/schemas/SimpleResult'
+        - type: object
+          properties:
+            rows:
+              type: array
+              items:
+                $ref: '#/components/schemas/AuditHistoryRow'
+
+    AuditHistoryRow:
+      type: object
+      description: One row from ai_extraction_audit, joined to its lot/bale context.
+      properties:
+        contextType: { type: string, enum: [LOT, BALE] }
+        itemDescription: { type: string, nullable: true }
+        rollNo: { type: string, nullable: true }
+        baleNo: { type: string, nullable: true }
+        s3DocumentUrl: { type: string, nullable: true }
+        extractionStatus: { type: string, nullable: true }
+        errorMessage: { type: string, nullable: true }
+        rawExtractedJson: { type: string, nullable: true }
+        createdByName: { type: string, nullable: true }
+        createdAt: { type: string, format: date-time, nullable: true }
+
+    VendorDetails:
+      type: object
+      description: "Empty object if the PO has no matching vendor row."
+      properties:
+        vendorName: { type: string }
+        vendorAddress: { type: string, description: "Pre-joined, comma-separated; blank/'.' address lines already filtered out server-side." }
+        vendorMobile: { type: string }
+
+    FabricLineItem:
+      type: object
+      description: One PO line item -- one row per Fabric line, or one row per RM line depending on the header's itemType.
+      properties:
+        lineitemId: { type: integer }
+        fabricId: { type: integer, description: "fabric_master.fabric_id (Fabric) or item_trim_id (RM)." }
+        description: { type: string }
+        uom: { type: string, nullable: true }
+        totalOrderQty: { type: number, format: double }
+        totalReceivedQty:
+          type: number
+          format: double
+          description: "Fabric: sum of po_fabric_receive_items.received_qty. RM: legacy receivedqty + rm_qty (everything ever legacy-received, approved or not)."
+        fabricCode:
+          type: string
+          nullable: true
+          description: "fabric_master.fabriccode (Fabric) or trimconstruction_master.rmcode (RM)."
+        rollCount:
+          type: integer
+          description: "Fabric only: count of distinct rolls actually received via the legacy screen (0 for RM)."
+
+    GrnCheckingHeader:
+      type: object
+      properties:
+        id: { type: integer }
+        poNumber: { type: integer }
+        poNumberWithSymbol: { type: string }
+        companyId: { type: integer }
+        itemType: { type: string, enum: [FABRIC, RM] }
+        checkingDate: { type: string, format: date-time, nullable: true }
+        remarks: { type: string, nullable: true }
+        grnNo: { type: string, nullable: true, description: "Filled in on first Approve Checking." }
+        createdBy: { type: integer, nullable: true }
+        createdAt: { type: string, format: date-time, nullable: true }
+        updatedAt: { type: string, format: date-time, nullable: true }
+
+    GrnCheckingFabricLot:
+      type: object
+      properties:
+        id: { type: integer }
+        headerId: { type: integer }
+        poLineitemId: { type: integer }
+        fabricId: { type: integer }
+        rollNo: { type: string }
+        lotDate: { type: string, format: date-time, nullable: true }
+        lotDateDisplay: { type: string, nullable: true, description: "Pre-formatted dd/MM/yyyy -- prefer this over lotDate for display." }
+        totalInMtrs: { type: number, format: double, nullable: true, description: "NOT the on-screen 'Total In Mtrs' -- that is aliased to receivedQty. This is a separate, largely unused DB column." }
+        aiDocS3Url: { type: string, nullable: true }
+        status:
+          type: string
+          enum: [DRAFT, SUBMITTED, APPROVED]
+          description: "Convenience rollup only -- NEVER trust this for gating; derive the real state from bales[].status (see business-rules-and-flows.md)."
+        receivedQty: { type: number, format: double, nullable: true, description: "This IS the on-screen 'Total In Mtrs' value." }
+        balanceQty: { type: number, format: double, nullable: true }
+        checkedQty: { type: number, format: double, nullable: true, description: "APPROVED-bales-only sum." }
+        damagedQty: { type: number, format: double, nullable: true }
+        bales:
+          type: array
+          items:
+            $ref: '#/components/schemas/GrnCheckingFabricBale'
+        uploadHistory:
+          type: array
+          items:
+            $ref: '#/components/schemas/UploadHistoryEntry'
+
+    GrnCheckingFabricBale:
+      type: object
+      properties:
+        id: { type: integer }
+        lotId: { type: integer }
+        baleNo: { type: string, nullable: true }
+        totalPcs: { type: integer }
+        totalInMtrs: { type: number, format: double, nullable: true, description: "Always server-derived as the sum of pieces[].totalInMtrs -- never accept a client-supplied value for this." }
+        checkedMtrs: { type: number, format: double, nullable: true }
+        damageMtrs: { type: number, format: double, nullable: true, description: "Manual entry, or AI-extracted from a worksheet re-upload (a real vendor ticket never carries this)." }
+        differenceMtrs: { type: number, format: double, nullable: true, description: "= totalInMtrs - checkedMtrs, arithmetic only." }
+        aiDocS3Url: { type: string, nullable: true }
+        status:
+          type: string
+          enum: [DRAFT, SUBMITTED, APPROVED]
+        approvedAt: { type: string, format: date-time, nullable: true }
+        approvedBy: { type: integer, nullable: true }
+        grnNo: { type: string, nullable: true }
+        pieces:
+          type: array
+          items:
+            $ref: '#/components/schemas/GrnCheckingFabricBalePiece'
+        uploadHistory:
+          type: array
+          items:
+            $ref: '#/components/schemas/UploadHistoryEntry'
+
+    GrnCheckingFabricBalePiece:
+      type: object
+      properties:
+        id: { type: integer }
+        baleId: { type: integer }
+        pcNo: { type: integer }
+        totalInMtrs: { type: number, format: double, nullable: true, description: "Vendor-declared (lot-level upload)." }
+        checkedMtrs: { type: number, format: double, nullable: true, description: "Bhairav-checked (bale-level upload or manual)." }
+
+    BalePieceInput:
+      type: object
+      description: Request-side piece shape for bale/save-draft.
+      required: [pcNo]
+      properties:
+        pcNo: { type: integer }
+        totalInMtrs: { type: number, format: double, nullable: true }
+        checkedMtrs: { type: number, format: double, nullable: true }
+
+    UploadHistoryEntry:
+      type: object
+      properties:
+        url: { type: string }
+        fileName: { type: string }
+        uploadedAtDisplay: { type: string, description: "Pre-formatted dd/MM/yyyy HH:mm." }
+
+    GrnCheckingUploadResult:
+      type: object
+      description: |
+        Shared response shape for every AI-upload endpoint (sync and
+        async, lot/bale/RM) AND the manual add-bale/remove-piece/unsubmit
+        endpoints (which reuse it purely for its `bale` field). Which
+        fields are populated depends entirely on which endpoint returned
+        it -- see each operation's description.
+      properties:
+        success: { type: boolean }
+        errorMessage: { type: string, nullable: true, description: "Set when the AI call itself failed/timed out/returned ERROR, or (async, done) when some pages failed but not all." }
+        mismatched: { type: boolean, description: "Soft PO/vendor mismatch -- data is still loaded, just flagged for review." }
+        mismatchMessage: { type: string, nullable: true }
+        fabricMismatchStopped: { type: boolean, description: "Hard stop: page 1's fabric description didn't match this PO line's. Job halted after page 1; resolve via /lot/upload/resume or /bale/upload/resume after user confirmation." }
+        expectedFabricDescription: { type: string, nullable: true }
+        extractedFabricDescription: { type: string, nullable: true }
+        lot:
+          $ref: '#/components/schemas/GrnCheckingFabricLot'
+        bale:
+          $ref: '#/components/schemas/GrnCheckingFabricBale'
+        rmItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/GrnCheckingRmItem'
+          description: "Populated for RM invoice uploads only."
+        rmUploadHistory:
+          type: array
+          items:
+            $ref: '#/components/schemas/UploadHistoryEntry'
+          description: "Populated for RM invoice uploads only."
+        jobId: { type: string, nullable: true }
+        jobStatus:
+          type: string
+          nullable: true
+          enum: [running, done, error, cancelled]
+        totalPages: { type: integer }
+        completedPages: { type: integer }
+
+    GrnCheckingRmItem:
+      type: object
+      properties:
+        id: { type: integer }
+        headerId: { type: integer }
+        poLineitemId: { type: integer }
+        checkedQty: { type: number, format: double, nullable: true }
+        alreadyCheckedQty: { type: number, format: double, default: 0, description: "Running cumulative total folded in on each approve round." }
+        damageQty: { type: number, format: double, nullable: true }
+        differenceQty: { type: number, format: double, nullable: true, description: "= receivedQty - checkedQty - alreadyCheckedQty - damageQty." }
+        status:
+          type: string
+          enum: [DRAFT, SUBMITTED, APPROVED]
+        grnNo: { type: string, nullable: true }
+        approvedAt: { type: string, format: date-time, nullable: true }
+        approvedBy: { type: integer, nullable: true }
+        warnings:
+          type: array
+          items: { type: string }
+
+    GrnCheckingBatchApproveResult:
+      type: object
+      properties:
+        success: { type: boolean }
+        errorMessage: { type: string, nullable: true }
+        grnNo: { type: string, nullable: true }
+        updatedLots:
+          type: array
+          items:
+            $ref: '#/components/schemas/GrnCheckingFabricLot'
+        warnings:
+          type: array
+          items: { type: string }
+
+    GrnCheckingRmApproveResult:
+      type: object
+      properties:
+        success: { type: boolean }
+        errorMessage: { type: string, nullable: true }
+        grnNo: { type: string, nullable: true }
+        updatedItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/GrnCheckingRmItem'
+        warnings:
+          type: array
+          items: { type: string }
+
+    GrnCheckingListRow:
+      type: object
+      properties:
+        headerId: { type: integer, nullable: true }
+        poNumber: { type: integer }
+        poNumberWithSymbol: { type: string }
+        vendorName: { type: string, nullable: true }
+        itemType: { type: string, enum: [Fabric, RM] }
+        lotNo: { type: string, nullable: true }
+        totalOrderQty: { type: number, format: double }
+        totalCheckedQty: { type: number, format: double }
+        grnNo: { type: string, nullable: true }
+        hasApprovedBatches: { type: boolean }
+        poStatus: { type: string }
+        userName: { type: string, nullable: true }
+        hasFabricBarcodes:
+          type: boolean
+          description: |
+            CONFIRMED present in the real response (verified live) even
+            though barcode is out of scope for this API package -- it's a
+            field on the shared GrnCheckingListRow the underlying service
+            method returns to BOTH controllers, not something specific to
+            mobile. Safe to ignore/drop client-side; do not build any
+            barcode UI around it.

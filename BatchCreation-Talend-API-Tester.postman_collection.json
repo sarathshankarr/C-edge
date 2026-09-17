@@ -1,0 +1,281 @@
+{
+  "info": {
+    "name": "BatchCreation Mobile APIs",
+    "_postman_id": "c3d8f1a2-9b4e-4f10-8a2d-batchcreationtalend",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "locationId", "value": "1" },
+    { "key": "fabricId", "value": "3" },
+    { "key": "fabricFlow", "value": "2" },
+    { "key": "batchId", "value": "" },
+    { "key": "batchDetailsId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "0a. Locations dropdown",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"Codeverse@demo\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": {
+          "raw": "http://localhost:8080/stitch/batchCreation/locations",
+          "host": ["http://localhost:8080/stitch"],
+          "path": ["batchCreation", "locations"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "0b. Fabric Process Flow dropdown",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"Codeverse@demo\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": {
+          "raw": "http://localhost:8080/stitch/batchCreation/fabricProcessFlow",
+          "host": ["http://localhost:8080/stitch"],
+          "path": ["batchCreation", "fabricProcessFlow"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "0c. Fabric Type dropdown (by Location)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"Codeverse@demo\",\n  \"locationId\": \"{{locationId}}\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": {
+          "raw": "http://localhost:8080/stitch/batchCreation/fabricsByLocation",
+          "host": ["http://localhost:8080/stitch"],
+          "path": ["batchCreation", "fabricsByLocation"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "0d. Lot No dropdown (by Fabric)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"Codeverse@demo\",\n  \"fabricId\": \"{{fabricId}}\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": {
+          "raw": "http://localhost:8080/stitch/batchCreation/lotNos",
+          "host": ["http://localhost:8080/stitch"],
+          "path": ["batchCreation", "lotNos"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "0e. Check Batch No (duplicate check)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"Codeverse@demo\",\n  \"batch_name\": \"123123\",\n  \"batchId\": 0\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": {
+          "raw": "http://localhost:8080/stitch/batchCreation/checkBatchNo",
+          "host": ["http://localhost:8080/stitch"],
+          "path": ["batchCreation", "checkBatchNo"]
+        },
+        "description": "batchId=0 for a new batch (create screen). Response has \"exists\": true/false for whether that batch name is already taken."
+      },
+      "response": []
+    },
+    {
+      "name": "1. List (page load / batch list)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"Codeverse@demo\",\n  \"start\": 0,\n  \"length\": 25,\n  \"searchKeyValue\": \"\",\n  \"styleSearchDropdown\": \"-1\",\n  \"dataFilter\": \"\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": {
+          "raw": "http://localhost:8080/stitch/batchCreation/list",
+          "host": ["http://localhost:8080/stitch"],
+          "path": ["batchCreation", "list"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "2a. Save Batch (draft, saveFlag=0)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"Codeverse@demo\",\n  \"locationId\": \"{{locationId}}\",\n  \"fabricId\": \"{{fabricId}}\",\n  \"cottonD\": \"Cotton D\",\n  \"polysD\": \"Polys D\",\n  \"desizeD\": \"Desize D\",\n  \"partyName\": \"Party Name\",\n  \"singeing\": 1,\n  \"hset\": 1,\n  \"kitty\": 1,\n  \"zerozero\": 1,\n  \"semiStarch\": 1,\n  \"crossDyg\": 1,\n  \"singleDyg\": 1,\n  \"solidDyg\": 1,\n  \"cationicDyg\": 1,\n  \"shiner\": 1,\n  \"creationDate\": \"17/09/2026\",\n  \"dcNo\": \"12345\",\n  \"qualityNameh\": \"\",\n  \"greyShortage\": 1,\n  \"weight\": 12,\n  \"reedPick\": \"Reed and Pick\",\n  \"fabricFlow\": \"{{fabricFlow}}\",\n  \"bioFinish\": \"Bio Finish\",\n  \"remazol\": \"Remazol\",\n  \"mercerise\": \"Mercerise\",\n  \"lycra\": \"Lycra\",\n  \"rolltrolley\": \"Roll\",\n  \"totalIssued\": 10,\n  \"sample\": \"Sample\",\n  \"bsr\": \"BSR\",\n  \"deliveryAt\": \"Delivery At\",\n  \"saveFlag\": 0,\n  \"batchDetails\": [\n    {\n      \"batchName\": \"123123\",\n      \"poNo\": 489,\n      \"vendorId\": 27,\n      \"noOfPieces\": 10,\n      \"rollNo\": \"1\",\n      \"mtr\": 10,\n      \"greyReceivedh\": 1000\n    }\n  ]\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": {
+          "raw": "http://localhost:8080/stitch/batchCreation/create",
+          "host": ["http://localhost:8080/stitch"],
+          "path": ["batchCreation", "create"]
+        },
+        "description": "Same endpoint as 2b (POST /batchCreation/create). saveFlag=0 = plain draft save: no batch_creation_fabric_process_flow update, no batch_inventory row created. creationDate must be dd/MM/yyyy (commonUtil.stringToUtil_yyyyMMdd actually parses dd/MM/yyyy despite its name)."
+      },
+      "response": []
+    },
+    {
+      "name": "2b. Submit Batch (saveFlag=1)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"Codeverse@demo\",\n  \"locationId\": \"{{locationId}}\",\n  \"fabricId\": \"{{fabricId}}\",\n  \"cottonD\": \"Cotton D\",\n  \"polysD\": \"Polys D\",\n  \"desizeD\": \"Desize D\",\n  \"partyName\": \"Party Name\",\n  \"singeing\": 1,\n  \"hset\": 1,\n  \"kitty\": 1,\n  \"zerozero\": 1,\n  \"semiStarch\": 1,\n  \"crossDyg\": 1,\n  \"singleDyg\": 1,\n  \"solidDyg\": 1,\n  \"cationicDyg\": 1,\n  \"shiner\": 1,\n  \"creationDate\": \"17/09/2026\",\n  \"dcNo\": \"12345\",\n  \"qualityNameh\": \"\",\n  \"greyShortage\": 1,\n  \"weight\": 12,\n  \"reedPick\": \"Reed and Pick\",\n  \"fabricFlow\": \"{{fabricFlow}}\",\n  \"bioFinish\": \"Bio Finish\",\n  \"remazol\": \"Remazol\",\n  \"mercerise\": \"Mercerise\",\n  \"lycra\": \"Lycra\",\n  \"rolltrolley\": \"Roll\",\n  \"totalIssued\": 10,\n  \"sample\": \"Sample\",\n  \"bsr\": \"BSR\",\n  \"deliveryAt\": \"Delivery At\",\n  \"saveFlag\": 1,\n  \"batchDetails\": [\n    {\n      \"batchName\": \"123123\",\n      \"poNo\": 489,\n      \"vendorId\": 27,\n      \"noOfPieces\": 10,\n      \"rollNo\": \"1\",\n      \"mtr\": 10,\n      \"greyReceivedh\": 1000\n    }\n  ]\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": {
+          "raw": "http://localhost:8080/stitch/batchCreation/create",
+          "host": ["http://localhost:8080/stitch"],
+          "path": ["batchCreation", "create"]
+        },
+        "description": "Same endpoint as 2a (POST /batchCreation/create). saveFlag=1 = Submit: also updates batch_creation_fabric_process_flow and inserts into batch_inventory. creationDate must be dd/MM/yyyy (commonUtil.stringToUtil_yyyyMMdd actually parses dd/MM/yyyy despite its name)."
+      },
+      "response": []
+    },
+    {
+      "name": "3a. Edit Batch (load)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"Codeverse@demo\",\n  \"batchId\": \"{{batchId}}\",\n  \"batchDetailsId\": \"{{batchDetailsId}}\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": {
+          "raw": "http://localhost:8080/stitch/batchCreation/edit",
+          "host": ["http://localhost:8080/stitch"],
+          "path": ["batchCreation", "edit"]
+        },
+        "description": "Mirrors editBatch(). Response data.viewDTO.batchDetails[] carries each row's id/mtr/lotNo - use those as batchDetailsId/mtrOld/rollNoh when calling update()."
+      },
+      "response": []
+    },
+    {
+      "name": "3b. Update Batch (submit=1)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"Codeverse@demo\",\n  \"batchId\": \"{{batchId}}\",\n  \"locationId\": \"{{locationId}}\",\n  \"fabricId\": \"{{fabricId}}\",\n  \"cottonD\": \"Cotton D\",\n  \"polysD\": \"Polys D\",\n  \"desizeD\": \"Desize D\",\n  \"partyName\": \"Party Name\",\n  \"singeing\": 1,\n  \"hset\": 1,\n  \"kitty\": 1,\n  \"zerozero\": 1,\n  \"semiStarch\": 1,\n  \"crossDyg\": 1,\n  \"singleDyg\": 1,\n  \"solidDyg\": 1,\n  \"cationicDyg\": 1,\n  \"shiner\": 1,\n  \"creationDate\": \"17/09/2026\",\n  \"dcNo\": \"12345\",\n  \"qualityNameh\": \"\",\n  \"greyShortage\": 1,\n  \"weight\": 12,\n  \"reedPick\": \"Reed and Pick\",\n  \"fabricFlow\": \"{{fabricFlow}}\",\n  \"bioFinish\": \"Bio Finish\",\n  \"remazol\": \"Remazol\",\n  \"mercerise\": \"Mercerise\",\n  \"lycra\": \"Lycra\",\n  \"rolltrolley\": \"Roll\",\n  \"totalIssued\": 10,\n  \"sample\": \"Sample\",\n  \"bsr\": \"BSR\",\n  \"deliveryAt\": \"Delivery At\",\n  \"saveFlag\": 1,\n  \"batchDetails\": [\n    {\n      \"batchDetailsId\": \"{{batchDetailsId}}\",\n      \"batchName\": \"123123\",\n      \"poNo\": 489,\n      \"vendorId\": 27,\n      \"noOfPieces\": 10,\n      \"rollNo\": \"1\",\n      \"mtr\": 10,\n      \"greyReceivedh\": 1000,\n      \"mtrOld\": 10,\n      \"lineItemId\": 0,\n      \"rollNoh\": \"1\"\n    }\n  ]\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": {
+          "raw": "http://localhost:8080/stitch/batchCreation/update",
+          "host": ["http://localhost:8080/stitch"],
+          "path": ["batchCreation", "update"]
+        },
+        "description": "Mirrors updateBatch(). batchDetails[].batchDetailsId/mtrOld/rollNoh should come from 3a's response for that row (existing row = update in place; omit them on a row to insert a new line item instead)."
+      },
+      "response": []
+    },
+    {
+      "name": "4. View Batch",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"Codeverse@demo\",\n  \"batchId\": \"{{batchDetailsId}}\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": {
+          "raw": "http://localhost:8080/stitch/batchCreation/view",
+          "host": ["http://localhost:8080/stitch"],
+          "path": ["batchCreation", "view"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "5. Delete Batch",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"Codeverse@demo\",\n  \"batchId\": \"{{batchId}}\",\n  \"batchDetailsId\": \"{{batchDetailsId}}\",\n  \"fabricId\": \"{{fabricId}}\",\n  \"locationId\": \"{{locationId}}\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": {
+          "raw": "http://localhost:8080/stitch/batchCreation/delete",
+          "host": ["http://localhost:8080/stitch"],
+          "path": ["batchCreation", "delete"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "6. Generate Batch PDF",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"Codeverse@demo\",\n  \"batchDetailsId\": \"{{batchDetailsId}}\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": {
+          "raw": "http://localhost:8080/stitch/batchCreation/pdf",
+          "host": ["http://localhost:8080/stitch"],
+          "path": ["batchCreation", "pdf"]
+        }
+      },
+      "response": []
+    }
+  ]
+}
