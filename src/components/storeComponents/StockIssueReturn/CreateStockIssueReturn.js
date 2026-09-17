@@ -8,6 +8,7 @@ import CreateStockIssueReturnUI from './CreateStockIssueReturnUI';
 const CreateStockIssueReturn = ({route}) => {
   const navigation = useNavigation();
 
+  
   // mode: 'create' (default) | 'edit' | 'approve' | 'view' — set by the list
   // screen based on sird_saveType (0=Approve, 1=Edit, >=2=View).
   const mode = route?.params?.mode || 'create';
