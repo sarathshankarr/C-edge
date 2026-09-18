@@ -1,10 +1,11 @@
 import React, {useState, useCallback, useRef, useEffect} from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
-import {Alert, PermissionsAndroid, Platform} from 'react-native';
+import {PermissionsAndroid, Platform} from 'react-native';
 import ReactNativeBlobUtil from 'react-native-blob-util';
 import * as GrnChkAPI from '../../../utils/apiCalls/grnCheckingApiCalls';
 import * as Constant from '../../../utils/constants/constant';
+import {showGrnAlert} from '../common/GrnAlert';
 
 import GrnCheckingListUI from './GrnCheckingListUI';
 
@@ -23,6 +24,8 @@ const GrnCheckingList = ({navigation, route, ...props}) => {
   const [popUpRBtnTitle, set_popUpRBtnTitle] = useState(undefined);
   const [isPopupLeft, set_isPopupLeft] = useState(false);
   const [MainLoading, set_MainLoading] = useState(false);
+  const [page, set_page] = useState(0);
+  const [hasMore, set_hasMore] = useState(true);
 
   const credentialsRef = useRef(null);
 
@@ -39,13 +42,13 @@ const GrnCheckingList = ({navigation, route, ...props}) => {
   }, []);
 
   useEffect(() => {
-    loadCredentials().then(() => getInitialData());
+    loadCredentials().then(() => getInitialData(0, true));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     if (route?.params?.refresh) {
-      getInitialData();
+      getInitialData(0, true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [route?.params?.refresh]);
@@ -69,18 +72,22 @@ const GrnCheckingList = ({navigation, route, ...props}) => {
     popUpAction(undefined, undefined, '', false, false);
   }, [popUpAction]);
 
+  // page 0 + reload=true always means "start over" (pull-to-refresh, initial
+  // mount, external refresh param); any other page is an onEndReached
+  // continuation that APPENDS to itemsArray instead of replacing it.
   const getInitialData = useCallback(
-    async (reload = true, searchField, searchValue, dataFilter) => {
+    async (page = 0, reload = true, searchField, searchValue, dataFilter) => {
       const {userName, userPsd, companyId} = await loadCredentials();
       set_isLoading(!reload);
       set_MainLoading(reload);
       try {
+        const start = reload ? 0 : page * PAGE_LENGTH;
         const obj = {
           userName,
           userPwd: userPsd,
           companyId: Number(companyId),
           menuId: GRN_CHECKING_MENU_ID,
-          start: 0,
+          start,
           length: PAGE_LENGTH,
           searchField: searchField || undefined,
           searchValue: searchValue || undefined,
@@ -88,7 +95,9 @@ const GrnCheckingList = ({navigation, route, ...props}) => {
         };
         const listApiObj = await GrnChkAPI.grnCheckingListApi(obj);
         if (listApiObj?.statusData && listApiObj?.responseData?.data) {
-          set_itemsArray(listApiObj.responseData.data);
+          const rows = listApiObj.responseData.data;
+          set_itemsArray(prev => (reload ? rows : [...prev, ...rows]));
+          set_hasMore(rows.length >= PAGE_LENGTH);
         } else {
           popUpAction(
             Constant.SERVICE_FAIL_MSG,
@@ -113,6 +122,26 @@ const GrnCheckingList = ({navigation, route, ...props}) => {
       }
     },
     [loadCredentials, popUpAction],
+  );
+
+  // Exposed to the UI as `fetchMore` -- `more=true` is an onEndReached
+  // continuation (advances `page`, appends); `more=false`/omitted is a
+  // full reload from page 0 (pull-to-refresh), matching
+  // GoodsReceiptNoteList.js's own fetchMore(more) convention.
+  const fetchMore = useCallback(
+    more => {
+      if (more) {
+        if (!hasMore || isLoading || MainLoading) return;
+        const next = page + 1;
+        set_page(next);
+        getInitialData(next, false);
+      } else {
+        set_page(0);
+        set_hasMore(true);
+        getInitialData(0, true);
+      }
+    },
+    [hasMore, isLoading, MainLoading, page, getInitialData],
   );
 
   // Routes to the Fabric (lot/bale/piece) screen or the flat RM screen
@@ -165,16 +194,10 @@ const GrnCheckingList = ({navigation, route, ...props}) => {
     }
   };
 
-  // Overall PO PDF -- list page's single "PDF" button, only enabled per-row
-  // when hasApprovedBatches is true (business-rules-and-flows.md, List page).
-  const downloadOverallPdf = useCallback(
-    async item => {
-      const {userName, userPsd, companyId} = await loadCredentials();
+  const downloadPdfFile = useCallback(
+    async (apiUrl, fileName) => {
+      const {userName, userPsd} = await loadCredentials();
       set_MainLoading(true);
-      const apiUrl = GrnChkAPI.grnCheckingOverallPdfUrl({
-        poNumber: item?.poNumber,
-        companyId,
-      });
       try {
         const response = await axios.get(apiUrl, {
           headers: {'X-User-Name': userName, 'X-User-Pwd': userPsd},
@@ -184,7 +207,7 @@ const GrnCheckingList = ({navigation, route, ...props}) => {
         if (Platform.OS === 'android') {
           const hasPermission = await requestStoragePermission();
           if (!hasPermission) {
-            Alert.alert(
+            showGrnAlert(
               'Permission Denied',
               'Storage permission is required to save the PDF.',
             );
@@ -193,8 +216,8 @@ const GrnCheckingList = ({navigation, route, ...props}) => {
         }
         const pdfPath =
           Platform.OS === 'android'
-            ? `/storage/emulated/0/Download/GrnChecking_${item?.poNumber}.pdf`
-            : `${ReactNativeBlobUtil.fs.dirs.DocumentDir}/GrnChecking_${item?.poNumber}.pdf`;
+            ? `/storage/emulated/0/Download/${fileName}`
+            : `${ReactNativeBlobUtil.fs.dirs.DocumentDir}/${fileName}`;
         await ReactNativeBlobUtil.fs.writeFile(pdfPath, base64Data, 'base64');
         popUpAction(
           Platform.OS === 'android'
@@ -221,6 +244,29 @@ const GrnCheckingList = ({navigation, route, ...props}) => {
     [loadCredentials, popUpAction],
   );
 
+  // Overall PO PDF -- list page's single "PDF" button, only enabled per-row
+  // when hasApprovedBatches is true (business-rules-and-flows.md, List page).
+  const downloadOverallPdf = useCallback(
+    async item => {
+      const {companyId} = await loadCredentials();
+      const apiUrl = GrnChkAPI.grnCheckingOverallPdfUrl({poNumber: item?.poNumber, companyId});
+      downloadPdfFile(apiUrl, `GrnChecking_${item?.poNumber}.pdf`);
+    },
+    [loadCredentials, downloadPdfFile],
+  );
+
+  // Barcode PDF (added 2026-09-18) -- Fabric-only, list page's "Barcode"
+  // link next to "PDF". Barcodes are generated automatically on bale
+  // approval; this only ever downloads what already exists.
+  const downloadBarcodePdf = useCallback(
+    async item => {
+      const {companyId} = await loadCredentials();
+      const apiUrl = GrnChkAPI.grnCheckingBarcodePoUrl({poNumber: item?.poNumber, companyId});
+      downloadPdfFile(apiUrl, `Barcodes-PO-${item?.poNumber}.pdf`);
+    },
+    [loadCredentials, downloadPdfFile],
+  );
+
   return (
     <GrnCheckingListUI
       itemsArray={itemsArray}
@@ -233,9 +279,10 @@ const GrnCheckingList = ({navigation, route, ...props}) => {
       backBtnAction={backBtnAction}
       actionOnRow={actionOnRow}
       popOkBtnAction={popOkBtnAction}
-      fetchMore={getInitialData}
+      fetchMore={fetchMore}
       MainLoading={MainLoading}
       downloadOverallPdf={downloadOverallPdf}
+      downloadBarcodePdf={downloadBarcodePdf}
     />
   );
 };

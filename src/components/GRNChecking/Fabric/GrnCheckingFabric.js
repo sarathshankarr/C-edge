@@ -1,11 +1,12 @@
 import React, {useState, useCallback, useRef, useEffect} from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {Alert, Platform, PermissionsAndroid} from 'react-native';
+import {Platform, PermissionsAndroid} from 'react-native';
 import axios from 'axios';
 import ReactNativeBlobUtil from 'react-native-blob-util';
 import * as GrnChkAPI from '../../../utils/apiCalls/grnCheckingApiCalls';
 import * as Constant from '../../../utils/constants/constant';
 import useAiUploadJob from '../AiUpload/useAiUploadJob';
+import {showGrnAlert} from '../common/GrnAlert';
 
 import GrnCheckingFabricUI from './GrnCheckingFabricUI';
 
@@ -24,7 +25,6 @@ const GrnCheckingFabric = ({navigation, route}) => {
   const [vendorDetails, set_vendorDetails] = useState(null);
   const [grnNumbers, set_grnNumbers] = useState([]);
   const [availableRollsByLineItem, set_availableRollsByLineItem] = useState({});
-  const [auditHistoryRows, set_auditHistoryRows] = useState([]);
   const [selectedBaleIds, set_selectedBaleIds] = useState([]);
   const [MainLoading, set_MainLoading] = useState(false);
   const [isPopUp, set_isPopUp] = useState(false);
@@ -60,8 +60,12 @@ const GrnCheckingFabric = ({navigation, route}) => {
     popUpAction(undefined, undefined, '', false, false);
   }, [popUpAction]);
 
+  // navigate (not goBack) so the List screen's own route?.params?.refresh
+  // effect fires and reloads -- a bale/lot save, submit, or approve done on
+  // this screen changes what the List's status/hasApprovedBatches columns
+  // should show, and goBack alone left it showing stale pre-edit data.
   const backBtnAction = useCallback(() => {
-    navigation.goBack();
+    navigation.navigate('GrnCheckingList', {refresh: Date.now()});
   }, [navigation]);
 
   // ---- /state ----
@@ -103,10 +107,21 @@ const GrnCheckingFabric = ({navigation, route}) => {
     [loadCredentials, poNumber, popUpAction],
   );
 
+  // Keyed on poNumber, not [] -- the List screen navigates here with
+  // `navigate`, not `push`, so opening a SECOND different record reuses
+  // this same screen instance instead of remounting it (React Navigation
+  // pops back to an already-in-stack route rather than pushing a new
+  // one). A mount-only effect would then never re-fetch, leaving the
+  // previous record's lots/lineItems on screen -- lineItemLots filters by
+  // lineitemId, so a stale lineItems set with no matching lots for the
+  // new record's ids renders empty Lot sections under a real header,
+  // which is what looked like "containers left much space".
   useEffect(() => {
+    set_selectedBaleIds([]);
+    set_availableRollsByLineItem({});
     loadState();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [poNumber]);
 
   // ---- in-place state mutation helpers ----
 
@@ -307,7 +322,7 @@ const GrnCheckingFabric = ({navigation, route}) => {
 
   const removePiece = useCallback(
     (lot, bale, pcNo) => {
-      Alert.alert('Confirm', Constant.GRNCHK_REMOVE_PIECE_CONFIRM(pcNo), [
+      showGrnAlert('Confirm', Constant.GRNCHK_REMOVE_PIECE_CONFIRM(pcNo), [
         {text: 'No', style: 'cancel'},
         {
           text: 'Yes',
@@ -376,7 +391,7 @@ const GrnCheckingFabric = ({navigation, route}) => {
 
   const unsubmitBale = useCallback(
     (lot, bale) => {
-      Alert.alert('Confirm', Constant.GRNCHK_REVERT_CONFIRM, [
+      showGrnAlert('Confirm', Constant.GRNCHK_REVERT_CONFIRM, [
         {text: 'No', style: 'cancel'},
         {
           text: 'Yes',
@@ -524,7 +539,7 @@ const GrnCheckingFabric = ({navigation, route}) => {
 
   const approveSelectedBales = useCallback(() => {
     if (selectedBaleIds.length === 0) return;
-    Alert.alert('Confirm', Constant.GRNCHK_APPROVE_CONFIRM(selectedBaleIds.length), [
+    showGrnAlert('Confirm', Constant.GRNCHK_APPROVE_CONFIRM(selectedBaleIds.length), [
       {text: 'No', style: 'cancel'},
       {
         text: 'Yes',
@@ -558,31 +573,33 @@ const GrnCheckingFabric = ({navigation, route}) => {
     ]);
   }, [selectedBaleIds, loadCredentials, mergeLot, popUpAction]);
 
-  // ---- audit history ----
-
-  const fetchAuditHistory = useCallback(async () => {
-    const creds = await loadCredentials();
-    if (!headerIdRef.current) return;
-    const res = await GrnChkAPI.grnCheckingAuditHistoryApi({...creds, headerId: headerIdRef.current});
-    if (res?.statusData && res?.responseData?.rows) {
-      set_auditHistoryRows(res.responseData.rows);
-    }
-  }, [loadCredentials]);
-
   // ---- AI upload result routing ----
 
+  // The upload response's own lot/bale is merged in immediately for instant
+  // feedback, but on a bale's very first-ever AI extraction the checked-mtrs
+  // values it carries can lag behind what the server actually persists
+  // (confirmed live: correct values only show up after a full /state
+  // reload, e.g. leaving and re-entering the screen) -- so also schedule a
+  // quiet background reload shortly after to self-heal that race, exactly
+  // like the existing post-submit reload below.
   const onLotUploadResult = useCallback(
     data => {
       if (data?.lot) mergeLot(data.lot);
+      if (data?.success !== false && !data?.fabricMismatchStopped) {
+        setTimeout(() => loadState(false), 1500);
+      }
     },
-    [mergeLot],
+    [mergeLot, loadState],
   );
 
   const onBaleUploadResult = useCallback(
     data => {
       if (data?.bale) mergeBale(data.bale.lotId, data.bale);
+      if (data?.success !== false && !data?.fabricMismatchStopped) {
+        setTimeout(() => loadState(false), 1500);
+      }
     },
-    [mergeBale],
+    [mergeBale, loadState],
   );
 
   const lotUploadJob = useAiUploadJob({
@@ -637,7 +654,7 @@ const GrnCheckingFabric = ({navigation, route}) => {
       if (Platform.OS === 'android') {
         const ok = await requestStoragePermission();
         if (!ok) {
-          Alert.alert('Permission Denied', 'Storage permission is required to save the PDF.');
+          showGrnAlert('Permission Denied', 'Storage permission is required to save the PDF.');
           return;
         }
       }
@@ -679,6 +696,35 @@ const GrnCheckingFabric = ({navigation, route}) => {
     [loadCredentials, downloadPdf],
   );
 
+  // Barcode PDFs (added 2026-09-18) -- barcodes are generated automatically
+  // on bale approval; these only ever download what already exists.
+  const downloadFabricLotsBarcode = useCallback(
+    async lineitemId => {
+      const creds = await loadCredentials();
+      const url = GrnChkAPI.grnCheckingBarcodeFabricLotsUrl({lineitemId, companyId: creds.companyId});
+      downloadPdf(url, `Barcodes-Fabric-${lineitemId}-LotsOnly.pdf`);
+    },
+    [loadCredentials, downloadPdf],
+  );
+
+  const downloadLotBalesBarcode = useCallback(
+    async lotId => {
+      const creds = await loadCredentials();
+      const url = GrnChkAPI.grnCheckingBarcodeLotBalesUrl({lotId, companyId: creds.companyId});
+      downloadPdf(url, `Barcodes-Lot-${lotId}-BalesOnly.pdf`);
+    },
+    [loadCredentials, downloadPdf],
+  );
+
+  const downloadBalePiecesBarcode = useCallback(
+    async baleId => {
+      const creds = await loadCredentials();
+      const url = GrnChkAPI.grnCheckingBarcodeBalePiecesUrl({baleId, companyId: creds.companyId});
+      downloadPdf(url, `Barcodes-Bale-${baleId}-Pieces.pdf`);
+    },
+    [loadCredentials, downloadPdf],
+  );
+
   return (
     <GrnCheckingFabricUI
       header={header}
@@ -687,7 +733,6 @@ const GrnCheckingFabric = ({navigation, route}) => {
       vendorDetails={vendorDetails}
       grnNumbers={grnNumbers}
       availableRollsByLineItem={availableRollsByLineItem}
-      auditHistoryRows={auditHistoryRows}
       selectedBaleIds={selectedBaleIds}
       MainLoading={MainLoading}
       isPopUp={isPopUp}
@@ -714,11 +759,13 @@ const GrnCheckingFabric = ({navigation, route}) => {
       submitAllDraftBales={submitAllDraftBales}
       toggleSelectForApproval={toggleSelectForApproval}
       approveSelectedBales={approveSelectedBales}
-      fetchAuditHistory={fetchAuditHistory}
       lotUploadJob={lotUploadJob}
       baleUploadJob={baleUploadJob}
       downloadGrnPdf={downloadGrnPdf}
       downloadWorksheetPdf={downloadWorksheetPdf}
+      downloadFabricLotsBarcode={downloadFabricLotsBarcode}
+      downloadLotBalesBarcode={downloadLotBalesBarcode}
+      downloadBalePiecesBarcode={downloadBalePiecesBarcode}
     />
   );
 };

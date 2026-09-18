@@ -16,6 +16,7 @@ import CommonStyles from '../../../utils/commonStyles/commonStyles';
 import HeaderComponent from '../../../utils/commonComponents/headerComponent';
 import LoaderComponent from '../../../utils/commonComponents/loaderComponent';
 import AlertComponent from '../../../utils/commonComponents/alertComponent';
+import GrnAlertHost from '../common/GrnAlertHost';
 
 let searchImg = require('./../../../../assets/images/png/searchIcon.png');
 
@@ -63,6 +64,13 @@ const GrnCheckingListUI = ({route, ...props}) => {
     [props.downloadOverallPdf],
   );
 
+  const downloadBarcode = useCallback(
+    item => {
+      props.downloadBarcodePdf(item);
+    },
+    [props.downloadBarcodePdf],
+  );
+
   // Debounced search-box filter, client-side across the current page --
   // server-side filtering (searchField/searchValue) can be wired in later
   // by calling props.fetchMore(true, field, value) instead.
@@ -92,13 +100,26 @@ const GrnCheckingListUI = ({route, ...props}) => {
 
   const onRefresh = useCallback(() => {
     set_refreshing(true);
-    props.fetchMore();
+    props.fetchMore(false);
     set_refreshing(false);
     set_recName('');
   }, [props.fetchMore]);
 
+  const loadMore = useCallback(() => {
+    // Loading more while the user is filtering the client-side search box
+    // would append server rows the filter hasn't seen yet and silently
+    // drop them from view -- only paginate while showing the unfiltered list.
+    if (!recName) props.fetchMore(true);
+  }, [props.fetchMore, recName]);
+
   const renderItem = useCallback(
-    ({item}) => (
+    ({item}) => {
+      // Barcode PDF only ever exists for approved Fabric rows -- everything
+      // else (RM, or Fabric with nothing approved yet) has just the
+      // overall PDF, so keep it on a single row next to the check-in
+      // button instead of stacked above an empty placeholder slot.
+      const showBarcode = item.hasApprovedBatches && item.itemType === 'Fabric';
+      return (
       <TouchableOpacity onPress={() => {}} style={CommonStyles.cellBackViewStyle}>
         <View
           style={{
@@ -118,7 +139,7 @@ const GrnCheckingListUI = ({route, ...props}) => {
           <Text style={[CommonStyles.tylesTextStyle, {flex: 0.9, textAlign: 'center'}]}>
             {item.userName || '-'}
           </Text>
-          <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center', width: 80}}>
+          <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center', width: 76}}>
             <TouchableOpacity
               activeOpacity={0.7}
               style={styles.button}
@@ -128,21 +149,37 @@ const GrnCheckingListUI = ({route, ...props}) => {
                 style={{width: 18, height: 18, resizeMode: 'contain', tintColor: '#fff'}}
               />
             </TouchableOpacity>
-            {item.hasApprovedBatches ? (
+            {showBarcode ? (
+              <View style={{alignItems: 'center', justifyContent: 'center'}}>
+                <TouchableOpacity onPress={() => downloadPdf(item)} style={{marginBottom: 4}}>
+                  <Image
+                    source={require('./../../../../assets/images/png/pdf2.png')}
+                    style={{width: 22, height: 22, resizeMode: 'contain'}}
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => downloadBarcode(item)}>
+                  <Image
+                    source={require('./../../../../assets/images/png/barcode_download.png')}
+                    style={{width: 22, height: 22, resizeMode: 'contain'}}
+                  />
+                </TouchableOpacity>
+              </View>
+            ) : item.hasApprovedBatches ? (
               <TouchableOpacity onPress={() => downloadPdf(item)}>
                 <Image
                   source={require('./../../../../assets/images/png/pdf2.png')}
-                  style={{width: 28, height: 28, resizeMode: 'contain'}}
+                  style={{width: 22, height: 22, resizeMode: 'contain'}}
                 />
               </TouchableOpacity>
             ) : (
-              <View style={{width: 28, height: 28}} />
+              <View style={{width: 22, height: 22}} />
             )}
           </View>
         </View>
       </TouchableOpacity>
-    ),
-    [handleActions, downloadPdf],
+      );
+    },
+    [handleActions, downloadPdf, downloadBarcode],
   );
 
   const keyExtractor = useCallback(
@@ -157,6 +194,7 @@ const GrnCheckingListUI = ({route, ...props}) => {
 
   return (
     <View style={[CommonStyles.mainComponentViewStyle]}>
+      <GrnAlertHost />
       <View style={[CommonStyles.headerView]}>
         <HeaderComponent
           isBackBtnEnable={true}
@@ -226,7 +264,7 @@ const GrnCheckingListUI = ({route, ...props}) => {
             <Text style={[CommonStyles.tylesHeaderTextStyle, {flex: 0.9, textAlign: 'center'}]}>
               {'User'}
             </Text>
-            <Text style={[CommonStyles.tylesHeaderTextStyle, {width: 80, textAlign: 'center'}]}>
+            <Text style={[CommonStyles.tylesHeaderTextStyle, {width: 76, textAlign: 'center'}]}>
               {'Action'}
             </Text>
           </View>
@@ -247,6 +285,8 @@ const GrnCheckingListUI = ({route, ...props}) => {
             keyExtractor={keyExtractor}
             showsVerticalScrollIndicator={false}
             ListFooterComponent={listFooter}
+            onEndReached={loadMore}
+            onEndReachedThreshold={0.3}
             refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
           />
         </View>

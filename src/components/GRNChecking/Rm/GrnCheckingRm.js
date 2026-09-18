@@ -1,13 +1,46 @@
 import React, {useState, useCallback, useRef, useEffect} from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {Alert, Platform, PermissionsAndroid} from 'react-native';
+import {Platform, PermissionsAndroid} from 'react-native';
 import axios from 'axios';
 import ReactNativeBlobUtil from 'react-native-blob-util';
 import * as GrnChkAPI from '../../../utils/apiCalls/grnCheckingApiCalls';
 import * as Constant from '../../../utils/constants/constant';
 import useAiUploadJob from '../AiUpload/useAiUploadJob';
+import {showGrnAlert} from '../common/GrnAlert';
 
 import GrnCheckingRmUI from './GrnCheckingRmUI';
+
+// GrnCheckingRmItemDTO (the /state response's own rmItems entries) carries
+// only the checking-side fields (checkedQty/alreadyCheckedQty/damageQty/
+// differenceQty/status/grnNo) -- the descriptive PO-line fields (name/color,
+// code, UOM, order qty, received qty) live in the SEPARATE fabricLineItems
+// array instead (confirmed against GrnCheckingRmItemDTO.java and
+// findFabricLineItemsForPo's SQL -- an RM item row has no description/uom/
+// qty columns of its own at all). A PO line also has no rmItem row yet
+// until its first draft save, so this always produces one row per
+// fabricLineItems entry, falling back to blank/zeroed checking fields.
+const buildRmRows = (lineItems, rmItems) => {
+  const byLineitem = new Map((rmItems || []).map(it => [it.poLineitemId, it]));
+  return (lineItems || []).map(li => {
+    const existing = byLineitem.get(li.lineitemId);
+    return {
+      poLineitemId: li.lineitemId,
+      itemDescription: li.description,
+      itemCode: li.fabricCode,
+      uom: li.uom,
+      orderQty: li.totalOrderQty,
+      totalReceivedQty: li.totalReceivedQty,
+      id: existing?.id,
+      checkedQty: existing?.checkedQty ?? null,
+      alreadyCheckedQty: existing?.alreadyCheckedQty ?? 0,
+      damageQty: existing?.damageQty ?? null,
+      differenceQty: existing?.differenceQty ?? li.totalReceivedQty,
+      status: existing?.status || 'DRAFT',
+      grnNo: existing?.grnNo || null,
+      warnings: existing?.warnings || [],
+    };
+  });
+};
 
 const GrnCheckingRm = ({navigation, route}) => {
   const {poNumber} = route?.params || {};
@@ -51,9 +84,28 @@ const GrnCheckingRm = ({navigation, route}) => {
     popUpAction(undefined, undefined, '', false, false);
   }, [popUpAction]);
 
+  // navigate (not goBack) so the List screen's own route?.params?.refresh
+  // effect fires and reloads -- a checked/damage-qty save, submit, or
+  // approve done on this screen changes what the List's status/
+  // hasApprovedBatches columns should show, and goBack alone left it
+  // showing stale pre-edit data.
   const backBtnAction = useCallback(() => {
-    navigation.goBack();
+    navigation.navigate('GrnCheckingList', {refresh: Date.now()});
   }, [navigation]);
+
+  const saveHeaderMeta = useCallback(
+    async (remarks, checkingDate) => {
+      const creds = await loadCredentials();
+      if (!headerIdRef.current) return;
+      await GrnChkAPI.grnCheckingSaveHeaderMetaApi({
+        ...creds,
+        headerId: headerIdRef.current,
+        remarks,
+        checkingDate,
+      });
+    },
+    [loadCredentials],
+  );
 
   const loadState = useCallback(
     async (showLoader = true) => {
@@ -75,7 +127,7 @@ const GrnCheckingRm = ({navigation, route}) => {
           console.log('GRNCHK_DEBUG /state vendorDetails:', JSON.stringify(data.vendorDetails));
           set_header(data.header);
           headerIdRef.current = data.header?.id;
-          set_rmItems(data.rmItems || []);
+          set_rmItems(buildRmRows(data.fabricLineItems, data.rmItems));
           set_rmUploadHistory(data.rmUploadHistory || []);
           set_vendorDetails(data.vendorDetails || null);
           set_grnNumbers(data.grnNumbers || []);
@@ -89,21 +141,33 @@ const GrnCheckingRm = ({navigation, route}) => {
     [loadCredentials, poNumber, popUpAction],
   );
 
+  // Keyed on poNumber, not [] -- see GrnCheckingFabric.js's own copy of
+  // this comment: the List screen navigates here with `navigate`, not
+  // `push`, so opening a second different record reuses this same screen
+  // instance instead of remounting it, and a mount-only effect would
+  // never re-fetch, leaving the previous record's rows on screen.
   useEffect(() => {
     loadState();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [poNumber]);
 
   const updateItemField = useCallback((poLineitemId, field, value) => {
     set_rmItems(prev => prev.map(it => (it.poLineitemId === poLineitemId ? {...it, [field]: value} : it)));
   }, []);
 
+  // `item` here is always a raw GrnCheckingRmItemDTO (save-draft/submit/
+  // approve/AI-upload responses) -- it has none of the descriptive
+  // fields buildRmRows filled in from fabricLineItems, so this must merge
+  // onto the existing row, never replace it wholesale, or the name/code/
+  // UOM/order/received-qty columns would blank out on every save.
   const mergeRmItem = useCallback(item => {
     if (!item) return;
     set_rmItems(prev => {
       const idx = prev.findIndex(it => it.poLineitemId === item.poLineitemId);
       if (idx === -1) return [...prev, item];
-      return prev.map((it, i) => (i === idx ? item : it));
+      const next = [...prev];
+      next[idx] = {...next[idx], ...item};
+      return next;
     });
   }, []);
 
@@ -123,46 +187,27 @@ const GrnCheckingRm = ({navigation, route}) => {
     [loadCredentials, mergeRmItem],
   );
 
-  const submitOne = useCallback(
-    async item => {
-      const creds = await loadCredentials();
-      set_MainLoading(true);
-      try {
-        const saved = await saveDraft(item);
-        if (!saved) {
-          popUpAction(Constant.GRNCHK_SAVE_FAILED_SUBMIT_CANCELLED_RM, Constant.DefaultAlert_MSG, 'OK', true, false);
-          return;
-        }
-        const res = await GrnChkAPI.grnCheckingRmSubmitApi({
-          ...creds,
-          headerId: headerIdRef.current,
-          poLineitemId: item.poLineitemId,
-        });
-        if (res?.statusData && res?.responseData?.success !== false) {
-          if (res.responseData.item) mergeRmItem(res.responseData.item);
-          const warnings = res.responseData.warnings || [];
-          popUpAction(
-            warnings.length ? [Constant.GRNCHK_SUBMITTED, ...warnings].join('\n') : Constant.GRNCHK_SUBMITTED,
-            Constant.SuccessAlert_MSG,
-            'OK',
-            true,
-            false,
-          );
-        } else {
-          popUpAction(
-            res?.responseData?.errorMessage || Constant.GRNCHK_SUBMIT_FAILED_RM,
-            Constant.DefaultAlert_MSG,
-            'OK',
-            true,
-            false,
-          );
-        }
-      } finally {
-        set_MainLoading(false);
-      }
-    },
-    [loadCredentials, mergeRmItem, popUpAction, saveDraft],
-  );
+  const saveAllDrafts = useCallback(async () => {
+    const draftRows = rmItems.filter(it => it.status === 'DRAFT' && !(it.totalReceivedQty <= 0));
+    if (draftRows.length === 0) {
+      popUpAction(Constant.GRNCHK_NO_DRAFT_RM_ITEMS, Constant.DefaultAlert_MSG, 'OK', true, false);
+      return;
+    }
+    set_MainLoading(true);
+    try {
+      const results = await Promise.all(draftRows.map(saveDraft));
+      const ok = results.every(Boolean);
+      popUpAction(
+        ok ? 'Saved.' : Constant.Fail_Save_Dtls_MSG,
+        ok ? Constant.SuccessAlert_MSG : Constant.DefaultAlert_MSG,
+        'OK',
+        true,
+        false,
+      );
+    } finally {
+      set_MainLoading(false);
+    }
+  }, [rmItems, popUpAction, saveDraft]);
 
   const submitAll = useCallback(async () => {
     const eligible = rmItems.filter(
@@ -210,7 +255,7 @@ const GrnCheckingRm = ({navigation, route}) => {
   }, [rmItems, loadCredentials, loadState, mergeRmItem, popUpAction, saveDraft]);
 
   const approveAll = useCallback(() => {
-    Alert.alert('Confirm', Constant.GRNCHK_APPROVE_CONFIRM_RM, [
+    showGrnAlert('Confirm', Constant.GRNCHK_APPROVE_CONFIRM_RM, [
       {text: 'No', style: 'cancel'},
       {
         text: 'Yes',
@@ -248,15 +293,27 @@ const GrnCheckingRm = ({navigation, route}) => {
     ]);
   }, [loadCredentials, loadState, mergeRmItem, popUpAction]);
 
+  // Same instant-merge-plus-background-reload pattern as the Fabric screen
+  // (GrnCheckingFabric.js's onLotUploadResult/onBaleUploadResult) -- a
+  // bale's first-ever AI extraction can lag behind what the server actually
+  // persists, only showing up correctly after a full /state reload.
   const onRmUploadResult = useCallback(
     data => {
       (data?.rmItems || []).forEach(mergeRmItem);
       if (data?.rmUploadHistory) set_rmUploadHistory(data.rmUploadHistory);
+      if (data?.success !== false) {
+        setTimeout(() => loadState(false), 1500);
+      }
     },
-    [mergeRmItem],
+    [mergeRmItem, loadState],
   );
 
-  // RM has no fabric-mismatch concept and no /resume endpoint.
+  // RM has no fabric-mismatch concept, no /resume endpoint, and no SYNC
+  // upload endpoint at all (only /rm/upload/async exists) -- alwaysAsync
+  // forces every upload (including a plain camera/gallery photo) through
+  // the async job/poll path instead of the sync branch, which for RM would
+  // otherwise call the async endpoint but treat its "job started" response
+  // as a finished result and never actually poll for the extraction.
   const rmUploadJob = useAiUploadJob({
     uploadApi: GrnChkAPI.grnCheckingRmUploadAsyncApi,
     uploadAsyncApi: GrnChkAPI.grnCheckingRmUploadAsyncApi,
@@ -264,6 +321,7 @@ const GrnCheckingRm = ({navigation, route}) => {
     cancelApi: GrnChkAPI.grnCheckingRmUploadCancelApi,
     resumeApi: undefined,
     hasFabricMismatch: false,
+    alwaysAsync: true,
     onResult: onRmUploadResult,
     getCreds: loadCredentials,
   });
@@ -336,10 +394,11 @@ const GrnCheckingRm = ({navigation, route}) => {
       isPopupLeft={isPopupLeft}
       popOkBtnAction={popOkBtnAction}
       backBtnAction={backBtnAction}
+      saveHeaderMeta={saveHeaderMeta}
       onRefresh={() => loadState(false)}
       updateItemField={updateItemField}
       saveDraft={saveDraft}
-      submitOne={submitOne}
+      saveAllDrafts={saveAllDrafts}
       submitAll={submitAll}
       approveAll={approveAll}
       rmUploadJob={rmUploadJob}

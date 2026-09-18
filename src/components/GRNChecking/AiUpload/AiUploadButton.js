@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {TouchableOpacity, Text, View, ActivityIndicator, Alert, StyleSheet, Platform, PermissionsAndroid, Modal, Image} from 'react-native';
+import {TouchableOpacity, Text, View, ActivityIndicator, StyleSheet, Platform, PermissionsAndroid, Modal, Image} from 'react-native';
 import Svg, {Path} from 'react-native-svg';
 import ImageCropPicker from 'react-native-image-crop-picker';
 import DocumentPicker from 'react-native-document-picker';
@@ -9,6 +9,7 @@ import {createPdf} from 'react-native-pdf-from-image';
 import Pdf from 'react-native-pdf';
 import ReactNativeBlobUtil from 'react-native-blob-util';
 import * as Constant from '../../../utils/constants/constant';
+import {showGrnAlert} from '../common/GrnAlert';
 
 // Upload-cloud icon (Feather-style outline), matching the reference look.
 const UploadCloudIcon = ({color = '#4F46E5', size = 16}) => (
@@ -70,7 +71,7 @@ const AiUploadButton = ({label, job, extraFields, style, disabled}) => {
   const scanAndPreview = async () => {
     const hasPermission = await ensureCameraPermission();
     if (!hasPermission) {
-      Alert.alert('Permission Denied', 'Camera permission is required to scan documents.');
+      showGrnAlert('Permission Denied', 'Camera permission is required to scan documents.');
       return;
     }
     set_scanning(true);
@@ -123,7 +124,7 @@ const AiUploadButton = ({label, job, extraFields, style, disabled}) => {
       set_pdfPreviewFile(toFile(uri, 'application/pdf', `${pdfName}.pdf`));
     } catch (e) {
       console.log('scanAndPreview error', e);
-      Alert.alert(Constant.DefaultAlert_MSG, 'Could not complete the document scan.');
+      showGrnAlert(Constant.DefaultAlert_MSG, 'Could not complete the document scan.');
     } finally {
       set_scanning(false);
     }
@@ -166,7 +167,7 @@ const AiUploadButton = ({label, job, extraFields, style, disabled}) => {
     if (!pdfPreviewFile) return;
     const hasPermission = await requestStoragePermission();
     if (!hasPermission) {
-      Alert.alert('Permission Denied', 'Storage permission is required to save the PDF.');
+      showGrnAlert('Permission Denied', 'Storage permission is required to save the PDF.');
       return;
     }
     try {
@@ -176,13 +177,13 @@ const AiUploadButton = ({label, job, extraFields, style, disabled}) => {
           ? `/storage/emulated/0/Download/${pdfPreviewFile.name}`
           : `${ReactNativeBlobUtil.fs.dirs.DocumentDir}/${pdfPreviewFile.name}`;
       await ReactNativeBlobUtil.fs.cp(sourcePath, destPath);
-      Alert.alert(
+      showGrnAlert(
         Constant.SuccessAlert_MSG,
         Platform.OS === 'android' ? `PDF saved successfully at ${destPath}` : 'PDF saved successfully',
       );
     } catch (e) {
       console.log('downloadPdfPreview error', e);
-      Alert.alert(Constant.DefaultAlert_MSG, Constant.SERVICE_FAIL_PDF_MSG);
+      showGrnAlert(Constant.DefaultAlert_MSG, Constant.SERVICE_FAIL_PDF_MSG);
     }
   };
 

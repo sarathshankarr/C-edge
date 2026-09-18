@@ -1,6 +1,6 @@
 import {useState, useRef, useCallback, useEffect} from 'react';
-import {Alert} from 'react-native';
 import * as Constant from '../../../utils/constants/constant';
+import {showGrnAlert} from '../common/GrnAlert';
 
 // Shared AI-upload state machine (sync + async job/poll/cancel/resume),
 // identical for Lot, Bale, and RM uploads -- see
@@ -12,6 +12,22 @@ import * as Constant from '../../../utils/constants/constant';
 // match gate, so it never receives fabricMismatchStopped and has no
 // matching /resume endpoint -- pass resumeApi: undefined for RM callers).
 const POLL_INTERVAL_MS = 1500;
+
+// The sync upload endpoints (/lot/upload, /bale/upload) have no
+// bypassFabricMismatch support at all (confirmed in
+// GrnCheckingMobileController/GrnCheckingPersistanceServiceImpl -- only the
+// */upload/async endpoints accept that flag) and don't set a dedicated
+// fabricMismatchStopped field on a hard stop either, just success:false plus
+// a freeform errorMessage. Detect that specific case by the same phrase the
+// server always includes (its own hardcoded fallback text, and the AI
+// service's own generated message both use it), then pull the two
+// single-quoted fabric names out of it so the confirm reads identically to
+// the async/PDF path's own GRNCHK_FABRIC_MISMATCH_CONFIRM wording.
+const FABRIC_MISMATCH_RE = /doesn't match this (?:po line|lot)'s fabric/i;
+const extractFabricNames = message => {
+  const names = [...String(message || '').matchAll(/'([^']*)'/g)].map(m => m[1]);
+  return {extracted: names[0], expected: names[1]};
+};
 
 // Every request/response in the AI-upload flow is logged under this tag so
 // it can be tracked end-to-end while testing, e.g.:
@@ -25,6 +41,15 @@ export default function useAiUploadJob({
   cancelApi,
   resumeApi,
   hasFabricMismatch = true,
+  // RM has no sync upload endpoint at all -- only /rm/upload/async exists
+  // (confirmed in GrnCheckingMobileController: there is no /rm/upload).
+  // Without this, a plain camera/gallery photo (not a PDF, no forceAsync)
+  // took the sync branch below and called uploadApi -- which for RM was
+  // wired to that SAME async endpoint -- and treated its immediate
+  // "jobId, jobStatus: running" response as if it were a finished sync
+  // result, never polling for the real extraction. That's why AI upload
+  // silently did nothing for RM despite "succeeding" instantly.
+  alwaysAsync = false,
   onResult,
   getCreds,
 }) {
@@ -55,7 +80,7 @@ export default function useAiUploadJob({
       poll(jobId);
     } else {
       set_uploading(false);
-      Alert.alert(
+      showGrnAlert(
         Constant.DefaultAlert_MSG,
         res?.responseData?.errorMessage || Constant.GRNCHK_EXTRACTION_FAILED,
       );
@@ -72,7 +97,7 @@ export default function useAiUploadJob({
       jobIdRef.current = null;
 
       if (result?.jobStatus === 'cancelled') {
-        Alert.alert(
+        showGrnAlert(
           Constant.DefaultAlert_MSG,
           result?.errorMessage || Constant.GRNCHK_EXTRACTION_CANCELLED,
         );
@@ -91,15 +116,15 @@ export default function useAiUploadJob({
         // resume would silently no-op.
         jobIdRef.current = result?.jobId || knownJobId || null;
         LOG('MISMATCH stop -- jobId for resume:', jobIdRef.current);
-        Alert.alert(
+        showGrnAlert(
           Constant.DefaultAlert_MSG,
           Constant.GRNCHK_FABRIC_MISMATCH_CONFIRM(
             result?.extractedFabricDescription,
             result?.expectedFabricDescription,
           ),
           [
-            {text: 'No', style: 'cancel', onPress: () => (jobIdRef.current = null)},
-            {text: 'Yes', onPress: () => resumeJob()},
+            {text: 'Cancel', style: 'cancel', onPress: () => (jobIdRef.current = null)},
+            {text: 'Yes Proceed', onPress: () => resumeJob()},
           ],
         );
         return;
@@ -109,7 +134,7 @@ export default function useAiUploadJob({
         if (result?.lot || result?.bale) {
           onResult && onResult(result);
         }
-        Alert.alert(
+        showGrnAlert(
           Constant.DefaultAlert_MSG,
           result?.errorMessage || Constant.GRNCHK_EXTRACTION_FAILED,
         );
@@ -118,17 +143,17 @@ export default function useAiUploadJob({
 
       // Terminal success.
       if (result?.mismatched) {
-        Alert.alert(
+        showGrnAlert(
           Constant.DefaultAlert_MSG,
           `${result?.mismatchMessage || ''}\n${Constant.GRNCHK_MISMATCH_HINT}`,
         );
       } else if (result?.errorMessage) {
-        Alert.alert(
+        showGrnAlert(
           Constant.DefaultAlert_MSG,
           `Document read with some issues: ${result.errorMessage}`,
         );
       } else {
-        Alert.alert(Constant.SuccessAlert_MSG, Constant.GRNCHK_DOC_READ_SUCCESS);
+        showGrnAlert(Constant.SuccessAlert_MSG, Constant.GRNCHK_DOC_READ_SUCCESS);
       }
       onResult && onResult(result);
     },
@@ -160,7 +185,7 @@ export default function useAiUploadJob({
 
   const cancelJob = useCallback(() => {
     if (!jobIdRef.current || !cancelApi) return;
-    Alert.alert(Constant.DefaultAlert_MSG, Constant.GRNCHK_CANCEL_CONFIRM, [
+    showGrnAlert(Constant.DefaultAlert_MSG, Constant.GRNCHK_CANCEL_CONFIRM, [
       {text: 'No', style: 'cancel'},
       {
         text: 'Yes',
@@ -177,12 +202,34 @@ export default function useAiUploadJob({
     ]);
   }, [getCreds, cancelApi]);
 
+  // Shared by a normal multi-page upload and by the sync path's own
+  // "Yes Proceed" bypass-retry below -- both end up as an async job either
+  // way (bypassFabricMismatch only exists on the async endpoint).
+  const startAsyncUpload = useCallback(
+    async formData => {
+      set_uploading(true);
+      set_progress(null);
+      const res = await uploadAsyncApi(formData);
+      LOG('UPLOAD (async) response <-', JSON.stringify({statusData: res?.statusData, error: res?.error, responseData: res?.responseData}));
+      const data = res?.responseData;
+      if (!res?.statusData || !data || data.success === false) {
+        set_uploading(false);
+        showGrnAlert(Constant.DefaultAlert_MSG, data?.errorMessage || Constant.GRNCHK_EXTRACTION_FAILED);
+        return;
+      }
+      jobIdRef.current = data.jobId;
+      set_progress({totalPages: data.totalPages, completedPages: data.completedPages});
+      poll(data.jobId);
+    },
+    [uploadAsyncApi, poll],
+  );
+
   // file: {uri, type, name} (RN file object). extraFields: entity-specific
   // ids (lotId/baleId/headerId, expectedPoNumber, expectedVendorName).
   const upload = useCallback(
     async (file, extraFields, {forceAsync = false} = {}) => {
       const creds = await getCreds();
-      const isMultiPage = forceAsync || file?.type === 'application/pdf';
+      const isMultiPage = alwaysAsync || forceAsync || file?.type === 'application/pdf';
       set_uploading(true);
       set_progress(null);
 
@@ -212,41 +259,50 @@ export default function useAiUploadJob({
         set_uploading(false);
         const data = res?.responseData;
         if (!res?.statusData || !data) {
-          Alert.alert(Constant.DefaultAlert_MSG, Constant.GRNCHK_EXTRACTION_FAILED);
+          showGrnAlert(Constant.DefaultAlert_MSG, Constant.GRNCHK_EXTRACTION_FAILED);
+          return;
+        }
+        if (data.success === false && FABRIC_MISMATCH_RE.test(data.errorMessage || '')) {
+          onResult && onResult(data);
+          const {extracted, expected} = extractFabricNames(data.errorMessage);
+          showGrnAlert(
+            Constant.DefaultAlert_MSG,
+            Constant.GRNCHK_FABRIC_MISMATCH_CONFIRM(extracted, expected),
+            [
+              {text: 'Cancel', style: 'cancel'},
+              {
+                text: 'Yes Proceed',
+                onPress: () => {
+                  formData.append('bypassFabricMismatch', 'true');
+                  startAsyncUpload(formData);
+                },
+              },
+            ],
+          );
           return;
         }
         if (data.success === false) {
-          Alert.alert(Constant.DefaultAlert_MSG, data.errorMessage || Constant.GRNCHK_EXTRACTION_FAILED);
+          showGrnAlert(Constant.DefaultAlert_MSG, data.errorMessage || Constant.GRNCHK_EXTRACTION_FAILED);
         } else if (data.mismatched) {
-          Alert.alert(
+          showGrnAlert(
             Constant.DefaultAlert_MSG,
             `${data.mismatchMessage || ''}\n${Constant.GRNCHK_MISMATCH_HINT}`,
           );
         } else if (data.errorMessage) {
-          Alert.alert(
+          showGrnAlert(
             Constant.DefaultAlert_MSG,
             `Document read with some issues: ${data.errorMessage}`,
           );
         } else {
-          Alert.alert(Constant.SuccessAlert_MSG, Constant.GRNCHK_DOC_READ_SUCCESS);
+          showGrnAlert(Constant.SuccessAlert_MSG, Constant.GRNCHK_DOC_READ_SUCCESS);
         }
         onResult && onResult(data);
         return;
       }
 
-      const res = await uploadAsyncApi(formData);
-      LOG('UPLOAD (async) response <-', JSON.stringify({statusData: res?.statusData, error: res?.error, responseData: res?.responseData}));
-      const data = res?.responseData;
-      if (!res?.statusData || !data || data.success === false) {
-        set_uploading(false);
-        Alert.alert(Constant.DefaultAlert_MSG, data?.errorMessage || Constant.GRNCHK_EXTRACTION_FAILED);
-        return;
-      }
-      jobIdRef.current = data.jobId;
-      set_progress({totalPages: data.totalPages, completedPages: data.completedPages});
-      poll(data.jobId);
+      startAsyncUpload(formData);
     },
-    [getCreds, uploadApi, uploadAsyncApi, onResult, poll],
+    [getCreds, uploadApi, onResult, startAsyncUpload, alwaysAsync],
   );
 
   return {

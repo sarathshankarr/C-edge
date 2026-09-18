@@ -22,6 +22,7 @@ import HeaderComponent from '../../../utils/commonComponents/headerComponent';
 import LoaderComponent from '../../../utils/commonComponents/loaderComponent';
 import AlertComponent from '../../../utils/commonComponents/alertComponent';
 import AiUploadButton from '../AiUpload/AiUploadButton';
+import GrnAlertHost from '../common/GrnAlertHost';
 import {ColorContext} from '../../colorTheme/colorTheme';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabled) {
@@ -37,10 +38,26 @@ const animateNext = () => LayoutAnimation.configureNext(LayoutAnimation.Presets.
 
 const fmt = v => (v === null || v === undefined || v === '' ? '-' : String(v));
 
+// Quantity/measurement display formatting: round to 2 decimals, then drop
+// the hundredths digit if it's 0 (12.40 -> 12.4), and drop the tenths digit
+// too if that's also 0 (12.00 -> 12). Only for read-only number display --
+// never applied to an editable TextInput's own value (that would fight the
+// user mid-type).
+const fmtNum = v => {
+  if (v === null || v === undefined || v === '') return '-';
+  const num = Number(v);
+  if (isNaN(num)) return '-';
+  const [intPart, decPart] = (Math.round(num * 100) / 100).toFixed(2).split('.');
+  if (decPart[1] !== '0') return `${intPart}.${decPart}`;
+  if (decPart[0] !== '0') return `${intPart}.${decPart[0]}`;
+  return intPart;
+};
+
 const STATUS_COLORS = {DRAFT: '#757575', SUBMITTED: '#F9A825', APPROVED: '#66BB6A'};
 const statusColor = status => STATUS_COLORS[status] || STATUS_COLORS.DRAFT;
 
 const searchImg = require('./../../../../assets/images/png/searchIcon.png');
+const barcodeImg = require('./../../../../assets/images/png/barcode_download.png');
 
 // ---- a minimal "choose one from a list" modal picker -- this codebase has
 // no existing dropdown/select component for a data-driven option list, so
@@ -86,6 +103,7 @@ const BaleCard = ({
   onToggleSelect,
   uploadJob,
   downloadWorksheetPdf,
+  downloadBalePiecesBarcode,
 }) => {
   const [moveModalVisible, set_moveModalVisible] = useState(false);
   const isDraft = bale.status === 'DRAFT';
@@ -106,7 +124,14 @@ const BaleCard = ({
           />
           <Text style={styles.baleNoPcs}>({fmt(bale.totalPcs)} Pcs)</Text>
         </View>
-        <Text style={[styles.baleStatus, {color: statusColor(bale.status)}]}>{bale.status}</Text>
+        <View style={styles.baleStatusRow}>
+          <Text style={[styles.baleStatus, {color: statusColor(bale.status)}]}>{bale.status}</Text>
+          {bale.status === 'APPROVED' ? (
+            <TouchableOpacity onPress={() => downloadBalePiecesBarcode(bale.id)} style={styles.barcodeIconBtn}>
+              <Image source={barcodeImg} style={styles.barcodeIcon} />
+            </TouchableOpacity>
+          ) : null}
+        </View>
       </View>
 
       <View style={styles.baleHeaderDivider} />
@@ -117,7 +142,7 @@ const BaleCard = ({
           job={uploadJob}
           extraFields={{baleId: bale.id}}
           style={styles.aiUploadSpacing}
-          disabled={bale.status === 'APPROVED'}
+          disabled={bale.status !== 'DRAFT'}
         />
         {bale.status === 'SUBMITTED' ? (
           <Pressable
@@ -166,7 +191,7 @@ const BaleCard = ({
               <View style={styles.pieceColDiff}>
                 <View style={[styles.diffChip, diffOk ? styles.diffChipOk : styles.diffChipBad]}>
                   <Text style={[styles.diffChipText, diffOk ? styles.diffChipTextOk : styles.diffChipTextBad]}>
-                    {pieceDiff.toFixed(1)}
+                    {fmtNum(pieceDiff)}
                   </Text>
                 </View>
               </View>
@@ -187,17 +212,17 @@ const BaleCard = ({
       <View style={styles.baleTotalsRow}>
         <View style={styles.baleTotalsCol}>
           <Text style={styles.baleTotalsLabel}>Total In Mtrs</Text>
-          <Text style={styles.baleTotalsValue}>{totalInMtrs}</Text>
+          <Text style={styles.baleTotalsValue}>{fmtNum(totalInMtrs)}</Text>
         </View>
         <View style={styles.baleTotalsCol}>
           <Text style={styles.baleTotalsLabel}>Checked</Text>
-          <Text style={styles.baleTotalsValue}>{checkedMtrs}</Text>
+          <Text style={styles.baleTotalsValue}>{fmtNum(checkedMtrs)}</Text>
         </View>
         <View style={[styles.baleTotalsCol, styles.baleTotalsColLast]}>
           <Text style={styles.baleTotalsLabel}>Difference</Text>
           <View style={[styles.diffChip, baleDiffOk ? styles.diffChipOk : styles.diffChipBad]}>
             <Text style={[styles.diffChipText, baleDiffOk ? styles.diffChipTextOk : styles.diffChipTextBad]}>
-              {(totalInMtrs - checkedMtrs).toFixed(1)}
+              {fmtNum(totalInMtrs - checkedMtrs)}
             </Text>
           </View>
         </View>
@@ -217,7 +242,9 @@ const BaleCard = ({
       </View>
 
       {bale.status === 'APPROVED' && bale.grnNo ? (
-        <Text style={styles.grnLink}>GRN No: {bale.grnNo}</Text>
+        <View style={styles.baleApprovedRow}>
+          <Text style={styles.grnLink}>GRN No: {bale.grnNo}</Text>
+        </View>
       ) : null}
       {bale.status === 'SUBMITTED' ? <Text style={styles.lockedHint}>Locked from editing</Text> : null}
 
@@ -272,6 +299,8 @@ const LotSection = ({
   lotUploadJob,
   baleUploadJob,
   downloadWorksheetPdf,
+  downloadLotBalesBarcode,
+  downloadBalePiecesBarcode,
   poNumber,
   vendorName,
 }) => {
@@ -314,27 +343,27 @@ const LotSection = ({
             </View>
             <View style={styles.fabricField}>
               <Text style={styles.fieldLabel}>Total In Mtrs</Text>
-              <Text style={styles.fieldValue}>{fmt(lot.receivedQty)}</Text>
+              <Text style={styles.fieldValue}>{fmtNum(lot.receivedQty)}</Text>
             </View>
           </View>
           <View style={styles.fabricFieldsRow}>
             <View style={styles.fabricField}>
               <Text style={styles.fieldLabel}>Received Qty</Text>
-              <Text style={styles.fieldValue}>{fmt(lot.receivedQty)}</Text>
+              <Text style={styles.fieldValue}>{fmtNum(lot.receivedQty)}</Text>
             </View>
             <View style={styles.fabricField}>
               <Text style={styles.fieldLabel}>Checked Qty</Text>
-              <Text style={styles.fieldValue}>{fmt(lot.checkedQty)}</Text>
+              <Text style={styles.fieldValue}>{fmtNum(lot.checkedQty)}</Text>
             </View>
             <View style={styles.fabricField}>
               <Text style={styles.fieldLabel}>Damaged Qty</Text>
-              <Text style={styles.fieldValue}>{fmt(lot.damagedQty)}</Text>
+              <Text style={styles.fieldValue}>{fmtNum(lot.damagedQty)}</Text>
             </View>
           </View>
           <View style={styles.fabricFieldsRow}>
             <View style={[styles.fabricField, styles.balanceQtyField]}>
               <Text style={styles.fieldLabel}>Balance Qty</Text>
-              <Text style={[styles.fieldValue, styles.balanceQtyValue]}>{fmt(lot.balanceQty)}</Text>
+              <Text style={[styles.fieldValue, styles.balanceQtyValue]}>{fmtNum(lot.balanceQty)}</Text>
             </View>
           </View>
         </View>
@@ -359,6 +388,10 @@ const LotSection = ({
               <TouchableOpacity style={styles.draftOnlyRow} onPress={() => set_draftOnly(o => !o)}>
                 <View style={[styles.checkbox, draftOnly && styles.checkboxChecked]} />
                 <Text style={styles.draftOnlyLabel} numberOfLines={1}>Draft Only</Text>
+              </TouchableOpacity>
+              <View style={styles.lotSecondaryActionSpacer} />
+              <TouchableOpacity onPress={() => downloadLotBalesBarcode(lot.id)} style={styles.barcodeIconBtn}>
+                <Image source={barcodeImg} style={styles.barcodeIcon} />
               </TouchableOpacity>
             </View>
 
@@ -447,6 +480,7 @@ const LotSection = ({
               onToggleSelect={next => onToggleSelectForApproval(lot, bale, next)}
               uploadJob={baleUploadJob}
               downloadWorksheetPdf={downloadWorksheetPdf}
+              downloadBalePiecesBarcode={downloadBalePiecesBarcode}
             />
           ))}
         </View>
@@ -482,10 +516,21 @@ const FabricSection = ({
   return (
     <View style={styles.fabricSection}>
       <View style={styles.fabricHeaderCard}>
-        <TouchableOpacity style={styles.caretRow} onPress={() => { animateNext(); set_expanded(e => !e); }}>
-          <Text style={styles.caretIcon}>{expanded ? '▼' : '▶'}</Text>
-          <Text style={styles.fabricTitle}>{lineItem.description}</Text>
-        </TouchableOpacity>
+        <View style={styles.fabricHeaderTopRow}>
+          <TouchableOpacity
+            style={[styles.caretRow, {flex: 1}]}
+            onPress={() => { animateNext(); set_expanded(e => !e); }}>
+            <Text style={styles.caretIcon}>{expanded ? '▼' : '▶'}</Text>
+            <Text style={styles.fabricTitle}>{lineItem.description}</Text>
+          </TouchableOpacity>
+          {lineItem.rollCount > 0 ? (
+            <TouchableOpacity
+              onPress={() => lotHandlers.downloadFabricLotsBarcode(lineItem.lineitemId)}
+              style={styles.barcodeIconBtn}>
+              <Image source={barcodeImg} style={styles.barcodeIcon} />
+            </TouchableOpacity>
+          ) : null}
+        </View>
 
         <View style={styles.fabricFieldsGrid}>
           <View style={styles.fabricFieldsRow}>
@@ -509,25 +554,25 @@ const FabricSection = ({
             </View>
             <View style={styles.fabricField}>
               <Text style={styles.fieldLabel}>Total Order Qty</Text>
-              <Text style={styles.fieldValue}>{fmt(lineItem.totalOrderQty)}</Text>
+              <Text style={styles.fieldValue}>{fmtNum(lineItem.totalOrderQty)}</Text>
             </View>
             <View style={styles.fabricField}>
               <Text style={styles.fieldLabel}>Total Received Qty</Text>
-              <Text style={styles.fieldValue}>{fmt(lineItem.totalReceivedQty)}</Text>
+              <Text style={styles.fieldValue}>{fmtNum(lineItem.totalReceivedQty)}</Text>
             </View>
           </View>
           <View style={styles.fabricFieldsRow}>
             <View style={styles.fabricField}>
               <Text style={styles.fieldLabel}>Total Checked Qty</Text>
-              <Text style={styles.fieldValue}>{fmt(totalCheckedQty)}</Text>
+              <Text style={styles.fieldValue}>{fmtNum(totalCheckedQty)}</Text>
             </View>
             <View style={styles.fabricField}>
               <Text style={styles.fieldLabel}>Total Damaged Qty</Text>
-              <Text style={styles.fieldValue}>{fmt(totalDamagedQty)}</Text>
+              <Text style={styles.fieldValue}>{fmtNum(totalDamagedQty)}</Text>
             </View>
             <View style={styles.fabricField}>
               <Text style={styles.fieldLabel}>Total Balance Qty</Text>
-              <Text style={styles.fieldValue}>{fmt(totalBalanceQty)}</Text>
+              <Text style={styles.fieldValue}>{fmtNum(totalBalanceQty)}</Text>
             </View>
           </View>
         </View>
@@ -559,6 +604,8 @@ const FabricSection = ({
               lotUploadJob={lotHandlers.lotUploadJob}
               baleUploadJob={lotHandlers.baleUploadJob}
               downloadWorksheetPdf={lotHandlers.downloadWorksheetPdf}
+              downloadLotBalesBarcode={lotHandlers.downloadLotBalesBarcode}
+              downloadBalePiecesBarcode={lotHandlers.downloadBalePiecesBarcode}
               poNumber={lotHandlers.poNumber}
               vendorName={lotHandlers.vendorName}
             />
@@ -599,7 +646,6 @@ const GrnCheckingFabricUI = props => {
   const [checkingDate, set_checkingDate] = useState(props.header?.checkingDate || '');
   const [isDatePickerVisible, set_isDatePickerVisible] = useState(false);
   const [refreshing, set_refreshing] = useState(false);
-  const [auditOpen, set_auditOpen] = useState(false);
   const [vendorOpen, set_vendorOpen] = useState(true);
   const [poDetailsOpen, set_poDetailsOpen] = useState(true);
 
@@ -616,12 +662,6 @@ const GrnCheckingFabricUI = props => {
     set_refreshing(false);
   }, [props.onRefresh]);
 
-  const toggleAudit = useCallback(() => {
-    animateNext();
-    if (!auditOpen) props.fetchAuditHistory();
-    set_auditOpen(o => !o);
-  }, [auditOpen, props.fetchAuditHistory]);
-
   const lotHandlers = {
     addBaleManual: props.addBaleManual,
     updatePieceField: props.updatePieceField,
@@ -635,12 +675,16 @@ const GrnCheckingFabricUI = props => {
     lotUploadJob: props.lotUploadJob,
     baleUploadJob: props.baleUploadJob,
     downloadWorksheetPdf: props.downloadWorksheetPdf,
+    downloadFabricLotsBarcode: props.downloadFabricLotsBarcode,
+    downloadLotBalesBarcode: props.downloadLotBalesBarcode,
+    downloadBalePiecesBarcode: props.downloadBalePiecesBarcode,
     poNumber: props.header?.poNumber,
     vendorName: props.vendorDetails?.vendorName,
   };
 
   return (
     <View style={CommonStyles.mainComponentViewStyle}>
+      <GrnAlertHost />
       <View style={CommonStyles.headerView}>
         <HeaderComponent
           isBackBtnEnable={true}
@@ -738,17 +782,6 @@ const GrnCheckingFabricUI = props => {
           />
         ))}
 
-        <TouchableOpacity style={styles.auditToggle} onPress={toggleAudit}>
-          <Text style={styles.docsToggle}>{auditOpen ? 'Hide' : 'View'} audit history</Text>
-        </TouchableOpacity>
-        {auditOpen
-          ? (props.auditHistoryRows || []).map((row, i) => (
-              <Text key={i} style={styles.docsRow}>
-                [{row.contextType}] {row.rollNo || row.baleNo} -- {row.extractionStatus} ({fmt(row.createdByName)})
-              </Text>
-            ))
-          : null}
-
         <View style={{height: 90}} />
       </ScrollView>
 
@@ -793,7 +826,14 @@ const GrnCheckingFabricUI = props => {
 };
 
 const styles = StyleSheet.create({
-  scroll: {flex: 1, paddingHorizontal: 12},
+  // width: '100%' is required, not decorative -- CommonStyles.mainComponentViewStyle
+  // (this screen's outer wrapper, shared app-wide) sets alignItems: 'center',
+  // so without an explicit width this ScrollView shrink-wraps to its own
+  // content's intrinsic width and gets centered instead of stretching full
+  // screen width. That intrinsic width varies with how much text a given
+  // record actually has (vendor name length, digit counts, etc.), which is
+  // exactly why some PO records rendered visibly narrower than others.
+  scroll: {flex: 1, width: '100%', paddingHorizontal: 6},
   sectionContainer: {
     backgroundColor: '#fff',
     borderRadius: 8,
@@ -872,6 +912,9 @@ const styles = StyleSheet.create({
   caretRow: {flexDirection: 'row', alignItems: 'center'},
   caretIcon: {fontSize: 12, marginRight: 8, color: '#555'},
   fabricTitle: {fontSize: 14, fontWeight: '700', flex: 1},
+  fabricHeaderTopRow: {flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'},
+  barcodeIconBtn: {marginLeft: 8, padding: 2},
+  barcodeIcon: {width: 20, height: 20, resizeMode: 'contain', tintColor: '#2979ff'},
   fabricFieldsGrid: {marginTop: 8},
   fabricFieldsRow: {flexDirection: 'row', marginBottom: 8},
   fabricField: {flex: 1, paddingRight: 8},
@@ -922,6 +965,7 @@ const styles = StyleSheet.create({
     borderTopColor: '#E0E4EA',
     borderStyle: 'dashed',
   },
+  lotSecondaryActionSpacer: {flex: 1},
   lotActionBtn: {
     backgroundColor: '#455a64',
     borderRadius: 6,
@@ -1003,6 +1047,7 @@ const styles = StyleSheet.create({
     marginRight: 6,
   },
   baleNoPcs: {fontSize: 12, color: '#555'},
+  baleStatusRow: {flexDirection: 'row', alignItems: 'center'},
   baleStatus: {fontSize: 11, color: '#2979ff', fontWeight: '600'},
   // Piece qtys table -- a real bordered/rounded table frame (not loose
   // rows), tinted header band, zebra-striped rows, tabular numerals, and a
@@ -1110,6 +1155,7 @@ const styles = StyleSheet.create({
   damageInput: {minWidth: 90, marginRight: 0},
   baleTotalsText: {fontSize: 11, color: '#333', marginRight: 12},
   grnLink: {color: '#2979ff', fontSize: 12, marginTop: 6},
+  baleApprovedRow: {flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 6},
   lockedHint: {color: '#999', fontStyle: 'italic', fontSize: 11, marginTop: 6},
   baleActionsRow: {flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', marginTop: 8},
   baleActionBtn: {
@@ -1158,8 +1204,6 @@ const styles = StyleSheet.create({
     flexShrink: 0,
   },
   draftOnlyLabel: {fontSize: 11, color: '#333'},
-
-  auditToggle: {marginTop: 14, marginBottom: 4},
 
   bottomBar: {
     flexDirection: 'row',

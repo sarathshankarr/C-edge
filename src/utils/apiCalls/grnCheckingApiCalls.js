@@ -266,3 +266,21 @@ export function grnCheckingOverallPdfUrl({poNumber, companyId}) {
 export function grnCheckingWorksheetPdfUrl({lotId, cols, companyId, draftOnly}) {
   return `${GRNCHK_BASE()}/pdf/worksheet?lotId=${encodeURIComponent(lotId)}&cols=${encodeURIComponent(cols || 2)}&draftOnly=${draftOnly ? 'true' : 'false'}&companyId=${encodeURIComponent(companyId)}`;
 }
+
+// ---- Barcode PDFs (added 2026-09-18, Fabric-only) ----
+
+export function grnCheckingBarcodePoUrl({poNumber, companyId}) {
+  return `${GRNCHK_BASE()}/barcode/po?poNumber=${encodeURIComponent(poNumber)}&companyId=${encodeURIComponent(companyId)}`;
+}
+
+export function grnCheckingBarcodeFabricLotsUrl({lineitemId, companyId}) {
+  return `${GRNCHK_BASE()}/barcode/fabric/lots?lineitemId=${encodeURIComponent(lineitemId)}&companyId=${encodeURIComponent(companyId)}`;
+}
+
+export function grnCheckingBarcodeLotBalesUrl({lotId, companyId}) {
+  return `${GRNCHK_BASE()}/barcode/lot/bales?lotId=${encodeURIComponent(lotId)}&companyId=${encodeURIComponent(companyId)}`;
+}
+
+export function grnCheckingBarcodeBalePiecesUrl({baleId, companyId}) {
+  return `${GRNCHK_BASE()}/barcode/bale/pieces?baleId=${encodeURIComponent(baleId)}&companyId=${encodeURIComponent(companyId)}`;
+}
