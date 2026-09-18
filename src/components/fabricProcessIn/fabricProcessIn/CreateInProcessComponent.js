@@ -200,7 +200,7 @@ const CreateInProcessComponent = ({ route }) => {
     tempObj.compIds = usercompanyId;
     tempObj.company = JSON.parse(companyObj);
 
-    console.log("saving obj ==>", tempObj);
+    console.log("[CreateInProcess] saving obj ==>", tempObj);
 
 
     set_isLoading(true);
@@ -208,17 +208,22 @@ const CreateInProcessComponent = ({ route }) => {
     let SAVEAPIObj = await APIServiceCall.saveCreateProcessIn(tempObj);
     set_isLoading(false);
 
-    console.log("Sucess before returned obj ", SAVEAPIObj?.responseData);
+    console.log("[CreateInProcess] full API response ==>", JSON.stringify(SAVEAPIObj));
+    console.log("[CreateInProcess] isInternet:", SAVEAPIObj?.isInternet, "statusData:", SAVEAPIObj?.statusData, "responseData:", SAVEAPIObj?.responseData, "error:", SAVEAPIObj?.error);
 
     if (SAVEAPIObj && SAVEAPIObj?.statusData && SAVEAPIObj?.responseData !== 0) {
-      console.log("Sucessfully saved ===> ");
+      console.log("[CreateInProcess] Sucessfully saved ===> ");
       backBtnAction();
+    } else if (SAVEAPIObj?.isProcessFlowNotConfigured) {
+      console.log("[CreateInProcess] failed saving =====> reason: process flow not configured for this fabric/batch/printing combination");
+      popUpAction(Constant.Fail_ProcessFlow_Not_Configured_MSG, Constant.DefaultAlert_MSG, 'OK', true, false);
     } else {
-      console.log("failed  saving =====> ")
+      console.log("[CreateInProcess] failed saving =====> reason:", SAVEAPIObj?.isInternet === false ? 'no internet' : (SAVEAPIObj?.error ? 'error: ' + JSON.stringify(SAVEAPIObj.error) : 'statusData falsy or responseData === 0'));
       popUpAction(Constant.Fail_Save_Dtls_MSG, Constant.DefaultAlert_MSG, 'OK', true, false);
     }
 
-    if (SAVEAPIObj && SAVEAPIObj.error) {
+    if (SAVEAPIObj && SAVEAPIObj.error && !SAVEAPIObj.isProcessFlowNotConfigured) {
+      console.log("[CreateInProcess] error branch hit ==>", SAVEAPIObj.error);
       popUpAction(Constant.SERVICE_FAIL_MSG, Constant.DefaultAlert_MSG, 'OK', true, false)
     }
 

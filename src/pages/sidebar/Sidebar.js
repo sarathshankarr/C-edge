@@ -79,6 +79,12 @@ const Sidebar = ({navigation}) => {
           src: require('../../../assets/images/png/stamp.png'),
         },
         {
+          label: 'GRN Checking',
+          route: 'GrnCheckingList',
+          menu_id: 981,
+          src: require('../../../assets/images/png/grn.png'),
+        },
+        {
           label: 'Box Packing',
           route: 'BoxPackingList',
           menu_id: 345,

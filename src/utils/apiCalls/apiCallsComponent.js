@@ -8842,6 +8842,8 @@ export async function saveCreateProcessIn(jsonValue) {
   let responseData = undefined;
   let logoutData = false;
   let obj = undefined;
+  let isProcessFlowNotConfigured = false;
+  let httpStatus = undefined;
 
   let internet = await internetCheck();
   if (!internet) {
@@ -8851,11 +8853,15 @@ export async function saveCreateProcessIn(jsonValue) {
       responseData: responseData,
       error: returnError,
       isInternet: internet,
+      isProcessFlowNotConfigured: isProcessFlowNotConfigured,
+      httpStatus: httpStatus,
     };
     return obj;
   }
-  // console.log('saveCreateProcessIn ', jsonValue, Environment.uri + "fabricprocessinapi/apisaveFabricProcessIn")
-  await fetch(Environment.uri + 'fabricprocessinapi/apisaveFabricProcessIn', {
+  const saveUrl = Environment.uri + 'fabricprocessinapi/apisaveFabricProcessIn';
+  console.log('[saveCreateProcessIn] request url ==>', saveUrl);
+  console.log('[saveCreateProcessIn] request body ==>', JSON.stringify(jsonValue));
+  await fetch(saveUrl, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -8863,19 +8869,52 @@ export async function saveCreateProcessIn(jsonValue) {
     },
     body: JSON.stringify(jsonValue),
   })
-    .then(response => response.json())
-    .then(async data => {
-      // console.log('apisaveFabricProcessIn ', data)
+    .then(async response => {
+      httpStatus = response.status;
+      console.log('[saveCreateProcessIn] response status ==>', response.status, response.statusText, 'ok:', response.ok);
+      const rawText = await response.text();
+      console.log('[saveCreateProcessIn] raw response body ==>', rawText);
 
-      if (data) {
+      if (!response.ok) {
+        returnError = `HTTP ${response.status} ${response.statusText}: ${rawText}`;
+
+        // Backend crashes with org.hornetq.utils.json.JSONException: JSONObject["outmenuId"] not found
+        // in BatchCreationPersistanceDaoImpl.saveFabricProcess -> getMenuidsByBatchNo when there is no
+        // next process-flow step configured for this fabric/batch/printing combination.
+        if (
+          response.status === 500 &&
+          typeof rawText === 'string' &&
+          (rawText.includes('outmenuId') || rawText.includes('JSONException'))
+        ) {
+          isProcessFlowNotConfigured = true;
+          console.log('[saveCreateProcessIn] detected process-flow-not-configured backend error ==>', returnError);
+        } else {
+          console.log('[saveCreateProcessIn] non-OK http status, treating as failure ==>', returnError);
+        }
+        return null;
+      }
+
+      try {
+        return rawText ? JSON.parse(rawText) : null;
+      } catch (parseErr) {
+        console.log('[saveCreateProcessIn] JSON parse error ==>', parseErr.message, 'raw body was ==>', rawText);
+        returnError = parseErr;
+        return null;
+      }
+    })
+    .then(async data => {
+      console.log('[saveCreateProcessIn] parsed data ==>', data);
+
+      if (data !== null && data !== undefined) {
         statusData = true;
         responseData = data;
       } else {
         statusData = undefined;
+        console.log('[saveCreateProcessIn] no usable data returned, statusData left undefined');
       }
     })
     .catch(error => {
-      console.log('apisaveFabricProcessIn', error);
+      console.log('[saveCreateProcessIn] fetch/network error ==>', error?.message, error);
       returnError = error;
     });
 
@@ -8885,7 +8924,10 @@ export async function saveCreateProcessIn(jsonValue) {
     responseData: responseData,
     error: returnError,
     isInternet: internet,
+    isProcessFlowNotConfigured: isProcessFlowNotConfigured,
+    httpStatus: httpStatus,
   };
+  console.log('[saveCreateProcessIn] final returned obj ==>', obj);
   return obj;
 }
 export async function saveCreateRawMaterialMasters(jsonValue) {

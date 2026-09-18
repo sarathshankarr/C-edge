@@ -135,6 +135,9 @@ import CreateStyleTransferOut from '../components/Style Transfer Out/CreateStyle
 import StyleTransferOutList from '../components/Style Transfer Out/StyleTransferOutList';
 import GoodsReceiptNoteList from '../components/GoodsReceiptNote/GoodsReceiptNoteList';
 import SaveGoodsReceiptNote from '../components/GoodsReceiptNote/SaveGoodsReceiptNote';
+import GrnCheckingList from '../components/GRNChecking/List/GrnCheckingList';
+import GrnCheckingFabric from '../components/GRNChecking/Fabric/GrnCheckingFabric';
+import GrnCheckingRm from '../components/GRNChecking/Rm/GrnCheckingRm';
 import CreateNewOutInProcess from '../components/NewOutInProcess/CreateNewOutInProcess';
 import NewOutInProcessList from '../components/NewOutInProcess/NewOutInProcessList';
 import NewOutInProcessEdit from '../components/NewOutInProcess/NewOutInProcessEdit';
@@ -295,8 +298,11 @@ const AppStack = () => {
       <Stack.Screen name="NewProcessOutList" component={NewProcessOutList} options={{ headerShown: false }} /> 
       <Stack.Screen name="StyleTransferOutList" component={StyleTransferOutList} options={{ headerShown: false }} /> 
       <Stack.Screen name="SaveStyleTransferOut" component={SaveStyleTransferOut} options={{ headerShown: false }} /> 
-      <Stack.Screen name="GoodsReceiptNoteList" component={GoodsReceiptNoteList} options={{ headerShown: false }} /> 
-      <Stack.Screen name="SaveGoodsReceiptNote" component={SaveGoodsReceiptNote} options={{ headerShown: false }} /> 
+      <Stack.Screen name="GoodsReceiptNoteList" component={GoodsReceiptNoteList} options={{ headerShown: false }} />
+      <Stack.Screen name="SaveGoodsReceiptNote" component={SaveGoodsReceiptNote} options={{ headerShown: false }} />
+      <Stack.Screen name="GrnCheckingList" component={GrnCheckingList} options={{ headerShown: false }} />
+      <Stack.Screen name="GrnCheckingFabric" component={GrnCheckingFabric} options={{ headerShown: false }} />
+      <Stack.Screen name="GrnCheckingRm" component={GrnCheckingRm} options={{ headerShown: false }} /> 
       <Stack.Screen name="CreateNewOutInProcess" component={CreateNewOutInProcess} options={{ headerShown: false }} /> 
       <Stack.Screen name="NewOutInProcessList" component={NewOutInProcessList} options={{ headerShown: false }} /> 
       <Stack.Screen name="NewOutInProcessEdit" component={NewOutInProcessEdit} options={{ headerShown: false }} /> 
