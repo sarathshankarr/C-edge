@@ -1,4 +1,4 @@
-import React, {useState, useCallback, useContext} from 'react';
+import React, {useState, useCallback, useContext, useEffect} from 'react';
 import {
   View,
   Text,
@@ -35,6 +35,21 @@ if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabled) {
 // collapsed content, so the whole page reflows with an animation instead
 // of an instant jump.
 const animateNext = () => LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+
+// A lot's bale list is a plain .map() inside the page's own outer
+// ScrollView, not a virtualized FlatList (nesting a same-orientation
+// VirtualizedList inside a ScrollView doesn't actually window properly --
+// it has no way to know what the outer scroll position is, so it ends up
+// rendering everything anyway). With only a handful of bales that's fine,
+// but a lot with hundreds of bales renders hundreds of BaleCards --
+// each with a dozen-plus TextInputs, an AiUploadButton carrying 3 always-
+// mounted Modals, and a PickerModal -- all synchronously in one shot,
+// which is exactly the kind of single-frame native-view explosion that
+// blocks the JS/UI thread past Android's ANR watchdog. Rendering bales in
+// bounded batches (with a "Show more" button) keeps any one expand/append
+// bounded to a size LayoutAnimation and Yoga can actually lay out in one
+// frame, regardless of how many bales the lot really has.
+const BALE_BATCH_SIZE = 25;
 
 const fmt = v => (v === null || v === undefined || v === '' ? '-' : String(v));
 
@@ -311,12 +326,23 @@ const LotSection = ({
   const [docsOpen, set_docsOpen] = useState(false);
   const [baleSearchText, set_baleSearchText] = useState('');
   const [draftOnly, set_draftOnly] = useState(false);
+  const [visibleBaleCount, set_visibleBaleCount] = useState(BALE_BATCH_SIZE);
 
   const filteredBales = (lot.bales || []).filter(bale => {
     const term = baleSearchText.trim().toUpperCase();
     if (!term) return true;
     return bale.baleNo?.toString().toUpperCase().includes(term);
   });
+
+  // Re-narrow to the first batch whenever the search text changes, so
+  // filtering doesn't get stuck only searching whatever batch happened to
+  // already be loaded.
+  useEffect(() => {
+    set_visibleBaleCount(BALE_BATCH_SIZE);
+  }, [baleSearchText]);
+
+  const visibleBales = filteredBales.slice(0, visibleBaleCount);
+  const remainingBaleCount = filteredBales.length - visibleBales.length;
 
   return (
     <View style={styles.lotSection}>
@@ -463,7 +489,7 @@ const LotSection = ({
             <Text style={styles.noBaleMatchText}>No bale matches "{baleSearchText}".</Text>
           ) : null}
 
-          {filteredBales.map(bale => (
+          {visibleBales.map(bale => (
             <BaleCard
               key={bale.id}
               lot={lot}
@@ -483,6 +509,16 @@ const LotSection = ({
               downloadBalePiecesBarcode={downloadBalePiecesBarcode}
             />
           ))}
+
+          {remainingBaleCount > 0 ? (
+            <TouchableOpacity
+              style={styles.showMoreBalesBtn}
+              onPress={() => set_visibleBaleCount(c => c + BALE_BATCH_SIZE)}>
+              <Text style={styles.showMoreBalesBtnText}>
+                Show more ({remainingBaleCount} more bale{remainingBaleCount === 1 ? '' : 's'})
+              </Text>
+            </TouchableOpacity>
+          ) : null}
         </View>
       ) : null}
     </View>
@@ -1007,6 +1043,15 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   noBaleMatchText: {fontSize: 12, color: '#888', fontStyle: 'italic', marginTop: 4, marginBottom: 4},
+  showMoreBalesBtn: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 10,
+    marginTop: 4,
+    borderRadius: 6,
+    backgroundColor: 'rgba(41,121,255,0.08)',
+  },
+  showMoreBalesBtnText: {color: '#2979ff', fontSize: 12, fontWeight: '700'},
   balanceQtyField: {
     backgroundColor: 'rgba(41,121,255,0.08)',
     borderRadius: 6,

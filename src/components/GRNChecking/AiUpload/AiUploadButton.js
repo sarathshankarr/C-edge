@@ -229,9 +229,37 @@ const AiUploadButton = ({label, job, extraFields, style, disabled}) => {
 
   const pickFile = async () => {
     try {
-      const [doc] = await DocumentPicker.pick({type: [DocumentPicker.types.pdf]});
-      const file = toFile(doc.fileCopyUri || doc.uri, doc.type || 'application/pdf', doc.name);
-      console.log('GRNCHK_UPLOAD source=FilePicker', JSON.stringify({file, extraFields}));
+      // copyTo is required, not optional -- without it, fileCopyUri comes
+      // back undefined on Android and this fell back to the raw content://
+      // uri straight from whatever app the PDF was picked from (see the
+      // git history for the "virtual document" provider case this fixed).
+      const [doc] = await DocumentPicker.pick({type: [DocumentPicker.types.pdf], copyTo: 'cachesDirectory'});
+      if (doc.copyError) {
+        showGrnAlert(Constant.DefaultAlert_MSG, `Could not read the selected file: ${doc.copyError}`);
+        return;
+      }
+      // Confirmed live (2026-09-19): copyTo preserves the ORIGINAL
+      // filename, spaces/parentheses and all, so fileCopyUri comes back
+      // percent-encoded, e.g. ".../SRI%20AMMAN%20TEX%20(6)%20(4)-2.pdf".
+      // A diagnostic stat() against that exact string failed to find the
+      // file at all (needed decoding first) -- real-world evidence that
+      // anything touching this path without decoding it can silently miss
+      // or misread the file's content. That's the one thing genuinely
+      // unique to this picker: camera/gallery/scan always upload with a
+      // plain code-generated name (capture_....jpg, grncheck_scan_....pdf)
+      // and never hit this, which lines up with those never failing while
+      // this is the only path that has (confirmed: fails identically for
+      // both a clean single-bale ticket and a multi-ticket sheet, so it
+      // isn't about document content). Copying to our own safe filename
+      // here, exactly like every other source already does, removes the
+      // one real difference instead of relying on whatever fetch's native
+      // multipart layer does with an encoded path.
+      const sourcePath = decodeURIComponent((doc.fileCopyUri || doc.uri).replace('file://', ''));
+      const safeName = `grncheck_pick_${Date.now()}.pdf`;
+      const safePath = `${ReactNativeBlobUtil.fs.dirs.CacheDir}/${safeName}`;
+      await ReactNativeBlobUtil.fs.cp(sourcePath, safePath);
+      const file = toFile(`file://${safePath}`, doc.type || 'application/pdf', safeName);
+      console.log('GRNCHK_UPLOAD source=FilePicker', JSON.stringify({file, originalName: doc.name, extraFields}));
       await job.upload(file, extraFields, {forceAsync: true});
     } catch (e) {
       if (!DocumentPicker.isCancel(e)) console.log('GRNCHK_UPLOAD DocumentPicker error', e);
