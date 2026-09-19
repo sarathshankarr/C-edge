@@ -10,7 +10,6 @@ import {
   RefreshControl,
   ActivityIndicator,
   Platform,
-  Modal,
 } from 'react-native';
 import * as Constant from '../../../utils/constants/constant';
 import CommonStyles from '../../../utils/commonStyles/commonStyles';
@@ -25,14 +24,6 @@ let editImg = require('./../../../../assets/images/png/edit.png');
 let deleteImg = require('./../../../../assets/images/png/delete.webp');
 let pdfImg = require('./../../../../assets/images/png/pdf2.png');
 
-const SEARCH_FIELDS = [
-  {label: 'Batch Id', value: 'batchId'},
-  {label: 'Batch Nos', value: 'batchname'},
-  {label: 'Batch Creation Date', value: 'creationdate'},
-  {label: 'Lot Nos', value: 'lotnos'},
-  {label: 'PO No', value: 'ponos'},
-];
-
 const EyeIcon = () => (
   <Svg width={17} height={17} viewBox="0 0 24 24" fill="none">
     <Path
@@ -46,13 +37,76 @@ const EyeIcon = () => (
   </Svg>
 );
 
+// Builds the visible action buttons for a row (Edit/Delete are conditional)
+// and lays them out: 4 buttons -> 2x2 grid; 3 buttons -> 2 then 1 (centered);
+// 2 buttons -> one per row, stacked top/bottom (centered), not side by side.
+const buildActionRows = (item, {editRow, viewRow, downloadPDF, deleteRow}) => {
+  const buttons = [];
+
+  if (Number(item.isEdit) === 0) {
+    buttons.push(
+      <TouchableOpacity
+        key="edit"
+        activeOpacity={0.7}
+        style={[styles.button, {backgroundColor: '#2979ff'}]}
+        onPress={() => editRow(item)}>
+        <Image source={editImg} style={{width: 16, height: 16, tintColor: '#fff'}} />
+      </TouchableOpacity>,
+    );
+  }
+
+  buttons.push(
+    <TouchableOpacity
+      key="view"
+      activeOpacity={0.7}
+      style={[styles.button, {backgroundColor: '#4caf50'}]}
+      onPress={() => viewRow(item)}>
+      <EyeIcon />
+    </TouchableOpacity>,
+  );
+
+  buttons.push(
+    <TouchableOpacity key="pdf" onPress={() => downloadPDF(item)} style={styles.iconOnlyButton}>
+      <Image source={pdfImg} style={{width: 30, height: 30, resizeMode: 'contain'}} />
+    </TouchableOpacity>,
+  );
+
+  // No permission system for this module yet (mobile API never returns
+  // menuPrivileges) — delete access is assumed for everyone for now; the
+  // real client-side guard here is fabricflowstatus, matching the web's
+  // client-side-only check.
+  if (Number(item.fabricflowstatus) === 0) {
+    buttons.push(
+      <TouchableOpacity key="delete" onPress={() => deleteRow(item)} style={styles.iconOnlyButton}>
+        <Image
+          source={deleteImg}
+          style={{width: 22, height: 22, resizeMode: 'contain', tintColor: '#e53935'}}
+        />
+      </TouchableOpacity>,
+    );
+  }
+
+  // With exactly 2 buttons, stack them one per row (top/bottom) instead of
+  // side by side; otherwise chunk 2-per-row (4 -> 2x2 grid, 3 -> 2 then 1).
+  const perRow = buttons.length === 2 ? 1 : 2;
+  const rows = [];
+  for (let i = 0; i < buttons.length; i += perRow) {
+    rows.push(buttons.slice(i, i + perRow));
+  }
+
+  return rows.map(rowButtons => ({
+    buttons: rowButtons,
+    // A lone trailing button, or every row when there are only 2 buttons
+    // total, gets centered instead of spread across the column.
+    centered: rowButtons.length === 1 || buttons.length === 2,
+  }));
+};
+
 const BatchCreationListUI = ({route, ...props}) => {
   const [filterArray, set_filterArray] = useState(undefined);
   const [recName, set_recName] = useState('');
   const [refreshing, set_refreshing] = useState(false);
   const [ItemsArray, set_ItemsArray] = useState([]);
-  const [searchField, set_searchField] = useState(SEARCH_FIELDS[0]);
-  const [isFieldPickerOpen, set_isFieldPickerOpen] = useState(false);
 
   const debounceTimer = useRef(null);
 
@@ -77,26 +131,29 @@ const BatchCreationListUI = ({route, ...props}) => {
     props.popOkBtnAction();
   }, [props.popOkBtnAction]);
 
-  const runSearch = useCallback(
-    text => {
-      const searchTerm = (text || '').trim();
-      if (searchTerm.length === 0) {
-        props.fetchMore();
-        return;
-      }
-      props.onSearch(searchField.value, searchTerm);
-    },
-    [props.onSearch, props.fetchMore, searchField],
-  );
-
-  // Debounced search — only queries the server 350ms after typing stops
+  // Debounced client-side search — filters the already-loaded list 300ms
+  // after typing stops, matching the pattern used by every other list page.
   const filterPets = useCallback(
     name => {
       set_recName(name);
       if (debounceTimer.current) clearTimeout(debounceTimer.current);
-      debounceTimer.current = setTimeout(() => runSearch(name), 350);
+      debounceTimer.current = setTimeout(() => {
+        const searchTerm = name.toString().toLowerCase().trim();
+        if (searchTerm.length === 0) {
+          set_filterArray(ItemsArray);
+          return;
+        }
+        const styleArray = ItemsArray.filter(
+          item =>
+            item.batchNames?.toString().toLowerCase().includes(searchTerm) ||
+            item.lotNos?.toString().toLowerCase().includes(searchTerm) ||
+            item.batchCreationDate?.toString().toLowerCase().includes(searchTerm) ||
+            item.totalIssued?.toString().toLowerCase().includes(searchTerm),
+        );
+        set_filterArray(styleArray);
+      }, 300);
     },
-    [runSearch],
+    [ItemsArray],
   );
 
   const onRefresh = useCallback(() => {
@@ -143,47 +200,27 @@ const BatchCreationListUI = ({route, ...props}) => {
             justifyContent: 'space-between',
             alignItems: 'center',
           }}>
-          <Text style={[CommonStyles.tylesTextStyle, {flex: 0.5, textAlign: 'left'}]}>
-            {item.id}
-          </Text>
-          <Text style={[CommonStyles.tylesTextStyle, {flex: 1, textAlign: 'center'}]}>
+          <Text style={[CommonStyles.tylesTextStyle, styles.colBatchNo, {textAlign: 'left'}]}>
             {item.batchNames}
           </Text>
-          <Text style={[CommonStyles.tylesTextStyle, {flex: 1, textAlign: 'center'}]}>
-            {item.qualityName}
+          <Text style={[CommonStyles.tylesTextStyle, styles.colLotNo, {textAlign: 'center'}]}>
+            {item.lotNos || '-'}
           </Text>
-          <Text style={[CommonStyles.tylesTextStyle, {flex: 0.8, textAlign: 'center'}]}>
+          <Text style={[CommonStyles.tylesTextStyle, styles.colTotalIssued, {textAlign: 'center'}]}>
+            {item.totalIssued ?? '-'}
+          </Text>
+          <Text style={[CommonStyles.tylesTextStyle, styles.colDate, {textAlign: 'center'}]}>
             {item.batchCreationDate}
           </Text>
-          <View style={{flexDirection: 'row', alignItems: 'center', width: 150}}>
-            {Number(item.isEdit) === 0 ? (
-              <TouchableOpacity
-                activeOpacity={0.7}
-                style={[styles.button, {backgroundColor: '#2979ff'}]}
-                onPress={() => editRow(item)}>
-                <Image source={editImg} style={{width: 16, height: 16, tintColor: '#fff'}} />
-              </TouchableOpacity>
-            ) : (
-              <TouchableOpacity
-                activeOpacity={0.7}
-                style={[styles.button, {backgroundColor: '#4caf50'}]}
-                onPress={() => viewRow(item)}>
-                <EyeIcon />
-              </TouchableOpacity>
-            )}
-            <TouchableOpacity onPress={() => downloadPDF(item)} style={{marginRight: 8}}>
-              <Image source={pdfImg} style={{width: 30, height: 30, resizeMode: 'contain'}} />
-            </TouchableOpacity>
-            {Number(item.isEdit) === 0 ? (
-              <TouchableOpacity onPress={() => deleteRow(item)}>
-                <Image source={deleteImg} style={{width: 22, height: 22, resizeMode: 'contain'}} />
-              </TouchableOpacity>
-            ) : null}
+          <View style={styles.colAction}>
+            {buildActionRows(item, {editRow, viewRow, downloadPDF, deleteRow}).map((row, rowIndex) => (
+              <View
+                key={rowIndex}
+                style={[styles.actionRow, row.centered && styles.actionRowCenter]}>
+                {row.buttons}
+              </View>
+            ))}
           </View>
-        </View>
-        <View style={styles.subRow}>
-          <Text style={styles.subText}>Lot Nos: {item.lotNos || '-'}</Text>
-          <Text style={styles.subText}>Total Issued: {item.totalIssued ?? '-'}</Text>
         </View>
       </View>
     ),
@@ -226,13 +263,6 @@ const BatchCreationListUI = ({route, ...props}) => {
               marginBottom: 10,
               alignItems: 'center',
             }}>
-            <TouchableOpacity
-              style={styles.fieldPickerBtn}
-              onPress={() => set_isFieldPickerOpen(true)}>
-              <Text style={styles.fieldPickerBtnText} numberOfLines={1}>
-                {searchField.label}
-              </Text>
-            </TouchableOpacity>
             <View
               style={{
                 flexDirection: 'row',
@@ -256,7 +286,7 @@ const BatchCreationListUI = ({route, ...props}) => {
               <TextInput
                 style={[{flex: 1, color: '#000'}, Platform.OS === 'ios' && {paddingVertical: 12}]}
                 underlineColorAndroid="transparent"
-                placeholder={`Search by ${searchField.label}`}
+                placeholder="Search"
                 placeholderTextColor="#A0A0A0"
                 autoCapitalize="none"
                 value={recName}
@@ -267,20 +297,22 @@ const BatchCreationListUI = ({route, ...props}) => {
         ) : null}
 
         {filterArray && filterArray.length > 0 ? (
-          <View style={CommonStyles.listCommonHeader}>
-            <Text style={[CommonStyles.tylesHeaderTextStyle, {flex: 0.5, textAlign: 'left'}]}>
-              {'Id'}
-            </Text>
-            <Text style={[CommonStyles.tylesHeaderTextStyle, {flex: 1, textAlign: 'center'}]}>
+          <View style={[CommonStyles.listCommonHeader, styles.headerRow]}>
+            <Text style={[CommonStyles.tylesHeaderTextStyle, styles.colBatchNo, {textAlign: 'left'}]}>
               {'Batch No'}
             </Text>
-            <Text style={[CommonStyles.tylesHeaderTextStyle, {flex: 1, textAlign: 'center'}]}>
-              {'Quality'}
+            <Text
+              style={[CommonStyles.tylesHeaderTextStyle, styles.colLotNo, {textAlign: 'center'}]}
+              numberOfLines={2}>
+              {'Lot\nNo'}
             </Text>
-            <Text style={[CommonStyles.tylesHeaderTextStyle, {flex: 0.8, textAlign: 'center'}]}>
+            <Text style={[CommonStyles.tylesHeaderTextStyle, styles.colTotalIssued, {textAlign: 'center'}]}>
+              {'Total Issued'}
+            </Text>
+            <Text style={[CommonStyles.tylesHeaderTextStyle, styles.colDate, {textAlign: 'center'}]}>
               {'Date'}
             </Text>
-            <Text style={[CommonStyles.tylesHeaderTextStyle, {width: 150, textAlign: 'center'}]}>
+            <Text style={[CommonStyles.tylesHeaderTextStyle, styles.colActionLabel, {textAlign: 'center'}]}>
               {'Action'}
             </Text>
           </View>
@@ -310,28 +342,6 @@ const BatchCreationListUI = ({route, ...props}) => {
 
       <AddNewItem navItem={'CreateBatchCreation'} />
 
-      <Modal visible={isFieldPickerOpen} transparent animationType="fade">
-        <TouchableOpacity
-          style={styles.modalOverlay}
-          activeOpacity={1}
-          onPress={() => set_isFieldPickerOpen(false)}>
-          <View style={styles.modalCard}>
-            {SEARCH_FIELDS.map(field => (
-              <TouchableOpacity
-                key={field.value}
-                style={styles.modalOption}
-                onPress={() => {
-                  set_searchField(field);
-                  set_isFieldPickerOpen(false);
-                  if (recName) runSearch(recName);
-                }}>
-                <Text style={styles.modalOptionText}>{field.label}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </TouchableOpacity>
-      </Modal>
-
       {props.isPopUp ? (
         <View style={CommonStyles.customPopUpStyle}>
           <AlertComponent
@@ -359,65 +369,63 @@ const BatchCreationListUI = ({route, ...props}) => {
 };
 
 const styles = StyleSheet.create({
+  // Header row uses the same horizontal padding as each data row
+  // (CommonStyles.cellBackViewStyle) so the Action column lines up exactly.
+  headerRow: {
+    paddingHorizontal: 15,
+    marginBottom: 8,
+  },
+  colBatchNo: {
+    flex: 1.1,
+    marginHorizontal: 6,
+  },
+  colLotNo: {
+    flex: 0.7,
+    marginHorizontal: 6,
+  },
+  colTotalIssued: {
+    flex: 0.9,
+    marginHorizontal: 6,
+  },
+  colDate: {
+    flex: 0.9,
+    marginHorizontal: 6,
+  },
+  colActionLabel: {
+    width: 90,
+  },
+  colAction: {
+    width: 90,
+  },
+  actionRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  actionRowCenter: {
+    justifyContent: 'center',
+  },
   button: {
     width: 32,
     height: 32,
     borderRadius: 21,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 10,
+    marginBottom: 8,
+    marginHorizontal: 4,
     shadowColor: '#000',
     shadowOffset: {width: 0, height: 0},
     shadowOpacity: 0.5,
     shadowRadius: 10,
     elevation: 6,
   },
-  subRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 6,
-  },
-  subText: {
-    fontSize: 12,
-    color: '#666',
-  },
-  fieldPickerBtn: {
-    width: 90,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#5177c0',
+  // PDF/Delete are icon-only — no circular background/shadow like Edit/View.
+  iconOnlyButton: {
+    width: 32,
+    height: 32,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 8,
-    paddingHorizontal: 6,
-  },
-  fieldPickerBtnText: {
-    color: '#fff',
-    fontSize: 11,
-    fontWeight: '600',
-    textAlign: 'center',
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.3)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalCard: {
-    width: '80%',
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    paddingVertical: 8,
-  },
-  modalOption: {
-    paddingVertical: 14,
-    paddingHorizontal: 20,
-    borderBottomWidth: 1,
-    borderColor: '#eee',
-  },
-  modalOptionText: {
-    fontSize: 15,
-    color: '#000',
+    marginBottom: 8,
+    marginHorizontal: 4,
   },
 });
 

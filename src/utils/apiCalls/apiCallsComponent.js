@@ -14669,6 +14669,10 @@ export async function batchCreationLotNosApi(jsonValue) {
   return postBatchCreation('lotNos', jsonValue);
 }
 
+export async function batchCreationRollDetailsApi(jsonValue) {
+  return postBatchCreation('rollDetails', jsonValue);
+}
+
 export async function batchCreationCheckBatchNoApi(jsonValue) {
   return postBatchCreation('checkBatchNo', jsonValue);
 }

@@ -122,51 +122,41 @@ const BatchCreationList = ({navigation, route, ...props}) => {
     [navigation],
   );
 
+  // View re-uses the Create/Edit screen in a fully-disabled "view" mode, so
+  // it shares the exact same field mapping/prefill (no separate, drift-prone
+  // read-only layout) — it loads via the same `edit` API, keyed off batchId.
   const viewRow = useCallback(
-    async item => {
-      const {userName, userPsd} = await loadCredentials();
-      set_MainLoading(true);
-      try {
-        const obj = {
-          username: userName,
-          password: userPsd,
-          batchId: item?.batchDetailsId,
-        };
-        const viewApiObj = await APIServiceCall.viewBatchCreationApi(obj);
-        if (viewApiObj?.statusData && viewApiObj?.responseData) {
-          navigation.navigate('ViewBatchCreation', {
-            viewObject: viewApiObj.responseData,
-          });
-        } else {
-          popUpAction(
-            Constant.SERVICE_FAIL_MSG,
-            Constant.DefaultAlert_MSG,
-            'OK',
-            true,
-            false,
-          );
-        }
-      } catch (error) {
-        console.log('viewRow error ==>', error);
+    item => {
+      navigation.navigate('CreateBatchCreation', {
+        mode: 'view',
+        batchId: item?.id,
+        batchDetailsId: item?.batchDetailsId,
+      });
+    },
+    [navigation],
+  );
+
+  // The backend delete API enforces nothing server-side — it will delete
+  // unconditionally if called with valid IDs. isProductionProcess is the
+  // web's own client-side-only safety check (fabricflowstatus already
+  // gates whether the Delete icon shows at all in BatchCreationListUI), so
+  // it must be re-checked here before ever calling the API.
+  const deleteRow = useCallback(
+    item => {
+      if (Number(item?.isProductionProcess) !== 0) {
+        set_pendingDeleteItem(null);
         popUpAction(
-          Constant.SERVICE_FAIL_MSG,
+          'Selected batch is in another process, will not able to delete.',
           Constant.DefaultAlert_MSG,
           'OK',
           true,
           false,
         );
-      } finally {
-        set_MainLoading(false);
+        return;
       }
-    },
-    [loadCredentials, navigation, popUpAction],
-  );
-
-  const deleteRow = useCallback(
-    item => {
       set_pendingDeleteItem(item);
       popUpAction(
-        `Are you sure you want to delete Batch #${item?.id}?`,
+        'Do you want to delete this batch?',
         Constant.DefaultAlert_MSG,
         'Delete',
         true,
@@ -312,13 +302,6 @@ const BatchCreationList = ({navigation, route, ...props}) => {
     [loadCredentials, popUpAction],
   );
 
-  const onSearch = useCallback(
-    (styleSearchDropdown, searchKeyValue) => {
-      getInitialData({styleSearchDropdown, searchKeyValue}, false);
-    },
-    [getInitialData],
-  );
-
   return (
     <BatchCreationListUI
       itemsArray={itemsArray}
@@ -334,7 +317,6 @@ const BatchCreationList = ({navigation, route, ...props}) => {
       deleteRow={deleteRow}
       popOkBtnAction={popOkBtnAction}
       fetchMore={getInitialData}
-      onSearch={onSearch}
       MainLoading={MainLoading}
       downloadBatchCreationPDF={downloadBatchCreationPDF}
     />
