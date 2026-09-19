@@ -108,6 +108,12 @@ const Sidebar = ({navigation}) => {
           menu_id: 346,
           src: require('../../../assets/images/png/stamp.png'),
         },
+        {
+          label: 'Batch Creation',
+          route: 'BatchCreationList',
+          menu_id: 571,
+          src: require('../../../assets/images/png/stamp.png'),
+        },
       ],
     },
     masters: {

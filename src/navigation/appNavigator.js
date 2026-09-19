@@ -156,6 +156,9 @@ import ViewStockIssue from '../components/storeComponents/StockIssue/ViewStockIs
 import StockIssueReturnList from '../components/storeComponents/StockIssueReturn/StockIssueReturnList';
 import ViewStockIssueReturn from '../components/storeComponents/StockIssueReturn/ViewStockIssueReturn';
 import CreateStockIssueReturn from '../components/storeComponents/StockIssueReturn/CreateStockIssueReturn';
+import BatchCreationList from '../components/storeComponents/BatchCreation/BatchCreationList';
+import CreateBatchCreation from '../components/storeComponents/BatchCreation/CreateBatchCreation';
+import ViewBatchCreation from '../components/storeComponents/BatchCreation/ViewBatchCreation';
 
 
 const Stack = createNativeStackNavigator();
@@ -216,6 +219,9 @@ const AppStack = () => {
       <Stack.Screen name="StockIssueReturnList" component={StockIssueReturnList} options={{ headerShown: false }} />
       <Stack.Screen name="ViewStockIssueReturn" component={ViewStockIssueReturn} options={{ headerShown: false }} />
       <Stack.Screen name="CreateStockIssueReturn" component={CreateStockIssueReturn} options={{ headerShown: false }} />
+       <Stack.Screen name="BatchCreationList" component={BatchCreationList} options={{ headerShown: false }} />
+      <Stack.Screen name="CreateBatchCreation" component={CreateBatchCreation} options={{ headerShown: false }} />
+      <Stack.Screen name="ViewBatchCreation" component={ViewBatchCreation} options={{ headerShown: false }} />
       <Stack.Screen name="StockRequestEdit" component={StockRequestEdit} options={{ headerShown: false }} />
       <Stack.Screen name="StockRecieveEdit" component={StockRecieveEdit} options={{ headerShown: false }} /> 
       <Stack.Screen name="CreateStockRequest" component={CreateRequest} options={{ headerShown: false }} /> 

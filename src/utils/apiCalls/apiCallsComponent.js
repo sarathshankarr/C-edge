@@ -14575,3 +14575,125 @@ export async function checkStyleWiseLocationInv(barcodeList, fromLoc) {
   };
   return obj;
 }
+// ---------------------------------------------------------------------------
+// Batch Creation (Order Management) — mirrors BatchCreationApiController's
+// stateless JSON endpoints under POST {baseUrl}/batchCreation/<endpoint>.
+// Every call carries username/password in the body; server wraps the payload
+// under a `data` key for list/locations/fabricProcessFlow/fabricsByLocation/
+// lotNos/edit/view, but create/update return a flat {status,batchId,message}.
+// ---------------------------------------------------------------------------
+async function postBatchCreation(endpoint, jsonValue) {
+  let returnError = undefined;
+  let statusData = undefined;
+  let responseData = undefined;
+  let logoutData = false;
+  let obj = undefined;
+
+  let internet = await internetCheck();
+  console.log(`[BatchCreation] postBatchCreation(${endpoint}) internetCheck =`, internet);
+  if (!internet) {
+    console.log(`[BatchCreation] postBatchCreation(${endpoint}) aborted — no internet connection detected.`);
+    obj = {
+      logoutData: logoutData,
+      statusData: statusData,
+      responseData: responseData,
+      error: returnError,
+      isInternet: internet,
+    };
+    return obj;
+  }
+  try {
+    const url = Environment.uri + 'batchCreation/' + endpoint;
+    console.log(`[BatchCreation] postBatchCreation(${endpoint}) requesting`, url, 'body =', JSON.stringify(jsonValue));
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+      body: JSON.stringify(jsonValue),
+    });
+    const rawText = await response.text();
+    if (!response.ok) {
+      console.log(
+        `${endpoint} non-OK response `,
+        url,
+        response.status,
+        rawText?.slice(0, 300),
+      );
+    }
+    let data;
+    try {
+      data = JSON.parse(rawText);
+    } catch (parseErr) {
+      console.log(`${endpoint} non-JSON response `, url, rawText?.slice(0, 300));
+      throw parseErr;
+    }
+    if (data) {
+      statusData = true;
+      responseData = data?.data !== undefined ? data.data : data;
+    }
+    console.log(`[BatchCreation] postBatchCreation(${endpoint}) parsed response =`, JSON.stringify(data));
+  } catch (error) {
+    console.log(`${endpoint} error `, error);
+    returnError = error;
+  }
+
+  obj = {
+    logoutData: logoutData,
+    statusData: statusData,
+    responseData: responseData,
+    error: returnError,
+    isInternet: internet,
+  };
+  return obj;
+}
+
+export async function batchCreationListApi(jsonValue) {
+  return postBatchCreation('list', jsonValue);
+}
+
+export async function batchCreationLocationsApi(jsonValue) {
+  return postBatchCreation('locations', jsonValue);
+}
+
+export async function batchCreationFabricProcessFlowApi(jsonValue) {
+  return postBatchCreation('fabricProcessFlow', jsonValue);
+}
+
+export async function batchCreationFabricsByLocationApi(jsonValue) {
+  return postBatchCreation('fabricsByLocation', jsonValue);
+}
+
+export async function batchCreationLotNosApi(jsonValue) {
+  return postBatchCreation('lotNos', jsonValue);
+}
+
+export async function batchCreationCheckBatchNoApi(jsonValue) {
+  return postBatchCreation('checkBatchNo', jsonValue);
+}
+
+export async function createBatchCreationApi(jsonValue) {
+  return postBatchCreation('create', jsonValue);
+}
+
+export async function editBatchCreationApi(jsonValue) {
+  return postBatchCreation('edit', jsonValue);
+}
+
+export async function updateBatchCreationApi(jsonValue) {
+  return postBatchCreation('update', jsonValue);
+}
+
+export async function viewBatchCreationApi(jsonValue) {
+  return postBatchCreation('view', jsonValue);
+}
+
+export async function deleteBatchCreationApi(jsonValue) {
+  return postBatchCreation('delete', jsonValue);
+}
+
+export const downloadBatchCreationPdf = () => {
+  const URL = Environment.uri + 'batchCreation/pdf';
+  return URL;
+};
