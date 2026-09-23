@@ -25,6 +25,32 @@ import {RadioButton, TextInput} from 'react-native-paper';
 import {ColorContext} from '../../colorTheme/colorTheme';
 
 let downArrowImg = require('./../../../../assets/images/png/dropDownImg.png');
+
+// Out Time options come back as "hh:mm AM/PM" text (ids differ per customer
+// DB), so default-selection matches on the text, not the id.
+const parseTimeToMinutes = timeStr => {
+  const match = /^(\d{1,2}):(\d{2})\s*(AM|PM)$/i.exec(String(timeStr || '').trim());
+  if (!match) return null;
+  let hours = parseInt(match[1], 10) % 12;
+  const minutes = parseInt(match[2], 10);
+  if (/pm/i.test(match[3])) hours += 12;
+  return hours * 60 + minutes;
+};
+
+const pickLatestTimeNotAfter = (options, targetMinutes) => {
+  let best = null;
+  let bestMinutes = -1;
+  (options || []).forEach(opt => {
+    const mins = parseTimeToMinutes(opt.name);
+    if (mins === null || mins > targetMinutes) return;
+    if (mins > bestMinutes) {
+      best = opt;
+      bestMinutes = mins;
+    }
+  });
+  return best;
+};
+
 const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
   const {colors} = useContext(ColorContext);
   const styles = getStyles(colors);
@@ -45,6 +71,14 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
           const menuID = props.itemsObj.fpt_outtime.toString();
           setOutTimeName(props?.itemsObj?.inOutTimesMap[menuID]);
           setOutTimeId(props.itemsObj.fpt_outtime.toString());
+        } else {
+          const now = new Date();
+          const nowMinutes = now.getHours() * 60 + now.getMinutes();
+          const defaultOutTime = pickLatestTimeNotAfter(inOutTimesMapList, nowMinutes);
+          if (defaultOutTime) {
+            setOutTimeName(defaultOutTime.name);
+            setOutTimeId(defaultOutTime.id);
+          }
         }
         if(props.itemsObj.fpt_intime){
           const menuID = props.itemsObj.fpt_intime.toString();

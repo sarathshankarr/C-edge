@@ -134,15 +134,41 @@ const LoginComponent = ({ navigation, route, ...props }) => {
         if (loginAPIObj?.responseData?.userRoleId) await AsyncStorage.setItem('userId', (loginAPIObj.responseData.userId.toString()));
 
         if (loginAPIObj?.responseData?.userRoleId) await AsyncStorage.setItem('roleId', (loginAPIObj.responseData.userRoleId.toString()));
-        if (loginAPIObj?.responseData?.usercompanyId) await AsyncStorage.setItem('companyId', (loginAPIObj.responseData.usercompanyId.toString()));
-        if (loginAPIObj?.responseData?.company) await AsyncStorage.setItem('companyObj', JSON.stringify(loginAPIObj.responseData.company));
+        // COMPANY_DEBUG: temporary -- traces what loginComponent.js itself
+        // sees on loginAPIObj.responseData before deciding what to write
+        // to AsyncStorage, and confirms the companyId/companyObj/
+        // CompaniesList writes actually happened (or why they were
+        // skipped, if a field was falsy).
+        console.log('COMPANY_DEBUG loginComponent responseData company fields ==>', JSON.stringify({
+          usercompanyId: loginAPIObj?.responseData?.usercompanyId,
+          company: loginAPIObj?.responseData?.company,
+          companyMap: loginAPIObj?.responseData?.companyMap,
+          companyIds: loginAPIObj?.responseData?.companyIds,
+        }));
+        if (loginAPIObj?.responseData?.usercompanyId) {
+          await AsyncStorage.setItem('companyId', (loginAPIObj.responseData.usercompanyId.toString()));
+          console.log('COMPANY_DEBUG wrote companyId ==>', loginAPIObj.responseData.usercompanyId.toString());
+        } else {
+          console.log('COMPANY_DEBUG usercompanyId missing/falsy -- companyId NOT written');
+        }
+        if (loginAPIObj?.responseData?.company) {
+          await AsyncStorage.setItem('companyObj', JSON.stringify(loginAPIObj.responseData.company));
+          console.log('COMPANY_DEBUG wrote companyObj ==>', JSON.stringify(loginAPIObj.responseData.company));
+        } else {
+          console.log('COMPANY_DEBUG company missing/falsy -- companyObj NOT written');
+        }
         if (loginAPIObj?.responseData?.companyMap) {
+          let writtenCompaniesList;
           if (loginAPIObj?.responseData?.companyIds === "0") {
-            await AsyncStorage.setItem('CompaniesList', JSON.stringify(loginAPIObj.responseData.companyMap));
+            writtenCompaniesList = loginAPIObj.responseData.companyMap;
+            await AsyncStorage.setItem('CompaniesList', JSON.stringify(writtenCompaniesList));
           } else {
-            const companyList = extractCompanyList(loginAPIObj?.responseData?.companyIds, loginAPIObj.responseData.companyMap);
-            await AsyncStorage.setItem('CompaniesList', JSON.stringify(companyList));
+            writtenCompaniesList = extractCompanyList(loginAPIObj?.responseData?.companyIds, loginAPIObj.responseData.companyMap);
+            await AsyncStorage.setItem('CompaniesList', JSON.stringify(writtenCompaniesList));
           }
+          console.log('COMPANY_DEBUG wrote CompaniesList ==>', JSON.stringify(writtenCompaniesList));
+        } else {
+          console.log('COMPANY_DEBUG companyMap missing/falsy -- CompaniesList NOT written');
         }
         if (loginAPIObj?.responseData?.dashboardlink) await AsyncStorage.setItem('dashboardlink', (loginAPIObj.responseData.dashboardlink|| ''));
 

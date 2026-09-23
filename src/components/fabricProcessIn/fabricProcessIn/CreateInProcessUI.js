@@ -28,6 +28,35 @@ import {RadioButton, TextInput} from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 let downArrowImg = require('./../../../../assets/images/png/dropDownImg.png');
+
+// In Time options come back as "hh:mm AM/PM" text (ids differ per customer
+// DB), so default-selection matches on the text, not the id.
+const parseTimeToMinutes = timeStr => {
+  const match = /^(\d{1,2}):(\d{2})\s*(AM|PM)$/i.exec(String(timeStr || '').trim());
+  if (!match) return null;
+  let hours = parseInt(match[1], 10) % 12;
+  const minutes = parseInt(match[2], 10);
+  if (/pm/i.test(match[3])) hours += 12;
+  return hours * 60 + minutes;
+};
+
+// Shift 1 is 08:00 AM (inclusive) to 08:00 PM (exclusive); Shift 2 is the rest.
+const getShiftLabelForMinutes = minutes => (minutes >= 480 && minutes < 1200 ? '1' : '2');
+
+const pickLatestTimeNotAfter = (options, targetMinutes) => {
+  let best = null;
+  let bestMinutes = -1;
+  (options || []).forEach(opt => {
+    const mins = parseTimeToMinutes(opt.name);
+    if (mins === null || mins > targetMinutes) return;
+    if (mins > bestMinutes) {
+      best = opt;
+      bestMinutes = mins;
+    }
+  });
+  return best;
+};
+
 const CreateInProcessUI = ({route, navigation, ...props}) => {
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [enterSizesArray, set_enterSizesArray] = useState(undefined);
@@ -121,8 +150,20 @@ const CreateInProcessUI = ({route, navigation, ...props}) => {
 const [inTimeList, setInTimeList] = useState([]);
 const [filteredInTime, setFilteredInTime] = useState([]);
 const [showInTimeList, setShowInTimeList] = useState(false);
-const [inTimeName, setInTimeName] = useState(''); 
+const [inTimeName, setInTimeName] = useState('');
 const [inTimeId, setInTimeId] = useState('');
+const defaultInTimeAppliedRef = useRef(false);
+
+  const applyShiftForTimeName = (timeName, shiftOptions) => {
+    const mins = parseTimeToMinutes(timeName);
+    if (mins === null) return;
+    const label = getShiftLabelForMinutes(mins);
+    const match = (shiftOptions || []).find(o => String(o.name).trim() === label);
+    if (match) {
+      set_shiftId(match.id);
+      set_shift(match.name);
+    }
+  };
 
   useEffect(() => {
     // console.log("USE EFFECT ===>", )
@@ -150,6 +191,21 @@ const [inTimeId, setInTimeId] = useState('');
       }
       if (props.itemsArray.shiftMap) {
         set_shiftList(props.itemsArray.shiftMap);
+      }
+      if (
+        !defaultInTimeAppliedRef.current &&
+        props.itemsArray.inTime?.length &&
+        props.itemsArray.shiftMap?.length
+      ) {
+        defaultInTimeAppliedRef.current = true;
+        const now = new Date();
+        const nowMinutes = now.getHours() * 60 + now.getMinutes();
+        const defaultInTime = pickLatestTimeNotAfter(props.itemsArray.inTime, nowMinutes);
+        if (defaultInTime) {
+          setInTimeId(defaultInTime.id);
+          setInTimeName(defaultInTime.name);
+          applyShiftForTimeName(defaultInTime.name, props.itemsArray.shiftMap);
+        }
       }
     }
   }, [props.itemsArray]);
@@ -428,6 +484,7 @@ const [inTimeId, setInTimeId] = useState('');
     setInTimeId(item.id);
     setInTimeName(item.name);
     setShowInTimeList(false);
+    applyShiftForTimeName(item.name, shiftList);
   };
   
   const handleSearchInTime = text => {

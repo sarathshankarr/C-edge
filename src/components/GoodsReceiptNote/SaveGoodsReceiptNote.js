@@ -16,6 +16,16 @@ const SaveGoodsReceiptNote = ({navigation, route, ...props}) => {
   const [isPopupLeft, set_isPopupLeft] = useState(false);
   const [poNumber, set_poNumber] = useState(0);
   const [editFlag, set_editFlag] = useState(true);
+  // Company's newFlagSetupMasterDAO.nfsm_grn_checking flag -- when this
+  // company has the separate GRN Checking module turned on, this screen's
+  // Save must ONLY receive quantities (not also approve them), since
+  // approval now happens explicitly in GRN Checking's own Approve action.
+  // Without gating on this flag, the legacy backend's grn/grnReceiveSave
+  // endpoint treats the 'App'/'APP' marker in itemStr as "this request is
+  // from the app, so approve it too" -- fine for companies without GRN
+  // Checking (where receive-and-approve-in-one-step is the intended
+  // legacy flow), but wrong once GRN Checking owns approval separately.
+  const [grnCheckingEnabled, set_grnCheckingEnabled] = useState(false);
 
   React.useEffect(() => {
     if (route.params) {
@@ -38,6 +48,8 @@ const SaveGoodsReceiptNote = ({navigation, route, ...props}) => {
     let userPsd = await AsyncStorage.getItem('userPsd');
     let usercompanyId = await AsyncStorage.getItem('companyId');
     let companyObj = await AsyncStorage.getItem('companyObj');
+    const parsedCompanyObj = companyObj ? JSON.parse(companyObj) : null;
+    set_grnCheckingEnabled(parsedCompanyObj?.newFlagSetupMasterDAO?.nfsm_grn_checking === 1);
     set_isLoading(true);
 
     let obj = {
@@ -48,7 +60,7 @@ const SaveGoodsReceiptNote = ({navigation, route, ...props}) => {
       locIds: 0,
       brandIds: 0,
       compIds: usercompanyId,
-      company: JSON.parse(companyObj),
+      company: parsedCompanyObj,
       fromRecord: 0,
       toRecord: 25,
       userName: userName,
@@ -243,6 +255,7 @@ const SaveGoodsReceiptNote = ({navigation, route, ...props}) => {
       popOkBtnAction={popOkBtnAction}
       submitAction={submitAction}
       uploadMedia={uploadMedia}
+      grnCheckingEnabled={grnCheckingEnabled}
     />
   );
 };

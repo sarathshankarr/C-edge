@@ -367,7 +367,12 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
               `#${''}#${alreadyReceivedQty ?? '0'}#${shade ?? '0'}#${
                 grnwidth ?? '0'
               }#${price ?? '0'}#${batchid ?? '0'}` +
-              `#${'App'}#${styleId ?? '0'}#${stylewise_size_id ?? '0'}#${
+              // Empty (not 'App') when GRN Checking owns approval
+              // separately (nfsm_grn_checking) -- the legacy backend reads
+              // 'App' here as "this request is from the app, approve it
+              // too", which must not happen once GRN Checking is the one
+              // approving.
+              `#${props.grnCheckingEnabled ? '' : 'App'}#${styleId ?? '0'}#${stylewise_size_id ?? '0'}#${
                 buyer_Po_Id ?? '0'
               }#${buyerNo ?? '0'}` +
               `#${gstper ?? '0'}#${itemRate ?? ''}#${gst ?? '0'}#${
@@ -421,7 +426,8 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
                 alreadyReceivedQty ?? '0'
               }#${styleId ?? '0'}` +
               `#${shade ?? '0'}#${grnwidth ?? '0'}` +
-              `#${'App'}` +
+              // See the Fabric branch's identical comment above.
+              `#${props.grnCheckingEnabled ? '' : 'App'}` +
               `#${gstper ?? '0'}#${itemRate ?? ''}#${gst ?? '0'}` +
               `#${aisleId ?? '0'}#${binId ?? '0'}`
             );
@@ -454,7 +460,10 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
       vendorCustomerId: data?.pomaster.vendorCustomerId || 0,
       transportCost: 0,
       poNumber: data.pomaster?.poNumber || 0,
-      posave: 0,
+      // 1 when GRN Checking owns approval separately (nfsm_grn_checking),
+      // so this legacy save only records received qty; 0 for every other
+      // company, unchanged from before.
+      posave: props.grnCheckingEnabled ? 1 : 0,
       p_conv_rate: 0.0,
       buyerno: '',
       dispatch: '',
@@ -474,6 +483,7 @@ const SaveGoodsReceiptNoteUI = ({route, navigation, ...props}) => {
       itemStr: formatChildDataFab || '',
     };
     console.log('str ', obj?.itemStr);
+    console.log('GRN_SAVE_DEBUG save obj ==>', JSON.stringify(obj));
     // return;
     props.submitAction(obj);
   };

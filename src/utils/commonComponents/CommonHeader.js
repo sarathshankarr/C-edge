@@ -170,13 +170,18 @@ const CommonHeader = ({ title, showDrawerButton }) => {
   };
 
   const getCompanyObj = async (newCompanyID) => {
-    
+
 
     let obj = {
       "companyId": newCompanyID
     }
 
+    // COMPANY_DEBUG: this is the ONLY place company details get
+    // re-fetched from the network after login -- triggered by switching
+    // companies in the header dropdown, not by any other screen/response.
+    console.log('COMPANY_DEBUG getCompanyObj request ==>', JSON.stringify(obj));
     let GETNEWCOMPANYOBJ = await APIServiceCall.getNewCompanyObject(obj);
+    console.log('COMPANY_DEBUG getCompanyObj response ==>', JSON.stringify({statusData: GETNEWCOMPANYOBJ?.statusData, error: GETNEWCOMPANYOBJ?.error, responseData: GETNEWCOMPANYOBJ?.responseData}));
     // set_isLoading(false);
 
     if (GETNEWCOMPANYOBJ && GETNEWCOMPANYOBJ.statusData) {
@@ -185,11 +190,12 @@ const CommonHeader = ({ title, showDrawerButton }) => {
         // console.log("GETNEWCOMPANYOBJ No : ", GETNEWCOMPANYOBJ.responseData);
         await AsyncStorage.setItem('companyObj', JSON.stringify(GETNEWCOMPANYOBJ.responseData));
         await AsyncStorage.setItem('companyId', (newCompanyID).toString());
-        
+        console.log('COMPANY_DEBUG getCompanyObj wrote companyObj/companyId ==>', JSON.stringify({companyId: newCompanyID, companyObj: GETNEWCOMPANYOBJ.responseData}));
+
         let locIds = await AsyncStorage.getItem('locIds');
         const extractedLocationIds = await extractLocationIds(locIds, newCompanyID)
         await AsyncStorage.setItem('CurrentCompanyLocations', extractedLocationIds);
-         
+
         let curr = await AsyncStorage.getItem('companyId');
          console.log("CurrentCompanyLocation" , curr);
       }
@@ -255,7 +261,15 @@ const CommonHeader = ({ title, showDrawerButton }) => {
   const getCompaniesList = async () => {
     try {
       let companiesList = await AsyncStorage.getItem('CompaniesList');
+      // COMPANY_DEBUG: this only READS the cache -- if this comes back
+      // null, the problem happened earlier, either the /logIn response
+      // never had companyMap (see COMPANY_DEBUG logs in
+      // apiCallsComponent.js/loginComponent.js) or something cleared
+      // AsyncStorage since then.
       console.log("Companies list in CH ===> ", companiesList);
+      const companyObjRaw = await AsyncStorage.getItem('companyObj');
+      const companyIdRaw = await AsyncStorage.getItem('companyId');
+      console.log('COMPANY_DEBUG CommonHeader AsyncStorage read ==>', JSON.stringify({companyObjRaw, companyIdRaw}));
 
       const parsedList = companiesList ? JSON.parse(companiesList) : {};
       setcompanyList(parsedList);

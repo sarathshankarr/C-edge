@@ -29,7 +29,6 @@ import CommonStyles from './../../../utils/commonStyles/commonStyles';
 import HeaderComponent from './../../../utils/commonComponents/headerComponent';
 import LoaderComponent from './../../../utils/commonComponents/loaderComponent';
 import AlertComponent from './../../../utils/commonComponents/alertComponent';
-import CustomCheckBox from './../../../utils/commonComponents/CustomCheckBox';
 import * as Constant from './../../../utils/constants/constant';
 import {ColorContext} from './../../colorTheme/colorTheme';
 
@@ -39,20 +38,20 @@ import {ColorContext} from './../../colorTheme/colorTheme';
 // locally here rather than touching the shared style used by other modules.
 const FOOTER_HEIGHT = 64;
 
-// Matches the 10 boolean checkboxes on the web Create/Edit form — sent as
-// 1 when checked, omitted otherwise. See report §4.
-const CHECKBOX_FIELDS = [
-  {key: 'singeing', label: 'Singeing'},
-  {key: 'hset', label: 'H-Set'},
-  {key: 'kitty', label: 'Kitty'},
-  {key: 'zerozero', label: 'Zero-Zero'},
-  {key: 'semiStarch', label: 'Semi Starch'},
-  {key: 'crossDyg', label: 'Cross Dyeing'},
-  {key: 'singleDyg', label: 'Single Dyeing'},
-  {key: 'solidDyg', label: 'Solid Dyeing'},
-  {key: 'cationicDyg', label: 'Cationic Dyeing'},
-  {key: 'shiner', label: 'Shiner'},
-];
+// The fabric-treatment fields removed from the UI (per web parity) but still
+// sent to the server with their default value on every create/update.
+const CHECKBOX_DEFAULTS = {
+  singeing: 0,
+  hset: 0,
+  kitty: 0,
+  zerozero: 0,
+  semiStarch: 0,
+  crossDyg: 0,
+  singleDyg: 0,
+  solidDyg: 0,
+  cationicDyg: 0,
+  shiner: 0,
+};
 
 let rowKeySeq = 0;
 const newRowKey = () => `row_${Date.now()}_${rowKeySeq++}`;
@@ -85,9 +84,6 @@ const pad2 = n => String(n).padStart(2, '0');
 const formatDMY = date =>
   `${pad2(date.getDate())}/${pad2(date.getMonth() + 1)}/${date.getFullYear()}`;
 
-// A checkbox key whose DTO field name differs from our own field key.
-const CHECKBOX_DTO_ALIASES = {zerozero: 'zeroZero'};
-
 // Maps the `edit` API's viewDTO (a serialized BatchCreation entity) into
 // this form's field names. Verified against a real server response — see
 // the field-mismatch table this was fixed from (locationId comes back as
@@ -104,11 +100,6 @@ const mapViewDTOToForm = dto => {
     polysD: dto.polysD ?? '',
     desizeD: dto.desizeD ?? '',
     partyName: dto.partyName ?? '',
-    checkboxes: CHECKBOX_FIELDS.reduce((acc, f) => {
-      const dtoKey = CHECKBOX_DTO_ALIASES[f.key] || f.key;
-      acc[f.key] = Number(dto[dtoKey]) === 1;
-      return acc;
-    }, {}),
     creationDate: dto.batchCreationDateStr ?? dto.creationDate ?? dto.batchCreationDate ?? '',
     dcNo: dto.dcNo ?? '',
     qualityNameh: dto.qualityNameh ?? dto.qualityName ?? '',
@@ -306,9 +297,6 @@ const CreateBatchCreationUI = ({route, ...props}) => {
   const [polysD, set_polysD] = useState('');
   const [desizeD, set_desizeD] = useState('');
   const [partyName, set_partyName] = useState('');
-  const [checkboxes, set_checkboxes] = useState(
-    CHECKBOX_FIELDS.reduce((acc, f) => ({...acc, [f.key]: false}), {}),
-  );
   const [creationDate, set_creationDate] = useState('');
   const [isDatePickerVisible, set_isDatePickerVisible] = useState(false);
   const [dcNo, set_dcNo] = useState('');
@@ -362,7 +350,6 @@ const CreateBatchCreationUI = ({route, ...props}) => {
     set_polysD(form.polysD);
     set_desizeD(form.desizeD);
     set_partyName(form.partyName);
-    set_checkboxes(form.checkboxes);
     set_creationDate(form.creationDate);
     set_dcNo(form.dcNo);
     set_qualityNameh(form.qualityNameh);
@@ -455,10 +442,6 @@ const CreateBatchCreationUI = ({route, ...props}) => {
     console.log('[BatchCreation:CreateUI] lotNoOptions recomputed —', 'lotNosMap:', JSON.stringify(props.lotNosMap), '-> options:', JSON.stringify(opts));
     return opts;
   }, [props.lotNosMap]);
-
-  const toggleCheckbox = key => {
-    set_checkboxes(prev => ({...prev, [key]: !prev[key]}));
-  };
 
   const updateRow = (key, field, value) => {
     set_batchDetails(prev =>
@@ -619,6 +602,7 @@ const CreateBatchCreationUI = ({route, ...props}) => {
       bsr,
       deliveryAt,
       saveFlag,
+      ...CHECKBOX_DEFAULTS,
       // The backend deliberately mirrors the web app's parsing bug-for-bug:
       // an empty string for a numeric field (mtr/greyReceivedh/mtrOld) hits
       // `new BigDecimal("")` server-side and throws a NumberFormatException
@@ -649,9 +633,6 @@ const CreateBatchCreationUI = ({route, ...props}) => {
         return row;
       }),
     };
-    CHECKBOX_FIELDS.forEach(f => {
-      if (checkboxes[f.key]) payload[f.key] = 1;
-    });
     return payload;
   };
 
@@ -859,19 +840,6 @@ const CreateBatchCreationUI = ({route, ...props}) => {
           <TextField label="Polys D" value={polysD} onChangeText={set_polysD} editable={!isView} />
           <TextField label="Desize D" value={desizeD} onChangeText={set_desizeD} editable={!isView} />
           <TextField label="Party Name" value={partyName} onChangeText={set_partyName} editable={!isView} />
-
-          <Text style={[styles.sectionHeader, {borderLeftColor: colors.color2}]}>Fabric Treatment</Text>
-          <View style={styles.checkboxGrid}>
-            {CHECKBOX_FIELDS.map(f => (
-              <View key={f.key} style={styles.checkboxItem}>
-                <CustomCheckBox
-                  isChecked={checkboxes[f.key]}
-                  onToggle={() => !isView && toggleCheckbox(f.key)}
-                />
-                <Text style={styles.checkboxLabel}>{f.label}</Text>
-              </View>
-            ))}
-          </View>
 
           <View style={styles.fieldWrap} onLayout={recordFieldY('creationDate')}>
             <Text style={styles.label}>
@@ -1211,21 +1179,6 @@ const styles = StyleSheet.create({
     borderLeftWidth: 4,
     borderLeftColor: '#2979ff',
     paddingLeft: 8,
-  },
-  checkboxGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginBottom: 8,
-  },
-  checkboxItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    width: '50%',
-    marginBottom: 12,
-  },
-  checkboxLabel: {
-    fontSize: 13,
-    color: '#333',
   },
   removeRowText: {
     color: '#e53935',
