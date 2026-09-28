@@ -1,4 +1,4 @@
-import React, {useState, useRef, useEffect} from 'react';
+import React, {useState, useRef, useEffect, useContext} from 'react';
 import {
   View,
   FlatList,
@@ -26,8 +26,11 @@ import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import {formatDateIntoDMY} from '../../../utils/constants/constant';
 import {RadioButton, TextInput} from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useNavigation} from '@react-navigation/native';
+import {ColorContext} from '../../colorTheme/colorTheme';
 
 let downArrowImg = require('./../../../../assets/images/png/dropDownImg.png');
+let scanImg = require('./../../../../assets/images/png/scan.png');
 
 // In Time options come back as "hh:mm AM/PM" text (ids differ per customer
 // DB), so default-selection matches on the text, not the id.
@@ -58,6 +61,8 @@ const pickLatestTimeNotAfter = (options, targetMinutes) => {
 };
 
 const CreateInProcessUI = ({route, navigation, ...props}) => {
+  const nav = useNavigation();
+  const {colors} = useContext(ColorContext);
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [enterSizesArray, set_enterSizesArray] = useState(undefined);
   const [locationsList, set_locationsList] = useState([]);
@@ -153,6 +158,9 @@ const [showInTimeList, setShowInTimeList] = useState(false);
 const [inTimeName, setInTimeName] = useState('');
 const [inTimeId, setInTimeId] = useState('');
 const defaultInTimeAppliedRef = useRef(false);
+
+  // Barcode is only used to pick the Batch No — never sent on save.
+  const [barcode, set_barcode] = useState('');
 
   const applyShiftForTimeName = (timeName, shiftOptions) => {
     const mins = parseTimeToMinutes(timeName);
@@ -462,6 +470,105 @@ const defaultInTimeAppliedRef = useRef(false);
     set_batchNoName(item.name);
     set_showBatchNoList(false);
   };
+  // ─── Barcode ────────────────────────────────────────────────────────────
+  // Same Search / OR / Scan flow as Stock Issue Return. A barcode resolves
+  // (apiBatchByBarcode) to a batchCreationId, which is matched against the
+  // Batch No options by the part after "_", then picked via actionOnBatchNo —
+  // the same path as a manual pick (its batchNoId effect loads the details).
+  // Returns true when a Batch No was selected.
+  const resolveBarcode = async barcodeValue => {
+    if (!processId) {
+      Alert.alert('Alert', 'Please select Process before scanning the barcode');
+      return false;
+    }
+
+    let userName = await AsyncStorage.getItem('userName');
+    let userPsd = await AsyncStorage.getItem('userPsd');
+
+    props.set_isLoading(true);
+    let barcodeAPIObj;
+    try {
+      barcodeAPIObj = await APIServiceCall.getBatchByBarcode({
+        username: userName,
+        password: userPsd,
+        barcode: barcodeValue,
+      });
+    } finally {
+      props.set_isLoading(false);
+    }
+
+    if (!barcodeAPIObj?.statusData) {
+      Alert.alert(
+        'Alert',
+        barcodeAPIObj?.error?.status === 401 && barcodeAPIObj?.error?.message
+          ? barcodeAPIObj.error.message
+          : Constant.SERVICE_FAIL_MSG,
+      );
+      return false;
+    }
+
+    // batchDetailsIds = that batch no's batch_creation_details ids (one per
+    // lot). Match on these, not batchCreationId — several batch nos saved
+    // together share one batchCreationId.
+    const batchDetailsIds = (barcodeAPIObj.responseData?.batchDetailsIds || [])
+      .map(Number)
+      .filter(Boolean);
+    if (
+      String(barcodeAPIObj.responseData?.status) !== 'true' ||
+      batchDetailsIds.length === 0
+    ) {
+      Alert.alert('Alert', `No batch found for barcode ${barcodeValue}`);
+      return false;
+    }
+
+    const option = batchNoList.find(item =>
+      batchDetailsIds.includes(Number(String(item.id).split('_')[0])),
+    );
+    if (!option) {
+      Alert.alert(
+        'Alert',
+        `The batch for barcode ${barcodeValue} is not available for the selected process`,
+      );
+      return false;
+    }
+    if (option.id === batchNoId) {
+      Alert.alert('Alert', 'Barcode already scanned.');
+      return false;
+    }
+    actionOnBatchNo(option);
+    return true;
+  };
+
+  // Manual entry (or a keyboard-wedge scanner's Enter) — fired by Search.
+  const onSearchBarcode = async () => {
+    const value = barcode.trim();
+    if (!value) {
+      Alert.alert('Alert', 'Please enter a barcode.');
+      return;
+    }
+    // Cleared on every lookup (found or not) so a hardware scanner's next
+    // scan doesn't append to the previous value.
+    set_barcode('');
+    await resolveBarcode(value);
+  };
+
+  // Camera scan — picks the batch immediately on a successful read.
+  const onScanBarcode = () => {
+    nav.navigate('ScanQRPage2', {
+      onScanSuccess: async scannedValue => {
+        const value = String(scannedValue ?? '').trim();
+        if (!value) {
+          return;
+        }
+        const selected = await resolveBarcode(value);
+        if (selected) {
+          set_barcode('');
+          nav.goBack();
+        }
+      },
+    });
+  };
+
   const actionOnDesignNo = item => {
     set_designNoId(item.id);
     set_designNoName(item.name);
@@ -1222,6 +1329,41 @@ const defaultInTimeAppliedRef = useRef(false);
                 </ScrollView>
               </View>
             )}
+          </View>
+
+          {/* Barcode section — same layout as Stock Issue Return */}
+          <View style={[styles.barcodeContainer, {width: '95%'}]}>
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              <View style={{flex: 1, marginRight: 10}}>
+                <TextInput
+                  label="Barcode"
+                  value={barcode}
+                  mode="outlined"
+                  autoCapitalize="none"
+                  returnKeyType="search"
+                  onChangeText={text => set_barcode(text.trimStart())}
+                  onSubmitEditing={onSearchBarcode}
+                />
+              </View>
+              <TouchableOpacity
+                onPress={onSearchBarcode}
+                style={[styles.actionButton, {backgroundColor: colors.color2}]}>
+                <Text style={styles.actionButtonText}>Search</Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.dividerRow}>
+              <View style={styles.dividerLine} />
+              <Text style={styles.dividerText}>OR</Text>
+              <View style={styles.dividerLine} />
+            </View>
+
+            <TouchableOpacity
+              onPress={onScanBarcode}
+              style={[styles.scanButton, {backgroundColor: colors.color2}]}>
+              <Text style={styles.actionButtonText}>{'Scan  '}</Text>
+              <Image source={scanImg} style={{height: 20, width: 20, tintColor: '#fff'}} />
+            </TouchableOpacity>
           </View>
 
           <View
@@ -2081,6 +2223,49 @@ const defaultInTimeAppliedRef = useRef(false);
 export default CreateInProcessUI;
 
 const styles = StyleSheet.create({
+  barcodeContainer: {
+    padding: 20,
+    borderRadius: 10,
+    marginTop: hp('2%'),
+    borderColor: 'grey',
+    borderWidth: 1,
+  },
+  actionButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 6,
+    elevation: 3,
+  },
+  actionButtonText: {
+    color: '#fff',
+    fontWeight: '600',
+    fontSize: 16,
+  },
+  dividerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: hp('2%'),
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: '#ddd',
+  },
+  dividerText: {
+    marginHorizontal: 10,
+    color: '#888',
+    fontSize: 14,
+  },
+  scanButton: {
+    paddingVertical: 12,
+    borderRadius: 6,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 3,
+    alignSelf: 'center',
+    width: '50%',
+  },
   popSearchViewStyle: {
     height: hp('40%'),
     width: wp('90%'),

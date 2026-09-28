@@ -23,6 +23,7 @@ let searchImg = require('./../../../../assets/images/png/searchIcon.png');
 let editImg = require('./../../../../assets/images/png/edit.png');
 let deleteImg = require('./../../../../assets/images/png/delete.webp');
 let pdfImg = require('./../../../../assets/images/png/pdf2.png');
+let barcodeImg = require('./../../../../assets/images/png/barcode_download.png');
 
 const EyeIcon = () => (
   <Svg width={17} height={17} viewBox="0 0 24 24" fill="none">
@@ -40,7 +41,10 @@ const EyeIcon = () => (
 // Builds the visible action buttons for a row (Edit/Delete are conditional)
 // and lays them out: 4 buttons -> 2x2 grid; 3 buttons -> 2 then 1 (centered);
 // 2 buttons -> one per row, stacked top/bottom (centered), not side by side.
-const buildActionRows = (item, {editRow, viewRow, downloadPDF, deleteRow}) => {
+const buildActionRows = (
+  item,
+  {editRow, viewRow, downloadPDF, downloadBarcode, deleteRow},
+) => {
   const buttons = [];
 
   if (Number(item.isEdit) === 0) {
@@ -70,6 +74,18 @@ const buildActionRows = (item, {editRow, viewRow, downloadPDF, deleteRow}) => {
       <Image source={pdfImg} style={{width: 30, height: 30, resizeMode: 'contain'}} />
     </TouchableOpacity>,
   );
+
+  // Barcode label only exists once the batch is submitted (isEdit 1).
+  if (Number(item.isEdit) === 1) {
+    buttons.push(
+      <TouchableOpacity
+        key="barcode"
+        onPress={() => downloadBarcode(item)}
+        style={styles.iconOnlyButton}>
+        <Image source={barcodeImg} style={{width: 26, height: 26, resizeMode: 'contain'}} />
+      </TouchableOpacity>,
+    );
+  }
 
   // No permission system for this module yet (mobile API never returns
   // menuPrivileges) — delete access is assumed for everyone for now; the
@@ -191,6 +207,13 @@ const BatchCreationListUI = ({route, ...props}) => {
     [props.downloadBatchCreationPDF],
   );
 
+  const downloadBarcode = useCallback(
+    item => {
+      props.downloadBatchCreationBarcode(item);
+    },
+    [props.downloadBatchCreationBarcode],
+  );
+
   const renderItem = useCallback(
     ({item}) => (
       <View style={CommonStyles.cellBackViewStyle}>
@@ -213,7 +236,13 @@ const BatchCreationListUI = ({route, ...props}) => {
             {item.batchCreationDate}
           </Text>
           <View style={styles.colAction}>
-            {buildActionRows(item, {editRow, viewRow, downloadPDF, deleteRow}).map((row, rowIndex) => (
+            {buildActionRows(item, {
+              editRow,
+              viewRow,
+              downloadPDF,
+              downloadBarcode,
+              deleteRow,
+            }).map((row, rowIndex) => (
               <View
                 key={rowIndex}
                 style={[styles.actionRow, row.centered && styles.actionRowCenter]}>
@@ -224,7 +253,7 @@ const BatchCreationListUI = ({route, ...props}) => {
         </View>
       </View>
     ),
-    [editRow, viewRow, deleteRow, downloadPDF],
+    [editRow, viewRow, deleteRow, downloadPDF, downloadBarcode],
   );
 
   // Each aaData row is a batch-detail row, not a batch — `id` is the parent
@@ -418,7 +447,7 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     elevation: 6,
   },
-  // PDF/Delete are icon-only — no circular background/shadow like Edit/View.
+  // PDF/Barcode/Delete are icon-only — no circular background/shadow like Edit/View.
   iconOnlyButton: {
     width: 32,
     height: 32,

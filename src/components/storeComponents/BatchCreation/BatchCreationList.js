@@ -8,6 +8,23 @@ import ReactNativeBlobUtil from 'react-native-blob-util';
 
 import BatchCreationListUI from './BatchCreationListUI';
 
+// Debug helper: first bytes of an arraybuffer response as text, so a JSON
+// error body (or an HTML error page) is readable in the logs.
+const decodeArrayBufferStart = (data, max = 500) => {
+  try {
+    if (!data) return data;
+    if (typeof data === 'string') return data.slice(0, max);
+    const bytes = new Uint8Array(data).slice(0, max);
+    let text = '';
+    for (let i = 0; i < bytes.length; i++) {
+      text += String.fromCharCode(bytes[i]);
+    }
+    return text;
+  } catch (e) {
+    return `<could not decode: ${e?.message}>`;
+  }
+};
+
 const BatchCreationList = ({navigation, route, ...props}) => {
   const [itemsArray, set_itemsArray] = useState([]);
   const [isLoading, set_isLoading] = useState(false);
@@ -246,24 +263,68 @@ const BatchCreationList = ({navigation, route, ...props}) => {
     }
   };
 
-  const downloadBatchCreationPDF = useCallback(
-    async item => {
+  // Shared by the PDF and Barcode actions — both endpoints take the same
+  // body (plus extraBody) and return raw PDF bytes.
+  const downloadBatchFile = useCallback(
+    async (item, apiUrl, filePrefix, extraBody = {}) => {
       const {userName, userPsd} = await loadCredentials();
       set_MainLoading(true);
       const obj = {
         username: userName,
         password: userPsd,
         batchDetailsId: item?.batchDetailsId,
+        ...extraBody,
       };
-      const apiUrl = APIServiceCall.downloadBatchCreationPdf();
+      const logTag = `[BatchCreation][${filePrefix}]`;
+      // Which step we're on, so the catch block can say where it failed.
+      let stage = 'request';
       try {
+        console.log(
+          `${logTag} POST`,
+          apiUrl,
+          'body =',
+          JSON.stringify({...obj, password: obj.password ? '***' : obj.password}),
+        );
         const response = await axios.post(apiUrl, obj, {
           headers: {'Content-Type': 'application/json'},
           responseType: 'arraybuffer',
         });
+        stage = 'read-response';
+        console.log(
+          `${logTag} response status =`,
+          response?.status,
+          'content-type =',
+          response?.headers?.['content-type'],
+          'content-disposition =',
+          response?.headers?.['content-disposition'],
+          'data byteLength =',
+          response?.data?.byteLength,
+        );
         const base64Data = response?.request?._response;
+        console.log(
+          `${logTag} base64 (request._response) typeof =`,
+          typeof base64Data,
+          'length =',
+          base64Data?.length,
+          'first 60 chars =',
+          typeof base64Data === 'string' ? base64Data.slice(0, 60) : base64Data,
+        );
+        // A real PDF's base64 starts with "JVBERi" ("%PDF-").
+        if (typeof base64Data !== 'string' || !base64Data.startsWith('JVBERi')) {
+          console.log(
+            `${logTag} WARNING: response does not look like a PDF — decoded start =`,
+            decodeArrayBufferStart(response?.data),
+          );
+        }
         if (Platform.OS === 'android') {
+          stage = 'permission';
           const hasPermission = await requestStoragePermission();
+          console.log(
+            `${logTag} storage permission granted =`,
+            hasPermission,
+            'Platform.Version =',
+            Platform.Version,
+          );
           if (!hasPermission) {
             Alert.alert(
               'Permission Denied',
@@ -272,14 +333,43 @@ const BatchCreationList = ({navigation, route, ...props}) => {
             return;
           }
         }
-        const pdfPath =
-          Platform.OS === 'android'
-            ? `/storage/emulated/0/Download/BatchCreation_${item?.batchDetailsId}.pdf`
-            : `${ReactNativeBlobUtil.fs.dirs.DocumentDir}/BatchCreation_${item?.batchDetailsId}.pdf`;
-        await ReactNativeBlobUtil.fs.writeFile(pdfPath, base64Data, 'base64');
+        const fileName = `${filePrefix}_${item?.batchDetailsId}.pdf`;
+        let savedLocation;
+        stage = 'write-file';
+        if (Platform.OS === 'android' && Platform.Version >= 29) {
+          // Scoped storage (Android 10+): a raw write to
+          // /storage/emulated/0/Download fails with ENOENT when a file of
+          // that name already exists but isn't owned by this install. Write
+          // to the app cache, then copy into Downloads through MediaStore
+          // (which picks a free name instead of failing).
+          const cachePath = `${ReactNativeBlobUtil.fs.dirs.CacheDir}/${fileName}`;
+          console.log(`${logTag} writing temp file to`, cachePath);
+          await ReactNativeBlobUtil.fs.writeFile(cachePath, base64Data, 'base64');
+          stage = 'copy-to-mediastore';
+          const contentUri =
+            await ReactNativeBlobUtil.MediaCollection.copyToMediaStore(
+              {name: fileName, parentFolder: '', mimeType: 'application/pdf'},
+              'Download',
+              cachePath,
+            );
+          console.log(`${logTag} copied to MediaStore Downloads, uri =`, contentUri);
+          ReactNativeBlobUtil.fs
+            .unlink(cachePath)
+            .catch(e => console.log(`${logTag} temp file cleanup failed`, e?.message));
+          savedLocation = `Downloads (${fileName})`;
+        } else {
+          const pdfPath =
+            Platform.OS === 'android'
+              ? `/storage/emulated/0/Download/${fileName}`
+              : `${ReactNativeBlobUtil.fs.dirs.DocumentDir}/${fileName}`;
+          console.log(`${logTag} writing file to`, pdfPath);
+          await ReactNativeBlobUtil.fs.writeFile(pdfPath, base64Data, 'base64');
+          console.log(`${logTag} file written OK`, pdfPath);
+          savedLocation = pdfPath;
+        }
         popUpAction(
           Platform.OS === 'android'
-            ? `PDF saved successfully at ${pdfPath}`
+            ? `PDF saved successfully at ${savedLocation}`
             : 'PDF saved successfully',
           Constant.DefaultAlert_MSG,
           'OK',
@@ -287,7 +377,26 @@ const BatchCreationList = ({navigation, route, ...props}) => {
           false,
         );
       } catch (error) {
-        console.error('Error generating or saving PDF:', error);
+        console.error(`${logTag} Error generating or saving PDF at stage "${stage}":`, error);
+        console.log(`${logTag} error.message =`, error?.message, 'error.code =', error?.code);
+        if (error?.response) {
+          // HTTP error from the server (401/400/500) — the body is an
+          // ArrayBuffer because of responseType, so decode it to read the
+          // server's {status,message}.
+          console.log(
+            `${logTag} error.response.status =`,
+            error.response.status,
+            'content-type =',
+            error.response.headers?.['content-type'],
+            'body =',
+            decodeArrayBufferStart(error.response.data),
+          );
+        } else if (error?.request) {
+          console.log(
+            `${logTag} no response received (network/timeout/cleartext?) — request status =`,
+            error.request?.status,
+          );
+        }
         popUpAction(
           Constant.SERVICE_FAIL_PDF_MSG,
           Constant.DefaultAlert_MSG,
@@ -300,6 +409,27 @@ const BatchCreationList = ({navigation, route, ...props}) => {
       }
     },
     [loadCredentials, popUpAction],
+  );
+
+  const downloadBatchCreationPDF = useCallback(
+    item =>
+      downloadBatchFile(
+        item,
+        APIServiceCall.downloadBatchCreationPdf(),
+        'BatchCreation',
+      ),
+    [downloadBatchFile],
+  );
+
+  const downloadBatchCreationBarcode = useCallback(
+    item =>
+      downloadBatchFile(
+        item,
+        APIServiceCall.downloadBatchCreationBarcode(),
+        'BC_Barcode',
+        {menuId: 571},
+      ),
+    [downloadBatchFile],
   );
 
   return (
@@ -319,6 +449,7 @@ const BatchCreationList = ({navigation, route, ...props}) => {
       fetchMore={getInitialData}
       MainLoading={MainLoading}
       downloadBatchCreationPDF={downloadBatchCreationPDF}
+      downloadBatchCreationBarcode={downloadBatchCreationBarcode}
     />
   );
 };

@@ -144,6 +144,8 @@ const CreateStockIssueUI = props => {
   const barcodesRef = useRef([]);  // ✅ always has latest value
   const scannedBarcodes = useRef(new Map());
   const scannedBarcodesForItem = useRef(new Map());
+  // Fabric only: rowKey -> {styleRemain, defaultRemain, entries: [{barcode, scanText, qty, flag}]}
+  const fabricStateRef = useRef(new Map());
 
 
 
@@ -223,12 +225,126 @@ const CreateStockIssueUI = props => {
     [inHouse, customer],
   );
 
+  // ─── Fabric scan helpers ──────────────────────────────────────────────────
+
+  const rowKey = r => r.itemId + '_' + (r.sizeId ? r.sizeId : '');
+  const round2 = n => Math.round((Number(n) || 0) * 100) / 100;
+  const isFabricRow = r => String(r?.type ?? '').trim().toLowerCase() === 'fabric';
+  // lotWise comes from the stockIssueCreateApi response; missing means not lot-wise
+  const isLotWise = () => Number(props.lists?.lotWise) === 1;
+
+  const confirmExceed = () =>
+    new Promise(resolve => {
+      Alert.alert(
+        'Alert',
+        'Current scanning qty exceeds the required qty, are you sure to proceed?',
+        [
+          {text: 'Cancel', style: 'cancel', onPress: () => resolve(false)},
+          {text: 'OK', onPress: () => resolve(true)},
+        ],
+        {cancelable: false},
+      );
+    });
+
+  /** Running Style/Default remaining figures start at the row's available qtys */
+  const getFabricState = row => {
+    const key = rowKey(row);
+    let st = fabricStateRef.current.get(key);
+    if (!st) {
+      st = {
+        styleRemain: round2(row.styleavailQty),
+        defaultRemain: round2(row.defaultavailQty),
+        entries: [],
+      };
+      fabricStateRef.current.set(key, st);
+    }
+    return st;
+  };
+
+  const fabricIssuedQty = st => round2(st.entries.reduce((sum, e) => sum + e.qty, 0));
+
+  const setScannedBarcodeTexts = list => {
+    barcodesRef.current = list;
+    setUniqueBarcodes(list);
+  };
+
+  /** Pushes a fabric row's entries into barcodedetails and the row's Issued Qty */
+  const syncFabricRow = (key, extra = {}) => {
+    const st = fabricStateRef.current.get(key);
+    const entries = st?.entries ?? [];
+    const issuedQty = st ? fabricIssuedQty(st) : 0;
+    if (entries.length > 0) {
+      scannedBarcodesForItem.current.set(
+        key,
+        entries.map(e => e.barcode + '_' + e.qty + '_' + e.flag),
+      );
+    } else {
+      scannedBarcodesForItem.current.delete(key);
+    }
+    scannedBarcodes.current.set(key, issuedQty);
+    setRows(prev =>
+      prev.map(r =>
+        rowKey(r) === key
+          ? {...r, issuedQty, editable: false, barcode: entries[entries.length - 1]?.barcode ?? '', ...extra}
+          : r,
+      ),
+    );
+  };
+
+  /**
+   * rollData for the save: "fabricLineItemId:qty:fabricRollNo" per entry, built from the
+   * same entries (same order, same qty) as barcodedetails so the backend can pair them by position.
+   */
+  const buildFabricRollData = key => {
+    const entries = fabricStateRef.current.get(key)?.entries ?? [];
+    return entries
+      .map(e => {
+        if (e.fabricLineItemId == null || e.fabricRollNo == null) {
+          console.warn('rollData: missing fabricLineItemId/fabricRollNo for barcode', e.barcode, e);
+        }
+        return (e.fabricLineItemId ?? '') + ':' + e.qty + ':' + (e.fabricRollNo ?? '');
+      })
+      .join(',');
+  };
+
+  /** Gives a fabric row's scanned qtys back to its stock and clears its barcodes */
+  const releaseFabricRow = key => {
+    const st = fabricStateRef.current.get(key);
+    if (!st) return;
+    const texts = st.entries.map(e => e.scanText);
+    st.entries.forEach(e => {
+      if (e.flag === 0) st.styleRemain = round2(st.styleRemain + e.qty);
+      else st.defaultRemain = round2(st.defaultRemain + e.qty);
+    });
+    st.entries = [];
+    setScannedBarcodeTexts(barcodesRef.current.filter(b => !texts.includes(b)));
+    scannedBarcodes.current.delete(key);
+    syncFabricRow(key, {editable: true});
+    if (lastScannedBarcodeRef.current?.isFabric && lastScannedBarcodeRef.current.rowKey === key) {
+      setLastScannedBarcode({});
+    }
+  };
+
+  /** Drops all fabric scan state (rows are being replaced) */
+  const resetFabricState = () => {
+    const texts = [];
+    fabricStateRef.current.forEach((st, key) => {
+      st.entries.forEach(e => texts.push(e.scanText));
+      scannedBarcodesForItem.current.delete(key);
+      scannedBarcodes.current.delete(key);
+    });
+    fabricStateRef.current = new Map();
+    setScannedBarcodeTexts(barcodesRef.current.filter(b => !texts.includes(b)));
+    if (lastScannedBarcodeRef.current?.isFabric) setLastScannedBarcode({});
+  };
+
   // ─── Handlers ─────────────────────────────────────────────────────────────
 
   const onLocationSelect = async item => {
     setLocationId(item.id);
     setLocationName(item.name);
     setShowLocationList(false);
+    resetFabricState();
 
     const list = await props.onLocationChanges(item.id);
     setWorkOrdersList(list ?? []);
@@ -244,6 +360,7 @@ const CreateStockIssueUI = props => {
     setWorkOrderName(item.wo_val);
     setShowWorkOrderList(false);
     setSelectedIdxs([]);
+    resetFabricState();
     const list = await props.getTrimValuesByWo(item.wo_id, locationId)
     if(list) {
       list.forEach(element => {
@@ -368,18 +485,24 @@ const CreateStockIssueUI = props => {
       woId: workOrderId || 0,
       items: []
     }
-    const particulars = rows.map(item => ({
-      styleId: item.styleId,
-      lotId: 0,
-      bpId: 0,
-      itemId: item.itemId,
-      qty: Number(item.issuedQty || 0),
-      barcodedetails: (
-        scannedBarcodesForItem.current.get(item.itemId +"_"+ (item.sizeId?item.sizeId:'')) ?? []
-      ).join(','),
-      sizeId: item.sizeId || 0,
-      type: item.type,
-    }));
+    const particulars = rows.map(item => {
+      const particular = {
+        styleId: item.styleId,
+        lotId: 0,
+        bpId: 0,
+        itemId: item.itemId,
+        qty: Number(item.issuedQty || 0),
+        barcodedetails: (
+          scannedBarcodesForItem.current.get(item.itemId +"_"+ (item.sizeId?item.sizeId:'')) ?? []
+        ).join(','),
+        sizeId: item.sizeId || 0,
+        type: item.type,
+      };
+      if (isFabricRow(item)) {
+        particular.rollData = buildFabricRollData(rowKey(item));
+      }
+      return particular;
+    });
     submitObj.items = particulars;
 
     props.submitAction(submitObj);
@@ -389,6 +512,9 @@ const CreateStockIssueUI = props => {
 
 
   const toggleSelection = item => {
+    if (isFabricRow(item) && selectedIdxs.includes(rowKey(item))) {
+      releaseFabricRow(rowKey(item));
+    }
     setSelectedIdxs(prevIds => {
       const key = item.itemId+"_"+(item.sizeId?item.sizeId:'')
       let updated;
@@ -426,14 +552,21 @@ const CreateStockIssueUI = props => {
         : [...selectedIdxs, ...ids];
         setSelectAllCheckBox(!selectAllCheckBox);
       console.log('selectallcheckbox after', selectAllCheckBox);
+      if (selectAllCheckBox) {
+        rows.forEach(row => {
+          if (isFabricRow(row)) releaseFabricRow(rowKey(row));
+        });
+      }
       let lessAvailQty = false;
       if(newSelected.length>0) {
         rows.forEach(row => {
-          if(row.styleavailQty <= 0) {
+          // Scanned fabric rows keep their barcode-based Issued Qty
+          const hasFabricScans = isFabricRow(row) && fabricStateRef.current.get(rowKey(row))?.entries.length > 0;
+          if(row.styleavailQty <= 0 && !hasFabricScans) {
             newSelected = newSelected.filter(id => id !== row.itemId+"_"+(row.sizeId?row.sizeId:''));
             lessAvailQty = true;
           }
-          if(newSelected.includes(row.itemId+"_"+(row.sizeId?row.sizeId:''))) {
+          if(newSelected.includes(row.itemId+"_"+(row.sizeId?row.sizeId:'')) && !hasFabricScans) {
             if(row?.styleavailQty<row?.allowQty) {
               row.issuedQty = row?.styleavailQty;
             } else {
@@ -511,6 +644,10 @@ const CreateStockIssueUI = props => {
         Alert.alert('Alert', 'This barcode is Scanned!!');
         return;
       }
+      if (!text.trim().startsWith('12345')) {
+        await handleFabricScan(text.trim());
+        return;
+      }
       const parts = workOrderId.toString().split('_');
       const styleId = parts[0]?.trim();
     
@@ -531,17 +668,6 @@ const CreateStockIssueUI = props => {
       console.log('barcodeDetails ==>', barcodeDetails);
       barcodeDetails.editQty = barcodeDetails.qty
       barcodeDetails.sizeId = barcodeDetails.scaleId!==0?barcodeDetails.scaleId+'':''
-      if (!text.startsWith('12345') && text!==lastScannedBarcode?.itemGeneratedBarcode) {
-        barcodeDetails = {
-          itemId: barcodeDetails.fabricId || 0,
-          itemGeneratedBarcode: barcodeDetails.fmlgeneratedbarcode || '0',
-          qty: barcodeDetails.rollwiseQty || 0,
-          styleId: barcodeDetails.styleId || 0,
-          editQty: barcodeDetails.rollwiseQty || 0,
-          sizeId: ''
-        };
-      }
-    // fabricId, fmlgeneratedbarcode, rollwiseQty
       // Bug 4 fix — guard matchedRow
       const matchedRow = rows.find(r => r.itemId+"_"+(r.sizeId?r.sizeId:'') === barcodeDetails.itemId+"_"+(barcodeDetails.sizeId?barcodeDetails.sizeId:''));
       if (!matchedRow) {
@@ -596,6 +722,91 @@ const CreateStockIssueUI = props => {
       });
     };
 
+    /**
+     * Fabric roll scan. The backend only matches location + barcode, so the
+     * row / style / lot checks are done here. Stock is taken from Style (flag 0)
+     * for a style roll while Style remains, otherwise from Default (flag 1).
+     */
+    const handleFabricScan = async text => {
+      const parts = workOrderId.toString().split('_');
+      const woStyleId = Number(parts[0]?.trim()) || 0;
+
+      const res = await props.getBarcodeDetails({
+        location: Number(locationId) || 0,
+        styleId: woStyleId,
+        barcode: text,
+      });
+      if (!res) return;
+      console.log('fabric barcodeDetails ==>', res);
+
+      const rollStyleId = Number(res.styleid ?? res.styleId) || 0;
+      const batchId = Number(res.batchId) || 0;
+      const lotOk = isLotWise() ? batchId > 0 : batchId === 0;
+
+      const row = rows.find(
+        r =>
+          isFabricRow(r) &&
+          Number(r.itemId) === Number(res.fabricId) &&
+          (rollStyleId === 0 || rollStyleId === woStyleId) &&
+          lotOk,
+      );
+      if (!row || !res.fabricId) {
+        Alert.alert('Alert', 'Invalid barcode');
+        return;
+      }
+
+      const key = rowKey(row);
+      const st = getFabricState(row);
+      const useStyle = rollStyleId > 0 && st.styleRemain > 0;
+      const flag = useStyle ? 0 : 1;
+      const remain = useStyle ? st.styleRemain : st.defaultRemain;
+      if (remain <= 0) {
+        Alert.alert(
+          'Alert',
+          rollStyleId > 0
+            ? 'Style and Default Available Qty is Zero! Scan failed!'
+            : 'Default Available Qty is Zero! Scan failed!',
+        );
+        return;
+      }
+
+      let qty = round2(Math.min(Number(res.rollwiseQty) || 0, remain));
+      const issued = fabricIssuedQty(st);
+      const allowQty = round2(row.allowQty);
+      if (issued + qty > allowQty) {
+        const proceed = await confirmExceed();
+        if (!proceed) qty = round2(Math.min(qty, allowQty - issued));
+      }
+      if (qty <= 0) return;
+
+      const barcode = res.fmlgeneratedbarcode || text;
+      const {fabricLineItemId, fabricRollNo} = res; // for rollData
+      st.entries.push({barcode, scanText: text, qty, flag, fabricLineItemId, fabricRollNo});
+      if (useStyle) st.styleRemain = round2(st.styleRemain - qty);
+      else st.defaultRemain = round2(st.defaultRemain - qty);
+      syncFabricRow(key);
+
+      setLastScannedBarcode({
+        isFabric: true,
+        rowKey: key,
+        itemId: row.itemId,
+        sizeId: row.sizeId ? row.sizeId : '',
+        itemGeneratedBarcode: barcode,
+        scanText: text,
+        flag,
+        fabricLineItemId,
+        fabricRollNo,
+        qty,
+        rollQty: round2(res.rollwiseQty), // barcode's full qty: upper limit for editing
+        editQty: qty,
+      });
+      setScannedBarcodeTexts([...barcodesRef.current, text]);
+      setSelectedIdxs(prevs => {
+        const safeIds = prevs ?? [];
+        return safeIds.includes(key) ? safeIds : [...safeIds, key];
+      });
+    };
+
 useEffect(() => {
   console.log('uniqueBarcodes updated:', uniqueBarcodes);
 }, [uniqueBarcodes]);
@@ -632,8 +843,93 @@ useEffect(() => {
   lastScannedBarcodeRef.current = lastScannedBarcode;
 }, [lastScannedBarcode]);
 
+/**
+ * Fabric: edits the last scanned roll's qty against the stock (flag) it came from.
+ * Runs when editing ends (not per keystroke) so the exceed confirm shows once.
+ * Qty 0 removes the entry; typing a qty again re-adds it.
+ */
+const fabricEditBusyRef = useRef(false);
+const handleEditFabricQty = async text => {
+  if (fabricEditBusyRef.current) return;
+  const cur = lastScannedBarcodeRef.current;
+  const st = fabricStateRef.current.get(cur.rowKey);
+  const row = rows.find(r => rowKey(r) === cur.rowKey);
+  if (!st || !row) return;
+
+  const idx = st.entries.findIndex(e => e.scanText === cur.scanText);
+  if (idx < 0 && barcodesRef.current.includes(cur.scanText)) return;
+  const oldQty = idx >= 0 ? st.entries[idx].qty : 0;
+  const revert = () => setLastScannedBarcode(prev => ({...prev, editQty: String(oldQty)}));
+
+  const parsedQty = text === '' || text === null || text === undefined ? 0 : parseFloat(text);
+  if (isNaN(parsedQty) || parsedQty < 0) {
+    revert();
+    return;
+  }
+  let newQty = round2(parsedQty);
+  if (newQty === oldQty) return;
+
+  if (newQty > (cur.rollQty ?? cur.qty)) {
+    Alert.alert('Qty Exceeding', 'Entered Qty cannot exceed barcode Qty');
+    revert();
+    return;
+  }
+  const remainKey = cur.flag === 0 ? 'styleRemain' : 'defaultRemain';
+  if (newQty - oldQty > st[remainKey]) {
+    Alert.alert(
+      'Qty Exceeding',
+      cur.flag === 0
+        ? 'Entered Qty leading to exceed Style Available Qty'
+        : 'Entered Qty leading to exceed Default Available Qty',
+    );
+    revert();
+    return;
+  }
+  const otherIssued = round2(fabricIssuedQty(st) - oldQty);
+  const allowQty = round2(row.allowQty);
+  if (newQty > oldQty && otherIssued + newQty > allowQty) {
+    fabricEditBusyRef.current = true;
+    const proceed = await confirmExceed();
+    fabricEditBusyRef.current = false;
+    if (!proceed) {
+      // Cap so Issued equals the required qty; if the other barcodes already reach it, keep the old qty
+      const toRequired = round2(allowQty - otherIssued);
+      newQty = toRequired > 0 ? toRequired : oldQty;
+      if (newQty === oldQty) {
+        revert();
+        return;
+      }
+    }
+  }
+
+  st[remainKey] = round2(st[remainKey] - (newQty - oldQty));
+  if (newQty === 0) {
+    if (idx >= 0) st.entries.splice(idx, 1);
+    setScannedBarcodeTexts(barcodesRef.current.filter(b => b !== cur.scanText));
+  } else if (idx >= 0) {
+    st.entries[idx] = {...st.entries[idx], qty: newQty};
+  } else {
+    st.entries.push({
+      barcode: cur.itemGeneratedBarcode,
+      scanText: cur.scanText,
+      qty: newQty,
+      flag: cur.flag,
+      fabricLineItemId: cur.fabricLineItemId,
+      fabricRollNo: cur.fabricRollNo,
+    });
+    setScannedBarcodeTexts([...barcodesRef.current, cur.scanText]);
+  }
+  syncFabricRow(cur.rowKey);
+  setLastScannedBarcode(prev => ({...prev, editQty: newQty === parsedQty ? text : String(newQty)}));
+};
+
 const handleEditScannedQty = (qty) => {
   const currentBarcode = lastScannedBarcodeRef.current; // ✅ always fresh
+  if (currentBarcode?.isFabric) {
+    // Only keep the typed text; handleEditFabricQty applies it on end editing
+    setLastScannedBarcode(prev => ({...prev, editQty: qty}));
+    return;
+  }
 
   if (qty === '' || qty === null) {
     setLastScannedBarcode(prev => ({ ...prev, editQty: 0 }));
@@ -895,6 +1191,11 @@ const handleEditScannedQty = (qty) => {
               label="Edit Barcode Qty"
               value={lastScannedBarcode ? lastScannedBarcode.editQty?.toString() : '0'}
               onChangeText={qty => handleEditScannedQty(qty)}
+              onEndEditing={() => {
+                if (lastScannedBarcodeRef.current?.isFabric) {
+                  handleEditFabricQty(lastScannedBarcodeRef.current.editQty);
+                }
+              }}
               keyboardType="decimal-pad"
               mode="outlined"
             />

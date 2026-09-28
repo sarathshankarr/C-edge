@@ -55,6 +55,17 @@ export async function loginUserAPIService(jsonValue) {
 
     const data = await response.json();
     // console.log('loginUserAPIService Response ', data);
+    // COMPANY_DEBUG: temporary -- traces the company-related fields as they
+    // exist in the RAW /logIn response, before loginComponent.js does
+    // anything with them. Compare this against the COMPANY_DEBUG logs in
+    // loginComponent.js (what gets written to AsyncStorage) and
+    // CommonHeader.js (what gets read back) to find where the value drops.
+    console.log('COMPANY_DEBUG raw /logIn response company fields ==>', JSON.stringify({
+      company: data?.company,
+      companyMap: data?.companyMap,
+      usercompanyId: data?.usercompanyId,
+      companyIds: data?.companyIds,
+    }));
 
     if (data && data.passwordStatus) {
       statusData = data.passwordStatus;
@@ -6587,6 +6598,67 @@ export async function getBatchDetailsByBatchId(jsonValue) {
       console.log('getBatchDetailsByBatchId error ', error);
       returnError = error;
     });
+
+  obj = {
+    logoutData: logoutData,
+    statusData: statusData,
+    responseData: responseData,
+    error: returnError,
+    isInternet: internet,
+  };
+  return obj;
+}
+// Resolves a scanned Batch Creation barcode to its batchCreationId. Unlike the
+// older fabricprocessinapi endpoints this returns a real 401/500 with a JSON
+// {status,message} body, so the body is parsed regardless of HTTP status.
+export async function getBatchByBarcode(jsonValue) {
+  let returnError = undefined;
+  let statusData = undefined;
+  let responseData = undefined;
+  let logoutData = false;
+  let obj = undefined;
+
+  let internet = await internetCheck();
+  if (!internet) {
+    obj = {
+      logoutData: logoutData,
+      statusData: statusData,
+      responseData: responseData,
+      error: returnError,
+      isInternet: internet,
+    };
+    return obj;
+  }
+  console.log('URL', Environment.uri + 'fabricprocessinapi/apiBatchByBarcode');
+  try {
+    const response = await fetch(
+      Environment.uri + 'fabricprocessinapi/apiBatchByBarcode',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify(jsonValue),
+      },
+    );
+    const rawText = await response.text();
+    let data;
+    try {
+      data = rawText ? JSON.parse(rawText) : undefined;
+    } catch (parseErr) {
+      console.log('getBatchByBarcode non-JSON response ', rawText?.slice(0, 300));
+    }
+    if (response.ok && data) {
+      statusData = true;
+      responseData = data;
+    } else {
+      returnError = {status: response.status, message: data?.message};
+    }
+  } catch (error) {
+    console.log('getBatchByBarcode error ', error);
+    returnError = error;
+  }
 
   obj = {
     logoutData: logoutData,
@@ -14699,5 +14771,12 @@ export async function deleteBatchCreationApi(jsonValue) {
 
 export const downloadBatchCreationPdf = () => {
   const URL = Environment.uri + 'batchCreation/pdf';
+  return URL;
+};
+
+// Barcode label PDF — same request/response shape as batchCreation/pdf, but
+// the body also needs menuId 571 (selects the barcode number series).
+export const downloadBatchCreationBarcode = () => {
+  const URL = Environment.uri + 'batchCreation/barcode';
   return URL;
 };
