@@ -123,7 +123,7 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
         set_lotNo(props.itemsObj.fpt_lot_no);
       }
       if (props.itemsObj.fpt_roll_trolley) {
-        set_rollNo(props.itemsObj.fpt_roll_trolley);
+        set_rollNo(String(props.itemsObj.fpt_roll_trolley));
       }
       if (props.itemsObj.fpt_issued) {
         set_fabricIssued(props.itemsObj.fpt_issued);
@@ -338,7 +338,8 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
           : fabricProcessed,
       fpt_fabric_rejected: props?.itemsObj?.fpt_fabric_rejected,
       fpt_ph: props?.itemsObj?.fpt_ph,
-      fpt_roll_trolley: props?.itemsObj?.fpt_roll_trolley,
+      // The field's current value (never null) so Roll/Trolley edits are saved.
+      fpt_roll_trolley: rollNo ?? '',
       fpt_partyno: props?.itemsObj?.fpt_partyno,
       previousqty: props?.itemsObj?.fpt_issued,
       inmenuId: props?.itemsObj?.fpt_menuIn_id,
@@ -916,9 +917,16 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
             />
           </View>
 
+          {/* Input takes the remaining width; the already-processed bubble
+              sits beside it (not overlapping) as a flex sibling. */}
           <View
-            style={{marginTop: hp('2%'), flexDirection: 'row', width: '95%'}}>
-            <View style={{width: '80%'}}>
+            style={{
+              marginTop: hp('2%'),
+              flexDirection: 'row',
+              alignItems: 'center',
+              width: '95%',
+            }}>
+            <View style={{flex: 1}}>
               <TextInput
                 label="Fabric Processed "
                 value={fabricProcessed}
@@ -927,24 +935,21 @@ const SaveFabricProcessInUI = ({route, navigation, ...props}) => {
                 onChangeText={text => set_fabricProcessed(text)}
               />
             </View>
-            <View style={{position: 'relative'}}>
-              <Text
-                style={{
-                  backgroundColor: colors.color2,
-                  color: 'white',
-                  padding: 3,
-                  paddingHorizontal: 10,
-                  borderRadius: Platform.OS === 'ios' ? 12 : 30,
-                  overflow: 'hidden',
-                  position: 'absolute',
-                  left: -10,
-                  bottom: 15,
-                }}>
-                {props?.itemsObj?.fpt_fabricProcessed
-                  ? props?.itemsObj?.fpt_fabricProcessed.toString()
-                  : '0'}
-              </Text>
-            </View>
+            <Text
+              style={{
+                marginLeft: 8,
+                marginTop: 6,
+                backgroundColor: colors.color2,
+                color: 'white',
+                padding: 3,
+                paddingHorizontal: 10,
+                borderRadius: Platform.OS === 'ios' ? 12 : 30,
+                overflow: 'hidden',
+              }}>
+              {props?.itemsObj?.fpt_fabricProcessed
+                ? props?.itemsObj?.fpt_fabricProcessed.toString()
+                : '0'}
+            </Text>
           </View>
 
           <View style={{marginTop: hp('2%'), width: '95%'}}>
