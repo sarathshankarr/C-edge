@@ -1,4 +1,4 @@
-import React, {useState, useCallback, useRef, useEffect} from 'react';
+import React, {useCallback} from 'react';
 import {
   View,
   StyleSheet,
@@ -6,10 +6,8 @@ import {
   Text,
   FlatList,
   Image,
-  TextInput,
   RefreshControl,
   ActivityIndicator,
-  Platform,
 } from 'react-native';
 import * as Constant from '../../../utils/constants/constant';
 import CommonStyles from '../../../utils/commonStyles/commonStyles';
@@ -18,8 +16,8 @@ import LoaderComponent from '../../../utils/commonComponents/loaderComponent';
 import AlertComponent from '../../../utils/commonComponents/alertComponent';
 import AddNewItem from '../../../utils/commonComponents/AddNewItem';
 import Svg, {Path, Circle} from 'react-native-svg';
+import ListSearchBar from '../../../utils/commonComponents/ListSearchBar';
 
-let searchImg = require('./../../../../assets/images/png/searchIcon.png');
 let editImg = require('./../../../../assets/images/png/edit.png');
 let deleteImg = require('./../../../../assets/images/png/delete.webp');
 let pdfImg = require('./../../../../assets/images/png/pdf2.png');
@@ -119,25 +117,7 @@ const buildActionRows = (
 };
 
 const BatchCreationListUI = ({route, ...props}) => {
-  const [filterArray, set_filterArray] = useState(undefined);
-  const [recName, set_recName] = useState('');
-  const [refreshing, set_refreshing] = useState(false);
-  const [ItemsArray, set_ItemsArray] = useState([]);
-
-  const debounceTimer = useRef(null);
-
-  useEffect(() => {
-    if (props.itemsArray) {
-      set_filterArray(props.itemsArray);
-      set_ItemsArray(props.itemsArray);
-    }
-  }, [props.itemsArray]);
-
-  useEffect(() => {
-    return () => {
-      if (debounceTimer.current) clearTimeout(debounceTimer.current);
-    };
-  }, []);
+  const list = props.list;
 
   const backBtnAction = useCallback(() => {
     props.backBtnAction();
@@ -146,38 +126,6 @@ const BatchCreationListUI = ({route, ...props}) => {
   const popOkBtnAction = useCallback(() => {
     props.popOkBtnAction();
   }, [props.popOkBtnAction]);
-
-  // Debounced client-side search — filters the already-loaded list 300ms
-  // after typing stops, matching the pattern used by every other list page.
-  const filterPets = useCallback(
-    name => {
-      set_recName(name);
-      if (debounceTimer.current) clearTimeout(debounceTimer.current);
-      debounceTimer.current = setTimeout(() => {
-        const searchTerm = name.toString().toLowerCase().trim();
-        if (searchTerm.length === 0) {
-          set_filterArray(ItemsArray);
-          return;
-        }
-        const styleArray = ItemsArray.filter(
-          item =>
-            item.batchNames?.toString().toLowerCase().includes(searchTerm) ||
-            item.lotNos?.toString().toLowerCase().includes(searchTerm) ||
-            item.batchCreationDate?.toString().toLowerCase().includes(searchTerm) ||
-            item.totalIssued?.toString().toLowerCase().includes(searchTerm),
-        );
-        set_filterArray(styleArray);
-      }, 300);
-    },
-    [ItemsArray],
-  );
-
-  const onRefresh = useCallback(() => {
-    set_refreshing(true);
-    set_recName('');
-    props.fetchMore();
-    set_refreshing(false);
-  }, [props.fetchMore]);
 
   const editRow = useCallback(
     item => {
@@ -264,10 +212,33 @@ const BatchCreationListUI = ({route, ...props}) => {
     [],
   );
 
-  const listFooter = useCallback(
-    () => (props.isLoading ? <ActivityIndicator size="large" /> : null),
-    [props.isLoading],
-  );
+  const renderEmpty = () => {
+    if (list.error) {
+      return (
+        <View style={CommonStyles.noRecordsFoundStyle}>
+          <Text
+            style={[
+              CommonStyles.tylesHeaderTextStyle,
+              {fontSize: 15, textAlign: 'center'},
+            ]}>
+            {list.error}
+          </Text>
+          <TouchableOpacity style={styles.retryBtn} onPress={list.retry}>
+            <Text style={{color: '#fff', fontWeight: '700'}}>{'Retry'}</Text>
+          </TouchableOpacity>
+        </View>
+      );
+    }
+    return (
+      <View style={CommonStyles.noRecordsFoundStyle}>
+        {!list.isLoading ? (
+          <Text style={[CommonStyles.tylesHeaderTextStyle, {fontSize: 18}]}>
+            {Constant.noRecFound}
+          </Text>
+        ) : null}
+      </View>
+    );
+  };
 
   return (
     <View style={[CommonStyles.mainComponentViewStyle]}>
@@ -284,48 +255,9 @@ const BatchCreationListUI = ({route, ...props}) => {
       </View>
 
       <View style={CommonStyles.headerStyle}>
-        {filterArray ? (
-          <View
-            style={{
-              flexDirection: 'row',
-              width: '100%',
-              marginBottom: 10,
-              alignItems: 'center',
-            }}>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                flex: 1,
-                borderWidth: 1,
-                borderColor: '#D1D1D1',
-                borderRadius: 20,
-                backgroundColor: '#F9F9F9',
-                paddingHorizontal: 15,
-                shadowColor: '#000',
-                shadowOffset: {width: 0, height: 2},
-                shadowOpacity: 0.1,
-                shadowRadius: 4,
-                elevation: 3,
-              }}>
-              <Image
-                source={searchImg}
-                style={{height: 18, width: 18, tintColor: '#7F7F81', marginRight: 10}}
-              />
-              <TextInput
-                style={[{flex: 1, color: '#000'}, Platform.OS === 'ios' && {paddingVertical: 12}]}
-                underlineColorAndroid="transparent"
-                placeholder="Search"
-                placeholderTextColor="#A0A0A0"
-                autoCapitalize="none"
-                value={recName}
-                onChangeText={filterPets}
-              />
-            </View>
-          </View>
-        ) : null}
+        <ListSearchBar list={list} />
 
-        {filterArray && filterArray.length > 0 ? (
+        {list.rows.length > 0 ? (
           <View style={[CommonStyles.listCommonHeader, styles.headerRow]}>
             <Text style={[CommonStyles.tylesHeaderTextStyle, styles.colBatchNo, {textAlign: 'left'}]}>
               {'Batch No'}
@@ -346,24 +278,28 @@ const BatchCreationListUI = ({route, ...props}) => {
             </Text>
           </View>
         ) : (
-          <View style={CommonStyles.noRecordsFoundStyle}>
-            {!props.MainLoading ? (
-              <Text style={[CommonStyles.tylesHeaderTextStyle, {fontSize: 18}]}>
-                {Constant.noRecFound}
-              </Text>
-            ) : null}
-          </View>
+          renderEmpty()
         )}
 
-        <View style={CommonStyles.listStyle}>
+        <View style={[CommonStyles.listStyle, {flex: 1, height: undefined}]}>
           <FlatList
-            data={filterArray}
+            ref={list.listRef}
+            data={list.rows}
             renderItem={renderItem}
             keyExtractor={keyExtractor}
             showsVerticalScrollIndicator={false}
-            ListFooterComponent={listFooter}
+            onEndReached={list.loadMore}
+            onScrollEndDrag={list.onScrollEnd}
+            onMomentumScrollEnd={list.onScrollEnd}
+            onEndReachedThreshold={0.2}
+            ListFooterComponent={
+              list.isLoadingMore ? <ActivityIndicator size="large" /> : null
+            }
             refreshControl={
-              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+              <RefreshControl
+                refreshing={list.isRefreshing}
+                onRefresh={() => list.refresh()}
+              />
             }
           />
         </View>
@@ -386,7 +322,7 @@ const BatchCreationListUI = ({route, ...props}) => {
         </View>
       ) : null}
 
-      {props.MainLoading === true ? (
+      {props.MainLoading === true || list.isLoading ? (
         <LoaderComponent
           isLoader={true}
           loaderText={Constant.LOADER_MESSAGE}
@@ -398,6 +334,13 @@ const BatchCreationListUI = ({route, ...props}) => {
 };
 
 const styles = StyleSheet.create({
+  retryBtn: {
+    marginTop: 12,
+    paddingHorizontal: 20,
+    paddingVertical: 8,
+    borderRadius: 20,
+    backgroundColor: '#26A69A',
+  },
   // Header row uses the same horizontal padding as each data row
   // (CommonStyles.cellBackViewStyle) so the Action column lines up exactly.
   headerRow: {

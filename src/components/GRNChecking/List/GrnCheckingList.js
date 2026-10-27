@@ -8,24 +8,31 @@ import * as Constant from '../../../utils/constants/constant';
 import {showGrnAlert} from '../common/GrnAlert';
 
 import GrnCheckingListUI from './GrnCheckingListUI';
+import useSearchablePagedList from '../../../utils/Hooks/useSearchablePagedList';
+import {MOBILE_LIST_CONFIG} from '../../../utils/constants/mobileListConfig';
 
 // The GRN Checking list menu id (menu_master_tbl.menu_id = 981, see
 // AI/CED-1626/sql/03_grn_checking_menu.sql) -- required by /list per
 // openapi.yaml (used server-side for the "Last 30 Days" day-limit lookup).
 const GRN_CHECKING_MENU_ID = 981;
-const PAGE_LENGTH = 20;
+
+// One PO can have one row per item type (keyExtractor below), so de-duplicate
+// pages by PO + item type instead of poNumber alone.
+const LIST_CONFIG = {
+  ...MOBILE_LIST_CONFIG.GRN_CHECKING,
+  menuId: GRN_CHECKING_MENU_ID,
+  uniqueKey: '_rowKey',
+};
+const mapRow = row => ({...row, _rowKey: `${row?.poNumber}_${row?.itemType}`});
 
 const GrnCheckingList = ({navigation, route, ...props}) => {
-  const [itemsArray, set_itemsArray] = useState([]);
-  const [isLoading, set_isLoading] = useState(false);
   const [isPopUp, set_isPopUp] = useState(false);
   const [popUpMessage, set_popUpMessage] = useState(undefined);
   const [popUpAlert, set_popUpAlert] = useState(undefined);
   const [popUpRBtnTitle, set_popUpRBtnTitle] = useState(undefined);
   const [isPopupLeft, set_isPopupLeft] = useState(false);
   const [MainLoading, set_MainLoading] = useState(false);
-  const [page, set_page] = useState(0);
-  const [hasMore, set_hasMore] = useState(true);
+  const isSessionExpired = useRef(false);
 
   const credentialsRef = useRef(null);
 
@@ -41,14 +48,24 @@ const GrnCheckingList = ({navigation, route, ...props}) => {
     return credentialsRef.current;
   }, []);
 
-  useEffect(() => {
-    loadCredentials().then(() => getInitialData(0, true));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const list = useSearchablePagedList(LIST_CONFIG, {
+    mapRow,
+    onInvalidLogin: () => {
+      isSessionExpired.current = true;
+      popUpAction(
+        'Session expired / invalid credentials. Please login again.',
+        Constant.DefaultAlert_MSG,
+        'OK',
+        true,
+        false,
+      );
+    },
+  });
 
+  // Returning from a check screen with {refresh}: reload page 1, keeping search and filter.
   useEffect(() => {
     if (route?.params?.refresh) {
-      getInitialData(0, true);
+      list.retry();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [route?.params?.refresh]);
@@ -68,81 +85,18 @@ const GrnCheckingList = ({navigation, route, ...props}) => {
     [],
   );
 
-  const popOkBtnAction = useCallback(() => {
+  const popOkBtnAction = useCallback(async () => {
     popUpAction(undefined, undefined, '', false, false);
-  }, [popUpAction]);
-
-  // page 0 + reload=true always means "start over" (pull-to-refresh, initial
-  // mount, external refresh param); any other page is an onEndReached
-  // continuation that APPENDS to itemsArray instead of replacing it.
-  const getInitialData = useCallback(
-    async (page = 0, reload = true, searchField, searchValue, dataFilter) => {
-      const {userName, userPsd, companyId} = await loadCredentials();
-      set_isLoading(!reload);
-      set_MainLoading(reload);
-      try {
-        const start = reload ? 0 : page * PAGE_LENGTH;
-        const obj = {
-          userName,
-          userPwd: userPsd,
-          companyId: Number(companyId),
-          menuId: GRN_CHECKING_MENU_ID,
-          start,
-          length: PAGE_LENGTH,
-          searchField: searchField || undefined,
-          searchValue: searchValue || undefined,
-          dataFilter: dataFilter || undefined,
-        };
-        const listApiObj = await GrnChkAPI.grnCheckingListApi(obj);
-        if (listApiObj?.statusData && listApiObj?.responseData?.data) {
-          const rows = listApiObj.responseData.data;
-          set_itemsArray(prev => (reload ? rows : [...prev, ...rows]));
-          set_hasMore(rows.length >= PAGE_LENGTH);
-        } else {
-          popUpAction(
-            Constant.SERVICE_FAIL_MSG,
-            Constant.DefaultAlert_MSG,
-            'OK',
-            true,
-            false,
-          );
-        }
-      } catch (error) {
-        console.log('GrnCheckingList getInitialData error ==>', error);
-        popUpAction(
-          Constant.SERVICE_FAIL_MSG,
-          Constant.DefaultAlert_MSG,
-          'OK',
-          true,
-          false,
-        );
-      } finally {
-        set_isLoading(false);
-        set_MainLoading(false);
-      }
-    },
-    [loadCredentials, popUpAction],
-  );
-
-  // Exposed to the UI as `fetchMore` -- `more=true` is an onEndReached
-  // continuation (advances `page`, appends); `more=false`/omitted is a
-  // full reload from page 0 (pull-to-refresh), matching
-  // GoodsReceiptNoteList.js's own fetchMore(more) convention.
-  const fetchMore = useCallback(
-    more => {
-      if (more) {
-        if (!hasMore || isLoading || MainLoading) return;
-        const next = page + 1;
-        set_page(next);
-        getInitialData(next, false);
-      } else {
-        set_page(0);
-        set_hasMore(true);
-        getInitialData(0, true);
-      }
-    },
-    [hasMore, isLoading, MainLoading, page, getInitialData],
-  );
+    if (isSessionExpired.current) {
+      isSessionExpired.current = false;
+      credentialsRef.current = null;
+      await AsyncStorage.removeItem('userDisplayName');
+      await AsyncStorage.removeItem('admin');
+      await AsyncStorage.removeItem('userName');
+      await AsyncStorage.removeItem('userPsd');
+      navigation.reset({index: 0, routes: [{name: 'LoginComponent'}]});
+    }
+  }, [popUpAction, navigation]);
 
   // Routes to the Fabric (lot/bale/piece) screen or the flat RM screen
   // depending on the row's own itemType -- both read the same /state bundle.
@@ -162,17 +116,8 @@ const GrnCheckingList = ({navigation, route, ...props}) => {
     try {
       if (Platform.OS === 'android') {
         if (Platform.Version >= 33) {
-          const granted = await PermissionsAndroid.request(
-            PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES,
-            {
-              title: 'Storage Permission Required',
-              message: 'This app needs access to your storage to download PDF',
-              buttonNeutral: 'Ask Me Later',
-              buttonNegative: 'Cancel',
-              buttonPositive: 'OK',
-            },
-          );
-          return granted === PermissionsAndroid.RESULTS.GRANTED;
+          // Android 13+: saving the app's own files to Downloads needs no permission
+          return true;
         } else {
           const granted = await PermissionsAndroid.request(
             PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
@@ -269,8 +214,7 @@ const GrnCheckingList = ({navigation, route, ...props}) => {
 
   return (
     <GrnCheckingListUI
-      itemsArray={itemsArray}
-      isLoading={isLoading}
+      list={list}
       popUpAlert={popUpAlert}
       popUpMessage={popUpMessage}
       popUpRBtnTitle={popUpRBtnTitle}
@@ -279,7 +223,6 @@ const GrnCheckingList = ({navigation, route, ...props}) => {
       backBtnAction={backBtnAction}
       actionOnRow={actionOnRow}
       popOkBtnAction={popOkBtnAction}
-      fetchMore={fetchMore}
       MainLoading={MainLoading}
       downloadOverallPdf={downloadOverallPdf}
       downloadBarcodePdf={downloadBarcodePdf}

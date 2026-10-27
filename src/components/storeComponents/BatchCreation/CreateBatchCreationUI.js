@@ -31,6 +31,7 @@ import LoaderComponent from './../../../utils/commonComponents/loaderComponent';
 import AlertComponent from './../../../utils/commonComponents/alertComponent';
 import * as Constant from './../../../utils/constants/constant';
 import {ColorContext} from './../../colorTheme/colorTheme';
+import BalePieceSelectionModal, {round4, summarizePicks} from './BalePieceSelectionModal';
 
 // CommonStyles.bottomViewComponentStyle1 (the shared absolute-positioned
 // footer container used across the app) defaults to hp('12%'), which is far
@@ -75,7 +76,30 @@ const emptyRow = () => ({
   fabWidth: '',
   grnRecDate: '',
   grnNo: '',
+  // GRN Checking bale/piece selection (never sent as-is — see buildPayload).
+  // pieces: current picks; savedPieces: picks loaded on edit (restored if
+  // the lot is changed back); piecesChanged: send `pieces` on update;
+  // hasBales: /balePieces returned bales for this row's lot (link shown).
+  pieces: [],
+  savedPieces: [],
+  piecesChanged: false,
+  hasBales: false,
+  // Create only: the lot's checkedTotal (2 decimals) shown as Grey Received.
+  greyCheckedTotal: '',
 });
+
+// Saved picks from the edit/view response, keyed by batchDetailsId (string).
+const savedPicksFor = (pieceSelections, batchDetailsId) =>
+  ((pieceSelections || {})[String(batchDetailsId)] || []).map(p => ({
+    ...p,
+    allocatedMtrs: Number(p.allocatedMtrs) || 0,
+    scannedBarcode: p.scannedBarcode || '',
+  }));
+
+const fmt2 = v => {
+  const n = parseFloat(v);
+  return isNaN(n) ? '' : n.toFixed(2);
+};
 
 const mapToOptions = map =>
   Object.entries(map || {}).map(([id, label]) => ({id: String(id), label: String(label)}));
@@ -90,7 +114,7 @@ const formatDMY = date =>
 // `bc_location_id`, dates as `batchCreationDateStr`, `reedAndPick` instead
 // of `reedPick`, `fabricProcessFlow` instead of `fabricFlow`, and each row's
 // `noOfPices` (sic) / `greyReceived` instead of `noOfPieces`/`greyReceivedh`).
-const mapViewDTOToForm = dto => {
+const mapViewDTOToForm = (dto, pieceSelections) => {
   if (!dto) return null;
   const details = dto.batchDetails || dto.batchCreationDetails || [];
   return {
@@ -135,6 +159,11 @@ const mapViewDTOToForm = dto => {
           fabWidth: d.fabWidth ?? d.greyWidth ?? '',
           grnRecDate: d.grnRecDate ?? d.greyDate ?? '',
           grnNo: d.grnNo ?? '',
+          pieces: savedPicksFor(pieceSelections, d.id ?? d.batchDetailsId),
+          savedPieces: savedPicksFor(pieceSelections, d.id ?? d.batchDetailsId),
+          piecesChanged: false,
+          hasBales: false,
+          greyCheckedTotal: '',
         }))
       : [emptyRow()],
   };
@@ -316,6 +345,20 @@ const CreateBatchCreationUI = ({route, ...props}) => {
   const [batchDetails, set_batchDetails] = useState([emptyRow()]);
   const [confirmSubmitVisible, set_confirmSubmitVisible] = useState(false);
 
+  // GRN Checking flag — from the edit response (edit/view) or from
+  // rollDetails (create). Off: no link, no popup, no `pieces` sent.
+  const [grnCheckingEnabled, set_grnCheckingEnabled] = useState(false);
+  // Open Select Bales / Pieces popup: {rowKey, rollNo, bales, initialPicks}.
+  const [picker, set_picker] = useState(null);
+  const [viewPickerVisible, set_viewPickerVisible] = useState(false);
+  // rowKey -> "rollNo|fabricId" last checked for link visibility; a response
+  // whose key no longer matches is stale and ignored.
+  const linkCheckRef = useRef({});
+
+  useEffect(() => {
+    if (props.grnCheckingEnabled) set_grnCheckingEnabled(true);
+  }, [props.grnCheckingEnabled]);
+
   // Location -> Fabric Type -> Lot No cascade (report §4 "Dropdown data sourcing")
   useEffect(() => {
     console.log('[BatchCreation:CreateUI] locationId changed ->', locationId);
@@ -341,7 +384,7 @@ const CreateBatchCreationUI = ({route, ...props}) => {
   useEffect(() => {
     if (!isPrefillMode || !props.editViewDTO) return;
     console.log('[BatchCreation:CreateUI] prefilling edit form from viewDTO:', JSON.stringify(props.editViewDTO));
-    const form = mapViewDTOToForm(props.editViewDTO);
+    const form = mapViewDTOToForm(props.editViewDTO, props.pieceSelections);
     console.log('[BatchCreation:CreateUI] mapped form:', JSON.stringify(form));
     if (!form) return;
     set_locationId(String(form.locationId || ''));
@@ -461,7 +504,16 @@ const CreateBatchCreationUI = ({route, ...props}) => {
   // behavior (a roll can be split across multiple rows, so Grey Received
   // must subtract what other rows on this same roll already claim).
   const onLotNoSelect = async (row, rollNo) => {
-    updateRow(row._key, 'rollNo', rollNo);
+    // A lot change clears the row's picks; on edit, going back to the row's
+    // original lot restores its saved picks and makes it untouched again.
+    const backToSavedLot = isEdit && !!row.batchDetailsId && rollNo === row.rollNoh;
+    updateRowFields(row._key, {
+      rollNo,
+      pieces: backToSavedLot ? row.savedPieces || [] : [],
+      piecesChanged: !backToSavedLot,
+      hasBales: false,
+      greyCheckedTotal: '',
+    });
     if (!rollNo) return;
 
     console.log('[BatchCreation:CreateUI] Lot No selected ->', rollNo, 'for row', row._key);
@@ -501,6 +553,135 @@ const CreateBatchCreationUI = ({route, ...props}) => {
       grnNo: grn.grnNo ?? '',
       greyReceivedh,
     });
+
+    if (typeof grn.grnCheckingEnabled === 'boolean') {
+      set_grnCheckingEnabled(grn.grnCheckingEnabled);
+    }
+    // Create only: show the lot's checked total as Grey Received on every
+    // row with this lot. greyReceivedh (over-issue check, value sent on
+    // save) is left exactly as computed above.
+    if (!isEdit && grn.checkedTotal !== null && grn.checkedTotal !== undefined) {
+      const checked = fmt2(grn.checkedTotal);
+      if (checked !== '') {
+        set_batchDetails(prev =>
+          prev.map(r =>
+            r._key === row._key || r.rollNo === rollNo ? {...r, greyCheckedTotal: checked} : r,
+          ),
+        );
+      }
+    }
+  };
+
+  // Rows whose picks will be sent on save: every row on create; on edit the
+  // changed/re-picked saved rows plus new rows.
+  const willSendPicks = r => !isEdit || !r.batchDetailsId || r.piecesChanged;
+
+  // Edit only: this row's own id (if saved) + every other saved row that is
+  // changed/re-picked — the server treats their saved picks as free.
+  const excludeIdsFor = (row, rows) => {
+    if (!isEdit) return [];
+    const ids = [];
+    rows.forEach(r => {
+      if (!r.batchDetailsId) return;
+      if (r._key === row._key || r.piecesChanged) ids.push(Number(r.batchDetailsId));
+    });
+    return ids;
+  };
+
+  // Fabric (or location) change: the picks of every row are dropped.
+  const clearAllPicks = () =>
+    set_batchDetails(prev =>
+      prev.map(r => ({...r, pieces: [], piecesChanged: true, hasBales: false})),
+    );
+
+  // Link visibility: re-check /balePieces whenever a row's lot (or the
+  // fabric) changes, ignoring responses for a lot that is no longer current.
+  useEffect(() => {
+    if (!grnCheckingEnabled || isView) return;
+    batchDetails.forEach(row => {
+      const hasLot = row.rollNo && String(row.rollNo) !== '0' && fabricId;
+      const key = hasLot ? `${row.rollNo}|${fabricId}` : '';
+      if (linkCheckRef.current[row._key] === key) return;
+      linkCheckRef.current[row._key] = key;
+      if (!key) return;
+      props
+        .loadBalePieces(row.rollNo, fabricId, excludeIdsFor(row, batchDetails), false)
+        .then(res => {
+          if (linkCheckRef.current[row._key] !== key) return;
+          updateRowFields(row._key, {hasBales: !!(res.ok && res.bales.length > 0)});
+        });
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [batchDetails, fabricId, grnCheckingEnabled]);
+
+  const openPicker = async row => {
+    if (!row.rollNo || String(row.rollNo) === '0') {
+      Alert.alert(Constant.DefaultAlert_MSG, 'Please select the Lot No');
+      return;
+    }
+    const res = await props.loadBalePieces(
+      row.rollNo,
+      fabricId,
+      excludeIdsFor(row, batchDetails),
+      true,
+    );
+    if (!res.ok) {
+      Alert.alert(Constant.DefaultAlert_MSG, 'Could not load the bales for this lot.');
+      return;
+    }
+    // Meters of each piece already picked in OTHER rows of this form that
+    // the server doesn't know about yet.
+    const pending = {};
+    batchDetails.forEach(r => {
+      if (r._key === row._key || !willSendPicks(r)) return;
+      (r.pieces || []).forEach(p => {
+        pending[p.pieceId] = (pending[p.pieceId] || 0) + (Number(p.allocatedMtrs) || 0);
+      });
+    });
+    const bales = res.bales.map(b => ({
+      ...b,
+      pieces: (b.pieces || []).map(p => ({
+        ...p,
+        available: round4((Number(p.remainingMtrs) || 0) - (pending[p.pieceId] || 0)),
+      })),
+    }));
+    set_picker({rowKey: row._key, rollNo: row.rollNo, bales, initialPicks: row.pieces || []});
+  };
+
+  const onPickerAdd = picks => {
+    const fields = {pieces: picks, piecesChanged: true};
+    if (picks.length > 0) {
+      // Same as the user typing the total into MTR (Total Issued follows).
+      fields.mtr = String(summarizePicks(picks).total);
+    }
+    updateRowFields(picker.rowKey, fields);
+    set_picker(null);
+  };
+
+  // View: every saved pick of the batch (all its rows).
+  const viewPicks = useMemo(
+    () =>
+      isView
+        ? Object.values(props.pieceSelections || {}).flatMap(list =>
+            (list || []).map(p => ({...p, allocatedMtrs: Number(p.allocatedMtrs) || 0})),
+          )
+        : [],
+    [isView, props.pieceSelections],
+  );
+  const viewPicksSummary = summarizePicks(viewPicks);
+
+  // " (n pcs, X mtrs)" in green; amber with " - differs from MTR" when the
+  // row's MTR is empty or not the picks total. A hint only — never blocks.
+  const renderPickSummary = (picks, mtr) => {
+    if (!picks || picks.length === 0) return null;
+    const {count, total} = summarizePicks(picks);
+    const mtrNum = parseFloat(mtr);
+    const differs = isNaN(mtrNum) || round4(mtrNum) !== total;
+    return (
+      <Text style={differs ? styles.pickSummaryWarn : styles.pickSummary}>
+        {` (${count} pcs, ${total} mtrs)${differs ? ' - differs from MTR' : ''}`}
+      </Text>
+    );
   };
 
   // Changing Location/Fabric Type on an existing batch invalidates its saved
@@ -629,6 +810,21 @@ const CreateBatchCreationUI = ({route, ...props}) => {
           }
           row.rollNoh = r.rollNoh;
           row.lineItemId = r.lineItemId ?? 0;
+        }
+        // Bale/piece picks (GRN Checking only). On update, untouched saved
+        // rows omit the key so the server keeps their saved selection;
+        // changed rows always send it (even []) to replace it.
+        if (grnCheckingEnabled) {
+          const send =
+            isEdit && r.batchDetailsId ? r.piecesChanged : (r.pieces || []).length > 0;
+          if (send) {
+            row.pieces = (r.pieces || []).map(p => ({
+              pieceId: p.pieceId,
+              allocatedMtrs: p.allocatedMtrs,
+              selectionSource: p.selectionSource,
+              scannedBarcode: p.scannedBarcode || '',
+            }));
+          }
         }
         return row;
       }),
@@ -806,6 +1002,7 @@ const CreateBatchCreationUI = ({route, ...props}) => {
               const apply = () => {
                 set_locationId(id);
                 set_fabricId('');
+                clearAllPicks();
               };
               if (isEdit && id !== locationId) {
                 confirmDiscardRowsThen(apply);
@@ -826,7 +1023,10 @@ const CreateBatchCreationUI = ({route, ...props}) => {
             placeholder={locationId ? 'Select...' : 'Select a location first'}
             onSelect={id => {
               console.log('[BatchCreation:CreateUI] Fabric selected ->', id);
-              const apply = () => set_fabricId(id);
+              const apply = () => {
+                set_fabricId(id);
+                clearAllPicks();
+              };
               if (isEdit && id !== fabricId) {
                 confirmDiscardRowsThen(apply);
               } else {
@@ -903,7 +1103,7 @@ const CreateBatchCreationUI = ({route, ...props}) => {
             <View>
               <View style={styles.tableHeaderRow}>
                 <Text style={[styles.tableHeaderCell, styles.colBatchNo]}>Batch No</Text>
-                <Text style={[styles.tableHeaderCell, styles.colLotNo]}>Lot No</Text>
+                <Text style={[styles.tableHeaderCell, styles.colLotNo, grnCheckingEnabled && styles.colLotNoWide]}>Lot No</Text>
                 <Text style={[styles.tableHeaderCell, styles.colGreyReceived]}>Grey Received</Text>
                 <Text style={[styles.tableHeaderCell, styles.colPieces]}>No of Pieces</Text>
                 <Text style={[styles.tableHeaderCell, styles.colMtr]}>MTR</Text>
@@ -923,27 +1123,63 @@ const CreateBatchCreationUI = ({route, ...props}) => {
                       placeholderTextColor="#999"
                     />
                   </View>
-                  <View style={[styles.tableCell, styles.colLotNo]}>
+                  <View style={[styles.tableCell, styles.colLotNo, grnCheckingEnabled && styles.colLotNoWide]}>
                     {isView ? (
-                      <Text style={styles.tablePlainText} numberOfLines={2}>
-                        {row.rollNo || '-'}
-                      </Text>
+                      <>
+                        <Text style={styles.tablePlainText} numberOfLines={2}>
+                          {row.rollNo || '-'}
+                        </Text>
+                        {grnCheckingEnabled && viewPicks.length > 0 ? (
+                          <Text style={styles.pickLinkWrap}>
+                            <Text style={styles.pickLink} onPress={() => set_viewPickerVisible(true)}>
+                              View Bales / Pieces
+                            </Text>
+                            <Text style={styles.pickSummary}>
+                              {` (${viewPicksSummary.count} pcs, ${viewPicksSummary.total} mtrs)`}
+                            </Text>
+                          </Text>
+                        ) : null}
+                      </>
                     ) : (
-                      <SelectField
-                        ref={r => (lotNoFieldRefs.current[row._key] = r)}
-                        compact
-                        value={row.rollNo}
-                        options={lotNoOptions}
-                        disabled={!fabricId}
-                        placeholder={fabricId ? 'Select...' : 'Select fabric first'}
-                        onSelect={id => onLotNoSelect(row, id)}
-                      />
+                      <>
+                        <SelectField
+                          ref={r => (lotNoFieldRefs.current[row._key] = r)}
+                          compact
+                          value={row.rollNo}
+                          options={lotNoOptions}
+                          disabled={!fabricId}
+                          placeholder={fabricId ? 'Select...' : 'Select fabric first'}
+                          onSelect={id => onLotNoSelect(row, id)}
+                        />
+                        {grnCheckingEnabled && (row.hasBales || (row.pieces || []).length > 0) ? (
+                          <Text style={styles.pickLinkWrap}>
+                            <Text style={styles.pickLink} onPress={() => openPicker(row)}>
+                              Select Bales / Pieces
+                            </Text>
+                            {renderPickSummary(row.pieces, row.mtr)}
+                          </Text>
+                        ) : null}
+                      </>
                     )}
                   </View>
                   <View style={[styles.tableCell, styles.colGreyReceived]}>
                     <Text style={styles.tablePlainText} numberOfLines={1}>
-                      {isView ? '' : row.greyReceivedh || row.greyReceivedh === 0 ? row.greyReceivedh : '-'}
+                      {isView
+                        ? ''
+                        : row.greyCheckedTotal
+                        ? row.greyCheckedTotal
+                        : row.greyReceivedh || row.greyReceivedh === 0
+                        ? row.greyReceivedh
+                        : '-'}
                     </Text>
+                    {!isView &&
+                    row.greyCheckedTotal &&
+                    fmt2(row.greyReceivedh) !== '' &&
+                    fmt2(row.greyReceivedh) !== row.greyCheckedTotal ? (
+                      <Text style={styles.greyAvailableText} numberOfLines={1}>
+                        available {fmt2(row.greyReceivedh)}
+                      </Text>
+                    ) : null}
                   </View>
                   <View style={[styles.tableCell, styles.colPieces]}>
                     <TextInput
@@ -975,7 +1211,7 @@ const CreateBatchCreationUI = ({route, ...props}) => {
               ))}
 
               <View style={[styles.tableRow, styles.tableTotalRow]}>
-                <Text style={[styles.tableTotalLabel, styles.colTotalLabel]}>Total Issued</Text>
+                <Text style={[styles.tableTotalLabel, styles.colTotalLabel, grnCheckingEnabled && styles.colTotalLabelWide]}>Total Issued</Text>
                 <Text style={[styles.tableTotalValue, styles.colMtr]}>{totalIssued}</Text>
                 <View style={styles.colAction} />
               </View>
@@ -1074,6 +1310,25 @@ const CreateBatchCreationUI = ({route, ...props}) => {
           </TouchableOpacity>
         </View>
       </View>
+
+      {grnCheckingEnabled && !isView ? (
+        <BalePieceSelectionModal
+          visible={!!picker}
+          rollNo={picker?.rollNo}
+          bales={picker?.bales}
+          initialPicks={picker?.initialPicks}
+          onCancel={() => set_picker(null)}
+          onAdd={onPickerAdd}
+        />
+      ) : null}
+      {grnCheckingEnabled && isView ? (
+        <BalePieceSelectionModal
+          visible={viewPickerVisible}
+          readOnly
+          viewPicks={viewPicks}
+          onCancel={() => set_viewPickerVisible(false)}
+        />
+      ) : null}
 
       <Modal visible={confirmSubmitVisible} transparent animationType="fade">
         <View style={styles.modalOverlay}>
@@ -1274,6 +1529,34 @@ const styles = StyleSheet.create({
   },
   colTotalLabel: {
     width: 140 + 130 + 110 + 100,
+  },
+  // GRN Checking on: room for the Select Bales / Pieces link + summary.
+  colLotNoWide: {
+    width: 180,
+  },
+  colTotalLabelWide: {
+    width: 140 + 180 + 110 + 100,
+  },
+  pickLinkWrap: {
+    fontSize: 11,
+    marginTop: 4,
+  },
+  pickLink: {
+    color: '#2979ff',
+    fontWeight: '600',
+    textDecorationLine: 'underline',
+  },
+  pickSummary: {
+    color: '#166534',
+  },
+  pickSummaryWarn: {
+    color: '#b45309',
+  },
+  greyAvailableText: {
+    fontSize: 10,
+    color: '#888',
+    textAlign: 'center',
+    marginTop: 2,
   },
   grnInfoBox: {
     marginTop: 4,

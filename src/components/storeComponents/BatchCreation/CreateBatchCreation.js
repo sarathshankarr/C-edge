@@ -31,6 +31,10 @@ const CreateBatchCreation = ({route}) => {
   const [fabricsMap, set_fabricsMap] = useState({});
   const [lotNosMap, set_lotNosMap] = useState({});
   const [editViewDTO, set_editViewDTO] = useState(null);
+  // GRN Checking bale/piece selection — from the `edit` response (edit and
+  // view). On create the flag comes from rollDetails instead (see the UI).
+  const [grnCheckingEnabled, set_grnCheckingEnabled] = useState(false);
+  const [pieceSelections, set_pieceSelections] = useState({});
 
   const backBtnAction = useCallback(() => {
     navigation.navigate('BatchCreationList', {refresh: Date.now()});
@@ -210,6 +214,36 @@ const CreateBatchCreation = ({route}) => {
     }
   }, []);
 
+  // GRN Checking bales/pieces of a lot. Returns {ok, grnCheckingEnabled,
+  // bales}; ok is false on a network/HTTP error or a status other than
+  // "true". `withLoader` shows the screen loader (popup open), the silent
+  // link-visibility check passes false.
+  const loadBalePieces = useCallback(
+    async (rollNo, fabricId, excludeDetailsIds, withLoader) => {
+      const auth = await getAuth();
+      const body = {...auth, rollNo, fabricId, excludeDetailsIds: excludeDetailsIds || []};
+      LOG('balePieces — request:', {...body, password: '***'});
+      if (withLoader) set_isLoading(true);
+      try {
+        const res = await APIServiceCall.batchCreationBalePiecesApi(body);
+        LOG('balePieces — statusData:', res?.statusData, 'responseData:', JSON.stringify(res?.responseData));
+        const data = res?.responseData;
+        const ok = !!(res?.statusData && data && String(data.status) === 'true');
+        return {
+          ok,
+          grnCheckingEnabled: ok && data.grnCheckingEnabled === true,
+          bales: ok && Array.isArray(data.bales) ? data.bales : [],
+        };
+      } catch (error) {
+        LOG('balePieces — error:', error);
+        return {ok: false, grnCheckingEnabled: false, bales: []};
+      } finally {
+        if (withLoader) set_isLoading(false);
+      }
+    },
+    [],
+  );
+
   const checkBatchNo = useCallback(async (batch_name, batchId) => {
     const auth = await getAuth();
     LOG('checkBatchNo — request:', {...auth, password: '***', batch_name, batchId: batchId || 0});
@@ -244,6 +278,14 @@ const CreateBatchCreation = ({route}) => {
       if (res?.statusData && res?.responseData) {
         const data = res.responseData;
         LOG('edit — viewDTO:', JSON.stringify(data.viewDTO), 'locationsMap:', JSON.stringify(data.locationsMap), 'fabricMap:', JSON.stringify(data.fabricMap), 'fabricFlowConfigMap:', JSON.stringify(data.fabricFlowConfigMap), 'rollsMap:', JSON.stringify(data.rollsMap));
+        // Set before editViewDTO so the UI's prefill (which runs on
+        // editViewDTO) already sees the saved piece selections.
+        set_grnCheckingEnabled(data.grnCheckingEnabled === true);
+        set_pieceSelections(
+          data.pieceSelections && typeof data.pieceSelections === 'object'
+            ? data.pieceSelections
+            : {},
+        );
         set_editViewDTO(data.viewDTO || null);
         set_locationsMap(data.locationsMap || {});
         set_fabricsMap(data.fabricMap || {});
@@ -344,6 +386,9 @@ const CreateBatchCreation = ({route}) => {
       loadFabricsByLocation={loadFabricsByLocation}
       loadLotNos={loadLotNos}
       loadRollDetails={loadRollDetails}
+      loadBalePieces={loadBalePieces}
+      grnCheckingEnabled={grnCheckingEnabled}
+      pieceSelections={pieceSelections}
       checkBatchNo={checkBatchNo}
       submit={submit}
     />

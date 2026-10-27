@@ -20,38 +20,14 @@ import CommonStyles from '../../../utils/commonStyles/commonStyles';
 import HeaderComponent from '../../../utils/commonComponents/headerComponent';
 import LoaderComponent from '../../../utils/commonComponents/loaderComponent';
 import AlertComponent from '../../../utils/commonComponents/alertComponent';
-import FilterModal from '../../../utils/commonComponents/FilterModal';
 import AddNewItem from '../../../utils/commonComponents/AddNewItem';
+import ListSearchBar from '../../../utils/commonComponents/ListSearchBar';
 import Svg, {Path, Circle} from 'react-native-svg';
 
 let searchImg = require('./../../../../assets/images/png/searchIcon.png');
 
 const StockIssueListUI = ({route, ...props}) => {
-  const [filterArray, set_filterArray] = useState(undefined);
-  const [recName, set_recName] = useState(undefined);
-  const [refreshing, set_refreshing] = useState(false);
-  const [ItemsArray, set_ItemsArray] = useState([]);
-  const [showFilteredList, set_showFilteredList] = useState(false);
-  const [filterCount, set_filterCount] = useState(0);
-  const [isFiltering, setIsFiltering] = useState(false);
-  const [isFilterVisible, setFilterVisible] = useState(false);
-
-  const isKeyboard = useRef(false);
-  const debounceTimer = useRef(null);
-
-  useEffect(() => {
-    if (props.itemsArray) {
-      set_filterArray(props.itemsArray);
-      set_ItemsArray(props.itemsArray);
-    }
-  }, [props.itemsArray]);
-
-  // Cleanup debounce timer on unmount
-  useEffect(() => {
-    return () => {
-      if (debounceTimer.current) clearTimeout(debounceTimer.current);
-    };
-  }, []);
+  const list = props.list;
 
   const backBtnAction = useCallback(() => {
     props.backBtnAction();
@@ -75,62 +51,30 @@ const StockIssueListUI = ({route, ...props}) => {
     [props.downloadStockIssuePDF],
   );
 
-  // Debounced search — only runs filter 300ms after the user stops typing
-  const filterPets = useCallback(
-    name => {
-      set_recName(name);
-      if (debounceTimer.current) clearTimeout(debounceTimer.current);
-      debounceTimer.current = setTimeout(() => {
-        const searchTerm = name.toString().toLowerCase().trim();
-        if (searchTerm.length === 0) {
-          set_filterArray(ItemsArray);
-          setIsFiltering(false);
-          return;
-        }
-        setIsFiltering(true);
-        const upper = name.toUpperCase();
-        const styleArray = ItemsArray.filter(
-          item =>
-            item.g_id?.toString().toUpperCase().includes(upper) ||
-            item.location?.toString().toUpperCase().includes(upper) ||
-            item.referenceDate?.toUpperCase().includes(upper),
-        );
-        set_filterArray(styleArray);
-      }, 300);
-    },
-    [ItemsArray],
-  );
-
-  const fetchMore = useCallback(() => {
-    if (!isFiltering) {
-      props.fetchMore(true);
+  const renderEmpty = () => {
+    if (list.isLoading || props.MainLoading) {
+      return null;
     }
-  }, [isFiltering, props.fetchMore]);
-
-  const applyFilterFxn = useCallback(
-    (types, Ids, count) => {
-      props.applyFilterFxn(types, Ids);
-      set_filterCount(count);
-      set_showFilteredList(true);
-      setFilterVisible(false);
-    },
-    [props.applyFilterFxn],
-  );
-
-  const onRefresh = useCallback(() => {
-    set_refreshing(true);
-    props.fetchMore(false);
-    set_refreshing(false);
-    set_filterCount(0);
-    set_recName('');
-    set_showFilteredList(false);
-    setFilterVisible(false);
-    setIsFiltering(false);
-  }, [props.fetchMore]);
-
-  const clearFilter = useCallback(() => {
-    onRefresh();
-  }, [onRefresh]);
+    if (list.error) {
+      return (
+        <View style={CommonStyles.noRecordsFoundStyle}>
+          <Text style={[CommonStyles.tylesHeaderTextStyle, styles.emptyText]}>
+            {list.error}
+          </Text>
+          <TouchableOpacity style={styles.retryBtn} onPress={list.retry}>
+            <Text style={styles.retryText}>{'Retry'}</Text>
+          </TouchableOpacity>
+        </View>
+      );
+    }
+    return (
+      <View style={CommonStyles.noRecordsFoundStyle}>
+        <Text style={[CommonStyles.tylesHeaderTextStyle, {fontSize: 18}]}>
+          {Constant.noRecFound}
+        </Text>
+      </View>
+    );
+  };
 
   const renderItem = useCallback(
     ({item}) => (
@@ -221,8 +165,8 @@ const StockIssueListUI = ({route, ...props}) => {
   );
 
   const listFooter = useCallback(
-    () => (props.isLoading ? <ActivityIndicator size="large" /> : null),
-    [props.isLoading],
+    () => (list.isLoadingMore ? <ActivityIndicator size="large" /> : null),
+    [list.isLoadingMore],
   );
 
   return (
@@ -240,57 +184,9 @@ const StockIssueListUI = ({route, ...props}) => {
       </View>
 
       <View style={CommonStyles.headerStyle}>
-        {filterArray ? (
-          <View
-            style={{
-              flexDirection: 'row',
-              width: '100%',
-              marginBottom: 10,
-              alignItems: 'center',
-            }}>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                flex: 1,
-                borderWidth: 1,
-                borderColor: '#D1D1D1',
-                borderRadius: 20,
-                backgroundColor: '#F9F9F9',
-                paddingHorizontal: 15,
-                shadowColor: '#000',
-                shadowOffset: {width: 0, height: 2},
-                shadowOpacity: 0.1,
-                shadowRadius: 4,
-                elevation: 3,
-              }}>
-              <Image
-                source={searchImg}
-                style={{
-                  height: 18,
-                  width: 18,
-                  tintColor: '#7F7F81',
-                  marginRight: 10,
-                }}
-              />
-              <TextInput
-                style={[
-                  {flex: 1, color: '#000'},
-                  Platform.OS === 'ios' && {paddingVertical: 12},
-                ]}
-                underlineColorAndroid="transparent"
-                placeholder="Search"
-                placeholderTextColor="#A0A0A0"
-                autoCapitalize="none"
-                value={recName}
-                onFocus={() => (isKeyboard.current = true)}
-                onChangeText={filterPets}
-              />
-            </View>
-          </View>
-        ) : null}
+        <ListSearchBar list={list} />
 
-        {filterArray && filterArray.length > 0 ? (
+        {list.rows.length > 0 ? (
           <View style={CommonStyles.listCommonHeader}>
             <Text
               style={[
@@ -322,26 +218,26 @@ const StockIssueListUI = ({route, ...props}) => {
             </Text>
           </View>
         ) : (
-          <View style={CommonStyles.noRecordsFoundStyle}>
-            {!props.MainLoading ? (
-              <Text style={[CommonStyles.tylesHeaderTextStyle, {fontSize: 18}]}>
-                {Constant.noRecFound}
-              </Text>
-            ) : null}
-          </View>
+          renderEmpty()
         )}
 
-        <View style={CommonStyles.listStyle}>
+        <View style={[CommonStyles.listStyle, {flex: 1, height: undefined}]}>
           <FlatList
-            data={filterArray}
+            ref={list.listRef}
+            data={list.rows}
             renderItem={renderItem}
             keyExtractor={keyExtractor}
             showsVerticalScrollIndicator={false}
-            onEndReached={showFilteredList ? undefined : fetchMore}
+            onEndReached={list.loadMore}
+            onScrollEndDrag={list.onScrollEnd}
+            onMomentumScrollEnd={list.onScrollEnd}
             onEndReachedThreshold={0.2}
-            ListFooterComponent={showFilteredList ? undefined : listFooter}
+            ListFooterComponent={listFooter}
             refreshControl={
-              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+              <RefreshControl
+                refreshing={list.isRefreshing}
+                onRefresh={() => list.refresh()}
+              />
             }
           />
         </View>
@@ -364,7 +260,7 @@ const StockIssueListUI = ({route, ...props}) => {
         </View>
       ) : null}
 
-      {props.MainLoading === true ? (
+      {props.MainLoading === true || list.isLoading ? (
         <LoaderComponent
           isLoader={true}
           loaderText={Constant.LOADER_MESSAGE}
@@ -376,6 +272,15 @@ const StockIssueListUI = ({route, ...props}) => {
 };
 
 const styles = StyleSheet.create({
+  emptyText: {fontSize: 15, textAlign: 'center'},
+  retryBtn: {
+    marginTop: 12,
+    paddingHorizontal: 20,
+    paddingVertical: 8,
+    borderRadius: 20,
+    backgroundColor: '#26A69A',
+  },
+  retryText: {color: '#fff', fontWeight: '700'},
   button: {
     width: 32,
     height: 32,

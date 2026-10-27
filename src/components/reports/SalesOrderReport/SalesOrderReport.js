@@ -75,17 +75,8 @@ const SalesOrderReport = ({navigation, route, ...props}) => {
       if (Platform.OS === 'android') {
         if (Platform.Version >= 33) {
           // Android 13 and above
-          const granted = await PermissionsAndroid.request(
-            PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES,
-            {
-              title: 'Storage Permission Required',
-              message: 'This app needs access to your storage to download PDF',
-              buttonNeutral: 'Ask Me Later',
-              buttonNegative: 'Cancel',
-              buttonPositive: 'OK',
-            },
-          );
-          return granted === PermissionsAndroid.RESULTS.GRANTED;
+          // Android 13+: saving the app's own files to Downloads needs no permission
+          return true;
         } else if (Platform.Version >= 30) {
           // Android 11 - 12 (Scoped Storage)
           const granted = await PermissionsAndroid.request(

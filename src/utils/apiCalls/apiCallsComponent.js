@@ -14745,6 +14745,12 @@ export async function batchCreationRollDetailsApi(jsonValue) {
   return postBatchCreation('rollDetails', jsonValue);
 }
 
+// GRN Checking bales of a lot with the pieces that still have meters left —
+// flat {status, grnCheckingEnabled, bales:[...]} (no `data` wrapper).
+export async function batchCreationBalePiecesApi(jsonValue) {
+  return postBatchCreation('balePieces', jsonValue);
+}
+
 export async function batchCreationCheckBatchNoApi(jsonValue) {
   return postBatchCreation('checkBatchNo', jsonValue);
 }
@@ -14780,3 +14786,54 @@ export const downloadBatchCreationBarcode = () => {
   const URL = Environment.uri + 'batchCreation/barcode';
   return URL;
 };
+
+// Mobile list APIs — POST {baseUrl}/<path> (usually mobileList/<endpoint>). Shared by the
+// searchable paged list screens (see utils/Hooks/useSearchablePagedList.js).
+// Returns one of:
+//   {kind: 'ok', rows}        — HTTP 200 with rows having status "True" (or [])
+//   {kind: 'invalidLogin'}    — [{"status": "False"}]
+//   {kind: 'noInternet'}
+//   {kind: 'error', message}  — HTTP error (500 body is plain text) or bad JSON
+export async function postMobileList(path, jsonValue, signal) {
+  const internet = await internetCheck();
+  if (!internet) {
+    return {kind: 'noInternet'};
+  }
+  const url = Environment.uri + path;
+  console.log('[MobileList] POST', url, 'body =', JSON.stringify({...jsonValue, userPwd: '***'}));
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+      body: JSON.stringify(jsonValue),
+      signal,
+    });
+    const text = await response.text();
+    if (!response.ok) {
+      console.log('[MobileList]', path, 'HTTP', response.status, text);
+      return {kind: 'error', message: text};
+    }
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch (e) {
+      return {kind: 'error', message: 'Invalid response'};
+    }
+    if (!Array.isArray(data)) {
+      return {kind: 'error', message: 'Invalid response'};
+    }
+    if (data.length > 0 && String(data[0]?.status).toLowerCase() === 'false') {
+      return {kind: 'invalidLogin'};
+    }
+    return {kind: 'ok', rows: data};
+  } catch (error) {
+    if (error?.name === 'AbortError') {
+      return {kind: 'aborted'};
+    }
+    console.log('[MobileList]', path, 'error', error);
+    return {kind: 'error', message: String(error?.message || error)};
+  }
+}

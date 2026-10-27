@@ -7,6 +7,15 @@ import {Alert, PermissionsAndroid, Platform} from 'react-native';
 import ReactNativeBlobUtil from 'react-native-blob-util';
 
 import BatchCreationListUI from './BatchCreationListUI';
+import useSearchablePagedList from './../../../utils/Hooks/useSearchablePagedList';
+import {MOBILE_LIST_CONFIG} from './../../../utils/constants/mobileListConfig';
+
+// Rows are batch-detail rows: `id` (batchId) repeats across a batch's detail
+// rows, so de-duplicate pages by batchDetailsId (same as keyExtractor in the UI).
+const LIST_CONFIG = {
+  ...MOBILE_LIST_CONFIG.BATCH_CREATION,
+  uniqueKey: 'batchDetailsId',
+};
 
 // Debug helper: first bytes of an arraybuffer response as text, so a JSON
 // error body (or an HTML error page) is readable in the logs.
@@ -26,8 +35,6 @@ const decodeArrayBufferStart = (data, max = 500) => {
 };
 
 const BatchCreationList = ({navigation, route, ...props}) => {
-  const [itemsArray, set_itemsArray] = useState([]);
-  const [isLoading, set_isLoading] = useState(false);
   const [isPopUp, set_isPopUp] = useState(false);
   const [popUpMessage, set_popUpMessage] = useState(undefined);
   const [popUpAlert, set_popUpAlert] = useState(undefined);
@@ -35,6 +42,7 @@ const BatchCreationList = ({navigation, route, ...props}) => {
   const [isPopupLeft, set_isPopupLeft] = useState(false);
   const [MainLoading, set_MainLoading] = useState(false);
   const [pendingDeleteItem, set_pendingDeleteItem] = useState(null);
+  const isSessionExpired = useRef(false);
 
   // Load credentials once; avoid repeated AsyncStorage reads on every operation
   const credentialsRef = useRef(null);
@@ -71,55 +79,34 @@ const BatchCreationList = ({navigation, route, ...props}) => {
       return;
     }
     popUpAction(undefined, undefined, '', false, false);
+    if (isSessionExpired.current) {
+      isSessionExpired.current = false;
+      credentialsRef.current = null;
+      AsyncStorage.multiRemove(['userDisplayName', 'admin', 'userName', 'userPsd']).then(() =>
+        navigation.reset({index: 0, routes: [{name: 'LoginComponent'}]}),
+      );
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pendingDeleteItem, popUpAction]);
 
-  const getInitialData = useCallback(
-    async (searchParams = {}, reload = true) => {
-      const {userName, userPsd} = await loadCredentials();
-      set_isLoading(!reload);
-      set_MainLoading(reload);
-      try {
-        const obj = {
-          username: userName,
-          password: userPsd,
-          start: 0,
-          length: 100,
-          searchKeyValue: '',
-          styleSearchDropdown: '-1',
-          dataFilter: '',
-          ...searchParams,
-        };
-        const listApiObj = await APIServiceCall.batchCreationListApi(obj);
-        if (listApiObj?.statusData && listApiObj?.responseData?.aaData) {
-          set_itemsArray(listApiObj.responseData.aaData);
-        } else if (listApiObj?.statusData) {
-          set_itemsArray([]);
-        } else {
-          popUpAction(
-            Constant.SERVICE_FAIL_MSG,
-            Constant.DefaultAlert_MSG,
-            'OK',
-            true,
-            false,
-          );
-        }
-      } finally {
-        set_isLoading(false);
-        set_MainLoading(false);
-      }
+  const list = useSearchablePagedList(LIST_CONFIG, {
+    onInvalidLogin: () => {
+      isSessionExpired.current = true;
+      popUpAction(
+        'Session expired / invalid credentials. Please login again.',
+        Constant.DefaultAlert_MSG,
+        'OK',
+        true,
+        false,
+      );
     },
-    [loadCredentials, popUpAction],
-  );
+  });
+  const reloadList = list.retry;
 
-  useEffect(() => {
-    loadCredentials().then(() => getInitialData());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
+  // Returning from Create/Edit with {refresh}: reload page 1, keeping search and filter.
   useEffect(() => {
     if (route?.params?.refresh) {
-      getInitialData();
+      reloadList();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [route?.params?.refresh]);
@@ -201,7 +188,7 @@ const BatchCreationList = ({navigation, route, ...props}) => {
           deleteApiObj?.statusData &&
           deleteApiObj?.responseData?.status !== 'false'
         ) {
-          getInitialData();
+          reloadList();
         } else {
           popUpAction(
             Constant.SERVICE_FAIL_MSG,
@@ -224,24 +211,15 @@ const BatchCreationList = ({navigation, route, ...props}) => {
         set_MainLoading(false);
       }
     },
-    [loadCredentials, getInitialData, popUpAction],
+    [loadCredentials, reloadList, popUpAction],
   );
 
   const requestStoragePermission = async () => {
     try {
       if (Platform.OS === 'android') {
         if (Platform.Version >= 33) {
-          const granted = await PermissionsAndroid.request(
-            PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES,
-            {
-              title: 'Storage Permission Required',
-              message: 'This app needs access to your storage to download PDF',
-              buttonNeutral: 'Ask Me Later',
-              buttonNegative: 'Cancel',
-              buttonPositive: 'OK',
-            },
-          );
-          return granted === PermissionsAndroid.RESULTS.GRANTED;
+          // Android 13+: saving the app's own files to Downloads needs no permission
+          return true;
         } else {
           const granted = await PermissionsAndroid.request(
             PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
@@ -434,8 +412,7 @@ const BatchCreationList = ({navigation, route, ...props}) => {
 
   return (
     <BatchCreationListUI
-      itemsArray={itemsArray}
-      isLoading={isLoading}
+      list={list}
       popUpAlert={popUpAlert}
       popUpMessage={popUpMessage}
       popUpRBtnTitle={popUpRBtnTitle}
@@ -446,7 +423,6 @@ const BatchCreationList = ({navigation, route, ...props}) => {
       viewRow={viewRow}
       deleteRow={deleteRow}
       popOkBtnAction={popOkBtnAction}
-      fetchMore={getInitialData}
       MainLoading={MainLoading}
       downloadBatchCreationPDF={downloadBatchCreationPDF}
       downloadBatchCreationBarcode={downloadBatchCreationBarcode}

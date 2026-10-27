@@ -327,11 +327,9 @@ const GrnCheckingRm = ({navigation, route}) => {
   });
 
   const requestStoragePermission = async () => {
-    if (Platform.OS !== 'android') return true;
-    const perm =
-      Platform.Version >= 33
-        ? PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES
-        : PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE;
+    // Android 13+: saving the app's own files to Downloads needs no permission
+    if (Platform.OS !== 'android' || Platform.Version >= 33) return true;
+    const perm = PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE;
     const granted = await PermissionsAndroid.request(perm, {
       title: 'Storage Permission Required',
       message: 'This app needs access to your storage to download PDF',

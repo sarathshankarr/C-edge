@@ -319,17 +319,8 @@ const POApprovalUI = ({route, ...props}) => {
     try {
       if (Platform.OS === 'android') {
         if (Platform.Version >= 33) {
-          const granted = await PermissionsAndroid.request(
-            PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES,
-            {
-              title: 'Storage Permission Required',
-              message: 'This app needs access to your media to download files',
-              buttonNeutral: 'Ask Me Later',
-              buttonNegative: 'Cancel',
-              buttonPositive: 'OK',
-            },
-          );
-          return granted === PermissionsAndroid.RESULTS.GRANTED;
+          // Android 13+: saving the app's own files to Downloads needs no permission
+          return true;
         } else if (Platform.Version >= 30) {
           const granted = await PermissionsAndroid.request(
             PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
